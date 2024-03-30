@@ -1,0 +1,29 @@
+<changelogs>
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
+		<version>0.0.1.0</version>
+		<date>30th March 2024</date>
+		<title>First Devlopemt Release</title>
+		<addition>
+			<item><![CDATA[<h3>First Developemnt Release v0.0.1.0</h3> Updated 30th March 2024]]></item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+		</change>
+		<other>
+		</other>
+		<language>
+			<item>en-GB only</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+</changelogs>
