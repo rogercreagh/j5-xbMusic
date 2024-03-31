@@ -19,3 +19,13 @@
 
 (tba)
 
+```
+Array
+(
+    [changelog] => Array
+        (
+            [0] => Array
+                (
+                    [element] => com_xbarticleman
+                    [type] => component
+```

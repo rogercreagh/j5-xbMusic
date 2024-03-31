@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic config file v0.0.0.1 30th March 2024 -->
+<config>
+	<inlinehelp button="show"/>
+<!-- GENERAL TAB -->				
+	<fieldset name="general"
+		label="XBCONFIG_GENERAL"
+		description="XBCONFIG_GENERAL_DESC"
+	>
+   		<field name="infonote" type="note"
+			label="XBCONFIG_INFONOTE_LABEL"
+			description="XBCONFIG_INFONOTE_DESC"
+			class="info"
+		/>	
+        
+   		<field name="beernote" type="note"
+			label="XBCONFIG_BUY_A_BEER_LABEL"
+			description="XBCONFIG_BUY_A_BEER_DESC"
+			class="info"
+		/>	
+        
+        
+	</fieldset>
+	
+<!-- BEER TAB -->
+	<fieldset name="reg"
+			label="XBCONFIG_REGCRED_LABEL"
+			description="XBCONFIG_REGCRED_DESC"
+	>
+  		<field name="beernote" type="note"
+			label="XBCONFIG_BEER_NOTE"
+			description="XBCONFIG_BEER_LINK"
+			class="info"
+		/>	
+		<field name="roger_beer" type="password"
+			label="XBCONFIG_BEER_FIELD" description="XBCONFIG_BEER_FIELD_DESC"
+			default=""
+		/>	
+		<field name="beernote2" type="note"
+			label="XBCONFIG_BEER_PAY_AT_THE_BAR"
+			description="XBCONFIG_BEER_FORM"			
+		/>
+		<field name="othercreditsnote" type="note"
+			label="XBCONFIG_CREDITS_NOTE"
+			description="XBARTMAN_CREDITS_NOTE"
+		/>
+		<field name="devtoolsnote" type="note"
+			label="XBCONFIG_DEV_TOOLS"
+			description="XBARTMAN_DEV_TOOLS_DESC"
+		/>
+	</fieldset>		
+
+<!-- PERMISSIONS TAB -->
+	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC" >
+		<field name="rules" type="rules" label="JCONFIG_PERMISSIONS_LABEL" 
+			component="com_xbmusic" filter="rules" validate="rules" section="component" />
+	</fieldset>
+	
+</config>

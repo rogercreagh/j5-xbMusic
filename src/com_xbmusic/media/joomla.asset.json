@@ -1,0 +1,21 @@
+{
+    "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+    "name": "com_xbmusic",
+    "version": "4.0.0",
+    "description": "assets used by xbmusic",
+    "license": "GPL-3.0-or-later",
+    "assets": [
+      {
+        "name": "xbmusic.styles",
+        "description": "xbMusic custom css",
+        "type": "style",
+        "uri": "com_xbmusic/xbmusic.css"
+      },
+      {
+        "name": "xbcommon.styles",
+        "description": "xb common component css",
+        "type": "style",
+        "uri": "com_xbmusic/xbcommon.css"
+      }      
+    ]
+}

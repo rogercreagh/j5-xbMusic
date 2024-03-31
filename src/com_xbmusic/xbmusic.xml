@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="component" method="upgrade">
+	<name>com_xbmusic</name>
+	<creationDate>31st March 2024</creationDate>
+	<version>0.0.0.1</version>
+	<author>RogerCO</author>
+	<authorEmail>roger@crosborne.co.uk</authorEmail>
+	<authorUrl>www.crosborne.uk</authorUrl>
+	<copyright>Copyright (C) Roger Creagh-Osborne, 2024, All rights reserved.</copyright>
+	<license>GNU/GPL Version 3</license>
+	<description>XBMUSIC_XML_DESCRIPTION</description>
+	
+	<namespace path="src/">Crosborne\Component\Xbmusic</namespace>
+
+	<scriptfile>script.xbmusic.php</scriptfile>	
+
+	<media destination="com_xbmusic" folder="media">
+		<file>joomla.asset.json</file>
+		<folder>css</folder>
+<!-- 	<folder>images</folder>
+ -->		
+		<folder>js</folder>
+	</media>
+		
+	<administration>
+		<files folder="admin">
+			<file>access.xml</file>
+			<file>config.xml</file>
+<!--
+  			<folder>forms</folder>
+-->
+			<folder>language</folder>
+<!-- 
+ 			<folder>layouts</folder>
+ -->
+			<folder>services</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+		</files>
+		
+		<menu img="class:default" link="option=com_xbmusic">com_xbmusic</menu>
+		<submenu>
+			<menu link="option=com_xbmusic&amp;view=dashboard" >
+				xbmusic_iconmenu_dashboard
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=albums" >
+				xbmusic_iconmenu_albums
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=artists" >
+				xbmusic_iconmenu_artists
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=playlists" >
+				xbmusic_iconmenu_playlists
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=songs" >
+				xbmusic_iconmenu_songs
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=tracks" >
+				xbmusic_iconmenu_tracks
+			</menu>
+			<menu link="option=com_config&amp;view=component&amp;component=com_xbmusic" >
+				xbmusic_iconmenu_options				
+			</menu>
+		</submenu>
+		
+	</administration>
+
+    	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
+
+	<updateservers>
+		<server type="extension" priority="1" name="xbMusic Updates">
+			https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/update_xbmusic.xml
+		</server>
+	</updateservers>
+
+	
+</extension>

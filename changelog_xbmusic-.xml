@@ -2,9 +2,9 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.1.0</version>
+		<version>0.0.0.1</version>
 		<date>30th March 2024</date>
-		<title>First Devlopemt Release</title>
+		<title>First Devlopemt Trial</title>
 		<addition>
 			<item><![CDATA[<h3>First Developemnt Release v0.0.1.0</h3> Updated 30th March 2024]]></item>
 		</addition>

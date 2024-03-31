@@ -1,0 +1,27 @@
+/*******
+ * @package xbMusic
+ * @filesource media/css/xbmusic.cdd
+ * @version 0.0.0.1 31st March 2024
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ ******/
+
+/* Joomla system overrides/improvements */ 
+
+/*--------------------------------*/
+
+/* the preview eye button */
+.icon-eye {
+	color:#448; 
+}
+.icon-eye:hover {
+	color:#185ba1;
+	cursor:pointer;
+}
+/* preview modal iframe margin */
+#pvModal .modal-body { 
+	margin:10px 30px;
+}
+
+
