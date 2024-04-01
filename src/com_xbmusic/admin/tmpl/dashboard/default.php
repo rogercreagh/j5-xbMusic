@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.0.1 31st March 2024
+ * @version 0.0.2.1 1st April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -27,20 +27,180 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 		<h3><?php echo Text::_('XB_STATUS_SUM'); ?></h3>
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
-				<div class="xbbox gradgrey">
-					<h4 class="xbmb20><span class="xbbadge badge-success" style="font-size:1rem;"><?php echo '1171'; ?></span> 
-						<?php echo Text::_('Tracks'); ?>
-            			<span class="xbpl50 xbnit"><?php echo Text::_('XBMUSIC_STATE_CNTS'); ?> : </span>
-            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo (1==0) ? 'label-grey' : 'label-green';?>"
-            			 title="Published">&nbsp;&nbsp;<?php echo '1001';?></span></span>
-            			<span class="xbpl50"><span class="icon-times xblabel <?php echo (1==0) ? 'label-grey':'label-orange';?>"
-            			 title="Unpublished">&nbsp;&nbsp;<?php echo '235';?></span></span>
-            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo (1==0) ? 'label-grey' : 'label-black';?>"
-            			 title="Archived">&nbsp;&nbsp;<?php echo '57';?></span></span>
-            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo (1==0) ? 'label-grey' : 'label-pink';?>"
-            			 title="Trashed">&nbsp;&nbsp;<?php echo '2';?></span></span>
-					</h4>
+				<div class="xbbox gradgreen">
+					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_TRACKS'); ?></h4>
+					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
+						<span class="xbbadge badge-green"><?php echo $this->trackcnts['total']; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->trackcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->trackcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->trackcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->trackcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['trashed'];?></span></span>
+					</p>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbbadge badge-ltgreen"><?php echo $this->trackcnts['catcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbbadge badge-cyan"><?php echo $this->trackcnts['tagcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+					</table>
 				</div>
+
+				<div class="xbbox gradcyan">
+					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_SONGS'); ?></h4>
+					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
+						<span class="xbbadge badge-cyan"><?php echo $this->songcnts['total']; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->songcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->songcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->songcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->songcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['trashed'];?></span></span>
+					</p>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbbadge badge-ltgreen"><?php echo $this->songcnts['catcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbbadge badge-cyan"><?php echo $this->songcnts['tagcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="xbbox gradblue">
+					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_ARTISTS'); ?></h4>
+					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
+						<span class="xbbadge badge-blue"><?php echo $this->artistcnts['total']; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->artistcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->artistcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->artistcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->artistcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['trashed'];?></span></span>
+					</p>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbbadge badge-ltgreen"><?php echo $this->artistcnts['catcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbbadge badge-cyan"><?php echo $this->artistcnts['tagcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="xbbox gradyellow">
+					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_ALBUMS'); ?></h4>
+					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
+						<span class="xbbadge badge-yellow"><?php echo $this->albumcnts['total']; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->albumcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->albumcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->albumcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->albumcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['trashed'];?></span></span>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbbadge badge-ltgreen"><?php echo $this->albumcnts['catcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbbadge badge-cyan"><?php echo $this->albumcnts['tagcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+					</table>
+					</p>
+				</div>
+
+				<div class="xbbox gradpink">
+					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h4>
+					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
+						<span class="xbbadge badge-pink"><?php echo $this->playlistcnts['total']; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->playlistcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->playlistcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->playlistcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->playlistcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['trashed'];?></span></span>
+					</p>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbbadge badge-ltgreen"><?php echo $this->playlistcnts['catcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbbadge badge-cyan"><?php echo $this->playlistcnts['tagcnt'];?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="xbbox gradcat">
+					<h4 class="xbmb20"><?php echo Text::_('XB_CATEGORIES'); ?></h4>
+					<p>
+						<span class="xbnit"><?php echo Text::_('XB_DEFINED'); ?></span>
+						<span class="xbbadge badge-success"><?php echo '1171'; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo (1==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '1001';?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo (1==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '235';?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo (1==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo '57';?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo (1==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo '2';?></span></span>
+					</p>
+				</div>
+				
+				<div class="xbbox gradtag">
+					<h4 class="xbmb20"><?php echo Text::_('XB_TAGS'); ?></h4>
+					<p>
+						<span class="xbnit"><?php echo Text::_('XB_USED'); ?></span>
+						<span class="xbbadge badge-success"><?php echo '1171'; ?></span>
+            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo (1==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '1001';?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo (1==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '235';?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo (1==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo '57';?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo (1==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo '2';?></span></span>
+					</p>
+				</div>				
+
           	</div>
           	
 			<div id="xbinfo" class="xbwp40 pull-left" style="max-width:400px;">

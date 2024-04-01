@@ -42,11 +42,11 @@
 		/>
 		<field name="othercreditsnote" type="note"
 			label="XBCONFIG_CREDITS_NOTE"
-			description="XBARTMAN_CREDITS_NOTE"
+			description="XBMUSIC_CREDITS_NOTE"
 		/>
 		<field name="devtoolsnote" type="note"
 			label="XBCONFIG_DEV_TOOLS"
-			description="XBARTMAN_DEV_TOOLS_DESC"
+			description="XBMUSIC_DEV_TOOLS_DESC"
 		/>
 	</fieldset>		
 

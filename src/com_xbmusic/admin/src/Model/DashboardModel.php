@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.0.1 31st March 2024
+ * @version 0.0.2.1 1st April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -52,92 +52,52 @@ class DashboardModel extends ListModel {
     }
     
     /**
-     * @name getArticleCnts
-     * @desc gets count of all articles and states and count of articles with tags, in-content imgs, links, and shortcodes
-     * @return assoc array 0f count values
+     * @name getTrackCnts and also other ItemtypeCnts
+     * @desc gets count of all tracks/artists etc 
+     * @return assoc array of count values
      */
-    public function getArticleCnts() {
-        $artcnts = array('total'=>0, 'published'=>0, 'unpublished'=>0, 'archived'=>0, 'trashed'=>0,
-            'catcnt'=>0, 'tagged'=>0, 'embimaged'=>0, 'emblinked'=>0, 'scoded'=>0, 'featured'=>0, 'live'=>0, 'scheduled'=>0
+    public function getTrackCnts() {
+        return $this->ItemCnts('track','#__xbmusic_tracks');
+    }
+    public function getSongCnts() {
+        return $this->ItemCnts('song','#__xbmusic_songs');
+    }
+    public function getPlaylistCnts() {
+        return $this->ItemCnts('playlist','#__xbmusic_playlists');
+    }
+    public function getArtistCnts() {
+        return $this->ItemCnts('artist','#__xbmusic_artists');
+    }
+    public function getAlbumCnts() {
+        return $this->ItemCnts('album','#__xbmusic_albums');
+    }  
+    private function ItemCnts(string $item, string $table ) {
+        $cnts = array('total'=>0, 'published'=>0, 'unpublished'=>0, 'archived'=>0, 'trashed'=>0,
+            'catcnt'=>0, 'tagcnt'=>0
         );
         //get states
-        $artcnts = array_merge($artcnts,XbmusicHelper::statusCnts());
+        $cnts = array_merge($cnts,XbmusicHelper::statusCnts($table,'status','com_xbmusic'));
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         
-        // get featured and live
-        
-        $query->clear();
-        $query->select('*')->from('#__content_frontpage AS a');
-        $query->leftJoin('#__content as b','b.id = a.content_id');
-        $query->leftJoin('j5_categories as c on c.id = b.catid');
+        // get catcnt       
+        $query->select('COUNT(DISTINCT(catid)) AS catcnt');
+        $query->from($db->qn($table));
         // both article & category must be published
-        $query->where('b.state = 1 AND c.published = 1');
         $db->setQuery($query);
-        $homepage = $db->loadObjectList();
-        $artcnts['featured'] = count($homepage);
-        // check start and end featured if set
-        foreach ($homepage as $art) {
-            if (is_null($art->featured_up)) {
-                if (is_null($art->featured_down)) {
-                    $artcnts['live'] ++;
-                } elseif (time() < strtotime($art->featured_down)) {
-                    $artcnts['live'] ++;
-                } 
-            } elseif (time() > strtotime($art->featured_up)) {
-                if (is_null($art->featured_down)) {
-                    $artcnts['live'] ++;
-                } elseif ((time() < strtotime($art->featured_down))) {
-                    $artcnts['live'] ++;
-                }
-            }
-        }
+        $res = $db->loadResult;
+        if ($res > 0) $cnts['catcnt'] = $res;
                 
-        //get tagged - articles with tags
+        //get tagcnt
         $query->clear();
-        $query->select('COUNT(DISTINCT(a.content_item_id)) AS artstagged')
+        $query->select('COUNT(DISTINCT(a.tag_id)) AS tagcnt')
         ->from('#__contentitem_tag_map AS a')
-        ->where('a.type_alias = '.$db->q('com_content.article'));
+        ->where('a.type_alias = '.$db->q('com_xbmusic.'.$item));
         $db->setQuery($query);
         $res = $db->loadResult();
-        if ($res>0) $artcnts['tagged'] = $res;
+        if ($res>0) $cnts['tagcnt'] = $res;
         
-        //get imgcnts - articles with images by type (rel/embed)
-        $query->clear();
-        $query->select('COUNT(DISTINCT(a.id)) AS relimged')
-        ->from('#__content AS a')
-        ->where('a.images REGEXP '.$db->q('image_((intro)|(fulltext))\":\"[^,]+\"'));
-        $db->setQuery($query);
-        $res = $db->loadResult();
-        if ($res>0) $artcnts['relimged'] = $res;
-        
-        $query->clear();
-        $query->select('COUNT(DISTINCT(a.id)) AS embimaged')
-        ->from('#__content AS a')
-        ->where('CONCAT(a.introtext," ",a.fulltext)'.' REGEXP '.$db->q('<img '));
-        $db->setQuery($query);
-        $res = $db->loadResult();
-        if ($res>0) $artcnts['embimaged'] = $res;
-        
-        //get linkcnts - articles with links by type (art/embed)
-        $query->clear();
-        $query->select('COUNT(DISTINCT(a.id)) AS emblinked')
-        ->from('#__content AS a')
-        ->where('CONCAT(a.introtext," ",a.fulltext)'.' REGEXP '.$db->q('<a [^\>]*?href'));
-        $db->setQuery($query);
-        $res = $db->loadResult();
-        if ($res>0) $artcnts['emblinked'] = $res;
-                
-        //get scode cnts - articles with scodes
-        $query->clear();
-        $query->select('COUNT(DISTINCT(a.id)) AS embimged')
-        ->from('#__content AS a')
-        ->where('CONCAT(a.introtext," ",a.fulltext)'.' REGEXP '.$db->q('{[[:alpha:]].+?}'));
-        $db->setQuery($query);
-        $res = $db->loadResult();
-        if ($res>0) $artcnts['scoded'] = $res;
-        
-        return $artcnts;
+        return $cnts;
     }
 
     /**

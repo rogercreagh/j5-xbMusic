@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.0.1 31st March 2024
+ * @version 0.0.2.1 1st April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -37,7 +37,12 @@ class HtmlView extends BaseHtmlView {
         
         $this->xmldata = Installer::parseXMLInstallFile(JPATH_COMPONENT_ADMINISTRATOR . '/xbmusic.xml');
         $this->client = $this->get('Client');
-                
+        $this->albumcnts = $this->get('AlbumCnts');
+        $this->artistcnts = $this->get('ArtistCnts');
+        $this->playlistcnts = $this->get('PlaylistCnts');
+        $this->songcnts = $this->get('SongCnts');
+        $this->trackcnts = $this->get('TrackCnts');
+        
         // Check for errors.
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
@@ -48,9 +53,9 @@ class HtmlView extends BaseHtmlView {
          if ((!is_array($changelog)) || (!$changelog)) {
              $this->changelog .= Text::_('XB_CHANGELOG_NOT_FOUND');
          } else {
-             if (!array_key_exists('changelog',$changelog)) {
+             if (array_key_exists('element',$changelog['changelog'])) {
                  //we have only one entry, need to demote it a level
-                 $changelog = array($changelog);
+                 $changelog = array('changelog'=>array($changelog['changelog']));
              }
              foreach ($changelog['changelog'] as $i=>$log) {
                  $this->titleok = false;
