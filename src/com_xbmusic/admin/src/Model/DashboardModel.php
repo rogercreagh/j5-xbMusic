@@ -120,6 +120,10 @@ class DashboardModel extends ListModel {
         return $cats;        
     }
     
+    public function getCatCnts() {
+        return 
+    }
+    
     public function getTagCnts() {
         $tagcnts = array('totaltags' =>0, 'tagsused'=>0);
         
@@ -130,7 +134,7 @@ class DashboardModel extends ListModel {
         
         $query->select('COUNT(DISTINCT(a.tag_id)) AS tagsused')
         ->from('#__contentitem_tag_map AS a')
-        ->where('a.type_alias = '.$db->q('com_content.article'));
+        ->where('a.type_alias LIKE '.$db->q('com_xbmusic%'));
         $db->setQuery($query);
         $res = $db->loadResult();
         if ($res>0) $tagcnts['tagsused'] = $res;

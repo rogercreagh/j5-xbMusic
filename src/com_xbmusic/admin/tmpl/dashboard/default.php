@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.2.1 1st April 2024
+ * @version 0.0.2.2 2nd April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -52,6 +52,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
 							</td>
 						</tr>
+						<tr>
+							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_track; ?></span>
+								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_track; ?></span>
+							</td>
+							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->tracktagparents; ?>
+							</td>
+						</tr>
 					</table>
 				</div>
 
@@ -78,6 +85,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->songcnts['tagcnt'];?></span>
 								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_song; ?></span>
+								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_song; ?></span>
+							</td>
+							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->songtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -107,6 +121,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 								<span class="xbbadge badge-cyan"><?php echo $this->artistcnts['tagcnt'];?></span>
 								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
 							</td>
+						<tr>
+							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_artist; ?></span>
+								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_artist; ?></span>
+							</td>
+							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->artisttagparents; ?>
+							</td>
+						</tr>
 						</tr>
 					</table>
 				</div>
@@ -133,6 +154,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->albumcnts['tagcnt'];?></span>
 								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_album; ?></span>
+								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_album; ?></span>
+							</td>
+							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->albumtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -162,6 +190,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->playlistcnts['tagcnt'];?></span>
 								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+							</td>
+						</tr>
+						<tr>
+							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_plist; ?></span>
+								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_plist; ?></span>
+							</td>
+							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->plisttagparents; ?>
 							</td>
 						</tr>
 					</table>

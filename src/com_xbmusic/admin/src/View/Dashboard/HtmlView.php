@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.2.1 1st April 2024
+ * @version 0.0.2.2 2nd April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -22,6 +22,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
@@ -29,9 +30,113 @@ class HtmlView extends BaseHtmlView {
     
     public function display($tpl = null) {
         $app = Factory::getApplication();
+        $taghelper = new TagsHelper();
         $params = ComponentHelper::getParams('com_xbmusic');
         
-//        $this->artcnts = $this->get('ArticleCnts');
+        $rootcat_album = $params->get('rootcat_album',0);
+        if ($rootcat_album == 0) {
+            $defcat_album = $params->get('defcat_album',0);           
+        } else {
+            $defcat_album = $params->get('defrescat_album)',0);
+        }
+        $this->rootcat_album = ($rootcat_album == 0) ? 'not restricted' : XbmusicHelper::getCat($rootcat_album)->title;
+        $this->defcat_album = ($defcat_album == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_album)->title;
+
+        $albumtagparents = $params->get('albumtagparents');
+        if (is_array($albumtagparents)) {
+            $albumtagparents = $taghelper->getTagNames($albumtagparents);
+            $this->albumtagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            foreach ($albumtagparents as $name) {
+                $this->albumtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
+            }
+        } else {
+            $this->albumtagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        //==========================
+        
+        $rootcat_artist = $params->get('rootcat_artist',0);
+        if ($rootcat_artist == 0) {
+            $defcat_artist = $params->get('defcat_artist',0);
+        } else {
+            $defcat_artist = $params->get('defrescat_artist)',0);
+        }
+        $this->rootcat_artist = ($rootcat_artist == 0) ? 'not restricted' : XbmusicHelper::getCat($rootcat_artist)->title;
+        $this->defcat_artist = ($defcat_artist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_artist)->title;
+        
+        $artisttagparents = $params->get('artisttagparents');
+        if (is_array($artisttagparents)) {
+            $artisttagparents = $taghelper->getTagNames($artisttagparents);
+            $this->artisttagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>:';
+            foreach ($artisttagparents as $name) {
+                $this->artisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
+            }
+        } else {
+            $this->artisttagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        //==========================
+        
+        $rootcat_plist = $params->get('rootcat_plist',0);
+        if ($rootcat_plist == 0) {
+            $defcat_plist = $params->get('defcat_plist',0);
+        } else {
+            $defcat_plist = $params->get('defrescat_plist)',0);
+        }
+        $this->rootcat_plist = ($rootcat_plist == 0) ? 'not restricted' : XbmusicHelper::getCat($rootcat_plist)->title;
+        $this->defcat_plist = ($defcat_plist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_plist)->title;
+        
+        $plisttagparents = $params->get('plisttagparents');
+        if (is_array($plisttagparents)) {
+            $plisttagparents = $taghelper->getTagNames($plisttagparents);
+            $this->plisttagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            foreach ($plisttagparents as $name) {
+                $this->plisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
+            }
+        } else {
+            $this->plisttagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        //==========================
+        
+        $rootcat_song = $params->get('rootcat_song',0);
+        if ($rootcat_song == 0) {
+            $defcat_song = $params->get('defcat_song',0);
+        } else {
+            $defcat_song = $params->get('defrescat_song)',0);
+        }
+        $this->rootcat_song = ($rootcat_song == 0) ? 'not restricted' : XbmusicHelper::getCat($rootcat_song)->title;
+        $this->defcat_song = ($defcat_song == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_song)->title;
+        
+        $songtagparents = $params->get('songtagparents');
+        if (is_array($songtagparents)) {
+            $songtagparents = $taghelper->getTagNames($songtagparents);
+            $this->songtagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            foreach ($songtagparents as $name) {
+                $this->songtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
+            }
+        } else {
+            $this->songtagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        //==========================
+        
+        $rootcat_track = $params->get('rootcat_track',0);
+        if ($rootcat_track == 0) {
+            $defcat_track = $params->get('defcat_track',0);
+        } else {
+            $defcat_track = $params->get('defrescat_track)',0);
+        }
+        $this->rootcat_track = ($rootcat_track == 0) ? 'not restricted' : XbmusicHelper::getCat($rootcat_track)->title;
+        $this->defcat_track = ($defcat_track == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_track)->title;
+        
+        $tracktagparents = $params->get('tracktagparents');
+        if (is_array($tracktagparents)) {
+            $tracktagparents = $taghelper->getTagNames($tracktagparents);
+            $this->tracktagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            foreach ($tracktagparents as $name) {
+                $this->tracktagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
+            }
+        } else {
+            $this->tracktagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        //==========================
         
         $changelog = $this->get('Changelog');
         
@@ -42,6 +147,9 @@ class HtmlView extends BaseHtmlView {
         $this->playlistcnts = $this->get('PlaylistCnts');
         $this->songcnts = $this->get('SongCnts');
         $this->trackcnts = $this->get('TrackCnts');
+        $this->catcnts = $this->get('CatCnts');
+        $this->tagcnts = $this->get('TagCnts');
+        
         
         // Check for errors.
         if (count($errors = $this->get('Errors'))) {

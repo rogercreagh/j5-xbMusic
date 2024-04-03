@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.0.1 30th March 2024 -->
+<!-- xbMusic config file v0.0.2.2 2nd April 2024 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -21,6 +21,230 @@
         
         
 	</fieldset>
+
+<!-- CATEGORIES TAB -->
+	<fieldset name="cats"
+		label="XBMUSIC_CONFIG_CATS_SET"
+		description="XBMUSIC_CONFIG_CATS_SET_DESC"
+	>
+		<field name ="albumcatnote"
+			label="XBMUSIC_ALBUMCAT_NOTE"
+			description="XBMUSIC_CAT_NOTE_DESC"
+		/>
+		<field name="rootcat_album" type="category"
+			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			extension="com_xbmusic" 
+		>
+			<option value="0">XBMUSIC_NO_RESTRICT</option>
+		</field>
+		<field
+			name="defcat_album" type="category"
+			label="XBCONFIG_CAT_DEF_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_album:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+		<field
+			name="defrescat_album" type="category"
+			label="XBCONFIG_CAT_DEFRES_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_album!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>		
+		
+		<field name ="artistcatnote"
+			label="XBMUSIC_ARTISTCAT_NOTE"
+			description="XBMUSIC_CAT_NOTE_DESC"
+		/>
+		<field name="rootcat_artist" type="category"
+			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			extension="com_xbmusic" 
+		>
+			<option value="0">XBMUSIC_NO_RESTRICT</option>
+		</field>
+		<field
+			name="defcat_artist" type="category"
+			label="XBCONFIG_CAT_DEF_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_artist:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+		<field
+			name="defrescat_artist" type="category"
+			label="XBCONFIG_CAT_DEFRES_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_artist!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>		
+		
+		<field name ="plistcatnote"
+			label="XBMUSIC_PLISTCAT_NOTE"
+			description="XBMUSIC_CAT_NOTE_DESC"
+		/>
+		<field name="rootcat_plist" type="category"
+			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			extension="com_xbmusic" 
+		>
+			<option value="0">XBMUSIC_NO_RESTRICT</option>
+		</field>
+		<field
+			name="defcat_plist" type="category"
+			label="XBCONFIG_CAT_DEF_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_plist:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+		<field
+			name="defrescat_plist" type="category"
+			label="XBCONFIG_CAT_DEFRES_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_plist!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>		
+		
+		<field name ="songcatnote"
+			label="XBMUSIC_SONGCAT_NOTE"
+			description="XBMUSIC_CAT_NOTE_DESC"
+		/>
+		<field name="rootcat_song" type="category"
+			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			extension="com_xbmusic" 
+		>
+			<option value="0">XBMUSIC_NO_RESTRICT</option>
+		</field>
+		<field
+			name="defcat_song" type="category"
+			label="XBCONFIG_CAT_DEF_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_song:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+		<field
+			name="defrescat_song" type="category"
+			label="XBCONFIG_CAT_DEFRES_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_song!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>		
+		
+		<field name ="trackcatnote"
+			label="XBMUSIC_TRACKCAT_NOTE"
+			description="XBMUSIC_CAT_NOTE_DESC"
+		/>
+		<field name="rootcat_track" type="category"
+			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			extension="com_xbmusic" 
+		>
+			<option value="0">XBMUSIC_NO_RESTRICT</option>
+		</field>
+		<field
+			name="defcat_track" type="category"
+			label="XBCONFIG_CAT_DEF_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_track:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+		<field
+			name="defrescat_track" type="category"
+			label="XBCONFIG_CAT_DEFRES_LABEL"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			showon="rootcat_track!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>		
+		
+		
+		
+		<field
+			addfieldpath="Crosborne\Component\Xbmusic\Administrator\Field" type="xbcats"
+			name="test_album" 
+			label="Test of XbcatsField"
+			description="XBCONFIG_CAT_DEF_DESC"
+			extension="com_xbmusic"
+			parent="album"
+			incparent="false"
+			showon="rootcat_album!:0"
+			>			
+			<option value="" >XBCONFIG_CAT_UNCAT</option>
+		</field>
+	</fieldset>		
+	
+<!-- TAGS TAB -->
+	<fieldset name="tags"
+		label="XBMUSIC_CONFIG_TAGS_SET"
+		description="XBMUSIC_CONFIG_TAGS_SET_DESC"
+	>
+		<field name ="albumtagnote"
+			label="XBMUSIC_ALBUMTAG_NOTE"
+			description="XBMUSIC_TAG_NOTE_DESC"
+		/>
+		<field name="albumtagparents" type="tag"
+			label="XBMUSIC_ALBUM_TAG_PARENTS"
+			description="XBMUSIC_TAG_PARENTS_DESC"
+			mode="nested"
+			multiple="true"			
+		/>
+		<field name ="artisttagnote"
+			label="XBMUSIC_ARTISTTAG_NOTE"
+			description="XBMUSIC_TAG_NOTE_DESC"
+		/>
+		<field name="artisttagparents" type="tag"
+			label="XBMUSIC_ARTIST_TAG_PARENTS"
+			description="XBMUSIC_TAG_PARENTS_DESC"
+			mode="nested"
+			multiple="true"			
+		/>
+		<field name ="plisttagnote"
+			label="XBMUSIC_PLISTTAG_NOTE"
+			description="XBMUSIC_TAG_NOTE_DESC"
+		/>
+		<field name="plisttagparents" type="tag"
+			label="XBMUSIC_PLIST_TAG_PARENTS"
+			description="XBMUSIC_TAG_PARENTS_DESC"
+			mode="nested"
+			multiple="true"			
+		/>
+		<field name ="songtagnote"
+			label="XBMUSIC_SONGTAG_NOTE"
+			description="XBMUSIC_TAG_NOTE_DESC"
+		/>
+		<field name="songtagparents" type="tag"
+			label="XBMUSIC_SONG_TAG_PARENTS"
+			description="XBMUSIC_TAG_PARENTS_DESC"
+			mode="nested"
+			multiple="true"			
+		/>
+		<field name ="tracktagnote"
+			label="XBMUSIC_TRACKTAG_NOTE"
+			description="XBMUSIC_TAG_NOTE_DESC"
+		/>
+		<field name="tracktagparents" type="tag"
+			label="XBMUSIC_TRACK_TAG_PARENTS"
+			description="XBMUSIC_TAG_PARENTS_DESC"
+			mode="nested"
+			multiple="true"			
+		/>
+		
+	</fieldset>		
 	
 <!-- BEER TAB -->
 	<fieldset name="reg"

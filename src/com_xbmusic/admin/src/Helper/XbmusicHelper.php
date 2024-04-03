@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.2.1 1st April 2024
+ * @version 0.0.2.2 1st April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -308,6 +308,22 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	/**
+	 * @name getCat()
+	 * @desc given category id returns full row
+	 * @param int $catid
+	 * @return object|null
+	 */
+	public static function getCat(int $catid) {
+	    $db = Factory::getDBO();
+	    $query = $db->getQuery(true);
+	    $query->select('*')
+	    ->from('#__categories AS a ')
+	    ->where('a.id = '.$db->q($catid));
+	    $db->setQuery($query);
+	    return $db->loadObject();
+	}
+	
+	/**
 	 * @name getTag()
 	 * @desc gets a tag's details given its id
 	 * @param (int) $tagid
@@ -322,6 +338,7 @@ class XbmusicHelper extends ComponentHelper
 	    $db->setQuery($query);
 	    return $db->loadObject();
 	}
+	
 	
 	public static function tagFilterQuery($query, $tagfilt, $taglogic) {
 	    
