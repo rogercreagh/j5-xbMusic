@@ -107,7 +107,7 @@ class DashboardModel extends ListModel {
     public function getCats() {
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
-        $query->select('a.id, a.title, a.published AS state')->from('#__categories AS a')->where('a.extension = '.$db->q('com_content'));
+        $query->select('a.id, a.title, a.published AS status')->from('#__categories AS a')->where('a.extension = '.$db->q('com_xbmusic'));
         $query->order('title ASC');
         $db->setQuery($query);
         $cats = $db->loadAssocList('id');
@@ -121,13 +121,15 @@ class DashboardModel extends ListModel {
     }
     
     public function getCatCnts() {
-        return 
+        $cnts = array('total'=>0, 'published'=>0, 'unpublished'=>0, 'archived'=>0, 'trashed'=>0);
+        $cnts = array_merge($cnts,XbmusicHelper::statusCnts('#__categories','published','com_xbmusic'));        
+        return $cnts;
     }
     
     public function getTagCnts() {
-        $tagcnts = array('totaltags' =>0, 'tagsused'=>0);
+        $tagcnts = array('total' =>0, 'used'=>0);
         
-        $tagcnts['totaltags'] = XbmusicHelper::getItemCnt('#__tags');
+        $tagcnts['total'] = XbmusicHelper::getItemCnt('#__tags');
         
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
@@ -137,7 +139,7 @@ class DashboardModel extends ListModel {
         ->where('a.type_alias LIKE '.$db->q('com_xbmusic%'));
         $db->setQuery($query);
         $res = $db->loadResult();
-        if ($res>0) $tagcnts['tagsused'] = $res;
+        if ($res>0) $tagcnts['used'] = $res;
         return $tagcnts;
     }    
     

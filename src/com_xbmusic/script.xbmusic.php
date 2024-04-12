@@ -12,8 +12,9 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Installer\Installer;
-use Joomla\CMS\Version;
 use Joomla\CMS\Installer\InstallerScript;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Version;
 use Joomla\Filesystem\Path;
 use Joomla\CMS\Uri\Uri;
 
@@ -72,6 +73,19 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $ext_mess .= '<p><b>Important</b> Before starting review &amp; set the component options&nbsp;&nbsp;';
             $ext_mess .=  '<a href="index.php?option=com_config&view=component&component='.$this->extension.'" class="btn btn-small btn-info">'.$this->extname.' Options</a>';
             //$res = $this->createCssFromTmpl();
+            // create default categories using category table if they haven't been recovered
+            $cats = array(
+                array("title"=>"Uncategorised","desc"=>"default fallback category for all xbMusic items"),
+                array("title"=>"Albums","desc"=>"default parent category for xbMusic Albums"),
+                array("title"=>"Artists","desc"=>"default parent category for xbMusic Artists"),
+                array("title"=>"Playlists","desc"=>"default parent category for xbMusic Playlists"),
+                array("title"=>"Songs","desc"=>"default parent category for xbMusic Songs"),
+                array("title"=>"Tracks","desc"=>"default parent category for xbMaps Tracks")
+            );
+            $message .= $this->createCategories($cats);
+            
+            Factory::getApplication()->enqueueMessage($message,'Info');
+            
             
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
@@ -81,6 +95,56 @@ class Com_xbmusicInstallerScript extends InstallerScript
             echo $ext_mess;
         }
         return true;
+    }
+    
+    /**
+     * @name createCategories()
+     * @param array $cats
+     * @return string message
+     */
+    public function createCategories(array $cats) {
+        $message = 'Creating '.$this->extension.' categories. ';
+        $db = Factory::getDBO();
+        foreach ($cats as $cat) {
+            if (key_exists('title',$cat)) {
+                $query = $db->getQuery(true);
+                //first check if category already exists
+                $query->select('id')->from($db->quoteName('#__categories'))
+                ->where($db->quoteName('title')." = ".$db->quote($cat['title']))
+                ->where($db->quoteName('extension')." = ".$db->quote('com_xbmusic'));
+                $db->setQuery($query);
+                if ($db->loadResult()>0) {
+                    $message .= '"'.$cat['title'].' already exists<br /> ';
+                } else {
+                    $category = Table::getInstance('Category');
+                    $category->extension = $this->extension;
+                    $category->title = $cat['title'];
+                    $category->description = $cat['desc'];
+                    $category->published = 1;
+                    $category->access = 1;
+                    $category->params = '{"category_layout":"","image":"","image_alt":""}';
+                    $category->metadata = '{"page_title":"","author":"","robots":""}';
+                    $category->language = '*';
+                    // Set the location in the tree
+                    $category->setLocation(1, 'last-child');
+                    // Check to make sure our data is valid
+                    if ($category->check()) {
+                        if ($category->store(true)) {
+                            // Build the path for our category
+                            $category->rebuildPath($category->id);
+                            $message .= $cat['title'].' id:'.$category->id.' created ok. ';
+                        } else {
+                            throw new Exception(500, $category->getError());
+                            //return '';
+                        }
+                    } else {
+                        throw new Exception(500, $category->getError());
+                        //return '';
+                    }                  
+                }
+            }
+        }
+        return $message;
     }
     
     

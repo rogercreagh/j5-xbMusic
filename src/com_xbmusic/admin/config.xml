@@ -27,12 +27,11 @@
 		label="XBMUSIC_CONFIG_CATS_SET"
 		description="XBMUSIC_CONFIG_CATS_SET_DESC"
 	>
-		<field name ="albumcatnote"
-			label="XBMUSIC_ALBUMCAT_NOTE"
-			description="XBMUSIC_CAT_NOTE_DESC"
+		<field name ="albumcatnote" type="note"
+			label="XBMUSIC_CONFIG_ALBUMCAT_NOTE"
 		/>
 		<field name="rootcat_album" type="category"
-			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -56,12 +55,11 @@
 			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>		
 		
-		<field name ="artistcatnote"
-			label="XBMUSIC_ARTISTCAT_NOTE"
-			description="XBMUSIC_CAT_NOTE_DESC"
+		<field name ="artistcatnote" type="note"
+			label="XBMUSIC_CONFIG_ARTISTCAT_NOTE"
 		/>
 		<field name="rootcat_artist" type="category"
-			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -85,12 +83,11 @@
 			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>		
 		
-		<field name ="plistcatnote"
-			label="XBMUSIC_PLISTCAT_NOTE"
-			description="XBMUSIC_CAT_NOTE_DESC"
+		<field name ="plistcatnote" type="note"
+			label="XBMUSIC_CONFIG_PLISTCAT_NOTE"
 		/>
 		<field name="rootcat_plist" type="category"
-			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -114,12 +111,11 @@
 			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>		
 		
-		<field name ="songcatnote"
-			label="XBMUSIC_SONGCAT_NOTE"
-			description="XBMUSIC_CAT_NOTE_DESC"
+		<field name ="songcatnote" type="note"
+			label="XBMUSIC_CONFIG_SONGCAT_NOTE"
 		/>
 		<field name="rootcat_song" type="category"
-			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -143,12 +139,11 @@
 			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>		
 		
-		<field name ="trackcatnote"
-			label="XBMUSIC_TRACKCAT_NOTE"
-			description="XBMUSIC_CAT_NOTE_DESC"
+		<field name ="trackcatnote" type="note"
+			label="XBMUSIC_CONFIG_TRACKCAT_NOTE"
 		/>
 		<field name="rootcat_track" type="category"
-			label="JCATEGORY" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -193,53 +188,48 @@
 		label="XBMUSIC_CONFIG_TAGS_SET"
 		description="XBMUSIC_CONFIG_TAGS_SET_DESC"
 	>
-		<field name ="albumtagnote"
-			label="XBMUSIC_ALBUMTAG_NOTE"
-			description="XBMUSIC_TAG_NOTE_DESC"
+		<field name ="albumtagnote" type="note"
+			label="XBMUSIC_CONFIG_ALBUMTAG_NOTE"
 		/>
 		<field name="albumtagparents" type="tag"
-			label="XBMUSIC_ALBUM_TAG_PARENTS"
-			description="XBMUSIC_TAG_PARENTS_DESC"
+			label="XBMUSIC_CONFIG_TAG_PARENTS"
+			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
 		/>
-		<field name ="artisttagnote"
-			label="XBMUSIC_ARTISTTAG_NOTE"
-			description="XBMUSIC_TAG_NOTE_DESC"
+		<field name ="artisttagnote" type="note"
+			label="XBMUSIC_CONFIG_ARTISTTAG_NOTE"
 		/>
 		<field name="artisttagparents" type="tag"
-			label="XBMUSIC_ARTIST_TAG_PARENTS"
-			description="XBMUSIC_TAG_PARENTS_DESC"
+			label="XBMUSIC_CONFIG_TAG_PARENTS"
+			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
 		/>
-		<field name ="plisttagnote"
-			label="XBMUSIC_PLISTTAG_NOTE"
-			description="XBMUSIC_TAG_NOTE_DESC"
+		<field name ="plisttagnote" type="note"
+			label="XBMUSIC_CONFIG_PLISTTAG_NOTE"
 		/>
 		<field name="plisttagparents" type="tag"
-			label="XBMUSIC_PLIST_TAG_PARENTS"
-			description="XBMUSIC_TAG_PARENTS_DESC"
+			label="XBMUSIC_CONFIG_TAG_PARENTS"
+			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
 		/>
-		<field name ="songtagnote"
-			label="XBMUSIC_SONGTAG_NOTE"
-			description="XBMUSIC_TAG_NOTE_DESC"
+		<field name ="songtagnote" type="note"
+			label="XBMUSIC_CONFIG_SONGTAG_NOTE"
 		/>
 		<field name="songtagparents" type="tag"
-			label="XBMUSIC_SONG_TAG_PARENTS"
-			description="XBMUSIC_TAG_PARENTS_DESC"
+			label="XBMUSIC_CONFIG_TAG_PARENTS"
+			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
 		/>
-		<field name ="tracktagnote"
-			label="XBMUSIC_TRACKTAG_NOTE"
-			description="XBMUSIC_TAG_NOTE_DESC"
+		<field name ="tracktagnote" type="note"
+			label="XBMUSIC_CONFIG_TRACKTAG_NOTE"
 		/>
 		<field name="tracktagparents" type="tag"
-			label="XBMUSIC_TRACK_TAG_PARENTS"
-			description="XBMUSIC_TAG_PARENTS_DESC"
+			label="XBMUSIC_CONFIG_TAG_PARENTS"
+			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
 		/>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.2.2 2nd April 2024
+ * @version 0.0.2.3 3rd April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -45,18 +45,18 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<tr>
 							<td class="xbwp50 xbpl20">
 								<span class="xbbadge badge-ltgreen"><?php echo $this->trackcnts['catcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_CATS_USED')); ?></span>
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->trackcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_track; ?></span>
-								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_track; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_track; ?>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>:</span> <span class="xbbadge badge-cat"><?php echo $this->defcat_track; ?></span>
 							</td>
-							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->tracktagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->tracktagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -80,18 +80,18 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<tr>
 							<td class="xbwp50 xbpl20">
 								<span class="xbbadge badge-ltgreen"><?php echo $this->songcnts['catcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_CATS_USED')); ?></span>
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->songcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_song; ?></span>
-								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_song; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_song; ?>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_song; ?></span>
 							</td>
-							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->songtagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->songtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -115,17 +115,17 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<tr>
 							<td class="xbwp50 xbpl20">
 								<span class="xbbadge badge-ltgreen"><?php echo $this->artistcnts['catcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_CATS_USED')); ?></span>
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->artistcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
 							</td>
 						<tr>
-							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_artist; ?></span>
-								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_artist; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_artist; ?>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_artist; ?></span>
 							</td>
-							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->artisttagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->artisttagparents; ?>
 							</td>
 						</tr>
 						</tr>
@@ -149,18 +149,18 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<tr>
 							<td class="xbwp50 xbpl20">
 								<span class="xbbadge badge-ltgreen"><?php echo $this->albumcnts['catcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_CATS_USED')); ?></span>
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->albumcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_album; ?></span>
-								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_album; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_album; ?>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_album; ?></span>
 							</td>
-							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->albumtagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->albumtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -185,18 +185,18 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<tr>
 							<td class="xbwp50 xbpl20">
 								<span class="xbbadge badge-ltgreen"><?php echo $this->playlistcnts['catcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('categories used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_CATS_USED')); ?></span>
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->playlistcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo Text::_('tags used'); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
-							<td><?php echo Text::_('XB_CATEGORY_BRANCH'); ?>: <span class="xbbadge badge-cat"><?php echo $this->rootcat_plist; ?></span>
-								<br /><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>: <span class="xbbadge badge-cat"><?php echo $this->defcat_plist; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_plist; ?></span>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_plist; ?></span>
 							</td>
-							<td><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?>: <?php echo $this->plisttagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->plisttagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -204,36 +204,34 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 
 				<div class="xbbox gradcat">
 					<h4 class="xbmb20"><?php echo Text::_('XB_CATEGORIES'); ?></h4>
-					<p>
-						<span class="xbnit"><?php echo Text::_('XB_DEFINED'); ?></span>
-						<span class="xbbadge badge-success"><?php echo '1171'; ?></span>
+					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATS'); ?></span>
+						<span class="xbbadge badge-cat"><?php echo $this->catcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
-            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo (1==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '1001';?></span></span>
-            			<span class="xbpl50"><span class="icon-times xblabel <?php echo (1==0) ? 'label-grey':'label-orange';?>"
-            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '235';?></span></span>
-            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo (1==0) ? 'label-grey' : 'label-black';?>"
-            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo '57';?></span></span>
-            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo (1==0) ? 'label-grey' : 'label-pink';?>"
-            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo '2';?></span></span>
+            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->catcnts['published']==0) ? 'label-grey' : 'label-green';?>"
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['published'];?></span></span>
+            			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->catcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
+            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['unpublished'];?></span></span>
+            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->catcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
+            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['archived'];?></span></span>
+            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->catcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['trashed'];?></span></span>
 					</p>
 				</div>
 				
 				<div class="xbbox gradtag">
 					<h4 class="xbmb20"><?php echo Text::_('XB_TAGS'); ?></h4>
-					<p>
-						<span class="xbnit"><?php echo Text::_('XB_USED'); ?></span>
-						<span class="xbbadge badge-success"><?php echo '1171'; ?></span>
-            			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
-            			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo (1==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '1001';?></span></span>
-            			<span class="xbpl50"><span class="icon-times xblabel <?php echo (1==0) ? 'label-grey':'label-orange';?>"
-            			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo '235';?></span></span>
-            			<span class="xbpl50"><span class="icon-archive xblabel <?php echo (1==0) ? 'label-grey' : 'label-black';?>"
-            			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo '57';?></span></span>
-            			<span class="xbpl50"><span class="icon-trash xblabel <?php echo (1==0) ? 'label-grey' : 'label-pink';?>"
-            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo '2';?></span></span>
-					</p>
+					<table class="xbwp100">
+						<tr>
+							<td class="xbwp50 xbpl20">
+								<span class="xbnit xbpl10"><?php echo Text::_('XBMUSIC_TAGS_TOTAL'); ?></span>
+								<span class="xbbadge badge-tag"><?php echo $this->tagcnts['total'];?></span>
+							</td>
+							<td class="xbwp50">
+								<span class="xbnit xbpl10"><?php echo Text::_('XBMUSIC_TAGS_USED'); ?></span>
+								<span class="xbbadge badge-ltblue"><?php echo $this->tagcnts['used'];?></span>
+							</td>
+						</tr>
+					</table>
 				</div>				
 
           	</div>
@@ -272,7 +270,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 					<?php echo HtmlHelper::_('bootstrap.endSlide'); ?>
 					<?php echo HtmlHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_LICENCE'), 'license','xbaccordion'); ?>
 						<p><?php echo Text::_( 'XB_LICENSE_GPL' ); ?>
-							<br><?php echo Text::sprintf('XB_LICENSE_INFO','xbMusic');?>
+							<br><?php echo Text::sprintf('XB_LICENSE_INFO','<b>xbMusic</b>');?>
 							<br /><?php echo $this->xmldata['copyright']; ?>
 						</p>		        		
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
