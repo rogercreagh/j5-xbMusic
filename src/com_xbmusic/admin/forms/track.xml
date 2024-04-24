@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<config>
+		<inlinehelp button="show"/>
+	</config>
+<!-- Title, Alias, Id, fileinfo -->	
+	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" type="xbtags" >
+		<field name="id" type="number" 
+			label="JGLOBAL_FIELD_ID_LABEL"
+			description="JGLOBAL_FIELD_ID_DESC" 
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+
+		<field name="title" type="text" 
+			label="JGLOBAL_TITLE"
+			description="JFIELD_TITLE_DESC"
+			class="input-xxlarge input-large-text"
+			size="40" required="true" 
+		/>
+
+		<field name="alias" type="text" 
+			label="JFIELD_ALIAS_LABEL"
+			description="JFIELD_ALIAS_DESC"
+			hint="JFIELD_ALIAS_PLACEHOLDER"
+			size="40" 
+		/>
+		<field name="rec_date" type="calendar"
+			label="Recording Date" description="Date track was recorded"
+			class="inputbox" size="20" format="%Y-%m-%d 0:0:0" filter="user_utc"
+			required="false"
+			showtime="false" translateformat="true" 
+			/>
+
+	</fieldset>
+	
+<!-- id3, descript, picture, rec-date, status, cat, alltags -->
+	<fieldset name="general">
+	
+		<field name="rec_date" type="text"
+			label="Recording date" description="Dates of track recording sessions, any format. Will default to album year if blank"
+			class="inputbox" maxlength="180"
+		/>
+
+		<field name="picture" type="accessiblemedia"
+			label="Track Picture" description="If blank will default to Album cover or ID3 picture" 
+			directory="xbmusic/covers"
+		/>
+			
+		
+		<field
+			name="note" type="textarea"
+			label="XB_ADMIN_NOTE"
+			description="XB_FIELD_ADMIN_NOTE_DESC"
+			class="span12" size="40" rows="3"
+			maxlength="255"
+		/>
+
+		<field 
+			name="status" type="list" 
+			label="JSTATUS"
+			description="JFIELD_PUBLISHED_DESC" 
+			class="chzn-color-state"
+			filter="intval" size="1" 
+			default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+			<option value="2">JARCHIVED</option>
+			<option value="-2">JTRASHED</option>
+		</field>
+
+		<field 
+			name="catid" type="categoryedit"
+			addfieldprefix="Joomla\Component\Categories\Administrator\Field"
+			extension="com_xbmusic"
+			label="JCATEGORY"
+			description="XB_FIELD_CATEGORY_DESC"
+			required="true"
+			published="1"
+			default=""
+		/>
+
+		<field 
+			name="tags" type="tag"
+			label="XB_FIELD_TAGS_ADD_REMOVE_LABEL"
+			description="XB_FIELD_TAGS_ADD_REMOVE_DESC"
+			hint="XB_FIELD_TAGS_ADD_REMOVE_HINT"
+			multiple="true" mode="ajax"
+			custom="deny"
+		/>
+	</fieldset>
+
+<!-- Album, artist(s), song, playlists -->	
+	<fieldset name="links">
+
+	
+	</fieldset>
+<!-- Standard joomla -->
+	<fieldset name="pub">
+
+		<field name="created" type="calendar"
+			label="XBCULTURE_CREATED_LBL" 
+			description="XBCULTURE_CREATED_DESC"
+			class="inputbox" size="20" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+
+		<field name="created_by" type="user"
+			label="XBCULTURE_CREATED_BY_LBL" 
+			description="XBCULTURE_CREATED_BY_DESC" />
+		
+		<field name="created_by_alias" type="text"
+			label="XBCULTURE_CREATED_BY_ALIAS_LBL" 
+			description="XBCULTURE_CREATED_BY_ALIAS_DESC"
+			class="inputbox" size="20" />
+
+		<field name="modified" type="calendar"
+			label="XBCULTURE_FIELD_MODIFIED_LBL" 
+			description="XBCULTURE_FIELD_MODIFIED_DESC"
+			class="inputbox" size="20" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+
+		<field name="modified_by" type="user"
+			label="XBCULTURE_FIELD_MODIFIED_BY_LBL" 
+			description="XBCULTURE_FIELD_MODIFIED_BY_DESC" />
+		
+		<field name="ordering" type="text" 
+			label="JFIELD_ORDERING_LABEL"
+			description="JFIELD_ORDERING_DESC" 
+			size="6"
+			default="0" 
+		/>
+
+		<field name="access" type="accesslevel"
+			label="JFIELD_ACCESS_LABEL"
+			filter="UINT"
+			validate="options"
+		/>
+	
+		<field name="rules" type="rules" 
+			label="JFIELD_RULES_LABEL"
+			translate_label="false" 
+			filter="rules"
+			component="com_xbmusic" 
+			section="track" 
+			validate="rules"
+		/>
+
+	</fieldset>
+
+
+</form>

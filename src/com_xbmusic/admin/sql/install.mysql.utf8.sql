@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `pathname` varchar(190) NOT NULL DEFAULT '',
   `id3` mediumtext,
   `song_id` int(11),
-  `rec_date` date,
+  `rec_date` varchar(190),
   `ext_links` mediumtext,
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '0',

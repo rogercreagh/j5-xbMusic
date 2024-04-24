@@ -48,7 +48,7 @@ if (strpos($listOrder, 'modified') !== false) {
 } elseif (strpos($listOrder, 'created') !== false) {
     $dateOrderCol = 'created';
 } else {
-    $dateOrderCol = 'rec_date';
+    $dateOrderCol = 'modified';
 }
 
 if ($saveOrder && !empty($this->items)) {
@@ -176,7 +176,7 @@ if ($saveOrder && !empty($this->items)) {
                             <?php endif; ?>             
 							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
 						</td>
-						<td class="article-status">
+						<td class="track-status">
                                 <?php
                                     $options = [
                                         'task_prefix' => 'tracks.',

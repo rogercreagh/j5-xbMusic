@@ -345,7 +345,7 @@ class XbmusicHelper extends ComponentHelper
 	    if (!empty($tagfilt)) {
 	        $tagfilt = ArrayHelper::toInteger($tagfilt);
 	        $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                WHERE tmap.type_alias = '.$db->quote('com_content.article').'
+                WHERE tmap.type_alias = '.$db->quote('com_xbmusic.track').'
                 AND tmap.content_item_id = a.id)';
 	        switch ($taglogic) {
 	            case 1: //all
@@ -365,7 +365,7 @@ class XbmusicHelper extends ComponentHelper
 	                    $tagIds = implode(',', $tagfilt);
 	                    if ($tagIds) {
 	                        $subQueryAny = '(SELECT DISTINCT content_item_id FROM #__contentitem_tag_map
-                                WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_content.article').')';
+                                WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.track').')';
 	                        $query->innerJoin('(' . (string) $subQueryAny . ') AS tagmap ON tagmap.content_item_id = a.id');
 	                    }
 	                }	                

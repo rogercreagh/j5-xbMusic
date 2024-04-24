@@ -83,7 +83,7 @@ class DashboardModel extends ListModel {
         // get catcnt       
         $query->select('COUNT(DISTINCT(catid)) AS catcnt');
         $query->from($db->qn($table));
-        // both article & category must be published
+        // both item & category must be published
         $db->setQuery($query);
         $res = $db->loadResult;
         if ($res > 0) $cnts['catcnt'] = $res;
