@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/TrackTable.php
- * @version 0.0.4.0 13th April 2024
+ * @version 0.0.4.0 25th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -17,6 +17,8 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
+use Joomla\CMS\Tag\TaggableTableInterface;
+use Joomla\CMS\Tag\TaggableTableTrait;
 use Joomla\CMS\Versioning\VersionableTableInterface;
 use Joomla\Database\DatabaseDriver;
 use Joomla\Database\ParameterType;
@@ -25,7 +27,9 @@ use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
 
-class TrackTable extends Table implements VersionableTableInterface {
+class TrackTable extends Table implements VersionableTableInterface, TaggableTableInterface {
+    
+    use TaggableTableTrait;
     
     protected $_supportNullValue = true;
     
@@ -64,11 +68,11 @@ class TrackTable extends Table implements VersionableTableInterface {
         }
         
         // Check for a valid category.
-        if (!$this->catid = (int) $this->catid) {
-            $this->setError(Text::_('JLIB_DATABASE_ERROR_CATEGORY_REQUIRED'));
+//         if (!$this->catid = (int) $this->catid) {
+//             $this->setError(Text::_('JLIB_DATABASE_ERROR_CATEGORY_REQUIRED'));
             
-            return false;
-        }
+//             return false;
+//         }
         
         // Set created date if not set.
         if (!(int) $this->created) {

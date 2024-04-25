@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.4.0 12th April 2024
+ * @version 0.0.4.0 25th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,11 +32,18 @@ use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 
 class TrackModel extends AdminModel {
   
+    public $typeAlias = 'com_xbmusic.track';
+    
+    protected $xbmusic_batch_commands = array(
+        'untag' => 'batchUntag',
+    );
+    
     public function batch($commands, $pks, $contexts) {
         $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
         return parent::batch($commands, $pks, $contexts);
     } 
-    
+
+/* 
     protected function batchMove($value, $pks, $contexts) {
         
         if (empty($this->batchSet))
@@ -125,6 +132,8 @@ class TrackModel extends AdminModel {
         
         return true;
     }
+  
+*/
     
     protected function batchUntag($value, $pks, $contexts) {
         $taghelper = new TagsHelper();
@@ -155,6 +164,7 @@ class TrackModel extends AdminModel {
         }
         return true;
     }
+    
     
     protected function canDelete($record) {
         if (empty($record->id) || ($record->state != -2)) {
@@ -192,8 +202,8 @@ class TrackModel extends AdminModel {
     public function getItem($pk = null) {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
-                $item->tags = new TagsHelper();
-                $item->tags->getTagIds($item->id, 'com_music.track');                
+                $tagsHelper = new TagsHelper();
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');                
             }
         }        
         return $item;
@@ -208,7 +218,7 @@ class TrackModel extends AdminModel {
         if (empty($form)) {
             return false;
         }
-        
+/*         
         // Object uses for checking edit state permission of track
         $record = new \stdClass();
         
@@ -293,6 +303,7 @@ class TrackModel extends AdminModel {
             $form->setFieldAttribute('created_by', 'filter', 'unset');
         }
         
+ */
         return $form;
     }
     
@@ -360,11 +371,13 @@ class TrackModel extends AdminModel {
                 $data->taggroup4 = array_intersect($taggroup4_tags, explode(',', $data->tags->tags));
             }
  */            
-            $this->preprocessData('com_xbmusic.track', $data);
+            //allow content plugins to preprocess
+            //$this->preprocessData('com_xbmusic.track', $data);
             
             return $data;
         }
         
+ /*** not needed?         
     public function validate($form, $data, $group = null) {
         if (!$this->getCurrentUser()->authorise('core.admin', 'com_xbmusic')) {
             if (isset($data['rules'])) {
@@ -374,6 +387,7 @@ class TrackModel extends AdminModel {
         
         return parent::validate($form, $data, $group);
     }
+    ****/
         
     public function save($data) {
         $app    = Factory::getApplication();
@@ -395,44 +409,13 @@ class TrackModel extends AdminModel {
         //             }
         
         // Create new category, if needed.
-        $createCategory = true;
-        
-        if (\is_null($data['catid'])) {
-            // When there is no catid passed don't try to create one
-            $createCategory = false;
+        // Validate the category id
+        // validateCategoryId() returns 0 if the catid can't be found
+        if ((int) $data['catid'] > 0)
+        {
+            $data['catid'] = CategoriesHelper::validateCategoryId($data['catid'], 'com_xbmusic');
         }
         
-        // If category ID is provided, check if it's valid.
-        if (is_numeric($data['catid']) && $data['catid']) {
-            $createCategory = !CategoriesHelper::validateCategoryId($data['catid'], 'com_xbmusic');
-        }
-        
-        // Save New Category
-        $trackrootcat = 1; //read this from params=
-        if ($createCategory && $this->canCreateCategory()) {
-            $category = [
-                // Remove #new# prefix, if exists.
-                'title'     => strpos($data['catid'], '#new#') === 0 ? substr($data['catid'], 5) : $data['catid'],
-                'parent_id' => $trackrootcat,
-                'extension' => 'com_xbmusic',
-                'language'  => $data['language'],
-                'published' => 1,
-            ];
-            
-            /** @var \Joomla\Component\Categories\Administrator\Model\CategoryModel $categoryModel */
-            $categoryModel = Factory::getApplication()->bootComponent('com_categories')
-            ->getMVCFactory()->createModel('Category', 'Administrator', ['ignore_request' => true]);
-            
-            // Create new category.
-            if (!$categoryModel->save($category)) {
-                $this->setError($categoryModel->getError());
-                
-                return false;
-            }
-            
-            // Get the Category ID.
-            $data['catid'] = $categoryModel->getState('category.id');
-        }
         
         /**TODO need to change this to make alias unique across all tracks but allow dupe titles  **/
         // Automatic handling of alias for empty fields
@@ -494,6 +477,20 @@ class TrackModel extends AdminModel {
         parent::preprocessForm($form, $data, $group);
     }
     
+    public function saveorder($idArray = null, $lft_array = null)
+    {
+        // Get an instance of the table object.
+        $table = $this->getTable();
+        
+        if (!$table->saveorder($idArray, $lft_array))
+        {
+            $this->setError($table->getError());
+            
+            return false;
+        }
+        
+        return true;
+    }
     
     private function canCreateCategory() {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.4.0 13th April 2024
+ * @version 0.0.4.0 25th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -24,14 +24,14 @@ class HtmlView extends BaseHtmlView {
     
     protected $form;
     protected $item;
-    protected $state;
+//    protected $state;
     protected $canDo;
     
     public function display($tpl = null) {
         
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
-        $this->state = $this->get('State');
+//        $this->state = $this->get('State');
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'track', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');

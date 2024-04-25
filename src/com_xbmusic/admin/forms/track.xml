@@ -25,12 +25,19 @@
 			hint="JFIELD_ALIAS_PLACEHOLDER"
 			size="40" 
 		/>
-		<field name="rec_date" type="calendar"
-			label="Recording Date" description="Date track was recorded"
-			class="inputbox" size="20" format="%Y-%m-%d 0:0:0" filter="user_utc"
-			required="false"
-			showtime="false" translateformat="true" 
-			/>
+		
+		 <field name="pathame" type="text" 
+			label="File path" description="path from the music root directory as set in xbMusic Options" 
+			value="" class="xbfilecontrol xbbold"
+			hint="include trailing slash/"
+			readonly="true"
+		/>
+
+		 <field name="filehame" type="text" 
+			label="File name" description="filename including extension" 
+			value="" class="xbfilecontrol xbbold"
+			readonly="true"
+		/>
 
 	</fieldset>
 	
@@ -71,8 +78,7 @@
 		</field>
 
 		<field 
-			name="catid" type="categoryedit"
-			addfieldprefix="Joomla\Component\Categories\Administrator\Field"
+			name="catid" type="category"
 			extension="com_xbmusic"
 			label="JCATEGORY"
 			description="XB_FIELD_CATEGORY_DESC"
@@ -85,7 +91,6 @@
 			name="tags" type="tag"
 			label="XB_FIELD_TAGS_ADD_REMOVE_LABEL"
 			description="XB_FIELD_TAGS_ADD_REMOVE_DESC"
-			hint="XB_FIELD_TAGS_ADD_REMOVE_HINT"
 			multiple="true" mode="ajax"
 			custom="deny"
 		/>
