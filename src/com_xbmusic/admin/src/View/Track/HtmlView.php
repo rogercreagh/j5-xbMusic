@@ -77,7 +77,7 @@ class HtmlView extends BaseHtmlView {
         $canDo = $this->canDo;
         
         ToolbarHelper::title(
-            Text::_('XBMUSIC_ADMIN_TRACK_' . ($checkedOut ? 'VIEW_TITLE' : 'EDIT_TITLE')),
+            Text::_('XBMUSIC_ADMIN_' . ($checkedOut ? 'VIEW_TARCK_TITLE' : 'EDIT_TRACK_TITLE')),
             'pencil-alt'
             );
         

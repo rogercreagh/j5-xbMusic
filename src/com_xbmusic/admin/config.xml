@@ -19,6 +19,13 @@
 			class="info"
 		/>	
         
+		<field name="base_music_folder" type="combo"
+			label="Music base folder" description="Use the /xbmusic folder within the site webspace or specify a path to a folder outside the webspace where the www-data user can read and write"
+  			default="xbmusic"
+  		>
+  			<option value="/xbmusic">xbmusic</option>
+  			<option value="../../html/id3/music">ID3 music</option>
+		</field>
         
 	</fieldset>
 
@@ -143,7 +150,8 @@
 			label="XBMUSIC_CONFIG_TRACKCAT_NOTE"
 		/>
 		<field name="rootcat_track" type="category"
-			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" 
+			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -153,25 +161,13 @@
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"
-			showon="rootcat_track:0"
 			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>
+		
+				
 		<field
-			name="defrescat_track" type="category"
-			label="XBCONFIG_CAT_DEFRES_LABEL"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			showon="rootcat_track!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>		
-		
-		
-		
-		<field
-			addfieldpath="Crosborne\Component\Xbmusic\Administrator\Field" type="xbcats"
-			name="test_album" 
+			addfieldpath="Crosborne\Component\Xbmusic\Administrator\Field" 
+			name="test_album" type="xbsubcat"
 			label="Test of XbcatsField"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"

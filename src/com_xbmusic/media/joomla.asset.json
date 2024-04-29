@@ -16,6 +16,12 @@
         "description": "xb common component css",
         "type": "style",
         "uri": "com_xbmusic/xbcommon.css"
-      }      
+      },
+      {
+		  "name": "xbmusic.showdown",
+		  "description": "showdown markdown utilties",
+		  "type": "script",
+		  "uri": "com_xbmusic/showdown.js"
+	  }
     ]
 }

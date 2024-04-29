@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * file script.xbmusic.php
- * @version 0.2.1.0 11th March 2024
+ * @filesource script.xbmusic.php
+ * @version 0.0.4.1 28th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -83,6 +83,22 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Tracks","desc"=>"default parent category for xbMaps Tracks")
             );
             $message .= $this->createCategories($cats);
+            
+            //create xbmusic image folder
+            if (!file_exists(JPATH_ROOT.'/images/xbmusic')) {
+                mkdir(JPATH_ROOT.'/images/xbmusic',0775);
+                $message .= 'Music images folder created (/images/xbmusic/).<br />';
+            } else{
+                $message .= '"/images/xbmusic/" already exists.<br />';
+            }
+            //create /xbmusic folder
+            if (!file_exists(JPATH_ROOT.'/xbmusic')) {
+                mkdir(JPATH_ROOT.'/xbmusic',0775);
+                $message .= 'Music folder created (/xbmusic/).<br />';
+            } else{
+                $message .= '"/xbmusic/" already exists.<br />';
+            }
+            
             
             Factory::getApplication()->enqueueMessage($message,'Info');
             
