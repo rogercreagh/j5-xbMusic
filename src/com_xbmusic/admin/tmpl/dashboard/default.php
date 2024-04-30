@@ -24,11 +24,11 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dashboard'); ?>" method="post" name="adminForm" id="adminForm">
 
-		<h3><?php echo Text::_('XB_STATUS_SUM'); ?></h3>
+		<h2><i class='icon-info-circle'></i><?php echo Text::_('XB_STATUS_SUM'); ?></h2>
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
 				<div class="xbbox gradgreen">
-					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_TRACKS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-guitar' ></i> <a href="index.php?option=com_xbmusic&view=tracks"><?php echo Text::_('XBMUSIC_TRACKS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-green"><?php echo $this->trackcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -63,7 +63,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradcyan">
-					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_SONGS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-music' ></i> <a href="index.php?option=com_xbmusic&view=songs"><?php echo Text::_('XBMUSIC_SONGS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-cyan"><?php echo $this->songcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -98,7 +98,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradblue">
-					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_ARTISTS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-users-line' ></i> <a href="index.php?option=com_xbmusic&view=artists"><?php echo Text::_('XBMUSIC_ARTISTS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-blue"><?php echo $this->artistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -133,7 +133,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradyellow">
-					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_ALBUMS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-compact-disc' ></i> <a href="index.php?option=com_xbmusic&view=albums"><?php echo Text::_('XBMUSIC_ALBUMS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-yellow"><?php echo $this->albumcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -168,7 +168,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradpink">
-					<h4 class="xbmb20"><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-headphones' ></i> <a href="index.php?option=com_xbmusic&view=playlists"><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-pink"><?php echo $this->playlistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -203,7 +203,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradcat">
-					<h4 class="xbmb20"><?php echo Text::_('XB_CATEGORIES'); ?></h4>
+					<h3 class="xbmb20"><i class='far fa-folder-open' ></i> <a href="index.php?option=com_categories&view=categories&extension=com_xbmusic"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATS'); ?></span>
 						<span class="xbbadge badge-cat"><?php echo $this->catcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -219,7 +219,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 				
 				<div class="xbbox gradtag">
-					<h4 class="xbmb20"><?php echo Text::_('XB_TAGS'); ?></h4>
+					<h3 class="xbmb20"><i class='fas fa-tags' ></i> <a href="index.php?option=com_xbmusic&view=tags"><?php echo Text::_('XB_TAGS'); ?></a></h3>
 					<table class="xbwp100">
 						<tr>
 							<td class="xbwp50 xbpl20">

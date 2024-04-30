@@ -79,10 +79,12 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('pathname'); ?> 
     		</div>
     		<div class="col-md-6">
-    			<?php $musicpath = Factory::getApplication()->getSession()->get('musicfolder','');
-    			if (is_dir($musicpath)) {
-       			    $this->form->setFieldAttribute('filename','directory',$musicpath);
-    			}
+    			<?php $session = Factory::getApplication()->getSession();
+                    $musicpath = $session->get('musicfolder','');
+        			if (is_dir($musicpath)) {
+           			  $this->form->setFieldAttribute('filename','directory',$musicpath);
+        			}
+                    $session->clear('musicfolder');
     			?>
     			<?php echo $this->form->renderField('filename'); ?> 
     		</div>

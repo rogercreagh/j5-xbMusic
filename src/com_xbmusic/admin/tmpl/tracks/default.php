@@ -217,7 +217,7 @@ if ($saveOrder && !empty($this->items)) {
 						<td>artists
 						</td>
 						<td>
-							<p><code><?php echo $item->pathname; ?>/</code>
+							<p><code><?php echo str_replace($this->basemusicfolder,'',$item->pathname); ?>/</code>
 								<br /><code><?php echo $item->filename;?></code>
 							</p>
 						</td>

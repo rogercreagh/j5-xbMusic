@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Tracks/HtmlView.php
- * @version 0.0.3.0 11th April 2024
+ * @version 0.0.4.3 30th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -45,6 +45,17 @@ class HtmlView extends BaseHtmlView {
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
                
+        $this->params      = ComponentHelper::getParams('com_xbmusic');;
+        
+        if ($this->params->get('use_xbmusic', 1)) {
+            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
+        } else {
+            if (is_dir($this->params->get('music_path',''))) {
+                $this->basemusicfolder = $this->params->get('music_path');
+            } else {
+                $this->basemusicfolder = JPATH_ROOT.'/xbmusic/';
+            }
+        }
         $this->addToolbar();
         
         return parent::display($tpl);
@@ -76,20 +87,33 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            if ($canDo->get('core.edit.state')) {
-                $childBar->publish('tracks.publish')->listCheck(true);
-                
-                $childBar->unpublish('tracks.unpublish')->listCheck(true);
-                
-                $childBar->archive('tracks.archive')->listCheck(true);
-                
-                if ($this->state->get('filter.status') != -2) {
-                    $childBar->trash('tracks.trash');
-                }
-                $childBar->checkin('tracks.checkin');
-                
+            $childBar->publish('tracks.publish')->listCheck(true);
+            
+            $childBar->unpublish('tracks.unpublish')->listCheck(true);
+            
+            $childBar->archive('tracks.archive')->listCheck(true);
+            
+            if ($this->state->get('filter.status') != -2) {
+                $childBar->trash('tracks.trash');
             }
+            $childBar->checkin('tracks.checkin');
+                
         }
+        
+        $dropdown = $toolbar->dropdownButton('views')
+        ->text('Other Views')
+        ->toggleSplit(false)
+        ->icon('icon-ellipsis-h')
+        ->buttonClass('btn btn-action')
+        ->listCheck(false);
+        $childBar = $dropdown->getChildToolbar();
+        $childBar->standardButton('dashboardview', 'Dashboard', 'tracks.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('albumsview', 'Albums', 'tracks.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
+        $childBar->standardButton('artistsview', 'Artists', 'tracks.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistview', 'Playlists', 'tracks.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('songsview', 'Songs', 'tracks.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('catsview', 'Categories', 'tracks.toCats')->listCheck(false)->icon('far fa-folder-open') ;
+        $childBar->standardButton('tagsview', 'Tags', 'tracks.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
             $toolbar->delete('tracks.delete', 'JTOOLBAR_EMPTY_TRASH')

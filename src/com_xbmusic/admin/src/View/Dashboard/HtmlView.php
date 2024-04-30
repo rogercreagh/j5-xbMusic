@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.2.3 3rd April 2024
+ * @version 0.0.4.3 30th April 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -234,6 +234,22 @@ class HtmlView extends BaseHtmlView {
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
         ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_DASHBOARD_TITLE'), 'fas fa-info-circle');
+        
+        $dropdown = $toolbar->dropdownButton('views')
+        ->text('Other Views')
+        ->toggleSplit(false)
+        ->icon('icon-ellipsis-h')
+        ->buttonClass('btn btn-action')
+        ->listCheck(false);       
+        $childBar = $dropdown->getChildToolbar();
+        $childBar->standardButton('albumsview', 'Albums', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
+        $childBar->standardButton('artistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistview', 'Playlists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('songsview', 'Songs', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('trackview', 'Tracks', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'Categories', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;
+        $childBar->standardButton('tagsview', 'Tags', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        
         
         $canDo = ContentHelper::getActions('com_xbmusic');           
         if ($canDo->get('core.admin')) {
