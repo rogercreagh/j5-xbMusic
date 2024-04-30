@@ -19,6 +19,7 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
 
 class HtmlView extends BaseHtmlView {
     
@@ -35,6 +36,16 @@ class HtmlView extends BaseHtmlView {
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'track', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');
+        
+        if ($this->params->get('use_xbmusic', 1)) {
+            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
+        } else {
+            if (is_dir($this->params->get('music_path',''))) {
+                $this->basemusicfolder = $this->params->get('music_path');
+            } else {
+                $this->basemusicfolder = JPATH_ROOT.'/xbmusic/';
+            }
+        }
 //         $this->taggroups = $this->params->get('enable_taggroups',0);
 //         if ($this->taggroups) {
 //             $taggroup_ids = array();

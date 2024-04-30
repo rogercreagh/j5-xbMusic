@@ -55,18 +55,35 @@ $input = Factory::getApplication()->getInput();
 		document.getElementById('pv_desc').innerHTML= descHtml;
     }
 
+ 	function postFolder() {
+ 		document.getElementById('task').value='track.setfolder';
+ 		this.form.submit();
+ 	}
+//     	var userdata = {'id':mydata,'name':myname};
+//         jQuery.ajax({
+//                 type: "POST",
+//                 url: "YOUR PHP URL HERE",
+//                 data:userdata, 
+//                 success: function(data){
+//                     console.log(data);
+//                 }
+//                 });
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
-    	<p class="xbnit">File name is required, if you have a file much of the other info can be read from the ID3 tags in the file.
-    		<br /> if no file is available you can enter a dummy name and complete the info manually. 
+    	<p class="xbnit">Base folder to find music files is <code><?php echo $this->basemusicfolder; ?></code> which is set in xbMusic Options.
     	</p>
-    	<div class="row form-horizontal">
+    	<div class="row form-vertical">
     		<div class="col-md-6">
     			<?php echo $this->form->renderField('pathname'); ?> 
     		</div>
     		<div class="col-md-6">
+    			<?php $musicpath = Factory::getApplication()->getSession()->get('musicfolder','');
+    			if (is_dir($musicpath)) {
+       			    $this->form->setFieldAttribute('filename','directory',$musicpath);
+    			}
+    			?>
     			<?php echo $this->form->renderField('filename'); ?> 
     		</div>
     	</div>
@@ -113,8 +130,6 @@ $input = Factory::getApplication()->getInput();
 							<?php echo '<img src="data:image/jpeg;base64,'.base64_encode($this->item->id3_picture).'"/>';  ?>
 	       				</div>
         			</div>
-        			<?php echo $this->form->renderField('picturefile'); ?> 
-          		
             		<?php echo $this->form->renderField('ext_links');?>
            		
 	   			</div>
@@ -129,6 +144,25 @@ $input = Factory::getApplication()->getInput();
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('ID3 data')); ?>
+        
+        <div class="row">
+        	<div class="col-12 col-lg-4">
+        	file & audio metadata - filesize, mime-type & format, playtime, bitrate, samplerate & mode, channels & mode, encoder, compression ratio
+        	</div>
+        	<div class="col-12 col-lg-4">
+        	id3 data - song title, artist name, album title, genre, track no, year, ...and more
+        	</div>
+        	<div class="col-12 col-lg-4">
+       			<?php echo Text::_('id3 Picture'); ?>
+       			
+				<?php echo '<img src="data:image/jpeg;base64,'.base64_encode($this->item->id3_picture).'"/>';  ?>
+        	</div>
+        </div>
+        
+        
+         <?php echo HTMLHelper::_('uitab.endTab'); ?>
+        
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
 			<div class="row">
     		</div>
@@ -184,7 +218,8 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
     	<hr />
     </div>	
-    <input type="hidden" name="task" value="track.edit" />
+    <input type="hidden" name="task" id="task" value="track.edit" />
+    <input type="hidden" name="newfolder" id="newfolder" value="" />
     <?php echo HTMLHelper::_('form.token'); ?>
     </form>
     <div class="clearfix"></div>

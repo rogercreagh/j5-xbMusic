@@ -167,7 +167,7 @@ class TrackModel extends AdminModel {
     
     
     protected function canDelete($record) {
-        if (empty($record->id) || ($record->state != -2)) {
+        if (empty($record->id) || ($record->status != -2)) {
             return false;
         }
         
@@ -195,7 +195,7 @@ class TrackModel extends AdminModel {
         
         // Reorder the tracks within the category so the new track is first
         if (empty($table->id)) {
-            $table->reorder('catid = ' . (int) $table->catid . ' AND state >= 0');
+            $table->reorder('catid = ' . (int) $table->catid . ' AND status >= 0');
         }
     }
     
@@ -218,7 +218,27 @@ class TrackModel extends AdminModel {
         if (empty($form)) {
             return false;
         }
-/*         
+        $params = ComponentHelper::getParams('com_xbmusic');
+        if ($params->get('use_xbmusic', 1)) {
+            $basemusicfolder = JPATH_ROOT.'/xbmusic/'.$params->get('xbmusic_subfolder','');
+        } else {
+            $basemusicfolder = ($params->get('music_path','') != '') ? $params->get('music_path') : JPATH_ROOT.'/xbmusic/';
+        }
+        $form->setFieldAttribute('pathname','directory',$basemusicfolder);
+        $mf = $app->getSession()->get('musicfolder','');
+        $form->setValue('pathname', null, $mf);
+        $form->setFieldAttribute('filename','directory',$mf);
+        
+//         $params = ComponentHelper::getParams('com_xbmusic');
+//         if ($this->params->get('use_xbmusic', 1)) {
+//             $this->basemusicfolder = JPATH_ROOT.'xbmusic/'.$this->params->get('xbmusic_subfolder','');
+//         } else {         
+//             $this->basemusicfolder = ($this->params->get('music_path','') != '') ? $this->params->get('music_path') : JPATH_ROOT.'/xbmusic/';
+//         }
+//         $form->setFieldAttribute('pathname','directory',$this->basemusicfolder,'general');
+        
+        
+        /*         
         // Object uses for checking edit state permission of track
         $record = new \stdClass();
         

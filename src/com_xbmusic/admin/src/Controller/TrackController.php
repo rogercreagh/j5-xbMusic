@@ -15,6 +15,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\FormController;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 
@@ -31,6 +32,26 @@ class TrackController extends FormController {
             $this->view_list = $ret;
             $this->view_item = 'track&retview='.$ret;
         }
+    }
+
+//     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
+        
+//         $task = $this->getTask();
+//         $item = $model->getItem();
+        
+//         if (($task=='setfolder')) {
+//             $tid = $validData['id'];
+//             if ($tid>0) {
+//                 $this->setRedirect('index.php?option=com_xbmusic&view=track&layout=edit&id='.$tid);
+//             }
+//         }
+// }
+
+    public function setfolder() {
+        $app=Factory::getApplication();
+        $nf = $this->input->get('jform','','string')['pathname'];
+        $app->getSession()->set('musicfolder',$nf);
+        $this->setRedirect((string)Uri::getInstance());       
     }
     
     protected function allowEdit($data = [], $key = 'id') {

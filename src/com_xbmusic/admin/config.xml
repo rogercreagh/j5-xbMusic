@@ -19,13 +19,33 @@
 			class="info"
 		/>	
         
-		<field name="base_music_folder" type="combo"
-			label="Music base folder" description="Use the /xbmusic folder within the site webspace or specify a path to a folder outside the webspace where the www-data user can read and write"
-  			default="xbmusic"
+  		<field name="use_xbmusic" type="radio"
+			label="Folder for Music files"
+			description="Either use the /xbmusic area within the website, or enter full filesystem path to music folder"
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			>
+				<option value="1" >xbmusic</option>
+				<option value="0">full path</option>
+		</field>	
+        
+		<field name="xbmusic_subfolder" type="folderlist"
+			label="subfolder in xbmusic" description="choose optional subfolder within xbmusic/"
+  			directory="xbmusic"
+			recursive="true"
+			showon="use_xbmusic:1"
+			default="xbmusic"
+			hide_none="true" hide_default="true"
   		>
-  			<option value="/xbmusic">xbmusic</option>
-  			<option value="../../html/id3/music">ID3 music</option>
+          <option value="">xbmusic</option>
 		</field>
+
+      	<field name="music_path" type="text"
+			label="Full path to music"
+			description="WARNING - you must specify a directory that is visible and writable by the web server process. Either set permissions on entire folder to 777 or add the web server user (eg www-data) to the owner group for the folder"
+			size="60"
+			showon="use_xbmusic:0"
+        />
         
 	</fieldset>
 

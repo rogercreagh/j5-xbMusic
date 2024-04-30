@@ -81,7 +81,7 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         
         // Set ordering
         if ($this->status < 0) {
-            // Set ordering to 0 if state is archived or trashed
+            // Set ordering to 0 if status is archived or trashed
             $this->ordering = 0;
         } elseif (empty($this->ordering)) {
             // Set ordering to last if ordering was 0

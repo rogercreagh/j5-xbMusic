@@ -4,7 +4,9 @@
 		<inlinehelp button="show"/>
 	</config>
 <!-- Title, Alias, Id, fileinfo -->	
-	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" type="xbtags" >
+	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
+		name="general"
+	>
 		<field name="id" type="number" 
 			label="JGLOBAL_FIELD_ID_LABEL"
 			description="JGLOBAL_FIELD_ID_DESC" 
@@ -26,17 +28,18 @@
 			size="40" 
 		/>
 		
-		 <field name="pathname" type="folderlist" 
+		 <field name="pathname" type="xbfolderlist" 
 			label="File path" description="path from the music root directory as set in xbMusic Options" 
 			class="xbfilecontrol"
 			directory="/xbmusic"
-			hide_none="true" hide_default="false"
+			hide_none="true" hide_default="true"
 			recursive="true"
-			default="/xbmusic"
-		/>
+			onchange="document.getElementById('task').value='track.setfolder'; this.form.submit();"
+		>
+		</field>
 
 		 <field name="filename" type="filelist" 
-			label="File name" description="filename including extension" 
+			label="File name" description="Filename" 
 			directory="/xbmusic"
 			hide_none="true" hide_default="true"
 			class="xbfilecontrol"
@@ -140,6 +143,14 @@
 					/>
 			</form>
 		</field>
+
+		<field
+			name="json_ext_links" type="textarea"
+			label="XB_ADMIN_NOTE"
+			description="XB_FIELD_ADMIN_NOTE_DESC"
+			class="span12" size="40" rows="3"
+			maxlength="255"
+		/>
 
 	
 	</fieldset>
