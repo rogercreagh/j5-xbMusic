@@ -18,7 +18,7 @@
 			label="JGLOBAL_TITLE"
 			description="JFIELD_TITLE_DESC"
 			class="input-xxlarge input-large-text"
-			size="40" required="true" 
+			size="40"  
 		/>
 
 		<field name="alias" type="text" 
@@ -43,40 +43,55 @@
 			directory="/xbmusic"
 			hide_none="true" hide_default="true"
 			class="xbfilecontrol"
-		/>
+			default="" required="true"
+		>
+			<option value="">Select file</option>
+		</field>
 
 	</fieldset>
 	
-<!-- id3, descript, picture, rec-date, status, cat, alltags -->
+<!-- rec-date, rel-date, description, status, access, ordering, cat, alltags, note -->
 	<fieldset name="general">
 	
-		<field name="rel_year" type="number"
+		<field name="rel_date" type="text"
 			label="Release Year" 
-			description="Year the album or track was released, if not set will default to recoding date year."
-			min="1900" max="2052"
-			default="2024"
-			class="inputbox" size="4" 
+			description="Date the album or track was released. Format [[DD-]MMM-]YYYY - day &amp; month optional"
+			class="inputbox" maxlength="12"
+		/>
+		<field name="rec_date" type="text"
+			label="Recording date" description="Date of track recording session. Format [[DD-]MMM-]YYYY - day &amp; month optional"
+			class="inputbox" maxlength="12"
 		/>
 
-
-		<field name="rec_date" type="calendar"
-			label="Recording date" description="Dates of track recording session."
-			class="inputbox" maxlength="20"
-			showtime="false"
-	 		format="%Y-%m-%d 0:0:0" filter="user_utc"
-		/>
-
-		<field name="picturefile" type="accessiblemedia"
-			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
-			directory="xbmusic"
-		/>
-					
 		<field name="description" type="textarea"
 			label="Edit Description" description="Plain text or Markdown code. " 
 			class="inputbox" rows="15" cols="60"
 			filter="string"   
 		/>
 		
+		<field name="ext_links" type="subform" 
+			label="External Links" description="Links to associated information for the track"
+			min="0" max="10" multiple="true"
+			buttons= "add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+		>
+			<form>
+				<field
+					name="link_text" type="text"
+					label="Link Text Label" size="20" maxlength="25"
+					/>
+				<field
+					name="link_url" type="url"
+					label="Link URL"
+					size="40"
+ 					/>
+				<field
+					name="link_desc" type="text"
+					label="Link Note" size="40" maxlength="190"
+					/>
+			</form>
+		</field>
+	
 		<field
 			name="note" type="textarea"
 			label="XB_ADMIN_NOTE"
@@ -112,47 +127,63 @@
 
 		<field 
 			name="tags" type="tag"
-			label="XB_FIELD_TAGS_ADD_REMOVE_LABEL"
+			label="All tags, incl. groups"
 			description="XB_FIELD_TAGS_ADD_REMOVE_DESC"
 			multiple="true" mode="ajax"
 			custom="deny"
 		/>
 	</fieldset>
+	
+
+	<fieldset name="image-info"
+		label="ID3 Embedded image info"
+	>
+		<field name="id3_image" type="hidden" 
+		/>
+		<field name="image_mime" type="text"
+			label="Mime Type"
+			description="Embedded image mime type"
+			size="20" maxlength="50"
+			readonly="true"
+		/>
+		<field name="image_width" type="text"
+			label="Image width"
+			description="embedded width in pixels"
+			size="5" maxlength="5"
+			readonly="true"
+		/>
+		<field name="image_height" type="text"
+			label="Image height"
+			description="embedded height in pixels"
+			size="5" maxlength="5"
+			readonly="true"
+		/>
+		<field name="image_size" type="text"
+			label="Image size (kB)"
+			description="Size of embedded image in kB"
+			size="6" maxlength="6"
+			readonly="true"
+		/>
+		<field name="image_type" type="text"
+			label="Picture type"
+			description="eg Album Cover, Portrait, Graphic..."
+			size="20" maxlength="50"
+		/>
+		<field name="image_desc" type="text"
+			label="Picture desciption"
+			description="fuller description of image"
+			size="20" maxlength="50"
+		/>
+		<field name="picturefile" type="accessiblemedia"
+			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
+			directory="xbmusic"
+			shownon="id3_image:"
+		/>
+	</fieldset>
+
 
 <!-- Album, artist(s), song, playlists -->	
 	<fieldset name="links">
-		<field name="ext_links" type="subform" 
-			label="XBCULTURE_EXTLINK_LBL" description="XBFILMS_FIELD_EXTLINKS_DESC"
-			min="0" max="10" multiple="true"
-			buttons= "add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-		>
-			<form>
-				<field
-					name="link_text" type="text"
-					label="XBFILMS_FIELD_LINKTEXT_LABEL" size="20" maxlength="25"
-					/>
-				<field
-					name="link_url" type="url"
-					label="XBFILMS_FIELD_URL_LABEL"
-					size="40"
- 					/>
-				<field
-					name="link_desc" type="text"
-					label="Description" size="40" maxlength="190"
-					/>
-			</form>
-		</field>
-
-		<field
-			name="json_ext_links" type="textarea"
-			label="XB_ADMIN_NOTE"
-			description="XB_FIELD_ADMIN_NOTE_DESC"
-			class="span12" size="40" rows="3"
-			maxlength="255"
-		/>
-
-	
 	</fieldset>
 <!-- Standard joomla -->
 	<fieldset name="pub">

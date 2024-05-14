@@ -14,6 +14,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
@@ -57,15 +58,23 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
         
         // Set alias
-        if (trim($this->alias) == '') {
-            $this->alias = $this->title;
-        }
+//         $this->params      = ComponentHelper::getParams('com_xbmusic');;
         
-        $this->alias = ApplicationHelper::stringURLSafe($this->alias, $this->language);
+//         if ($this->params->get('use_xbmusic', 1)) {
+//             $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
+//         } else {
+//             if (is_dir($this->params->get('music_path',''))) {
+//                 $this->basemusicfolder = $this->params->get('music_path');
+//             } else {
+//                 $this->basemusicfolder = JPATH_ROOT.'/xbmusic/';
+//             }
+//         }
+//         $localfilepathname = str_replace($this->basemusicfolder,'',$item->pathname);
+//         $this->alias  = OutputFilter::stringURLSafe($localfilepathname);
         
-        if (trim(str_replace('-', '', $this->alias)) == '') {
-            $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
-        }
+//         if (trim(str_replace('-', '', $this->alias)) == '') {
+//             $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
+//         }
         
         // Check for a valid category.
 //         if (!$this->catid = (int) $this->catid) {
@@ -127,13 +136,13 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
             }
             
             // Verify that the alias is unique
-            $table = new self($db, $this->getDispatcher());
+//             $table = new self($db, $this->getDispatcher());
             
-            if ($table->load(['alias' => $this->alias, 'catid' => $this->catid]) && ($table->id != $this->id || $this->id == 0)) {
-                $this->setError(Text::_('Error alias not unique'));
+//             if ($table->load(['alias' => $this->alias, 'catid' => $this->catid]) && ($table->id != $this->id || $this->id == 0)) {
+//                 $this->setError(Text::_('Error alias not unique'));
                 
-                return false;
-            }
+//                 return false;
+//             }
             
             // Store the new row
             parent::store($updateNulls);

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.2.2 1st April 2024
+ * @version 0.0.4.6 14th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -11,6 +11,8 @@
 namespace Crosborne\Component\Xbmusic\Administrator\Helper;
 
 defined('_JEXEC') or die;
+
+//require_once(JPATH_COMPONENT_ADMINISTRATOR.'/src/Helper/getid3/getid3.php');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Access\Access;
@@ -24,6 +26,7 @@ use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use DOMDocument;
+use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
 
 class XbmusicHelper extends ComponentHelper
 {
@@ -45,9 +48,71 @@ class XbmusicHelper extends ComponentHelper
 	    }
 	    return $result;
 	}
-	
-		
+
+	public static function getFileId3($filename, $image = '') {
+	    require (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
+	    $ThisFileInfo = getIdData($filename);
+	    $result = array();	 
+	    $result['audioinfo'] = array();
+	    $result['imageinfo'] = array();
+	    $result['id3tags'] = array();
+	    $result['fileinfo'] = array();
+	    $result['fileinfo']['playtime_string'] = (isset($ThisFileInfo['playtime_string'])) ? $ThisFileInfo['playtime_string'] : '';
+	    $result['fileinfo']['mime_type'] = (isset($ThisFileInfo['mime_type'])) ? $ThisFileInfo['mime_type'] : '';
+	    $result['fileinfo']['filesize'] = (isset($ThisFileInfo['filesize'])) ? $ThisFileInfo['filesize'] : '';
+	    $result['fileinfo']['fileformat'] = (isset($ThisFileInfo['fileformat'])) ? $ThisFileInfo['fileformat'] : '';
+	    $result['audioinfo']['bitrate'] = (isset($ThisFileInfo['bitrate'])) ? $ThisFileInfo['bitrate'] : '';
+	    $result['audioinfo']['channels'] = (isset($ThisFileInfo['audio']['channels'])) ? $ThisFileInfo['audio']['channels'] : '';
+	    $result['audioinfo']['channelmode'] = (isset($ThisFileInfo['audio']['channelmode'])) ? $ThisFileInfo['audio']['channelmode'] : '';
+	    $result['audioinfo']['sample_rate'] = (isset($ThisFileInfo['audio']['sample_rate'])) ? $ThisFileInfo['audio']['sample_rate'] : '';
+	    $result['audioinfo']['bitrate_mode'] = (isset($ThisFileInfo['audio']['bitrate_mode'])) ? $ThisFileInfo['audio']['bitrate_mode'] : '';
+	    $result['audioinfo']['compression_ratio'] = (isset($ThisFileInfo['audio']['compression_ratio'])) ? $ThisFileInfo['audio']['compression_ratio'] : '';
+	    $result['audioinfo']['encoder_options'] = (isset($ThisFileInfo['audio']['encoder_options'])) ? $ThisFileInfo['audio']['encoder_options'] : '';
+	    $result['audioinfo']['encoder'] = (isset($ThisFileInfo['audio']['encoder'])) ? $ThisFileInfo['audio']['encoder'] : '';
+	    $result['audioinfo']['playtime_seconds'] = (isset($ThisFileInfo['playtime_seconds'])) ? $ThisFileInfo['playtime_seconds'] : '';
+	    if(isset($ThisFileInfo['comments']['picture'][0])){
+//            $image='data:'.$ThisFileInfo['comments']['picture'][0]['image_mime'].';charset=utf-8;base64,'.base64_encode($OldThisFileInfo['comments']['picture'][0]['data']);
+//            $image = $ThisFileInfo['comments']['picture'][0]['data'];
+//    	    unset($ThisFileInfo['comments']['picture'][0]['data']);
+    	    $result['imageinfo'] = $ThisFileInfo['comments']['picture'][0]; //we're only getting the first image
+    	    unset($ThisFileInfo['comments']['picture']);
+	    }
+	    if (isset($ThisFileInfo['comments']['music_cd_identifier'])) { //this can contain binary chars and screws things up
+	        unset($ThisFileInfo['comments']['music_cd_identifier']);
+	    }
+	    $id3tags = array();
+	    foreach ($ThisFileInfo['comments'] as $key => $valuearr) {
+//	        $id3tags[] = array('tagname' => $key, 'tagvalue' => $valuearr[0]);
+            $id3tags[$key] = implode(', ', $valuearr);
+	    }
+	    $result['id3tags'] = $id3tags;
+//	    $result['id3tags'] = $ThisFileInfo['comments'];
+	    return $result;
+	}
+	    
+	    
 /****************** xbLibrary functions ***********/
+	
+	/**
+	 * @name checkValueExists()
+	 * @desc returns true if given value exists in given table column (case insensitive)
+	 * @param string $value - text to check
+	 * @param string $table - the table to check in
+	 * @param string $col- the column to check
+	 * @return boolean - true if value is found in column
+	 */
+	public static function checkValueExists( $value,  $table, $col) {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('id')->from($db->quoteName($table))
+	    ->where('LOWER('.$db->quoteName($col).')='.$db->quote(strtolower($value)));
+	    $db->setQuery($query);
+	    $res = $db->loadResult();
+	    if ($res > 0) {
+	        return true;
+	    }
+	    return false;
+	}
 	
 	/**
 	 * @name getItemCnt
@@ -69,9 +134,38 @@ class XbmusicHelper extends ComponentHelper
 	        $cnt = $db->loadResult();
 	    } catch (\Exception $e) {
 	        $dberr = $e->getMessage();
-	        Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query, 'error');
+	        Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
 	    }
 	    return $cnt;
+	}
+	
+	/**
+	 * @name getItems
+	 * @param string $table - table name containing item(s)
+	 * @param string $column - column to search in
+	 * @param unknown $search - value to search for, for partial string match use %str%
+	 * @param string $filter - optional string to use as andwhere clause
+	 * @return array of objects 
+	 */
+	public static function getItems(string $table, string $column, $search, $filter = '' ) {
+	    //TODO make case insenstive?
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*')->from($db->qn($table).' AS a');
+	    if ((is_string($search)) && (($search[0] == '%') || ($search[-1] == '%'))) {
+	        $query->where($db->qn($column). 'LIKE ('.$db->q($search).')');
+	    } else {
+	        $query->where($db->qn($column).' = '.$db->q($search));
+	    }
+	    if ($filter !='') $query->where($filter);
+	    $db->setQuery($query);
+	    try {
+	        $res = $db->loadObjectList();
+	    } catch (\Exception $e) {
+	        $dberr = $e->getMessage();
+	        Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
+	    }
+	    return $res;	    
 	}
 	
 	public static function abridgeText(string $source, int $maxstart = 6, int $maxend = 4, $wordbrk = true) {
@@ -87,6 +181,7 @@ class XbmusicHelper extends ComponentHelper
 	    }
 	    return $start.' ... '.$end;	    
 	}
+	
 	public static function truncateToText(string $source, int $maxlen=250, string $split = 'word', $ellipsis = true) { //null=exact|false=word|true=sentence
 	    if ($maxlen < 5) return $source; //silly the elipsis '...' is 3 chars
 	    $action = strpos(' firstsent lastsent word abridge exact',$split);
@@ -213,7 +308,7 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 	
-	/***
+	/**
 	 * @name checkComponent()
 	 * @desc test whether a component is installed and enabled.
 	 * NB This sets the seesion variable if component installed to 1 if enabled or 0 if disabled.
@@ -339,7 +434,6 @@ class XbmusicHelper extends ComponentHelper
 	    return $db->loadObject();
 	}
 	
-	
 	public static function tagFilterQuery($query, $tagfilt, $taglogic) {
 	    
 	    if (!empty($tagfilt)) {
@@ -376,5 +470,6 @@ class XbmusicHelper extends ComponentHelper
 	   }
 
 	}
+
 }
 

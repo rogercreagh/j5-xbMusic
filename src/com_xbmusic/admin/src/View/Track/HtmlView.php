@@ -46,6 +46,7 @@ class HtmlView extends BaseHtmlView {
                 $this->basemusicfolder = JPATH_ROOT.'/xbmusic/';
             }
         }
+        
 //         $this->taggroups = $this->params->get('enable_taggroups',0);
 //         if ($this->taggroups) {
 //             $taggroup_ids = array();

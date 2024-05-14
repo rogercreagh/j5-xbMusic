@@ -19,6 +19,8 @@
 			class="info"
 		/>	
         
+        <field name="space1" type="spacer" hr="true" />
+        
   		<field name="use_xbmusic" type="radio"
 			label="Folder for Music files"
 			description="Either use the /xbmusic area within the website, or enter full filesystem path to music folder"

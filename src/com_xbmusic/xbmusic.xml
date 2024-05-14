@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>30th April 2024</creationDate>
-	<version>0.0.4.3</version>
+	<creationDate>14th May 2024</creationDate>
+	<version>0.0.4.6</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -51,6 +51,7 @@
 			<folder>src</folder>
 			<folder>sql</folder>
 			<folder>tmpl</folder>
+<!--  -->			<folder>vendor</folder>
 		</files>
 		
 		<menu img="class:default" link="option=com_xbmusic">com_xbmusic</menu>

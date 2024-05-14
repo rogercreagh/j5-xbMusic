@@ -24,7 +24,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dashboard'); ?>" method="post" name="adminForm" id="adminForm">
 
-		<h2><i class='icon-info-circle'></i><?php echo Text::_('XB_STATUS_SUM'); ?></h2>
+		<h2><i class='icon-info-circle'></i> <?php echo Text::_('XB_STATUS_SUM'); ?></h2>
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
 				<div class="xbbox gradgreen">
