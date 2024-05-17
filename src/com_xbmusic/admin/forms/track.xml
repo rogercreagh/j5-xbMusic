@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.6.1 15th May 2024 -->
+<!-- xbMusic Track Form file v0.0.6.2 17th May 2024 -->
 
 <form>
 	<config>
@@ -178,7 +178,27 @@
 
 
 <!-- Album, artist(s), song, playlists -->	
-	<fieldset name="links">
+	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
+		name="links" 
+	>
+		<field name="songlist" type="subform"
+			label="Song(s)"
+			description="Track may be medley of several songs"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="song_id" type="xbsonglist" label="Song Title">
+					<option value=""> </option>	
+				</field>
+				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				/>
+			</form>
+		</field>			
+			
+		
 	</fieldset>
 <!-- Standard joomla -->
 	<fieldset name="pub">

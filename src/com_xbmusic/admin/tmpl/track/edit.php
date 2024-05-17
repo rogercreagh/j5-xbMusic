@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.4.6 14th May 2024
+ * @version 0.0.6.2 17th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -97,7 +97,11 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
+    	<div class="row">
+    		<div class="col-md-6">
      			<?php echo $this->form->renderField('perf_name'); ?> 
+     		</div>
+     	</div>
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
@@ -227,7 +231,7 @@ $input = Factory::getApplication()->getInput();
 					Artists
 				</div>
 				<div class="col-12">
-					Song
+					<?php echo $this->form->renderField('songlist'); ?> 
 				</div>
 				<div class="col-12">
 					Playlists

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.6.2 17th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -155,7 +155,8 @@ class TrackModel extends AdminModel {
         
         if (empty($data)) {
             $data = $this->getItem();
-
+            $data->songlist = $this->getTrackSongList();
+            
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
             if (($this->getState('track.id') == 0) && ($retview != '')) {
@@ -321,6 +322,47 @@ class TrackModel extends AdminModel {
         
         return true;
     }
+  
+    public function getTrackSongList() {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.id as song_id, ba.note AS note');
+        $query->from('#__xbmusic_songtrack AS ba');
+        $query->innerjoin('#__xbmusic_songs AS a ON ba.song_id = a.id');
+        $query->where('ba.track_id = '.(int) $this->getItem()->id);
+        $query->order('ba.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+    
+    function storeTrackSongs($track_id, $songList) {
+        //delete existing role list
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_songtrack'));
+        $query->where('track_id = '.$track_id);
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        $listorder=0;
+        foreach ($songList as $song) {
+            if ($song['song_id'] > 0) {
+                $listorder ++;
+                $query = $db->getQuery(true);
+                $query->insert($db->quoteName('#__xbmusic_songtrack'));
+                $query->columns('song_id,track_id,note,listorder');
+                $query->values('"'.$song_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$listorder.'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+            } else {
+                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
+                //create person
+                //add filmperson with new id
+            }
+        }
+    }
+    
     
     private function canCreateCategory() {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');

@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Field/XbtracklistField.php
- * @version 0.0.6.0 15th May 2024
+ * @filesource admin/src/Field/XbsonglistField.php
+ * @version 0.0.6.3 17th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -22,7 +22,7 @@ use Joomla\Utilities\ArrayHelper;
 use \stdClass;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class XbtracklistField extends ListField {
+class XbsonglistField extends ListField {
     
     /**
      * @desc gets an alphabetical list of all available tracks (title and performer)
@@ -32,15 +32,16 @@ class XbtracklistField extends ListField {
      */
     public function getOptions() {       
         $sess= Factory::getApplication()->getSession();
-        $songtitle = $sess->get('songtitle');
-//        Factory::getApplication()->enqueueMessage('songtitle '.$songtitle);
-        $sess->clear('songtitle');
+        $tracktitle = $sess->get('tracktitle');
+//        Factory::getApplication()->enqueueMessage('tracktitle '.$tracktitle);
+        $sess->clear('tracktitle');
         $db = Factory::getDbo();
         $query  = $db->getQuery(true);
-        $query->select('id AS value, CONCAT(title," - ",perf_name," (",SUBSTRING(rel_date,1,4),")") AS text')->from('#__xbmusic_tracks');
+        $query->select('id AS value, title AS text')->from('#__xbmusic_songs');
         $query->order('title ASC');
         $db->setQuery($query);
         $result = $db->loadObjectList();
+        //now get most recent 3 for top of list
         $query->clear('order');
         $query->order('created DESC')->setLimit('3');
         $recent = $db->loadObjectList();
@@ -49,13 +50,13 @@ class XbtracklistField extends ListField {
         $blank->value = 0;
         $blank->text = '------------';
         $recent[] = $blank;
-
+        // now get any title matches for top of list
         $like = array();
         /***/
-        if ($songtitle != '') {
+        if ($tracktitle != '') {
             $query->clear();
-            $query->select('id AS value, CONCAT(title," - ",perf_name," (",SUBSTRING(rel_date,1,4),")") AS text')->from('#__xbmusic_tracks');
-            $query->where('SOUNDEX('.$db->q($songtitle).') =  SOUNDEX(title)');
+            $query->select('id AS value, title AS text')->from('#__xbmusic_songs');
+            $query->where('SOUNDEX('.$db->q($tracktitle).') =  SOUNDEX( title)');
             $db->setQuery($query);
             //Factory::getApplication()->enqueueMessage('query '.$query->dump());
             $like = $db->loadObjectList();
