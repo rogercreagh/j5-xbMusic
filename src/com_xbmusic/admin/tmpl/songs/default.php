@@ -1,7 +1,7 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/tracks/default.php
+ * @filesource admin/tmpl/songs/default.php
  * @version 0.0.5.0 15th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
@@ -52,14 +52,14 @@ if (strpos($listOrder, 'modified') !== false) {
 }
 
 if ($saveOrder && !empty($this->items)) {
-    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=tracks.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
+    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
     HTMLHelper::_('draggablelist.draggable');
 }
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=tracks'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=songs'); ?>" method="post" name="adminForm" id="adminForm">
+		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_SONGS'); ?></h3>
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -88,15 +88,15 @@ if ($saveOrder && !empty($this->items)) {
           		</p>
           	</div>
 			
-			<table class="table table-striped table-hover xbtablelist" id="xbtrackList">
+			<table class="table table-striped table-hover xbtablelist" id="xbsongList">
     			<colgroup>
 					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
 					<col class="nowrap center hidden-phone" style="width:25px;"><!-- ordering -->
 					<col class="nowrap center" style="width:55px;"><!-- status -->
-    				<col ><!-- title, alias, songlink -->
-    				<col ><!-- artist -->
-    				<col ><!-- path, filename -->
-    				<col class="nowrap hidden-phone" ><!-- album, picture -->
+    				<col ><!-- title, alias -->
+    				<col ><!-- performers -->
+    				<col ><!-- tracks -->
+    				<col class="nowrap hidden-phone" ><!-- albums -->
     				<col class="nowrap hidden-phone" ><!-- playlists -->
     				<col class="nowrap hidden-phone" style="width:110px;" ><!-- category & tags -->
     				<col class="nowrap hidden-phone xbtc" style="width:160px; padding:0;"><!-- date & id -->
@@ -115,11 +115,11 @@ if ($saveOrder && !empty($this->items)) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th>artist(s)
+						<th>performers
 						</th>
-						<th>folder, filename
+						<th>tracks
 						</th>
-						<th>album, picture
+						<th>albums
 						</th>
 						<th>playlists
 						</th>
@@ -143,10 +143,10 @@ if ($saveOrder && !empty($this->items)) {
     				$item->max_ordering = 0;
     				$ordering   = ($listOrder == 'a.ordering');
     				$canCreate  = $user->authorise('core.create',     'com_xbmusic.category.' . $item->catid);
-    				$canEdit    = $user->authorise('core.edit',       'com_xbmusic.track.' . $item->id);
+    				$canEdit    = $user->authorise('core.edit',       'com_xbmusic.song.' . $item->id);
     				$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
-    				$canEditOwn = $user->authorise('core.edit.own',   'com_xbmusic.track.' . $item->id) && $item->created_by == $userId;
-    				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.track.' . $item->id) && $canCheckin;
+    				$canEditOwn = $user->authorise('core.edit.own',   'com_xbmusic.song.' . $item->id) && $item->created_by == $userId;
+    				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.song.' . $item->id) && $canCheckin;
     				$canEditCat    = $user->authorise('core.edit',       'com_xbmusic.category.' . $item->catid);
     				$canEditOwnCat = $user->authorise('core.edit.own',   'com_xbmusic.category.' . $item->catid) && $item->category_uid == $userId;
     				$canEditParCat    = $user->authorise('core.edit',       'com_xbmusic.category.' . $item->parent_category_id);
@@ -176,10 +176,10 @@ if ($saveOrder && !empty($this->items)) {
                             <?php endif; ?>             
 							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
 						</td>
-						<td class="track-status">
+						<td class="song-status">
                                 <?php
                                     $options = [
-                                        'task_prefix' => 'tracks.',
+                                        'task_prefix' => 'songs.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];
@@ -195,14 +195,14 @@ if ($saveOrder && !empty($this->items)) {
 								<?php endif; ?>
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<a class="hasTooltip" href="
-									<?php echo Route::_('index.php?option=com_xbmusic&task=track.edit&id=' . $item->id).'&retview=tracks';?>
+									<?php echo Route::_('index.php?option=com_xbmusic&task=song.edit&id=' . $item->id).'&retview=songs';?>
 									" title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->title); ?></a> 
 								<?php else : ?>
 									<span title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->title); ?></span>
 								<?php endif; ?>
-								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=track&tmpl=component&id='.$item->id)."'"; ?>
+								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=song&tmpl=component&id='.$item->id)."'"; ?>
           						<?php $pvtit = "'".$item->title."'"; ?>
                                 <span  data-bs-toggle="modal" data-bs-target="#pvModal" data-bs-source="<?php echo $pvuri; ?>" 
                                 	data-bs-itemtitle="<?php echo $item->title; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
@@ -213,14 +213,12 @@ if ($saveOrder && !empty($this->items)) {
 								</p>
 							</div>
 						</td>
-						<td>artists
+						<td>performers
 						</td>
-						<td>
-							<p><code><?php echo str_replace($this->basemusicfolder,'',$item->pathname); ?>/</code>
-								<br /><code><?php echo $item->filename;?></code>
-							</p>
+						<td>playlists
+							
 						</td>
-						<td>album, picture
+						<td>albums
 						</td>
 						<td>playlists
 						</td>
@@ -267,17 +265,17 @@ if ($saveOrder && !empty($this->items)) {
 					$this->loadTemplate('batch_body')
 				); ?>
 			<?php endif; ?>
-			<?php // Load the track preview modal ?>
+			<?php // Load the song preview modal ?>
 			<?php echo HTMLHelper::_(
 				'bootstrap.renderModal',
 				'pvModal',
 				array(
-					'title'  => Text::_('XBMUSIC_TRACK_PREVIEW'),
+					'title'  => Text::_('XBMUSIC_SONG_PREVIEW'),
 					'footer' => '',
 				    'height' => '900vh',
 				    'bodyHeight' => '90',
 				    'modalWidth' => '80',
-				    'url' => Uri::root().'index.php?option=com_xbmusic&view=track&id='.'x'
+				    'url' => Uri::root().'index.php?option=com_xbmusic&view=song&id='.'x'
 				),
 			); ?>
 

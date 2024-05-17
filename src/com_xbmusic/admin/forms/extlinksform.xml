@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic admin/forms/extlinksform.xml v0.0.6.0 15th May 2024 -->
+<form>
+	<fieldset>
+			<field
+				name="link_text" type="text" required="true"
+				label="XB_LINKTEXT_LABEL" size="20" maxlength="50"
+				/>
+			<field
+				name="link_url" type="url" required="true"
+				label="XB_URL"
+				size="40" maxlength="190"
+					/>
+			<field
+				name="link_desc" type="text"
+				label="XB_LINKDESC_LABEL" size="40" maxlength="190"
+				/>
+	</fieldset>
+</form>

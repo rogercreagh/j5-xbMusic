@@ -1,7 +1,7 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Model/TracksModel.php
+ * @filesource admin/src/Model/SongsModel.php
  * @version 0.0.5.0 15th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
@@ -21,7 +21,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class TracksModel extends ListModel {
+class SongsModel extends ListModel {
     
     public function __construct($config = array())
     {
@@ -113,15 +113,15 @@ class TracksModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.picturefile, a.filename, a.pathname, '
-                    .'a.rec_date, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
+                'DISTINCT a.id, a.title, a.alias, a.description, '
+                    .'a.comp_date, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
                     .'a.note'
                 )
             );
-        $query->from('#__xbmusic_tracks AS a');
+        $query->from('#__xbmusic_songs AS a');
                 
-        // join albums, songs, artists, playlists
+        // join tracks
         
         // Join over the users for the checked out user.
         $query->select('uc.name AS editor')
@@ -235,7 +235,7 @@ class TracksModel extends ListModel {
     	if ($tagfilt[0] > 0) {
     	    $tagfilt = ArrayHelper::toInteger($tagfilt);
     	    $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.track').'
+                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.song').'
                     AND tmap.content_item_id = a.id)';
     	    switch ($taglogic) {
     	        case 1: //all tags must be matched
@@ -255,7 +255,7 @@ class TracksModel extends ListModel {
     	                $tagIds = implode(',', $tagfilt);
     	                if ($tagIds) {
     	                    $subQueryAny = '(SELECT DISTINCT content_item_id AS cid FROM #__contentitem_tag_map
-                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.track').')';
+                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.song').')';
     	                    $query->innerJoin('(' . (string) $subQueryAny . ') AS tm ON tm.cid = a.id');
     	                }
     	            } //end else

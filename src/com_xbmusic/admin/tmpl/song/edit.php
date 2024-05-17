@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/track/edit.php
- * @version 0.0.4.6 14th May 2024
+ * @filesource admin/tmpl/song/edit.php
+ * @version 0.0.6.1 17th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -70,25 +70,8 @@ $input = Factory::getApplication()->getInput();
 //                 });
 </script>
 <div id="xbcomponent">
-    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
+    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=song&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
-    	<p class="xbnit">Base folder to find music files is <code><?php echo $this->basemusicfolder; ?></code> which is set in xbMusic Options.
-    	</p>
-    	<div class="row form-vertical">
-    		<div class="col-md-6">
-    			<?php echo $this->form->renderField('pathname'); ?> 
-    		</div>
-    		<div class="col-md-6">
-    			<?php $session = Factory::getApplication()->getSession();
-                    $musicpath = $session->get('musicfolder','');
-        			if (is_dir($musicpath)) {
-           			  $this->form->setFieldAttribute('filename','directory',$musicpath);
-        			}
-                    $session->clear('musicfolder');
-    			?>
-    			<?php echo $this->form->renderField('filename'); ?> 
-    		</div>
-    	</div>
     	<div class="row form-vertical">
     		<div class="col-md-10">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
@@ -97,7 +80,6 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
-     			<?php echo $this->form->renderField('perf_name'); ?> 
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
@@ -107,31 +89,9 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-9">
    					<div class="row xb09">
 		           		<div class="col-12 col-lg-5">
-        					<fieldset id="filedets" class="xbbox xbboxwht xbyscroll">
-        						<legend>File details</legend>
-    		           			<dl class="xbdl">
-    		           				<dt><?php echo Text::_('Duration'); ?></dt>
-    		           				<dd><?php echo $this->item->fileinfo->playtime_string; ?></dd>
-    		           				<dt><?php echo Text::_('Type'); ?></dt>
-    		           				<dd><?php echo $this->item->fileinfo->mime_type.' ('.$this->item->fileinfo->fileformat.')'; ?></dd>
-    		           				<dt><?php echo Text::_('File size'); ?></dt>
-    		           				<dd><?php echo number_format($this->item->fileinfo->filesize/1024,2).'kB'; ?></dd>
-    		           				<dt><?php echo Text::_('Bitrate'); ?></dt>
-    		           				<dd><?php echo number_format($this->item->audioinfo->bitrate/1000,0).'bps,'; ?>
-    		           				<?php echo Text::_('mode').' '.$this->item->audioinfo->bitrate_mode; ?></dd>
-    		           				<dt><?php echo Text::_('Channels'); ?></dt>
-    		           				<dd><?php echo $this->item->audioinfo->channels; ?>
-    		           				<?php echo $this->item->audioinfo->channelmode; ?></dd>
-    		           				<dt><?php echo Text::_('Sample rate'); ?></dt>
-    		           				<dd><?php echo number_format($this->item->audioinfo->sample_rate/1000,1).'kHz'; ?></dd>
-    		           				<dt><?php echo Text::_('Effective compression ratio'); ?></dt>
-    		           				<dd><?php echo number_format((1-$this->item->audioinfo->compression_ratio)*100,1).'%'; ?></dd>
-    		           			</dl>
-        					</fieldset>
 						</div>   					
 		           		<div class="col-12 col-lg-7">
-        					<?php echo $this->form->renderField('rec_date'); ?> 
-        					<?php echo $this->form->renderField('rel_date'); ?> 
+        					<?php echo $this->form->renderField('comp_date'); ?> 
         				</div>
         			</div>
   					<div class="row">
@@ -161,73 +121,21 @@ $input = Factory::getApplication()->getInput();
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
-        	<div class="row">
-           		<div class="col-12 col-md-5">
-           			<?php echo Text::_('id3 Image'); ?>
-					<?php echo '<img src="data:image/jpeg;base64,'.base64_encode($this->item->id3_image).'" />';  ?>
-				</div>        		
-           		<div class="col-12 col-md-7">
-					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
-						<legend>Image details</legend>
-    					<?php echo $this->form->renderField('image_type'); ?> 
-    					<?php echo $this->form->renderField('image_desc'); ?> 
-						<dl class="xbdl">
-    						<dt><?php echo Text::_('Type'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_mime;?></dd>
-    						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_width;?>&nbsp;x&nbsp;
-    						<?php echo $this->item->imageinfo->image_height;?> px</dd>
-    						<dt><?php echo Text::_('Size'); ?>:</dt>
-    						<dd><?php echo number_format($this->item->imageinfo->datalength/1024, 2);?> kB</dd>
-						</dl>
-					</fieldset>
-				</div>
-        	</div>
-			<div class="row">
-           		<div class="col-12 col-lg-6">
-					<?php //echo $this->form->renderField('picturefile'); ?> 
-				</div>
-           		<div class="col-12 col-lg-6">
-           			
-   				</div>
-			</div>
-        
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
-
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('ID3 data')); ?>
-        	<div class="row">
-           		<div class="col-12 col-md-5">
-					<fieldset id="id3dets" class="xbbox xbboxwht ">
-						<legend>ID3 Comment Tags</legend>
-						<dl class="xbdl">
-                    		<?php foreach ($this->item->id3_tags as $key=>$value) : ?>
-                    		    <dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
-                    		<?php endforeach; ?>        
-						</dl>
-					</fieldset>
-        		</div>
-        		<div class=col-12 col-md7">
-        			<p>Reload ID3, display new, if diff option to resave with new</p>
-        		</div>
-        	</div>
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
-        
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
 			<div class="row">
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'albums', Text::_('Linked Items')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
 			<div class="row">
+				<div class="col-12">
+					<?php echo $this->form->renderField('tracklist'); ?>	
+				</div>
 				<div class="col-12">
 					Album
 				</div>
 				<div class="col-12">
-					Artists
-				</div>
-				<div class="col-12">
-					Song
+					Performers
 				</div>
 				<div class="col-12">
 					Playlists
@@ -272,8 +180,7 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
     	<hr />
     </div>	
-    <input type="hidden" name="task" id="task" value="track.edit" />
-    <input type="hidden" name="newfolder" id="newfolder" value="" />
+    <input type="hidden" name="task" id="task" value="song.edit" />
     <?php echo HTMLHelper::_('form.token'); ?>
     </form>
     <div class="clearfix"></div>

@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.6.1 15th May 2024 -->
-
+<!-- xbMusic Song Form file v0.0.6.1 17th May 2024 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
 	</config>
 <!-- Title, Alias, Id, fileinfo -->	
-	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
-		name="general"
+	<fieldset name="general"
 	>
 		<field name="id" type="number" 
 			label="JGLOBAL_FIELD_ID_LABEL"
@@ -20,7 +18,7 @@
 			label="JGLOBAL_TITLE"
 			description="JFIELD_TITLE_DESC"
 			class="input-xxlarge input-large-text"
-			size="40"  
+			size="60"  
 		/>
 
 		<field name="alias" type="text" 
@@ -30,48 +28,21 @@
 			size="40" 
 		/>
 		
-		<field name="perf_name" type="text" 
-			label="Main Performer"
-			description="Short name to identify the primary performer or band"
-			hint="Will default to first named artist"
-			size="40" 
-		/>
-		
-		 <field name="pathname" type="xbfolderlist" 
-			label="File path" description="path from the music root directory as set in xbMusic Options" 
-			class="xbfilecontrol"
-			directory="/xbmusic"
-			hide_none="true" hide_default="true"
-			recursive="true"
-			onchange="document.getElementById('task').value='track.setfolder'; this.form.submit();"
-		>
-		</field>
-
-		 <field name="filename" type="filelist" 
-			label="File name" description="Filename" 
-			directory="/xbmusic"
-			hide_none="true" hide_default="true"
-			class="xbfilecontrol"
-			default="" required="true"
-		>
-			<option value="">Select file</option>
-		</field>
-
 	</fieldset>
 	
-<!-- rec-date, rel-date, description, status, access, ordering, cat, alltags, note -->
-	<fieldset name="general">
+<!-- comp-date, description, status, access, ordering, cat, alltags, note -->
+	<fieldset name="details">
 	
-		<field name="rel_date" type="text"
-			label="Release Year" 
-			description="Date the album or track was released. Format [[DD-]MMM-]YYYY - day &amp; month optional"
+		<field name="comp_date" type="text"
+			label="Composed" 
+			description="Date the song was composed. Format [[DD-]MMM-]YYYY - day &amp; month optional"
 			class="inputbox" maxlength="12"
 		/>
-		<field name="rec_date" type="text"
-			label="Recording date" description="Date of track recording session. Format [[DD-]MMM-]YYYY - day &amp; month optional"
-			class="inputbox" maxlength="12"
+		<field name="composers" type="textarea"
+			label="Composed by" description="Names of composers, one per line (will become link to people)" 
+			class="inputbox" rows="3" cols="60"
+			filter="string"   
 		/>
-
 		<field name="description" type="textarea"
 			label="Edit Description" description="Plain text or Markdown code. " 
 			class="inputbox" rows="15" cols="60"
@@ -130,55 +101,28 @@
 	</fieldset>
 	
 
-	<fieldset name="image-info"
-		label="ID3 Embedded image info"
-	>
-		<field name="id3_image" type="hidden" 
-		/>
-		<field name="image_mime" type="text"
-			label="Mime Type"
-			description="Embedded image mime type"
-			size="20" maxlength="50"
-			readonly="true"
-		/>
-		<field name="image_width" type="text"
-			label="Image width"
-			description="embedded width in pixels"
-			size="5" maxlength="5"
-			readonly="true"
-		/>
-		<field name="image_height" type="text"
-			label="Image height"
-			description="embedded height in pixels"
-			size="5" maxlength="5"
-			readonly="true"
-		/>
-		<field name="image_size" type="text"
-			label="Image size (kB)"
-			description="Size of embedded image in kB"
-			size="6" maxlength="6"
-			readonly="true"
-		/>
-		<field name="image_type" type="text"
-			label="Picture type"
-			description="eg Album Cover, Portrait, Graphic..."
-			size="20" maxlength="50"
-		/>
-		<field name="image_desc" type="text"
-			label="Picture desciption"
-			description="fuller description of image"
-			size="20" maxlength="50"
-		/>
-		<field name="picturefile" type="accessiblemedia"
-			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
-			directory="xbmusic"
-			shownon="id3_image:"
-		/>
-	</fieldset>
 
-
-<!-- Album, artist(s), song, playlists -->	
-	<fieldset name="links">
+<!-- Album, performer(s), tracks, playlists -->	
+	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
+		name="links">
+		<field name="tracklist" type="subform"
+			label="Track(s)"
+			description="Song may be used in one or more tracks"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="track_id" type="xbtracklist" label="Track Name">
+					<option value=""> </option>	
+				</field>
+				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				/>
+				<field name="oldorder" type="hidden" default="0" />
+			</form>
+		</field>			
+			
 	</fieldset>
 <!-- Standard joomla -->
 	<fieldset name="pub">

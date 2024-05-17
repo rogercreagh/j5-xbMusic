@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Table/TrackTable.php
- * @version 0.0.4.0 25th April 2024
+ * @filesource admin/src/Table/SongTable.php
+ * @version 0.0.6.0 15th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -28,7 +28,7 @@ use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
 
 
-class TrackTable extends Table implements VersionableTableInterface, TaggableTableInterface {
+class SongTable extends Table implements VersionableTableInterface, TaggableTableInterface {
     
     use TaggableTableTrait;
     
@@ -36,9 +36,9 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
     
     public function __construct(DatabaseDriver $db, DispatcherInterface $dispatcher = null)
     {
-        $this->typeAlias = 'com_xbmusic.track';
+        $this->typeAlias = 'com_xbmusic.song';
         
-        parent::__construct('#__xbmusic_tracks', 'id', $db, $dispatcher);
+        parent::__construct('#__xbmusic_songs', 'id', $db, $dispatcher);
         
         $this->created = Factory::getDate()->toSql();
         $this->setColumnAlias('published', 'status');
@@ -56,11 +56,12 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         
         // Set name
         $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
-        
+ 
         //json encode ext_links if set
         if (is_array($this->ext_links)) {
             $this->ext_links = json_encode($this->ext_links);
         }
+        
         
         // Set alias
 //         $this->params      = ComponentHelper::getParams('com_xbmusic');;

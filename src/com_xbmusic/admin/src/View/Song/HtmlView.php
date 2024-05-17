@@ -1,14 +1,14 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.4.0 25th April 2024
+ * @filesource admin/src/View/Song/HtmlView.php
+ * @version 0.0.6.0 15th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
-namespace Crosborne\Component\Xbmusic\Administrator\View\Track;
+namespace Crosborne\Component\Xbmusic\Administrator\View\Song;
 
 defined('_JEXEC') or die;
 
@@ -33,20 +33,10 @@ class HtmlView extends BaseHtmlView {
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
 //        $this->state = $this->get('State');
-        $this->canDo = ContentHelper::getActions('com_xbmusic', 'track', $this->item->id);
+        $this->canDo = ContentHelper::getActions('com_xbmusic', 'song', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');
-        
-        if ($this->params->get('use_xbmusic', 1)) {
-            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
-        } else {
-            if (is_dir($this->params->get('music_path',''))) {
-                $this->basemusicfolder = $this->params->get('music_path');
-            } else {
-                $this->basemusicfolder = JPATH_ROOT.'/xbmusic/';
-            }
-        }
-        
+                
 //         $this->taggroups = $this->params->get('enable_taggroups',0);
 //         if ($this->taggroups) {
 //             $taggroup_ids = array();
@@ -89,21 +79,21 @@ class HtmlView extends BaseHtmlView {
         $canDo = $this->canDo;
         
         ToolbarHelper::title(
-            Text::_('XBMUSIC_ADMIN_' . ($checkedOut ? 'VIEW_TRACK_TITLE' : 'EDIT_TRACK_TITLE')),
+            Text::_('XBMUSIC_ADMIN_' . ($checkedOut ? 'VIEW_SONG_TITLE' : 'EDIT_SONG_TITLE')),
             'pencil-alt'
             );
         
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         
         if (!$checkedOut && $itemEditable) {
-            $toolbar->apply('track.apply');
-            $toolbar->save('track.save');
+            $toolbar->apply('song.apply');
+            $toolbar->save('song.save');
         }
         
-        $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');
+        $toolbar->cancel('song.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
         $toolbar->inlinehelp();
-        $toolbar->help('Track: Edit',false,'https://crosborne.uk/xbmusic/doc#trackedit');
+        $toolbar->help('Song: Edit',false,'https://crosborne.uk/xbmusic/doc#songedit');
         
     }
 }
