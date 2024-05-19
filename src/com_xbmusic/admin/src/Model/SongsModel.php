@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongsModel.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.6.3 18th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -293,12 +293,39 @@ class SongsModel extends ListModel {
                         $item->ext_links_list = $item->ext_links_list.'</ul>';                        
                     }
                 } //end if is_object
-                $item->tags = $tagsHelper->getItemTags('com_xbmusic.music' , $item->id);               
+                $item->tracks = $this->getTracks($item->id);
+                
+                $item->tags = $tagsHelper->getItemTags('com_xbmusic.music' , $item->id);     
+                
             } //end foreach
         } //endif items
         return $items;
         
     } // end getItems
+    
+    public function getTracks($id) {
+        $db = $this->getDbo();
+        /* 
+SELECT a.id, a.title, a.perf_name, 
+(SELECT GROUP_CONCAT(b.name) FROM j5_xbmusic_artists AS b LEFT JOIN j5_xbmusic_artisttrack AS at ON at.track_id = a.id WHERE b.id = at.artist_id) AS artists
+from j5_xbmusic_tracks AS a
+ LEFT JOIN j5_xbmusic_songtrack AS st ON st.track_id = a.id
+#LEFT JOIN j5_xbmusic_artisttrack AS at ON at.track_id = a.id
+ #LEFT JOIN j5_xbmusic_artists AS b ON b.id = at.artist_id
+where st.song_id = 2
+order by a.title ASC
+         */
+        $subquery = '(SELECT GROUP_CONCAT(b.name) FROM j5_xbmusic_artists AS b LEFT JOIN j5_xbmusic_artisttrack AS at ON at.track_id = a.id WHERE b.id = at.artist_id) AS artists';
+        $query = $db->getQuery(true);
+        $query->select('a.id, a.title, st.note, '.$subquery);
+        $query->from('#__xbmusic_tracks AS a');
+        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.track_id = a.id');
+//        $query->join('LEFT','#__xbmusic_songs AS s ON s.id = st.song_id');
+        $query->where('st.song_id = '.$id);
+        $query->order('a.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
     
 }
 

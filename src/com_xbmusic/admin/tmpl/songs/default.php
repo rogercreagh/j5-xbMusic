@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/songs/default.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.6.3 19th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -115,9 +115,9 @@ if ($saveOrder && !empty($this->items)) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th>performers
+						<th>Recordings
 						</th>
-						<th>tracks
+						<th>Performers
 						</th>
 						<th>albums
 						</th>
@@ -177,6 +177,7 @@ if ($saveOrder && !empty($this->items)) {
 							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
 						</td>
 						<td class="song-status">
+							<div style="float:left;">
                                 <?php
                                     $options = [
                                         'task_prefix' => 'songs.',
@@ -185,7 +186,14 @@ if ($saveOrder && !empty($this->items)) {
                                     ];
 
                                     echo (new PublishedButton())->render((int) $item->status, $i, $options);
-                                    ?>
+                                ?>
+                            </div>
+                            <div>
+                                <?php if ($item->note !='') :?>
+                                	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
+                                		title="<?php echo $item->note; ?>"></span>
+								<?php endif; ?>
+                             </div>
 						</td>
 						<td class="has-context">
 							<div class="pull-left">
@@ -209,13 +217,32 @@ if ($saveOrder && !empty($this->items)) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbpl20 xb085 xbmb5"><i><?php echo Text::_('XB_NOTE'); ?></i> <b><?php echo $item->note; ?></b>
-								</p>
+								<?php if ($item->note != '') : ?>
+									<p class="xbpl20 xb085 xbmb5"><i><?php echo Text::_('XB_NOTE'); ?></i> <b><?php echo $item->note; ?></b>
+									</p>
+								<?php endif; ?>
 							</div>
 						</td>
-						<td>performers
+						<td><?php if (count($item->tracks) > 1) : ?>
+								<details class="xb09">
+									<summary><?php echo Text::sprintf('XBMUSIC_SONG_RECORDINGS',count($item->tracks)); ?></summary>
+									<ul>
+									<?php foreach ($item->tracks as $track) : ?>
+										<li><a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['id']; ?>">
+							                <?php echo $track['title']; ?></a>
+							                <br /><span class="xb09">(<?php echo $track['artists']; ?>)</span></li>
+									<?php endforeach; ?>
+									</ul>
+								</details>
+							<?php elseif (count($item->tracks)==1) : ?>
+								<p class="xb09"><i><?php echo Text::_('Recording'); ?></i>: 
+								<a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['id']; ?>">
+									<?php echo $item->tracks[0]['title']; ?>
+								</a>
+								<br /><span class="xb09"><?php echo Text::sprintf('XBMUSIC_PERF_BY',$track['artists']); ?></p>
+							<?php endif; ?>						
 						</td>
-						<td>playlists
+						<td>Performers
 							
 						</td>
 						<td>albums

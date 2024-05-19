@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TracksModel.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.6.3 18th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -293,12 +293,26 @@ class TracksModel extends ListModel {
                         $item->ext_links_list = $item->ext_links_list.'</ul>';                        
                     }
                 } //end if is_object
+                $item->songs = $this->getSongs($item->id);
+                
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.music' , $item->id);               
             } //end foreach
         } //endif items
         return $items;
         
     } // end getItems
+    
+    public function getSongs($id) {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.id, a.title, st.note, st.listorder');
+        $query->from('#__xbmusic_songs AS a');
+        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.song_id = a.id');
+        $query->where('st.track_id = '.$id);
+        $query->order('st.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();       
+    }
     
 }
 

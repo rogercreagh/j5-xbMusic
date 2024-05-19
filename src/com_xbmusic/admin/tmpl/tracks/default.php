@@ -60,6 +60,7 @@ if ($saveOrder && !empty($this->items)) {
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=tracks'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
+		<p class="xbnit">Base folder to find music files is <code><?php echo $this->basemusicfolder; ?></code> which is set in xbMusic Options.
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -92,7 +93,7 @@ if ($saveOrder && !empty($this->items)) {
     			<colgroup>
 					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
 					<col class="nowrap center hidden-phone" style="width:25px;"><!-- ordering -->
-					<col class="nowrap center" style="width:55px;"><!-- status -->
+					<col class="nowrap center" style="width:95px;"><!-- status -->
     				<col ><!-- title, alias, songlink -->
     				<col ><!-- artist -->
     				<col ><!-- path, filename -->
@@ -177,15 +178,23 @@ if ($saveOrder && !empty($this->items)) {
 							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
 						</td>
 						<td class="track-status">
+							<div style="float:left;">
                                 <?php
                                     $options = [
                                         'task_prefix' => 'tracks.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];
-
                                     echo (new PublishedButton())->render((int) $item->status, $i, $options);
-                                    ?>
+                                ?>
+                            </div>
+                            <div>
+                                <?php if ($item->note !='') :?>
+                                	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
+                                		title="<?php echo $item->note; ?>"></span>
+								<?php endif; ?>
+                             </div>
+                                   
 						</td>
 						<td class="has-context">
 							<div class="pull-left">
@@ -196,10 +205,10 @@ if ($saveOrder && !empty($this->items)) {
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<a class="hasTooltip" href="
 									<?php echo Route::_('index.php?option=com_xbmusic&task=track.edit&id=' . $item->id).'&retview=tracks';?>
-									" title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
+									" title="<?php echo Text::sprintf('XB_ALIAS_LABEL_TIP', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->title); ?></a> 
 								<?php else : ?>
-									<span title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
+									<span title="<?php echo Text::sprintf('XB_ALIAS_LABEL_TIP', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->title); ?></span>
 								<?php endif; ?>
 								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=track&tmpl=component&id='.$item->id)."'"; ?>
@@ -209,8 +218,22 @@ if ($saveOrder && !empty($this->items)) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbpl20 xb085 xbmb5"><i><?php echo Text::_('XB_NOTE'); ?></i> <b><?php echo $item->note; ?></b>
-								</p>
+								<?php if (count($item->songs) > 1) : ?>
+									<details class="xb09">
+										<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
+										<ul>
+										<?php foreach ($item->songs as $song) : ?>
+											<li><a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+								                <?php echo $song['title']; ?></a></li>
+										<?php endforeach; ?>
+										</ul>
+									</details>
+								<?php elseif (count($item->songs)==1) : ?>
+									<p class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
+									<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+										<?php echo $item->songs[0]['title']; ?>
+									</a></p>
+								<?php endif; ?>
 							</div>
 						</td>
 						<td>artists
@@ -220,7 +243,7 @@ if ($saveOrder && !empty($this->items)) {
 								<br /><code><?php echo $item->filename;?></code>
 							</p>
 						</td>
-						<td>album, picture
+						<td>						
 						</td>
 						<td>playlists
 						</td>
