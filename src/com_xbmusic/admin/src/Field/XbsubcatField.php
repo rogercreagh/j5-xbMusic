@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbsubcatField.php
- * @version 0.0.4.1 28th April 2024
+ * @version 0.0.6.4 21st May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -35,11 +35,13 @@ class XbsubcatField extends ListField {
             $itemtype = (string) $this->element['itemtype'];
             $rootid = $params->get('rootcat_'.$itemtype);
             $incroot= true;
+            $defcat = XbmusicHelper::getCat($params->get('defcat_'.$itemtype));
         } else {
             $rootid = 0;
             $incroot = false;
+            $defcat = XbmusicHelper::getCatByAlias('uncategorised', $extension);
         }
-        
+        $defopt = array(array('value'=>$defcat->id, 'text'=>$defcat->title.'(default)'));
         $db = Factory::getDbo();
         $query  = $db->getQuery(true);
         if ($rootid>0) {
@@ -69,7 +71,7 @@ class XbsubcatField extends ListField {
             }
         }
         // Merge any additional options in the XML definition.
-        $options = array_merge(parent::getOptions(), $options);
+        $options = array_merge(parent::getOptions(),$defopt, $options);
         return $options;
     }
     

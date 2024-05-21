@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.4.6 14th May 2024
+ * @version 0.0.6.4 20th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -409,14 +409,32 @@ class XbmusicHelper extends ComponentHelper
 	 * @return object|null
 	 */
 	public static function getCat(int $catid) {
-	    $db = Factory::getDBO();
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('*')
-	    ->from('#__categories AS a ')
-	    ->where('a.id = '.$db->q($catid));
+	       ->from('#__categories AS a ')
+	       ->where('a.id = '.$db->q($catid));
 	    $db->setQuery($query);
 	    return $db->loadObject();
 	}
+	
+	/**
+	 * @name getCatByAlias()
+	 * @desc given category alias returns full row
+	 * @param string $catalias
+	 * @param string $extension
+	 * @return object|null
+	 */
+	public static function getCatByAlias(string $catalias, $extension = 'com_xbmusic') {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*')
+	       ->from('#__categories AS a ')
+	       ->where('a.alias = '.$db->q($catalias));
+	    $db->setQuery($query);
+	    return $db->loadObject();
+	}
+	
 	
 	/**
 	 * @name getTag()

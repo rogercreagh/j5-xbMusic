@@ -117,8 +117,8 @@
 			description="XB_FIELD_CATEGORY_DESC"
 			required="true"
 			published="1"
-
-		/>
+		>
+		</field>
 
 		<field 
 			name="tags" type="tag"

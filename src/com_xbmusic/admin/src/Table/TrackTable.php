@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/TrackTable.php
- * @version 0.0.4.0 25th April 2024
+ * @version 0.0.6.4 20th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -63,7 +63,7 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         }
         
         // Set alias
-//         $this->params      = ComponentHelper::getParams('com_xbmusic');;
+         $this->params      = ComponentHelper::getParams('com_xbmusic');
         
 //         if ($this->params->get('use_xbmusic', 1)) {
 //             $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
@@ -81,12 +81,10 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
 //             $this->alias = Factory::getDate()->format('Y-m-d-H-i-s');
 //         }
         
-        // Check for a valid category.
-//         if (!$this->catid = (int) $this->catid) {
-//             $this->setError(Text::_('JLIB_DATABASE_ERROR_CATEGORY_REQUIRED'));
-            
-//             return false;
-//         }
+        // Set default value if catid empty.
+         if ($this->catid =='') {
+             $this->catid = $this->params->get('defcat_track');
+         }
         
         // Set created date if not set.
         if (!(int) $this->created) {
@@ -158,6 +156,8 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
                 $this->reorder($this->_db->quoteName('catid') . ' = ' . ((int) $oldrow->catid) . ' AND ' . $this->_db->quoteName('status') . ' >= 0');
             }
         }
+        //check if new song/artist/album and save if necessary
+        //create link to song/artist/album
         
         return \count($this->getErrors()) == 0;
     }
