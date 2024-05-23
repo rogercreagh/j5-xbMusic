@@ -102,7 +102,7 @@
 	
 
 
-<!-- Album, performer(s), tracks, playlists -->	
+<!-- tracks -->	
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		name="links">
 		<field name="tracklist" type="subform"

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.6.2 17th May 2024
+ * @version 0.0.6.5 22nd May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -99,7 +99,7 @@ $input = Factory::getApplication()->getInput();
     	</div>
     	<div class="row">
     		<div class="col-md-6">
-     			<?php echo $this->form->renderField('perf_name'); ?> 
+     			<?php echo $this->form->renderField('sortartist'); ?> 
      		</div>
      	</div>
     	<hr />
@@ -211,7 +211,7 @@ $input = Factory::getApplication()->getInput();
 						</dl>
 					</fieldset>
         		</div>
-        		<div class=col-12 col-md7">
+        		<div class="col-12 col-md7">
         			<p>Reload ID3, display new, if diff option to resave with new</p>
         		</div>
         	</div>
@@ -225,10 +225,10 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'albums', Text::_('Linked Items')); ?>
 			<div class="row">
 				<div class="col-12">
-					Album
+					<?php echo $this->form->renderField('albumlist'); ?> 
 				</div>
 				<div class="col-12">
-					Artists
+					<?php echo $this->form->renderField('artistlist'); ?> 
 				</div>
 				<div class="col-12">
 					<?php echo $this->form->renderField('songlist'); ?> 
@@ -238,8 +238,6 @@ $input = Factory::getApplication()->getInput();
 				</div>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-         
-
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
         <div class="row">

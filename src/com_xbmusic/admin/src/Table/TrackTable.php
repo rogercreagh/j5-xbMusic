@@ -26,6 +26,7 @@ use Joomla\Database\ParameterType;
 use Joomla\Event\DispatcherInterface;
 use Joomla\Registry\Registry;
 use Joomla\Utilities\ArrayHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 
 class TrackTable extends Table implements VersionableTableInterface, TaggableTableInterface {
@@ -83,7 +84,8 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         
         // Set default value if catid empty.
          if ($this->catid =='') {
-             $this->catid = $this->params->get('defcat_track');
+//             $this->catid = ($this->params->get('defcat_track')=='') ? XbmusicHelper::getCatByAlias('uncategorised') : $this->params->get('defcat_track');
+             $this->catid = $this->params->get('defcat_track',XbmusicHelper::getCatByAlias('uncategorised'));
          }
         
         // Set created date if not set.
@@ -151,12 +153,12 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
             parent::store($updateNulls);
             
             // Need to reorder ?
-            if ($oldrow->status >= 0 && ($this->status < 0 || $oldrow->catid != $this->catid)) {
-                // Reorder the oldrow
-                $this->reorder($this->_db->quoteName('catid') . ' = ' . ((int) $oldrow->catid) . ' AND ' . $this->_db->quoteName('status') . ' >= 0');
-            }
+//             if ($oldrow->status >= 0 && ($this->status < 0 || $oldrow->catid != $this->catid)) {
+//                 // Reorder the oldrow
+//                 $this->reorder($this->_db->quoteName('catid') . ' = ' . ((int) $oldrow->catid) . ' AND ' . $this->_db->quoteName('status') . ' >= 0');
+//             }
         }
-        //check if new song/artist/album and save if necessary
+        //check if new song/artist/album and save if necessary on return to save
         //create link to song/artist/album
         
         return \count($this->getErrors()) == 0;

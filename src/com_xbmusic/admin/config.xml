@@ -60,7 +60,8 @@
 			label="XBMUSIC_CONFIG_ALBUMCAT_NOTE"
 		/>
 		<field name="rootcat_album" type="category"
-			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" 
+			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -70,25 +71,14 @@
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"
-			showon="rootcat_album:0"
 			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>
-		<field
-			name="defrescat_album" type="category"
-			label="XBCONFIG_CAT_DEFRES_LABEL"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			showon="rootcat_album!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>		
-		
 		<field name ="artistcatnote" type="note"
 			label="XBMUSIC_CONFIG_ARTISTCAT_NOTE"
 		/>
 		<field name="rootcat_artist" type="category"
-			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" 
+			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -98,25 +88,14 @@
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"
-			showon="rootcat_artist:0"
 			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>
-		<field
-			name="defrescat_artist" type="category"
-			label="XBCONFIG_CAT_DEFRES_LABEL"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			showon="rootcat_artist!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>		
-		
 		<field name ="plistcatnote" type="note"
 			label="XBMUSIC_CONFIG_PLISTCAT_NOTE"
 		/>
 		<field name="rootcat_plist" type="category"
-			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" 
+			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -126,25 +105,14 @@
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"
-			showon="rootcat_plist:0"
 			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>
-		<field
-			name="defrescat_plist" type="category"
-			label="XBCONFIG_CAT_DEFRES_LABEL"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			showon="rootcat_plist!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>		
-		
 		<field name ="songcatnote" type="note"
 			label="XBMUSIC_CONFIG_SONGCAT_NOTE"
 		/>
 		<field name="rootcat_song" type="category"
-			label="XBMUSIC_CONFIG_PARENT_CAT" description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
+			label="XBMUSIC_CONFIG_PARENT_CAT" 
+			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
 		>
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
@@ -154,20 +122,8 @@
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"
-			showon="rootcat_song:0"
 			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
 		</field>
-		<field
-			name="defrescat_song" type="category"
-			label="XBCONFIG_CAT_DEFRES_LABEL"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			showon="rootcat_song!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>		
-		
 		<field name ="trackcatnote" type="note"
 			label="XBMUSIC_CONFIG_TRACKCAT_NOTE"
 		/>
@@ -186,19 +142,6 @@
 			>			
 		</field>
 		
-				
-		<field
-			addfieldpath="Crosborne\Component\Xbmusic\Administrator\Field" 
-			name="test_album" type="xbsubcat"
-			label="Test of XbcatsField"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			parent="album"
-			incparent="false"
-			showon="rootcat_album!:0"
-			>			
-			<option value="" >XBCONFIG_CAT_UNCAT</option>
-		</field>
 	</fieldset>		
 	
 <!-- TAGS TAB -->

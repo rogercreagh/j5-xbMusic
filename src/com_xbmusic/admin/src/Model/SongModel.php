@@ -274,10 +274,8 @@ class SongModel extends AdminModel {
         $db->setQuery($query);
         $db->execute();
         //restore the new list
-        $listorder=0;
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
-                $listorder ++;
                 $query = $db->getQuery(true);
                 $query->insert($db->quoteName('#__xbmusic_songtrack'));
                 $query->columns('song_id,track_id,note,listorder');

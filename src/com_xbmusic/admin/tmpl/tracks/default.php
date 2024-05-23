@@ -92,7 +92,6 @@ if ($saveOrder && !empty($this->items)) {
 			<table class="table table-striped table-hover xbtablelist" id="xbtrackList">
     			<colgroup>
 					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
-					<col class="nowrap center hidden-phone" style="width:25px;"><!-- ordering -->
 					<col class="nowrap center" style="width:95px;"><!-- status -->
     				<col ><!-- title, alias, songlink -->
     				<col ><!-- artist -->
@@ -106,9 +105,6 @@ if ($saveOrder && !empty($this->items)) {
 					<tr>
 						<th >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
-						</th>
-						<th>
-							<?php echo HTMLHelper::_('searchtools.sort', '', 'a.ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2'); ?>
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
@@ -137,6 +133,34 @@ if ($saveOrder && !empty($this->items)) {
 				</thead>
 				<?php if ($rowcnt > 9) : ?>
 					<tfoot>
+    					<tr>
+    						<th >
+    							<?php echo HTMLHelper::_('grid.checkall'); ?>
+    						</th>
+    						<th >
+    							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
+    						</th>
+    						<th >
+    							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+    						</th>
+    						<th>artist(s)
+    						</th>
+    						<th>folder, filename
+    						</th>
+    						<th>album, picture
+    						</th>
+    						<th>playlists
+    						</th>
+    						<th >
+    							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
+    							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
+    						</th>
+    						<th style="padding:0; text-align:center;"><span class="xb09">
+    							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
+    							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
+    							</span>
+    						</th>
+    					</tr>
 					</tfoot>
 				<?php endif; //rowcnt ?>
 				<body>
@@ -156,26 +180,6 @@ if ($saveOrder && !empty($this->items)) {
  					<tr class="row<?php echo $i % 2; ?>" sortable-group-id="<?php echo $item->catid; ?>">
 						<td>
 							<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
-						</td>
-						<td class="order">
-							<?php
-							$iconClass = '';
-							$numclass = '';
-							if (!$canChange) {
-							    $iconClass = ' inactive';
-							    $numclass = 'xbgrey';
-							} elseif (!$saveOrder) {
-							    $iconClass = ' inactive" title="' . Text::_('JORDERINGDISABLED');
-							    $numclass = 'xbgrey';
-							}
-							?>
-                            <span class="sortable-handler<?php echo $iconClass ?>">
-                                <span class="icon-ellipsis-v" aria-hidden="true"></span>
-                            </span>
-                            <?php if ($canChange && $saveOrder) : ?>
-                                <input type="text" name="order[]" size="5" value="<?php echo $item->ordering; ?>" class="width-20 text-area-order hidden">
-                            <?php endif; ?>             
-							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
 						</td>
 						<td class="track-status">
 							<div style="float:left;">

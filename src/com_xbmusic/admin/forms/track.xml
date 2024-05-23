@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.6.2 17th May 2024 -->
+<!-- xbMusic Track Form file v0.0.6.5 23rd May 2024 -->
 
 <form>
 	<config>
@@ -30,7 +30,7 @@
 			size="40" 
 		/>
 		
-		<field name="perf_name" type="text" 
+		<field name="sortartist" type="text" 
 			label="Main Performer"
 			description="Short name to identify the primary performer or band"
 			hint="Will default to first named artist"
@@ -182,10 +182,10 @@
 		name="links" 
 	>
 		<field name="songlist" type="subform"
-			label="Song(s)"
+			label="Songs(s)"
 			description="Track may be medley of several songs"			
 			multiple="true" min= "0" max= "10"
-			buttons="add,remove"
+			buttons="add,remove,move"
 			layout="joomla.form.field.subform.repeatable-table"
 			groupByFieldset="false" 
 		>
@@ -194,6 +194,45 @@
 					<option value=""> </option>	
 				</field>
 				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				/>
+			</form>
+		</field>	
+				
+		<field name="albumlist" type="subform"
+			label="Album"
+			description="Track may appear on more than one album - eg original and greatest hits or compilation"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="album_id" type="xbalbumlist" label="Album Title">
+					<option value=""> </option>	
+				</field>
+				<field name="discno" type="number" max="20" min="0" default="0" label="Disc No." size="5" maxlength="5"
+				/>
+				<field name="trackno" type="number" max="99" min="0" default="0" label="Track No." size="5" maxlength="5"
+				/>
+				<field name="oldorder" type="hidden" default="0" />
+			</form>
+		</field>	
+				
+		<field name="artistlist" type="subform"
+			label="Artists(s)"
+			description="Track may have several artists, album artist may be listed separately"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="artist_id" type="xbartistlist" label="Artist Name">
+					<option value=""> </option>	
+				</field>
+				<field name="role" type="text" label="XB_ROLE" size="20" maxlength="190"
+				/>
+				<field name="note" type="text" label="XB_NOTE" size="30" maxlength="190"
 				/>
 			</form>
 		</field>			

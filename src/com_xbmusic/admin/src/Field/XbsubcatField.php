@@ -35,7 +35,7 @@ class XbsubcatField extends ListField {
             $itemtype = (string) $this->element['itemtype'];
             $rootid = $params->get('rootcat_'.$itemtype);
             $incroot= true;
-            $defcat = XbmusicHelper::getCat($params->get('defcat_'.$itemtype));
+            $defcat = XbmusicHelper::getCat($params->get('defcat_'.$itemtype,XbmusicHelper::getCatByAlias('uncategorised',$extension)));
         } else {
             $rootid = 0;
             $incroot = false;

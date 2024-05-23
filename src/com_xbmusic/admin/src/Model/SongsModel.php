@@ -306,7 +306,7 @@ class SongsModel extends ListModel {
     public function getTracks($id) {
         $db = $this->getDbo();
         /* 
-SELECT a.id, a.title, a.perf_name, 
+SELECT a.id, a.title, a.sortartist, 
 (SELECT GROUP_CONCAT(b.name) FROM j5_xbmusic_artists AS b LEFT JOIN j5_xbmusic_artisttrack AS at ON at.track_id = a.id WHERE b.id = at.artist_id) AS artists
 from j5_xbmusic_tracks AS a
  LEFT JOIN j5_xbmusic_songtrack AS st ON st.track_id = a.id
