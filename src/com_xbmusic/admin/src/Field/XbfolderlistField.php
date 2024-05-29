@@ -38,7 +38,7 @@ class XbfolderlistField extends FolderlistField {
  
         $params = ComponentHelper::getParams('com_xbmusic');
         if ($params->get('use_xbmusic', 1)) {
-            $basemusicfolder = JPATH_ROOT.'/xbmusic/'.$params->get('xbmusic_subfolder','');
+            $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$params->get('xbmusic_subfolder','');
         } else { 
             $musicpath = trim($params->get('music_path',''));
             if (is_dir($musicpath)) {

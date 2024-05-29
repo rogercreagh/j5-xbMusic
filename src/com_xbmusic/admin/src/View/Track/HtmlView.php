@@ -38,7 +38,7 @@ class HtmlView extends BaseHtmlView {
         $this->params      = $this->get('State')->get('params');
         
         if ($this->params->get('use_xbmusic', 1)) {
-            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
+            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
         } else {
             if (is_dir(trim($this->params->get('music_path','')))) {
                 $this->basemusicfolder = trim($this->params->get('music_path'));

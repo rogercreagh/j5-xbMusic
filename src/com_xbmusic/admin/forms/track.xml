@@ -133,7 +133,9 @@
 	<fieldset name="image-info"
 		label="ID3 Embedded image info"
 	>
-		<field name="id3_image" type="hidden" 
+		<field name="artworkfilename" type="text" 
+		label="Image Filename"
+		
 		/>
 		<field name="image_mime" type="text"
 			label="Mime Type"
@@ -171,8 +173,7 @@
 		/>
 		<field name="picturefile" type="accessiblemedia"
 			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
-			directory="xbmusic"
-			shownon="id3_image:"
+			directory="xbmusic/artwork/albums"
 		/>
 	</fieldset>
 
@@ -210,7 +211,7 @@
 				<field name="album_id" type="xbalbumlist" label="Album Title">
 					<option value=""> </option>	
 				</field>
-				<field name="discno" type="number" max="20" min="0" default="0" label="Disc No." size="5" maxlength="5"
+				<field name="discno" type="text" default="0" label="Disc No." size="5" maxlength="5"
 				/>
 				<field name="trackno" type="number" max="99" min="0" default="0" label="Track No." size="5" maxlength="5"
 				/>

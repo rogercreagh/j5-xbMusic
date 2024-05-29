@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.4 20th May 2024
+ * @version 0.0.6.6 24th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -25,6 +25,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseQuery;
 use DOMDocument;
 use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
 
@@ -452,12 +453,21 @@ class XbmusicHelper extends ComponentHelper
 	    return $db->loadObject();
 	}
 	
-	public static function tagFilterQuery($query, $tagfilt, $taglogic) {
+    /**
+     * @name tagFilterQuery()
+     * @desc given tag filter ids and logic appends appropriate where statement to query
+     * @param DatabaseQuery $query - existing query object
+     * @param array $tagfilt - array of tag ids to filter by
+     * @param int $taglogic 1=all, 2=none, else: any
+     * @param string typealias - extension item type used in table #__contentitem_tag_map
+     * @return \Joomla\Database\DatabaseQuery object
+     */
+	public static function tagFilterQuery(DatabaseQuery $query, array $tagfilt, int $taglogic, $typealias = 'com_xbmusic.track') {
 	    
 	    if (!empty($tagfilt)) {
 	        $tagfilt = ArrayHelper::toInteger($tagfilt);
 	        $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                WHERE tmap.type_alias = '.$db->quote('com_xbmusic.track').'
+                WHERE tmap.type_alias = '.$db->quote($typealias).'
                 AND tmap.content_item_id = a.id)';
 	        switch ($taglogic) {
 	            case 1: //all
@@ -482,12 +492,49 @@ class XbmusicHelper extends ComponentHelper
 	                    }
 	                }	                
 	                break;
-	        }
-	        
-	    return $query;
-	   }
-
+            }	        
+        }
+        return $query;
 	}
 
+    /**
+     * @name imageMimeToExt()
+     * @desc returns a three letter file extension (without the dot) for a given image mime type
+     * @param string $mime
+     * @return string
+     */
+	public static function imageMimeToExt(string $mime) {
+	    $mimemap = array(
+	        'image/bmp'     => 'bmp',
+	        'image/x-bmp'   => 'bmp',
+	        'image/x-bitmap'    => 'bmp',
+	        'image/x-xbitmap'   => 'bmp',
+	        'image/x-win-bitmap'    => 'bmp',
+	        'image/x-windows-bmp'   => 'bmp',
+	        'image/ms-bmp'  => 'bmp',
+	        'image/x-ms-bmp'    => 'bmp',
+	        'image/cdr'     => 'cdr',
+	        'image/x-cdr'   => 'cdr',
+	        'image/gif'     => 'gif',
+	        'image/x-icon'  => 'ico',
+	        'image/x-ico'   => 'ico',
+	        'image/vnd.microsoft.icon'  => 'ico',
+	        'image/jp2'     => 'jp2',
+	        'video/mj2'     => 'jp2',
+	        'image/jpx'     => 'jp2',
+	        'image/jpm'     => 'jp2',
+	        'image/jpeg'    => 'jpg',
+	        'image/pjpeg'   => 'jpg',
+	        'image/png'     => 'png',
+	        'image/x-png'   => 'png',
+	        'image/vnd.adobe.photoshop' => 'psd',
+	        'image/svg+xml' => 'svg',
+	        'image/tiff'    => 'tiff',
+	        'image/webp'    => 'webp'
+	    );
+	    return isset($mimemap[$mime]) ? $mimemap[$mime] : 'xyz';
+	}
+	
+	
 }
 

@@ -71,7 +71,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $ext_mess .= '<h3>'.$this->extname.' component installed</h3>';
             $ext_mess .= '<p>version '.$manifest->version.' dated '.$manifest->creationDate.'</p>';
             $ext_mess .= '<p><b>Important</b> Before starting review &amp; set the component options&nbsp;&nbsp;';
-            $ext_mess .=  '<a href="index.php?option=com_config&view=component&component='.$this->extension.'" class="btn btn-small btn-info">'.$this->extname.' Options</a>';
+            $ext_mess .=  '<a href="index.php?option=com_config&view=component&component='.$this->extension.'" class="btn btn-small btn-info" style="color:#fff;">'.$this->extname.' Options</a>';
             //$res = $this->createCssFromTmpl();
             // create default categories using category table if they haven't been recovered
             $cats = array(
@@ -85,11 +85,11 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $message .= $this->createCategories($cats);
             
             //create xbmusic image folder
-            if (!file_exists(JPATH_ROOT.'/images/xbmusic')) {
-                mkdir(JPATH_ROOT.'/images/xbmusic',0775);
-                $message .= 'Music images folder created (/images/xbmusic/).<br />';
+            if (!file_exists(JPATH_ROOT.'/images/xbmusic/albums/unknown')) {
+                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/albums/unknown',0775,true);
+                $message .= 'Music artwork folders created (/images/xbmusic/albums/).<br />';
             } else{
-                $message .= '"/images/xbmusic/" already exists.<br />';
+                $message .= '"/images/xbmusic/albums" already exists.<br />';
             }
             //create /xbmusic folder
             if (!file_exists(JPATH_ROOT.'/xbmusic')) {
@@ -106,7 +106,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
             $ext_mess .= '<p>For help and information see <a href="https://crosborne.co.uk/'.$this->extslug.'/doc" target="_blank">www.crosborne.co.uk/'.$this->extslug.'/doc</a> ';
-            $ext_mess .= 'or use Help button in <a href="index.php?option='.$this->extension.'" class="btn btn-small btn-info">'.$this->extname.' Dashboard</a></p>';
+            $ext_mess .= 'or use Help button in <a href="index.php?option='.$this->extension.'" class="btn btn-small btn-info" style="color:#fff;">'.$this->extname.' Dashboard</a></p>';
             $ext_mess .= '</div>';
             echo $ext_mess;
         }

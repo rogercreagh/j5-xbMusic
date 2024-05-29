@@ -48,12 +48,12 @@ class HtmlView extends BaseHtmlView {
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
         
         if ($this->params->get('use_xbmusic', 1)) {
-            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'.$this->params->get('xbmusic_subfolder','');
+            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
         } else {
             if (is_dir(trim($this->params->get('music_path','')))) {
                 $this->basemusicfolder = trim($this->params->get('music_path'));
             } else {
-                $this->basemusicfolder = JPATH_ROOT.'/';
+                $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //xbmusic/ added
             }
         }
         $this->addToolbar();

@@ -30,21 +30,22 @@
 				<option value="1" >xbmusic</option>
 				<option value="0">full path</option>
 		</field>	
-        
+<!-- 
 		<field name="xbmusic_subfolder" type="folderlist"
 			label="subfolder in xbmusic" description="choose optional subfolder within xbmusic/"
   			directory="xbmusic"
 			recursive="true"
 			showon="use_xbmusic:1"
-			default="xbmusic"
 			hide_none="true" hide_default="true"
   		>
-          <option value="">xbmusic</option>
+          <option value="">xbmusic/</option>
 		</field>
+ -->        
 
       	<field name="music_path" type="text"
 			label="Full path to music"
 			description="WARNING - you must specify a directory that is visible and writable by the web server process. Either set permissions on entire folder to 777 or add the web server user (eg www-data) to the owner group for the folder"
+			hint="enter full/path/on/server/to/parent/for/music/files"
 			size="60"
 			showon="use_xbmusic:0"
         />

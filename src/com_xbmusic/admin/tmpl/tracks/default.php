@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.6.6 24th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -28,8 +28,8 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns');
-$wa->useScript('multiselect');
+$wa->useScript('table.columns')
+    ->useScript('multiselect');
 
 $app       = Factory::getApplication();
 $user  = Factory::getApplication()->getIdentity();
@@ -57,6 +57,11 @@ if ($saveOrder && !empty($this->items)) {
 }
 
 ?>
+<script>
+function stopProp(event) {
+	event.stopPropagation();
+}
+</script>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=tracks'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
@@ -200,7 +205,7 @@ if ($saveOrder && !empty($this->items)) {
                              </div>
                                    
 						</td>
-						<td class="has-context">
+						<td class="has-context"  onclick="stopProp(event);">
 							<div class="pull-left">
 								<p class="xbm0">
 								<?php if ($item->checked_out) : ?>
