@@ -186,6 +186,9 @@ ul.nav-tabs {
 	background-color: #999;
     border: solid 1px #777;
 }
+#xbcomponent a.xblabel {
+	color: #fff; /* fix for annoying change in Atum template */
+}
 .xblabel {
 	font-size: 0.8rem;
 	line-height: 1.0rem;

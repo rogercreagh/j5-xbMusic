@@ -38,7 +38,7 @@ $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 $saveOrder = $listOrder == 'a.ordering';
 
-$cvlink = '';
+$cvlink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
 $tvlink = '';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
@@ -65,7 +65,6 @@ function stopProp(event) {
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=tracks'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
-		<p class="xbnit">Base folder to find music files is <code><?php echo $this->basemusicfolder; ?></code> which is set in xbMusic Options.
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -98,11 +97,10 @@ function stopProp(event) {
     			<colgroup>
 					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
 					<col class="nowrap center" style="width:95px;"><!-- status -->
-    				<col ><!-- title, alias, songlink -->
-    				<col ><!-- artist -->
-    				<col ><!-- path, filename -->
-    				<col class="nowrap hidden-phone" ><!-- album, picture -->
-    				<col class="nowrap hidden-phone" ><!-- playlists -->
+    				<col ><!-- title, alias, songlink, rec/rel date -->
+    				<col style="width:105px;"><!-- artwork -->
+    				<col ><!-- Albums, Artists, Playlists -->
+    				<col class="nowrap hidden-phone" ><!-- path, filename -->
     				<col class="nowrap hidden-phone" style="width:110px;" ><!-- category & tags -->
     				<col class="nowrap hidden-phone xbtc" style="width:160px; padding:0;"><!-- date & id -->
     			</colgroup>	
@@ -116,14 +114,13 @@ function stopProp(event) {
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+							Recording &amp; release dates
 						</th>
-						<th>artist(s)
+						<th>Artwork
+						</th>
+						<th>Album(s), Artist(s), Playlists
 						</th>
 						<th>folder, filename
-						</th>
-						<th>album, picture
-						</th>
-						<th>playlists
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -145,17 +142,16 @@ function stopProp(event) {
     						<th >
     							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
     						</th>
-    						<th >
-    							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
-    						</th>
-    						<th>artist(s)
-    						</th>
-    						<th>folder, filename
-    						</th>
-    						<th>album, picture
-    						</th>
-    						<th>playlists
-    						</th>
+						<th >
+							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+							Recording &amp; release dates
+						</th>
+						<th>Artwork
+						</th>
+						<th>Album(s), Artist(s), Playlists
+						</th>
+						<th>folder, filename
+						</th>
     						<th >
     							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
     							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
@@ -209,7 +205,7 @@ function stopProp(event) {
 							<div class="pull-left">
 								<p class="xbm0">
 								<?php if ($item->checked_out) : ?>
-									<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'artimgs.', $canCheckin); ?>
+									<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'tracks.', $canCheckin); ?>
 								<?php endif; ?>
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<a class="hasTooltip" href="
@@ -226,7 +222,7 @@ function stopProp(event) {
                                 	data-bs-itemtitle="<?php echo $item->title; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
-								</p>
+								<br />
 								<?php if (count($item->songs) > 1) : ?>
 									<details class="xb09">
 										<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
@@ -238,14 +234,17 @@ function stopProp(event) {
 										</ul>
 									</details>
 								<?php elseif (count($item->songs)==1) : ?>
-									<p class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
+									<span class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
 									<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
 										<?php echo $item->songs[0]['title']; ?>
-									</a></p>
-								<?php endif; ?>
+									</a></span>
+								<?php endif; ?>$item->rel_date; ?>
+								</p>
 							</div>
 						</td>
-						<td>artists
+						<td><?php if ($item->artwork != '') : ?>
+								<img src="<?php echo $item->artwork; ?>" style="height:100px;" />
+							<?php endif; ?>
 						</td>
 						<td>
 							<p><code><?php echo str_replace($this->basemusicfolder,'',$item->pathname); ?>/</code>

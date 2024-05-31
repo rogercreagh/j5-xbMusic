@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.6.5 22nd May 2024
+ * @version 0.0.6.7 30th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -72,22 +72,38 @@ $input = Factory::getApplication()->getInput();
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
-    	<p class="xbnit">Base folder to find music files is <code><?php echo $this->basemusicfolder; ?></code> which is set in xbMusic Options.
+    	<p class="xbnit">
+    	<?php if ($this->item->id == 0 ) : ?>
+    		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
+   			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
+    	<?php else : ?>
+    		Music_base folder for this track :<?php echo $this->form->renderField('music_base'); ?> 
+   			<?php $this->form->setFieldAttribute('pathname','directory',$this->item->music_base); ?>
+    	<?php endif; ?>
+		<?php 
+            $session = Factory::getApplication()->getSession();
+            $musicpath = $session->get('musicfolder','');
+			if (is_dir($musicpath)) {
+			}
+            $session->clear('musicfolder');
+		?>
     	</p>
     	<div class="row form-vertical">
+     	<?php if ($this->item->id == 0 ) : ?>
     		<div class="col-md-6">
     			<?php echo $this->form->renderField('pathname'); ?> 
     		</div>
     		<div class="col-md-6">
-    			<?php $session = Factory::getApplication()->getSession();
-                    $musicpath = $session->get('musicfolder','');
-        			if (is_dir($musicpath)) {
-           			  $this->form->setFieldAttribute('filename','directory',$musicpath);
-        			}
-                    $session->clear('musicfolder');
-    			?>
     			<?php echo $this->form->renderField('filename'); ?> 
     		</div>
+    	<?php else: ?>
+    		<div class="col-md-6">
+    			<p>Track folder : <?php echo $this->item->pathname; ?></p>
+     		</div>
+    		<div class="col-md-6">
+    			<p>Track file : <?php echo $this->item->filename; ?></p>
+    		</div>
+    	<?php endif; ?>
     	</div>
     	<div class="row form-vertical">
     		<div class="col-md-10">

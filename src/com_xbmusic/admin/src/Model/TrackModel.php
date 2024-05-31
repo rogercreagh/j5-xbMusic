@@ -32,6 +32,7 @@ use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Symfony\Component\Validator\Constraints\IsNull;
 use Crosborne\Component\Xbmusic\Administrator\Extension\XbmusicComponent;
+use Joomla\CMS\Uri\Uri;
 
 class TrackModel extends AdminModel {
   
@@ -203,59 +204,63 @@ class TrackModel extends AdminModel {
         $isnewtrack = ($data['id'] == 0);
         //get the id3 data and use to set any track elements not set if id3 value available
         $filepathname = rtrim($data['pathname'],'/').'/'.$data['filename'];
-        if (file_exists($filepathname)) {
-            $filedata = XbmusicHelper::getFileId3($filepathname); 
-            // get the artist name withoout "The " to use for sorting and in artwork filename
-            if ($data['sortartist'] == '') {
-                if (isset($filedata['id3tags']['artist'])) {
-                    $data['sortartist'] = $this->stripThe($filedata['id3tags']['artist']);
-                }
-            }
-            //get album title for use in creating and linking album
-            $albumtitle = (isset($filedata['id3tags']['album'])) ? $filedata['id3tags']['album'] : '';
-            //get album artist for use in image filename and creating album
-            if (isset($filedata['id3tags']['band'])) {
-                $albumartist = $filedata['id3tags']['band'];
-            } else {
-                $albumartist = (isset($filedata['id3tags']['artist'])) ? $filedata['id3tags']['artist'] : '';
-            }
-            // get artwork if not set and if available in ID3
-            if (empty($data['artwork'])) {
-                if (isset($filedata['imageinfo']['data'])){
-                    // filename for image will be "album-title-albumartist-name.ext"
-                    // if track has no album listed but has image then "artist-name.ext" for all tracks by the artist
-                    // path will finish with initial letter of title or "unknown"
-                    $folder = ($albumtitle == '') ? 'Unknown' : strtolower($albumtitle[0]);
-                    $artpath = JPATH_ROOT.'/images/xbmusic/albums/'.$folder.'/';                
-                    if (!file_exists($artpath)) {
-                        mkdir($artpath,0775,true);                   
-                    }
-                    $artfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $albumtitle.' '.$data['sortartist']));
-                    $artpathfile = $artpath.$artfilename.'.'.XbmusicHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
-                    if (file_exists($artpathfile)) {
-                        $data['artwork'] = $artpathfile;
-                    } else {
-                        if (file_put_contents($artpathfile, $filedata['imageinfo']['data'])) {
-                            $data['artwork'] = $artpathfile;
-                        }                       
-                    }
-                    unset($filedata['imageinfo']['data']);                
-                }
-                // set data['artwork'] to imagefile               
-            } //endif empty artwork, if no artwork no action needed
+        if ($isnewtrack) {  
             
-            if ($data['id3_data'] == '') $data['id3_data'] = json_encode($filedata);
-        } else {
-            $app->enqueueMessage('Impossible Error : file '.$filepathname.' does not exist', 'Error');
-            return false;
-        }
-        
+            if (file_exists($filepathname)) {
+                $filedata = XbmusicHelper::getFileId3($filepathname); 
+                // get the artist name withoout "The " to use for sorting and in artwork filename
+                if ($data['sortartist'] == '') {
+                    if (isset($filedata['id3tags']['artist'])) {
+                        $data['sortartist'] = $this->stripThe($filedata['id3tags']['artist']);
+                    }
+                }
+                //get album title for use in creating and linking album
+                $albumtitle = (isset($filedata['id3tags']['album'])) ? $filedata['id3tags']['album'] : '';
+                //get album artist for use in image filename and creating album
+                if (isset($filedata['id3tags']['band'])) {
+                    $albumartist = $filedata['id3tags']['band'];
+                } else {
+                    $albumartist = (isset($filedata['id3tags']['artist'])) ? $filedata['id3tags']['artist'] : '';
+                }
+                // get artwork if not set and if available in ID3
+                if (empty($data['artwork'])) {
+                    if (isset($filedata['imageinfo']['data'])){
+                        // filename for image will be "album-title-albumartist-name.ext"
+                        // if track has no album listed but has image then "artist-name.ext" for all tracks by the artist
+                        // path will finish with initial letter of title or "unknown"
+                        $folder = ($albumtitle == '') ? 'NoAlbum' : 'albums/'.strtolower($albumtitle[0]);
+                        $artpath = '/images/xbmusic/artwork/'.$folder.'/';                
+                        if (!file_exists($artpath)) {
+                            mkdir(JPATH_ROOT.$artpath,0775,true);                   
+                        }
+                        $artfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $albumtitle.' '.$data['sortartist'])).'.'.XbmusicHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
+                        $artpathfile = JPATH_ROOT.$artpath.$artfilename;
+                        $arturl = Uri::root().$artpath.$artfilename;
+                        if (file_exists($artpathfile)) {
+                            $data['artwork'] = $arturl;
+                        } else {
+                            if (file_put_contents($artpathfile, $filedata['imageinfo']['data'])) {
+                                $data['artwork'] = $arturl;
+                            }                       
+                        }
+                        unset($filedata['imageinfo']['data']);                
+                    }
+                    // set data['artwork'] to imagefile               
+                } //endif empty artwork, if no artwork no action needed
+                
+ //               if ($data['id3_data'] == '') $data['id3_data'] = json_encode($filedata);
+            } else {
+                $app->enqueueMessage('Impossible Error : file '.$filepathname.' does not exist', 'Error');
+                return false;
+            } //endif file exists
+        } //endif newtrack
+//        $filedata = json_decode($data['id3_data'],true);
         if ($data['title'] == '') {
             if ($filedata['id3tags']['title'] != '') {
                 $data['title'] = $filedata['id3tags']['title'];
             }
-        } elseif ($data['title'] != $filedata['id3tags']['title']) {
-            $warnmsg .= 'Track title does not match ID3 title<br />';
+//        } elseif ($data['title'] != $filedata['id3tags']['title']) {
+//            $warnmsg .= 'Track title does not match ID3 title<br />';
         }
         if ($data['rec_date'] == '') {
             if (isset($filedata['id3tags']['recording_time'])) {
@@ -369,6 +374,10 @@ class TrackModel extends AdminModel {
         if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
         if ($warnmsg != '') $app->enqueueMessage($warnmsg, 'Warning');        
         return false;
+    }
+    
+    public function importID3data(&$data) {
+        
     }
     
     protected function preprocessForm(Form $form, $data, $group = 'content') {

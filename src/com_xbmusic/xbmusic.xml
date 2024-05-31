@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>28th May 2024</creationDate>
-	<version>0.0.6.6</version>
+	<creationDate>30th May 2024</creationDate>
+	<version>0.0.6.7</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -61,21 +61,45 @@
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=albums" >
 				xbmusic_iconmenu_albums
+				<params>
+					<menu-quicktask-title>XB_MUSIC_NEW_ALBUM</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=album&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=artists" >
 				xbmusic_iconmenu_artists
+				<params>
+					<menu-quicktask-title>XB_MUSIC_NEW_ARTIST</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=artist&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=playlists" >
 				xbmusic_iconmenu_playlists
+				<params>
+					<menu-quicktask-title>XB_MUSIC_NEW_PLIST</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=playlist&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=songs" >
 				xbmusic_iconmenu_songs
+				<params>
+					<menu-quicktask-title>XB_MUSIC_NEW_SONG</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=song&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=tracks" >
 				xbmusic_iconmenu_tracks
+				<params>
+					<menu-quicktask-title>XB_MUSIC_NEW_TRACK</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=track&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_categories&amp;view=categories&amp;extension=com_xbmusic" >
 				xbmusic_iconmenu_categories
+				<params>
+					<menu-quicktask-title>XB_NEW_CATEGORY</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_categories&amp;extension=com_xbmusic&amp;view=category&amp;layout=edit</menu-quicktask>
+				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=dataman" >
 				xbmusic_iconmenu_dataman

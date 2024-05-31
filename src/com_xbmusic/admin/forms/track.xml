@@ -37,6 +37,13 @@
 			size="40" 
 		/>
 		
+		<field name="music_base" type="text" 
+			label="Music base folder"
+			description="Full path to the folder for music folders and files set in the options. Can't be changed once the track has been saved."
+			readonly="true"
+			size="40" 
+		/>
+		
 		 <field name="pathname" type="xbfolderlist" 
 			label="File path" description="path from the music root directory as set in xbMusic Options" 
 			class="xbfilecontrol"
@@ -52,7 +59,7 @@
 			directory="/xbmusic"
 			hide_none="true" hide_default="true"
 			class="xbfilecontrol"
-			default="" required="true"
+			default="" 
 		>
 			<option value="">Select file</option>
 		</field>

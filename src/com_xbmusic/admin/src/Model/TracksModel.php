@@ -113,8 +113,8 @@ class TracksModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, '
-                    .'a.rec_date, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
+                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.artwork,'
+                    .'a.rec_date, a.rel_date, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
                     .'a.note'
                 )
@@ -295,7 +295,7 @@ class TracksModel extends ListModel {
                 } //end if is_object
                 $item->songs = $this->getSongs($item->id);
                 
-                $item->tags = $tagsHelper->getItemTags('com_xbmusic.music' , $item->id);               
+                $item->tags = $tagsHelper->getItemTags('com_xbmusic.track' , $item->id);               
             } //end foreach
         } //endif items
         return $items;
