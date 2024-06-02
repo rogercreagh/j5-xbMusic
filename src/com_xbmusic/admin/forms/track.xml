@@ -70,13 +70,25 @@
 	<fieldset name="general">
 	
 		<field name="rel_date" type="text"
-			label="Release Year" 
-			description="Date the album or track was released. Format [[DD-]MMM-]YYYY - day &amp; month optional"
-			class="inputbox" maxlength="12"
+			label="Release date" 
+			description="Date the album or track was released. Format YYYY[-MM[-DD]] - day &amp; month optional"
+			class="inputbox" maxlength="10"
+			hint="YYYY or YYYY-MM or YYYY-MM-DD"
+			pattern="(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)"
 		/>
 		<field name="rec_date" type="text"
-			label="Recording date" description="Date of track recording session. Format [[DD-]MMM-]YYYY - day &amp; month optional"
-			class="inputbox" maxlength="12"
+			label="Recording date" description="Date of track recording session. Format YYYY[-MM[-DD]] - day &amp; month optional"
+			class="inputbox" maxlength="10"
+			hint="YYYY or YYYY-MM or YYYY-MM-DD"
+			pattern="(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)"
+		/>
+		
+		<field name="duration" type="number"
+			label="Track Duration (secs)"
+			description=""
+			filter="integer"
+			min="0" max="99000" step="1"
+			size="5"
 		/>
 
 		<field name="description" type="textarea"
@@ -205,7 +217,40 @@
 				/>
 			</form>
 		</field>	
-				
+		
+		<field name="album_id" type="xbalbums"
+			label="Album"
+			description="A track can belong to only one album, if it is not already in the list it will be created from the ID3 tag data if avaiable"
+		>
+			<option value="0">Select Album</option>
+		</field>
+		
+		<field name="discno" type="text"
+			label="Disc No/subtitle"
+			description="Disc number of multi-disc set if appropriate. Use format N/M where N is the disc number and M is the number of discs in the album set. Leave blank for singledisc. The number may be followed by a space and a title for the disc in the set that makes the album - eg '1/2 Live Concert, 2/2 Studio Recording"
+			default="" hint="1/2"
+			size="15" maxlength="20" 
+		>
+			<option value="">No album or 1 disc</option>
+			<option value="1/2">Disc 1 of 2</option>
+			<option value="1/3">Disc 1 of 3</option>
+			<option value="1/4">Disc 1 of 4</option>
+			<option value="2/2">Disc 2 of 2</option>
+			<option value="2/3">Disc 2 of 3</option>
+			<option value="2/4">Disc 2 of 4</option>
+			<option value="3/3">Disc 3 of 3</option>
+			<option value="3/4">Disc 3 of 4</option>
+			<option value="4/4">Disc 4 of 4</option>
+		</field>
+		
+		<field name="trackno" type="integer"
+			label="Track number"
+			description="Number of the track on the disc. Multi disc sets will usually re-start at 1 on each disc. CDs of original double LP releases will often not include the original disc and track numbering but simply number them sequentially across the LPs in the ID3 data, or even reorder the original sequence. Re-releases often include 'bonus'tracks' added to the end of the original order - you might wish to label these as a separate disc"
+			first="0" last="99" step="1"
+			default="0"
+		>
+		</field>
+<!-- 
 		<field name="albumlist" type="subform"
 			label="Album"
 			description="Track may appear on more than one album - eg original and greatest hits or compilation"			
@@ -225,6 +270,7 @@
 				<field name="oldorder" type="hidden" default="0" />
 			</form>
 		</field>	
+ -->				
 				
 		<field name="artistlist" type="subform"
 			label="Artists(s)"

@@ -152,7 +152,9 @@ $input = Factory::getApplication()->getInput();
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
         					<?php echo $this->form->renderField('rel_date'); ?> 
-        				</div>
+        					<?php echo $this->form->renderField('duration'); ?> 
+    	        			<?php echo $this->item->id3_tags->duration; ?>
+           				</div>
         			</div>
   					<div class="row">
 		  	     		<div class="col-12 col-lg-6">
@@ -168,7 +170,7 @@ $input = Factory::getApplication()->getInput();
         				</div>
         			</div>
             		<?php echo $this->form->renderField('ext_links');?>
-           		
+
 	   			</div>
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
@@ -241,7 +243,9 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'albums', Text::_('Linked Items')); ?>
 			<div class="row">
 				<div class="col-12">
-					<?php echo $this->form->renderField('albumlist'); ?> 
+					<?php echo $this->form->renderField('album_id'); ?> 
+					<?php echo $this->form->renderField('discno'); ?> 
+					<?php echo $this->form->renderField('trackno'); ?> 
 				</div>
 				<div class="col-12">
 					<?php echo $this->form->renderField('artistlist'); ?> 

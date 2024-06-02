@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.6 24th May 2024
+ * @version 0.0.6.8 31st May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -91,6 +91,15 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 	    
+	public static function getMusicBase() {
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    if ($params->get('use_xbmusic', 1)) {
+	        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$params->get('xbmusic_subfolder','');
+	    } else {
+	        $basemusicfolder = (trim($params->get('music_path','')) != '') ? trim($params->get('music_path')) : JPATH_ROOT.'/xbmusic/';
+	    }
+	    return $basemusicfolder;
+	}
 	    
 /****************** xbLibrary functions ***********/
 	

@@ -298,7 +298,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
         'bootstrap.renderModal',
         'changelogModal',
         [
-            'title' => Text::_('XB_FULL_CHANGELOG')
+            'title' => Text::sprintf('XB_FULL_CHANGELOG','xbMusic')
         ],
         '<div style="margin:10px 30px;">'.$this->changelog.'</div>'
     );

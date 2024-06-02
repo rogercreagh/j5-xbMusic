@@ -32,7 +32,7 @@ class XbalbumlistField extends ListField {
     public function getOptions() {       
         $db = Factory::getDbo();
         $query  = $db->getQuery(true);
-        $query->select('id AS value, CONCAT(title, " (",sortartist,")") AS text')->from('#__xbmusic_albums');
+        $query->select('id as value, CONCAT(title, " (",sortartist,")") AS text')->from('#__xbmusic_albums');
         $query->order('title, sortartist ASC');
         $db->setQuery($query);
         $result = $db->loadObjectList();
