@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.6.7 30th May 2024
+ * @version 0.0.6.9 2nd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -77,8 +77,6 @@ $input = Factory::getApplication()->getInput();
     		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
    			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
     	<?php else : ?>
-    		Music_base folder for this track :<?php echo $this->form->renderField('music_base'); ?> 
-   			<?php $this->form->setFieldAttribute('pathname','directory',$this->item->music_base); ?>
     	<?php endif; ?>
 		<?php 
             $session = Factory::getApplication()->getSession();
@@ -152,8 +150,8 @@ $input = Factory::getApplication()->getInput();
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
         					<?php echo $this->form->renderField('rel_date'); ?> 
-        					<?php echo $this->form->renderField('duration'); ?> 
-    	        			<?php echo $this->item->id3_tags->duration; ?>
+        					<?php //echo $this->form->renderField('duration'); ?> 
+    	        			<?php //echo $this->item->id3_tags->duration; ?>
            				</div>
         			</div>
   					<div class="row">
@@ -164,7 +162,7 @@ $input = Factory::getApplication()->getInput();
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
 		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
 		           				</div>
-								<div id="pv_desc" class="xbbox xbboxwht" style="height:80%; overflow-y:scroll;">
+								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
         					</div> 
         				</div>
@@ -186,8 +184,9 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<?php echo Text::_('id3 Image'); ?>
-					<?php echo '<img src="data:image/jpeg;base64,'.base64_encode($this->item->id3_image).'" />';  ?>
+           			<?php echo Text::_('id3 Image'); ?><br/>
+					<img src="<?php echo $this->item->artwork; ?>" />
+					<br />[LOAD NEW IMAGE] (modal selector)
 				</div>        		
            		<div class="col-12 col-md-7">
 					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">

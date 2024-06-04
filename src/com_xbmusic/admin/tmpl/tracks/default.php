@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.6.6 24th May 2024
+ * @version 0.0.6.9 3rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -97,10 +97,9 @@ function stopProp(event) {
     			<colgroup>
 					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
 					<col class="nowrap center" style="width:95px;"><!-- status -->
-    				<col ><!-- title, alias, songlink, rec/rel date -->
+    				<col ><!-- title, alias, filename, rec/rel dates -->
     				<col style="width:105px;"><!-- artwork -->
     				<col ><!-- Albums, Artists, Playlists -->
-    				<col class="nowrap hidden-phone" ><!-- path, filename -->
     				<col class="nowrap hidden-phone" style="width:110px;" ><!-- category & tags -->
     				<col class="nowrap hidden-phone xbtc" style="width:160px; padding:0;"><!-- date & id -->
     			</colgroup>	
@@ -114,13 +113,18 @@ function stopProp(event) {
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
-							Recording &amp; release dates
+							<span class="xb09">
+								<?php echo Text::_('Recording'); ?> &amp;  
+								<?php echo HTMLHelper::_('searchtools.sort', 'Release', 'a.rel_date', $listDirn, $listOrder); ?>
+								<?php echo Text::_('dates');?>
+							</span>
 						</th>
 						<th>Artwork
 						</th>
-						<th>Album(s), Artist(s), Playlists
-						</th>
-						<th>folder, filename
+						<th><?php echo HTMLHelper::_('searchtools.sort', 'Album', 'album.title', $listDirn, $listOrder); ?>, 
+						<?php echo Text::_('Song(s)'); ?>,
+						<?php echo HTMLHelper::_('searchtools.sort', 'Artist', 'a.sortartist', $listDirn, $listOrder); ?>, 
+						<?php echo Text::_('Playlists'); ?>
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -201,11 +205,11 @@ function stopProp(event) {
                              </div>
                                    
 						</td>
-						<td class="has-context"  onclick="stopProp(event);">
+						<td class="has-context">
 							<div class="pull-left">
 								<p class="xbm0">
 								<?php if ($item->checked_out) : ?>
-									<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'tracks.', $canCheckin); ?>
+									<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'track.', $canCheckin); ?>
 								<?php endif; ?>
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<a class="hasTooltip" href="
@@ -223,22 +227,16 @@ function stopProp(event) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								<br />
-								<?php if (count($item->songs) > 1) : ?>
-									<details class="xb09">
-										<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
-										<ul>
-										<?php foreach ($item->songs as $song) : ?>
-											<li><a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
-								                <?php echo $song['title']; ?></a></li>
-										<?php endforeach; ?>
-										</ul>
-									</details>
-								<?php elseif (count($item->songs)==1) : ?>
-									<span class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
-									<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
-										<?php echo $item->songs[0]['title']; ?>
-									</a></span>
-								<?php endif; ?>$item->rel_date; ?>
+								<span class="xb09" title="<?php echo $item->pathname; ?>">
+									<code><?php echo $item->filename;?></code>
+								</span>
+								<br />
+								<?php if($item->rec_date != '') : ?>
+									<?php echo Text::_('Rec.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rec_date); ?>
+								<?php endif; ?>
+								<?php if($item->rel_date != '') : ?>									
+									<?php echo Text::_('Rel.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rel_date); ?>
+								<?php endif; ?>
 								</p>
 							</div>
 						</td>
@@ -246,14 +244,29 @@ function stopProp(event) {
 								<img src="<?php echo $item->artwork; ?>" style="height:100px;" />
 							<?php endif; ?>
 						</td>
-						<td>
-							<p><code><?php echo str_replace($this->basemusicfolder,'',$item->pathname); ?>/</code>
-								<br /><code><?php echo $item->filename;?></code>
-							</p>
-						</td>
-						<td>						
-						</td>
-						<td>playlists
+						<td onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
+							<i><?php echo Text::_('Album'); ?></i>: <?php echo $item->albumtitle; ?>
+							<?php if(count($item->songs)>0) : ?>
+								<hr />
+    							<?php if (count($item->songs) > 1) : ?>
+    								<details class="xb09">
+    									<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
+    									<ul>
+    									<?php foreach ($item->songs as $song) : ?>
+    										<li><a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+    							                <?php echo $song['title']; ?></a></li>
+    									<?php endforeach; ?>
+    									</ul>
+    								</details>
+    							<?php elseif (count($item->songs)==1) : ?>
+    								<span class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
+    								<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+    									<?php echo $item->songs[0]['title']; ?>
+    								</a></span>
+    							<?php endif; ?>
+							<?php endif; ?>
+							<hr />
+							<i><?php echo Text::_('Main Artist'); ?></i>: <?php echo $item->sortartist; ?>
 						</td>
 						<td>
 						<?php if ($item->catid > 0) : ?>

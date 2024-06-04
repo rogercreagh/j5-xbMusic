@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TracksModel.php
- * @version 0.0.6.3 18th May 2024
+ * @version 0.0.6.9 3rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -31,6 +31,9 @@ class TracksModel extends ListModel {
                 'id', 'a.id',
                 'title', 'a.title',
                 'alias', 'a.alias',
+                'rel_date', 'a.rel_date',
+                'sortartist', 'a.sortartist',
+                'albumtitle', 'album.title',
                 'checked_out', 'a.checked_out',
                 'checked_out_time', 'a.checked_out_time',
                 'catid', 'a.catid', 'category_title',
@@ -114,14 +117,16 @@ class TracksModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.artwork,'
-                    .'a.rec_date, a.rel_date, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
+                    .'a.rec_date, a.rel_date, a.sortartist, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
-                    .'a.note'
+                    .'a.note, album.title AS albumtitle'
                 )
             );
         $query->from('#__xbmusic_tracks AS a');
                 
-        // join albums, songs, artists, playlists
+        // join album, 
+        $query->join('LEFT', '#__xbmusic_albums AS album ON album.id = a.album_id');
+        // get songs, artists, playlists in getItems()
         
         // Join over the users for the checked out user.
         $query->select('uc.name AS editor')

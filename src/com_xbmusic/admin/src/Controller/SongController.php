@@ -64,6 +64,15 @@ class SongController extends FormController {
         
         return false;
     }
+ 
+    public function checkin() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('song');
+        $wynik = $model->checkin($pid);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $this->setRedirect($redirectTo );
+    }
     
     public function batch($model = null) {
         

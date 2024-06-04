@@ -22,6 +22,7 @@ use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Multilanguage;
 use Joomla\Utilities\ArrayHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 FormHelper::loadFieldClass('list');
 
@@ -68,7 +69,7 @@ class JFormFieldXbtags extends Joomla\CMS\Form\Field\TagField
 		    $maxlevel = $levels;
 		    if ($parent_id>1) {
 		        //get parent level
-		        $ptag = XbcultureHelper::getTag($parent_id);
+		        $ptag = XbmusicHelper::getTag($parent_id);
 		        $maxlevel += $ptag->level;
 		    }
 		}

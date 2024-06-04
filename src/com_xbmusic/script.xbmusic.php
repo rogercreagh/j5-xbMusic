@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.4.1 28th April 2024
+ * @version 0.0.6.9 3rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Installer\InstallerScript;
 use Joomla\CMS\Table\Table;
@@ -83,6 +84,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Tracks","desc"=>"default parent category for xbMaps Tracks")
             );
             $message .= $this->createCategories($cats);
+            
+            //create a top level tag to be parent for id3genre tags
+//            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));
             
             //create xbmusic image folder
             if (!file_exists(JPATH_ROOT.'/images/xbmusic/albums/unknown')) {
@@ -163,5 +167,55 @@ class Com_xbmusicInstallerScript extends InstallerScript
         return $message;
     }
     
+    /**
+     * @name createTag()
+     * @desc function to create a tag with title, parent_tag_id, status, and optional description
+     * @param assoc array $tagdata
+     * @return boolean|int new (or existing) tagid of false in case of error
+     */
+    public function createTag(array $tagdata) {
+        Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+        $app = Factory::getApplication();
+        //check if alias already exists (dupe id)
+        $alias = $tagdata['title'];
+        $alias = ApplicationHelper::stringURLSafe($alias);
+        if (trim(str_replace('-', '', $alias)) == '') {
+            $alias = Factory::getDate()->format('Y-m-d-H-i-s');
+        }
+        $db = Factory::getDBO();
+        $query = $db->getQuery(true);
+        $query->select('id')->from($db->quoteName('#__tags'))->where($db->quoteName('alias').' = '.$db->quote($alias));
+        $db->setQuery($query);
+        $id = $db->loadResult();
+        if ($id>0) {
+            $app->enqueueMessage('Tag with alias '.$alias.' already exists with id '.$id, 'Warning');
+            return $id;
+        }
+        
+        $table = Table::getInstance('Tag', 'TagsTable', array());
+        // Bind data
+        if (!$table->bind($tagdata)) {
+            $app->enqueueMessage($table->getError(),'Error');
+            return false;
+        }
+        // Check the data.
+        if (!$table->check()) {
+            $app->enqueueMessage($table->getError(),'Error');
+            return false;
+        }
+        // set the parent details
+        $table->setLocation($tagdata['parent_id'], 'last-child'); //no error reporting from this one
+        // Store the data.
+        if (!$table->store()){
+            $app->enqueueMessage($table->getError(),'Error');
+            return false;
+        }
+        if (!$table->rebuildPath($table->id)) {
+            $app->enqueueMessage($table->getError(),'Error');
+            return false;
+        }
+        $app->enqueueMessage('New tag '.$tagdata['title'].' created with id '.$table->id);
+        return $table->id;
+    }
     
 }

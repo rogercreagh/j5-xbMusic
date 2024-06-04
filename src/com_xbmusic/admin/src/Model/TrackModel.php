@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.6.8 31st May 2024
+ * @version 0.0.6.9 2nd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -218,20 +218,30 @@ class TrackModel extends AdminModel {
             if (!$this->importID3data($data)) return false;
         } //endif newtrack
         
-        //there may have been manual changes to say back to id3
+        //there may have been manual changes to save back to id3
         $id3changed = false;
         
- /**       
-        $id3data = json_decode($data['id3_data'],true);
-        
-        if ($id3ata['imageinfo']['picturetype'] != $data['image_type']) {
+        $olditem = parent::getItem($data['id']);
+        //       $filepathname = rtrim($olditem->pathname,'/').'/'.$olditem->filename;
+        //        $filedata = XbmusicHelper::getFileId3($filepathname);;
+        //                          unset($filedata['imageinfo']['data']);
+        $id3data = json_decode($olditem->id3_data);
+//        $app->enqueueMessage($data['id'].' item: '.$id3data->imageinfo->picturetype.' data:'.$data['image_type']);
+        if ($id3data->imageinfo->picturetype != $data['image_type']) {
             $id3changed = true;
-            $id3ata['imageinfo']['picturetype'] = $data['image_type'];
+            $id3data->imageinfo->picturetype = $data['image_type'];
+        }
+        if ($id3data->imageinfo->description != $data['image_desc']) {
+            $id3changed = true;
+            $id3data->imageinfo->description = $data['image_desc'];
+        }
+        //        $app->enqueueMessage('changed: '.$id3changed.' res '.$id3data->imageinfo->picturetype);
+        
+        if ($id3changed) {
+            $data['id3_data'] = json_encode($id3data);
+            //save changes back to file after saving (what about ?image data)
         }
         
-        if ($id3changed) $data['id3_data'] = json_encode($id3data); 
-        //save it back to file before?after successfully saving track
-**/            
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
         }
@@ -357,7 +367,7 @@ class TrackModel extends AdminModel {
             }
             if ($data['rel_date'] == '') {
                 if (isset($filedata['id3tags']['year'])) {
-                    if (preg_match('/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/',$filedata['id3tags']['recording_time'])==1) {
+                    if (preg_match('/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/',$filedata['id3tags']['year'])==1) {
                         $data['rel_date'] = $filedata['id3tags']['year'];
                     } else {
                         $warnmsg .= 'Release date '.$filedata['id3tags']['year'].' doesn\'t match Y(-M(-D)) format. Enter manually.<br />';
@@ -365,7 +375,8 @@ class TrackModel extends AdminModel {
                 }
             }
             if ($albumtitle != '') {
-                $data['album_id'] = $this->getCreateAlbum($albumtitle,$tid, $albumartist, $data['rel_date'], $data['artwork'] );
+                $numdiscs = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) explode('/',$filedata['id3tags']['part_of_a_set'])[1] :1;
+                $data['album_id'] = $this->getCreateAlbum($albumtitle,$tid, $albumartist, $data['rel_date'], $data['artwork'],$numdiscs );
                 $data['trackno'] = (isset($filedata['id3tags']['track_number'])) ? $filedata['id3tags']['track_number'] : 0;
                 $data['discno'] = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) $filedata['id3tags']['part_of_a_set'] : '';
                 
@@ -538,7 +549,7 @@ class TrackModel extends AdminModel {
         return $id;
     }
     
-    public function getCreateAlbum($title, $tid, $artist, $reldate, $artwork) {
+    public function getCreateAlbum($title, $tid, $artist, $reldate, $artwork, $numdiscs) {
         //what if artist releases two albums with same title?
         $sortartist = $this->stripThe($artist);
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title).' '.$sortartist);
@@ -548,7 +559,7 @@ class TrackModel extends AdminModel {
         $db->setQuery($query);
         $id = $db->loadResult();
         if (empty($id)) {
-            //create new song
+            //create new album
             $params = ComponentHelper::getParams('com_xbmusic');
             //get song default category
             $catid = $params->get('defcat_album');
@@ -557,8 +568,8 @@ class TrackModel extends AdminModel {
             $createbyalias = 'created from ID3';
             $query->clear();
             $query->insert('#__xbmusic_albums');
-            $query->columns('title, alias, albumartist, sortartist, rel_date, artwork, catid, status, access, created, modified, created_by_alias');
-            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$artwork.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
+            $query->columns('title, alias, albumartist, sortartist, rel_date, artwork, num_discs, catid, status, access, created, modified, created_by_alias');
+            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$artwork.'","'.$numdiscs.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
             //            $query->values($db->quote($title, $newalias, $catid, $createmod, $createmod, $createbyalias));
             $db->setQuery($query);
             try {

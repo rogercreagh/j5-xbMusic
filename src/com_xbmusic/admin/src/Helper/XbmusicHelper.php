@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.8 31st May 2024
+ * @version 0.0.6.9 3rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -27,6 +27,8 @@ use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseQuery;
 use DOMDocument;
+use DateTime;
+use Exception;
 use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
 
 class XbmusicHelper extends ComponentHelper
@@ -104,24 +106,149 @@ class XbmusicHelper extends ComponentHelper
 /****************** xbLibrary functions ***********/
 	
 	/**
+	 * @name createCategories()
+	 * @desc create categories 
+	 * @param array $cats - array of category details title, description, parent_id=1
+	 * @return string message
+	 */
+	public function createCategories(array $cats) {
+	    //TODO change as per createTags to use bind and not crash out if error
+	    $message = 'Creating '.$this->extension.' categories. ';
+	    $db = Factory::getDBO();
+	    foreach ($cats as $cat) {
+	        if (key_exists('title',$cat)) {
+	            $query = $db->getQuery(true);
+	            //first check if category already exists (could use $this->checkValueExists
+	            $query->select('id')->from($db->quoteName('#__categories'))
+	            ->where($db->quoteName('title')." = ".$db->quote($cat['title']))
+	            ->where($db->quoteName('extension')." = ".$db->quote('com_xbmusic'));
+	            $db->setQuery($query);
+	            if ($db->loadResult()>0) {
+	                $message .= '"'.$cat['title'].' already exists<br /> ';
+	            } else {
+	                $category = Table::getInstance('Category');
+	                $category->extension = $this->extension;
+	                $category->title = $cat['title'];
+	                $category->description = $cat['desc'];
+	                $category->published = 1;
+	                $category->access = 1;
+	                $category->params = '{"category_layout":"","image":"","image_alt":""}';
+	                $category->metadata = '{"page_title":"","author":"","robots":""}';
+	                $category->language = '*';
+	                // Set the location in the tree
+	                $category->setLocation($cat['parent_id'], 'last-child');
+	                // Check to make sure our data is valid
+	                if ($category->check()) {
+	                    if ($category->store(true)) {
+	                        // Build the path for our category
+	                        $category->rebuildPath($category->id);
+	                        $message .= $cat['title'].' id:'.$category->id.' created ok. ';
+	                    } else {
+	                        throw new Exception(500, $category->getError());
+	                        //return '';
+	                    }
+	                } else {
+	                    throw new Exception(500, $category->getError());
+	                    //return '';
+	                }
+	            }
+	        }
+	    }
+	    return $message;
+	}
+	
+	/**
+	 * @name createTags()
+	 * @desc function to create a tag with title, parent_tag_id, status, and optional description
+	 * @param assoc array $tagdata
+	 * @return boolean|array of new (or existing) tagids indexed by title, or false in case of error
+	 */
+	public static function createTags(array $tagsarr) {
+	    Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+	    $app = Factory::getApplication();
+	    //check if alias already exists (dupe id)
+	    foreach ($tagsarr as $tagdata) {
+	        $ids = array();
+	        $errmsg = '';
+	        $infomsg = '';
+    	    $alias = $tagdata['title'];
+    	    $alias = ApplicationHelper::stringURLSafe($alias);
+    	    if (trim(str_replace('-', '', $alias)) == '') {
+    	        $alias = Factory::getDate()->format('Y-m-d-H-i-s');
+    	    }
+    	    $id = $this->checkValueExists($alias, '#__tags', 'alias');
+    	    if ($id>0) {
+    	        $infomsg .= 'Tag with alias '.$alias.' already exists with id '.$id.'<br />';
+    	        $ids[] = array($tagdata['title'] => $id);
+    	    } else {    	    
+        	    $table = Table::getInstance('Tag', 'TagsTable', array());
+        	    // Bind data
+        	    if (!$table->bind($tagdata)) {
+        	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
+        	    } else {      	        
+            	    // Check the data.
+            	    if (!$table->check()) {
+            	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
+            	    } else {           	        
+                	    // set the parent details
+                	    $table->setLocation($tagdata['parent_id'], 'last-child'); //no error reporting from this one
+                	    // Store the data.
+                	    if (!$table->store()){
+                	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
+                	    } else {
+                    	    if (!$table->rebuildPath($table->id)) {
+                    	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
+                    	    } else {
+                        	    $infomsg .= 'New tag '.$tagdata['title'].' created with id '.$table->id;
+                        	    $ids[] = array($tagdata['title'] => $table->id);
+                    	    }
+                	    } // endif store 
+            	    } // endif check
+        	    } // endif bind
+    	    } //endif $id>0
+    	}  // endforeach
+    	if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
+    	if ($infomsg != '') $app->enqueueMessage($infomsg);
+    	
+	    return $ids;
+	}
+	
+    /**
 	 * @name checkValueExists()
 	 * @desc returns true if given value exists in given table column (case insensitive)
 	 * @param string $value - text to check
 	 * @param string $table - the table to check in
 	 * @param string $col- the column to check
-	 * @return boolean - true if value is found in column
+	 * @param string $where - optional additional where condition (AND). should be quoted
+	 * @return int|boolean - id if value is found in column, otherwise false
 	 */
-	public static function checkValueExists( $value,  $table, $col) {
+	public static function checkValueExists( $value,  $table, $col, $where = '') {
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('id')->from($db->quoteName($table))
 	    ->where('LOWER('.$db->quoteName($col).')='.$db->quote(strtolower($value)));
+	    if ($where != '') $query->where($where);
 	    $db->setQuery($query);
 	    $res = $db->loadResult();
 	    if ($res > 0) {
-	        return true;
+	        return $res;
 	    }
 	    return false;
+	}
+	
+	/**
+	 * @name strDateReformat()
+	 * @desc reformats date from YYYY[-MM[-DD]] to [DD-[MMM-]]YYYY
+	 * @param string $ymd
+	 * @return string
+	 */
+	public static function strDateReformat($ymd) {
+	    $parts = explode('-',$ymd);
+	    $res = '';
+	    if (count($parts)>2) $res = $parts[2].' ';
+	    if (count($parts)>1) $res .= DateTime::createFromFormat('!m', $parts[1])->format('M').' ';
+	    if (count($parts)>0) $res .= $parts[0];
+	    return $res;
 	}
 	
 	/**

@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/TrackController.php
- * @version 0.0.4.3 30th April 2024
+ * @version 0.0.6.9 3rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -53,6 +53,16 @@ class TrackController extends FormController {
         $app->getSession()->set('musicfolder',$nf);
         $this->setRedirect((string)Uri::getInstance());       
     }
+    
+    public function checkin() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->checkin($pid);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo );
+    }
+    
     
     protected function allowEdit($data = [], $key = 'id') {
         
