@@ -150,7 +150,7 @@ $input = Factory::getApplication()->getInput();
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
         					<?php echo $this->form->renderField('rel_date'); ?> 
-        					<?php //echo $this->form->renderField('duration'); ?> 
+        					<?php echo $this->form->renderField('duration'); ?> 
     	        			<?php //echo $this->item->id3_tags->duration; ?>
            				</div>
         			</div>

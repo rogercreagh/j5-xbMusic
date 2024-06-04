@@ -190,7 +190,7 @@ function stopProp(event) {
 							<div style="float:left;">
                                 <?php
                                     $options = [
-                                        'task_prefix' => 'tracks.',
+                                        'task_prefix' => 'track.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];

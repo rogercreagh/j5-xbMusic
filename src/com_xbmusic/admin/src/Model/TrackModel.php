@@ -12,6 +12,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\Model;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
@@ -198,22 +199,21 @@ class TrackModel extends AdminModel {
         $app    = Factory::getApplication();
         $input  = $app->getInput();
         $filter = InputFilter::getInstance();
-        $params = ComponentHelper::getParams('com_xbmusic');
         $infomsg = '';
         $warnmsg = '';
         // track alias is the pathname without the basemusicfolder part
-        if ($data['alias'] == '') {
-            $basemusicfolder = XbmusicHelper::getMusicBase();
-            $data['alias'] = OutputFilter::stringURLSafe(str_replace($basemusicfolder, '' , $data['pathname']).'-'. $data['filename']);
-            if ( XbmusicHelper::checkValueExists($data['alias'], '#__xbmusic_tracks', 'alias')) {
-                $warnmsg .= 'Duplicate alias - this track appears to be already in the database. Data not saved';
-                $app->enqueueMessage($warnmsg,'Error');
-                if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
-                return false;
-            }
-        }
         $isnewtrack = ($data['id'] == 0);
         if ($isnewtrack) {  
+            if ($data['alias'] == '') {
+                $basemusicfolder = XbmusicHelper::getMusicBase();
+                $data['alias'] = OutputFilter::stringURLSafe(str_replace($basemusicfolder, '' , $data['pathname']).'-'. $data['filename']);
+                if ( XbmusicHelper::checkValueExists($data['alias'], '#__xbmusic_tracks', 'alias')) {
+                    $warnmsg .= 'Duplicate alias - this track appears to be already in the database. Data not saved';
+                    $app->enqueueMessage($warnmsg,'Error');
+                    if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
+                    return false;
+                }
+            }
             //get the id3 data and use to set any track elements not set if id3 value available
             if (!$this->importID3data($data)) return false;
         } //endif newtrack
@@ -313,6 +313,7 @@ class TrackModel extends AdminModel {
     
     public function importID3data(&$data) {
         $app = Factory::getApplication();
+        $params = ComponentHelper::getParams('com_xbmusic');
         $warnmsg = '';
         $infomsg = '';
         $filepathname = rtrim($data['pathname'],'/').'/'.$data['filename'];
@@ -379,14 +380,7 @@ class TrackModel extends AdminModel {
                 $data['album_id'] = $this->getCreateAlbum($albumtitle,$tid, $albumartist, $data['rel_date'], $data['artwork'],$numdiscs );
                 $data['trackno'] = (isset($filedata['id3tags']['track_number'])) ? $filedata['id3tags']['track_number'] : 0;
                 $data['discno'] = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) $filedata['id3tags']['part_of_a_set'] : '';
-                
-//               $db = $this->getDbo();
-//                if (empty(XbmusicHelper::getItems('#__xbmusic_albumtrack', 'album_id', $data['albumid'], 'track_id = '.$db->q($tid)))) {
-//                    $n = count($data['albumlist']);
-                    //                        $data['albumlist']['albumlist'.$n] = array('album_id' => $albumid, 'note' =>'auto added with new track '.$tid, 'trackno' => $trackno);
-                    $infomsg .= Text::sprintf('Album %s added to track',$albumtitle);
- //               } else {
-//                    $infomsg .= Text::sprintf('Album %s already linked to track',$albumtitle);
+                $infomsg .= Text::sprintf('Album %s added to track',$albumtitle);
             } else {
                 $infomsg .= Text::_('No ID3 album info available for track');
             }
@@ -397,7 +391,29 @@ class TrackModel extends AdminModel {
             } elseif ($data['title'] != $filedata['id3tags']['title']) {
                 $warnmsg .= 'Track title does not match ID3 title<br />';
             }
-            if (isset($filedata['playtime_seconds'])) $data['duration'] = round($filedata['playtime_seconds']);  
+            if (isset($filedata['id3tags']['genre'])) {
+                $genre = $filedata['id3tags']['genre'];
+                if ($params->get('genrecattag','')==1){
+                    //if genre tag already exists
+                    $tid = XbmusicHelper::checkValueExists(ApplicationHelper::stringURLSafe($genre), '#__tags', 'alias');
+                    if ($tid>0) {
+                        $data['tags'][] = $tid;
+                    } else{
+                        $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
+                        if (!$pid>0) {
+                            $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres', 
+                                'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.')));
+                        }
+                        $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid));
+                        if ($newtag->id) {
+                            //add tag to item
+                            $data['tags'][] = $newtag->id; 
+                        }
+                        
+                    }                   
+                }
+            }
+            if (isset($filedata['playtime_seconds'])) $data['duration'] = (int)$filedata['playtime_seconds'];  
             $data['id3_data'] = json_encode($filedata);
             $data['created_by_alias'] = 'Created from ID3 Import';           
             $app->enqueueMessage($infomsg);

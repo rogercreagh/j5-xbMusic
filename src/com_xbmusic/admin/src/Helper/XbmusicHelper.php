@@ -164,58 +164,43 @@ class XbmusicHelper extends ComponentHelper
 	 * @return boolean|array of new (or existing) tagids indexed by title, or false in case of error
 	 */
 	public static function createTags(array $tagsarr) {
-	    Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+	    $result = array();
+	    foreach ($tagsarr as $tag) {	        
+	        $result[]= self::createTag($tag);
+	    }
+	    return $result;
+	}
+		
+	public static function createTag(array $tagdata) {
+	    //Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
 	    $app = Factory::getApplication();
-	    //check if alias already exists (dupe id)
-	    foreach ($tagsarr as $tagdata) {
-	        $ids = array();
-	        $errmsg = '';
-	        $infomsg = '';
-    	    $alias = $tagdata['title'];
-    	    $alias = ApplicationHelper::stringURLSafe($alias);
-    	    if (trim(str_replace('-', '', $alias)) == '') {
-    	        $alias = Factory::getDate()->format('Y-m-d-H-i-s');
-    	    }
-    	    $id = $this->checkValueExists($alias, '#__tags', 'alias');
-    	    if ($id>0) {
-    	        $infomsg .= 'Tag with alias '.$alias.' already exists with id '.$id.'<br />';
-    	        $ids[] = array($tagdata['title'] => $id);
-    	    } else {    	    
-        	    $table = Table::getInstance('Tag', 'TagsTable', array());
-        	    // Bind data
-        	    if (!$table->bind($tagdata)) {
-        	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
-        	    } else {      	        
-            	    // Check the data.
-            	    if (!$table->check()) {
-            	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
-            	    } else {           	        
-                	    // set the parent details
-                	    $table->setLocation($tagdata['parent_id'], 'last-child'); //no error reporting from this one
-                	    // Store the data.
-                	    if (!$table->store()){
-                	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
-                	    } else {
-                    	    if (!$table->rebuildPath($table->id)) {
-                    	        $errmsg .= $tagdata['title'].' error: '.$table->getError().'<br />';
-                    	    } else {
-                        	    $infomsg .= 'New tag '.$tagdata['title'].' created with id '.$table->id;
-                        	    $ids[] = array($tagdata['title'] => $table->id);
-                    	    }
-                	    } // endif store 
-            	    } // endif check
-        	    } // endif bind
-    	    } //endif $id>0
-    	}  // endforeach
-    	if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
-    	if ($infomsg != '') $app->enqueueMessage($infomsg);
-    	
-	    return $ids;
+	    $errmsg = '';
+	    $infomsg = '';
+        $wynik = new \stdClass();
+        //set defaults for status & parent
+        if (!key_exists('published', $tagdata))  $tagdata['published'] = 1;
+        if (!key_exists('parent_id', $tagdata))  $tagdata['parent_id'] = 1;
+        if (!key_exists('langauge', $tagdata))  $tagdata['language'] = '*';
+        if (!key_exists('description', $tagdata))  $tagdata['description'] = '';       
+        // Create new tag.
+        $tagModel = Factory::getApplication()->bootComponent('com_tags')
+           ->getMVCFactory()->createModel('Tag', 'Administrator', ['ignore_request' => true]);	        
+        if (!$tagModel->save($tagdata)) {
+            $errmsg = $tagModel->getError();	            
+        } else {
+	        $tagid = $tagModel->getState('tag.id');
+	        $infomsg .= 'New tag '.$tagdata['title'].' created with id '.$tagid;
+	        $wynik->id = $tagid;
+            $wynik->title = $tagdata['title'];	            
+        }
+	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
+        if ($infomsg != '') $app->enqueueMessage($infomsg);
+        return $wynik;
 	}
 	
-    /**
+	/**
 	 * @name checkValueExists()
-	 * @desc returns true if given value exists in given table column (case insensitive)
+	 * @desc returns its id if given value exists in given table column (case insensitive)
 	 * @param string $value - text to check
 	 * @param string $table - the table to check in
 	 * @param string $col- the column to check
