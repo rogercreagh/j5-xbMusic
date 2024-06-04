@@ -37,10 +37,20 @@
   width: 100% !important;
 }
 
+/* inline list */
+ul.inline {
+    margin-left: 0;
+    padding: 0;
+    list-style: none;
+}
+
 /*adjust default margins round labels for tags and cats */
-.xblabel, .xbbadge { margin:2px;}
-.xbtags ul.inline > li {
-	margin:0;
+.xblabel, .xbbadge { 
+	margin:2px;
+}
+ul.inline > li {
+	margin: 0;
+	display: inline-block;
 }
 
 /*adjust spacing between tag labels in tag layout */
@@ -364,6 +374,16 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xb085 { font-size:0.85em; }
 .xb08, .xbcredit { font-size:0.8em; }
 
+/* font sizes in rem */
+.xbr15 { font-size:1.5rem; }
+.xbr12, .xbtitle { font-size:1.2rem; }
+.xbr11, .xbsubtitle { font-size:1.1rem; }
+.xbr10 { font-size:1.0rem; }
+.xbr095 { font-size:0.95rem; }
+.xbr09, .xbnote { font-size:0.9rem; }
+.xbr085 { font-size:0.85rem; }
+.xbr08, .xbcredit { font-size:0.8rem; }
+
 /* font weights and styles */
 .xbnorm, .xbnit, .xbnote { font-weight: normal; }
 .xbbold, .xbtitle { font-weight: bold; }
@@ -382,6 +402,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbmr20 { margin-right:20px; }
 
 .xbmt2 { margin-top:2px; }
+.xbmt5 { margin-top:5px; }
 .xbmt10 { margin-top:10px; }
 .xbmt20 { margin-top:20px; }
 

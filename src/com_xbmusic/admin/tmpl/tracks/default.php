@@ -227,16 +227,18 @@ function stopProp(event) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								<br />
-								<span class="xb09" title="<?php echo $item->pathname; ?>">
+								<span title="<?php echo $item->pathname; ?>">
 									<code><?php echo $item->filename;?></code>
 								</span>
 								<br />
-								<?php if($item->rec_date != '') : ?>
-									<?php echo Text::_('Rec.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rec_date); ?>
-								<?php endif; ?>
-								<?php if($item->rel_date != '') : ?>									
-									<?php echo Text::_('Rel.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rel_date); ?>
-								<?php endif; ?>
+								<span class="xbr09">
+    								<?php if($item->rec_date != '') : ?>
+    									<?php echo Text::_('Rec.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rec_date); ?>
+    								<?php endif; ?>
+    								<?php if($item->rel_date != '') : ?>									
+    									<?php echo Text::_('Rel.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rel_date); ?>
+    								<?php endif; ?>
+								</span>
 								</p>
 							</div>
 						</td>
@@ -245,9 +247,10 @@ function stopProp(event) {
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
-							<i><?php echo Text::_('Album'); ?></i>: <?php echo $item->albumtitle; ?>
+							<i><?php echo Text::_('Album'); ?></i>: 
+								<?php echo ($item->albumid >0) ? $item->albumtitle : '<i>'.Text::_('album link missing').'</i>'; ?>
+							<hr class="xbmt5 xbmb5" />
 							<?php if(count($item->songs)>0) : ?>
-								<hr />
     							<?php if (count($item->songs) > 1) : ?>
     								<details class="xb09">
     									<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
@@ -259,14 +262,25 @@ function stopProp(event) {
     									</ul>
     								</details>
     							<?php elseif (count($item->songs)==1) : ?>
-    								<span class="xb09"><i><?php echo Text::_('Song title'); ?></i>: 
+    								<i><?php echo Text::_('Song title'); ?></i>: 
     								<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
     									<?php echo $item->songs[0]['title']; ?>
-    								</a></span>
+    								</a>
     							<?php endif; ?>
+							<?php else: ?>
+								<span class="xbnit"><?php echo Text::_('song link missing'); ?></span>
 							<?php endif; ?>
-							<hr />
-							<i><?php echo Text::_('Main Artist'); ?></i>: <?php echo $item->sortartist; ?>
+							
+							<hr class="xbmt5 xbmb5" />
+							<i><?php echo Text::_('Main Artist'); ?></i>: 
+								<?php echo ($item->sortartist !='') ? $item->sortartist: '<i>'.Text::_('sort name missing').'</i>'; ?>
+							<hr class="xbmt5 xbmb5" />
+							<i><?php echo Text::_('Playlists'); ?></i>: 
+							<?php if (count($item->playlists) >0) : ?>
+								<i><?php echo Text::_('Playlist'); ?></i>:
+							<?php else: ?>
+								<i><?php echo Text::_('not assigned to any playlist'); ?></i>
+							<?php endif; ?> 
 						</td>
 						<td>
 						<?php if ($item->catid > 0) : ?>

@@ -119,7 +119,7 @@ class TracksModel extends ListModel {
                 'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.artwork,'
                     .'a.rec_date, a.rel_date, a.sortartist, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
-                    .'a.note, album.title AS albumtitle'
+                    .'a.note, album.title AS albumtitle, a.album_id AS albumid'
                 )
             );
         $query->from('#__xbmusic_tracks AS a');
@@ -299,6 +299,8 @@ class TracksModel extends ListModel {
                     }
                 } //end if is_object
                 $item->songs = $this->getSongs($item->id);
+                $item->artists = array();
+                $item->playlists = array();
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.track' , $item->id);               
             } //end foreach

@@ -54,6 +54,51 @@ class TrackController extends FormController {
         $this->setRedirect((string)Uri::getInstance());       
     }
     
+    public function publish() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->publish($pid);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function unpublish() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->publish($pid,0);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function archive() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->publish($pid,2);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo);
+    }
+    
+    public function delete() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->delete($pid);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function trash() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $model = $this->getModel('track');
+        $wynik = $model->publish($pid,-2);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect($redirectTo );
+    }
+    
     public function checkin() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');

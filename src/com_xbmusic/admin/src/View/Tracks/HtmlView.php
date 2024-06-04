@@ -87,16 +87,16 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            $childBar->publish('tracks.publish')->listCheck(true);
+            $childBar->publish('track.publish')->listCheck(true);
             
-            $childBar->unpublish('tracks.unpublish')->listCheck(true);
+            $childBar->unpublish('track.unpublish')->listCheck(true);
             
-            $childBar->archive('tracks.archive')->listCheck(true);
+            $childBar->archive('track.archive')->listCheck(true);
             
             if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('tracks.trash');
+                $childBar->trash('track.trash');
             }
-            $childBar->checkin('tracks.checkin');
+            $childBar->checkin('track.checkin');
                 
         }
         
