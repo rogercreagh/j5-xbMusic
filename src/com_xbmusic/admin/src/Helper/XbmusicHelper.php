@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.9 3rd June 2024
+ * @version 0.0.6.10 5th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -25,6 +25,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
 use DOMDocument;
 use DateTime;
@@ -103,76 +104,83 @@ class XbmusicHelper extends ComponentHelper
 	    return $basemusicfolder;
 	}
 	    
-/****************** xbLibrary functions ***********/
-	
+/****************** xbLibrary functions ***********/	
+
 	/**
 	 * @name createCategories()
-	 * @desc create categories 
-	 * @param array $cats - array of category details title, description, parent_id=1
-	 * @return string message
+	 * @desc function to create several categories
+	 *     doesn't check if categories already exist - do this first with checkValueExists() or you'll get an error message.
+	 * @param array $catsarr which contains assoc array of data for each category containing at least 'title' element
+	 * @param boolean $silent - enable messages if false. You'll still get a duplicate alias message if the tag already exists.
+	 * @return array of objects containg id and title of new categories
 	 */
-	public function createCategories(array $cats) {
-	    //TODO change as per createTags to use bind and not crash out if error
-	    $message = 'Creating '.$this->extension.' categories. ';
-	    $db = Factory::getDBO();
-	    foreach ($cats as $cat) {
-	        if (key_exists('title',$cat)) {
-	            $query = $db->getQuery(true);
-	            //first check if category already exists (could use $this->checkValueExists
-	            $query->select('id')->from($db->quoteName('#__categories'))
-	            ->where($db->quoteName('title')." = ".$db->quote($cat['title']))
-	            ->where($db->quoteName('extension')." = ".$db->quote('com_xbmusic'));
-	            $db->setQuery($query);
-	            if ($db->loadResult()>0) {
-	                $message .= '"'.$cat['title'].' already exists<br /> ';
-	            } else {
-	                $category = Table::getInstance('Category');
-	                $category->extension = $this->extension;
-	                $category->title = $cat['title'];
-	                $category->description = $cat['desc'];
-	                $category->published = 1;
-	                $category->access = 1;
-	                $category->params = '{"category_layout":"","image":"","image_alt":""}';
-	                $category->metadata = '{"page_title":"","author":"","robots":""}';
-	                $category->language = '*';
-	                // Set the location in the tree
-	                $category->setLocation($cat['parent_id'], 'last-child');
-	                // Check to make sure our data is valid
-	                if ($category->check()) {
-	                    if ($category->store(true)) {
-	                        // Build the path for our category
-	                        $category->rebuildPath($category->id);
-	                        $message .= $cat['title'].' id:'.$category->id.' created ok. ';
-	                    } else {
-	                        throw new Exception(500, $category->getError());
-	                        //return '';
-	                    }
-	                } else {
-	                    throw new Exception(500, $category->getError());
-	                    //return '';
-	                }
-	            }
-	        }
+	public static function createCategories(array $catsarr, $silent = true) {
+	    $result = array();
+	    foreach ($catsarr as $cat) {
+	        $wynik = self::createCategory($cat, $silent);
+	        if (!empty($wynik)) $result[] = $wynik;
 	    }
-	    return $message;
+	    return $result;
+	}
+	
+	/**
+	 * @name createCategory()
+	 * @desc creates a category with the passed title and optional other fields including parent_id and returns an object containg the id and title
+	 *     doesn't check if category already exists - do this first with checkValueExists() or you'll get an error message.
+	 * @param assoc array $catdata
+	 * @param boolean $silent - enable messages if false. You'll still get a duplicate alias message if the category already exists.
+	 * @return \stdClass
+	 */
+	public static function createCategory(array $catdata, $silent = false) {
+	    $app = Factory::getApplication();
+	    $errmsg = '';
+	    $infomsg = '';
+	    $wynik = new \stdClass();
+	    if (!key_exists('published', $catdata))  $catdata['published'] = 1;
+	    if (!key_exists('parent_id', $catdata))  $catdata['parent_id'] = 1;
+	    if (!key_exists('langauge', $catdata))  $catdata['language'] = '*';
+	    if (!key_exists('description', $catdata))  $catdata['description'] = '';
+	    if (!key_exists('extension', $catdata))  $catdata['extension'] = 'com_xbmusic';
+	    $catModel = Factory::getApplication()->bootComponent('com_categories')
+	    ->getMVCFactory()->createModel('Category', 'Administrator', ['ignore_request' => true]);
+	    if (!$catModel->save($catdata)) {
+	        $errmsg = $catModel->getError();
+	    } else {
+	        $catid = $catModel->getState('category.id');
+	        $infomsg .= 'New category '.$catdata['title'].' created with id '.$catid;
+	        $wynik->id = $catid;
+	        $wynik->title = $catdata['title'];
+	    }
+	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
+	    if ($infomsg != '') $app->enqueueMessage($infomsg,'Info');
+	    return $wynik;
 	}
 	
 	/**
 	 * @name createTags()
 	 * @desc function to create a tag with title, parent_tag_id, status, and optional description
-	 * @param assoc array $tagdata
-	 * @return boolean|array of new (or existing) tagids indexed by title, or false in case of error
+	 * @param array $tagsarr which contains assoc array of data for each tag containing at least 'title' element
+	 * @param boolean $silent - enable messages if false. You'll still get a duplicate alias message if the tag already exists.
+	 * @return array of objects containg id and title of new tags
 	 */
-	public static function createTags(array $tagsarr) {
+	public static function createTags(array $tagsarr, $silent = true) {
 	    $result = array();
 	    foreach ($tagsarr as $tag) {	        
-	        $result[]= self::createTag($tag);
+	        $wynik = self::createTag($tag, $silent);
+	        if (!empty($wynik)) $result[] = $wynik;
 	    }
 	    return $result;
 	}
 		
-	public static function createTag(array $tagdata) {
-	    //Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
+	/**
+	 * @name createTag()
+	 * @desc creates a tag with the passed title and optional other fields including parent_id and returns an object containg the id and title
+	 *     doesn't check if tag already exists - do this first with checkValueExists() or you'll get an error message.
+	 * @param array $tagdata - ['title'=>$mynewtitle
+	 * @param boolean $silent - supress messages if true. You'll still get a message if the tag already exists.
+	 * @return \stdClass - (id->int, title->string). WIll be empty if the function failed
+	 */
+	public static function createTag(array $tagdata, $silent = false) {
 	    $app = Factory::getApplication();
 	    $errmsg = '';
 	    $infomsg = '';
@@ -194,7 +202,7 @@ class XbmusicHelper extends ComponentHelper
             $wynik->title = $tagdata['title'];	            
         }
 	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
-        if ($infomsg != '') $app->enqueueMessage($infomsg);
+        if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');
         return $wynik;
 	}
 	
@@ -208,7 +216,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return int|boolean - id if value is found in column, otherwise false
 	 */
 	public static function checkValueExists( $value,  $table, $col, $where = '') {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('id')->from($db->quoteName($table))
 	    ->where('LOWER('.$db->quoteName($col).')='.$db->quote(strtolower($value)));
@@ -244,7 +253,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return integer
 	 */
 	public static function getItemCnt(string $table, $filter = '') {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('COUNT(*)')->from($db->quoteName($table));
 	    if ($filter !='') {
@@ -271,7 +281,8 @@ class XbmusicHelper extends ComponentHelper
 	 */
 	public static function getItems(string $table, string $column, $search, $filter = '' ) {
 	    //TODO make case insenstive?
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')->from($db->qn($table).' AS a');
 	    if ((is_string($search)) && (($search[0] == '%') || ($search[-1] == '%'))) {
@@ -412,7 +423,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function statusCnts(string $table = '#__content', string $colname = 'state', string $ext='com_content') {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('DISTINCT a.'.$colname.', a.alias')
 	    ->from($db->quoteName($table).' AS a');
@@ -440,7 +452,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return boolean|number - true= installed and enabled, 0= installed not enabled, null = not installed
 	 */
 	public static function checkComponent($name, $usesess = true) {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db->setQuery('SELECT enabled FROM #__extensions WHERE element = '.$db->quote($name));
 	    $res = $db->loadResult();
 	    if ($usesess) {
@@ -462,7 +475,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return boolean - true if the table exists
 	 */
 	public static function checkTable(string $table) {
-	    $db=Factory::getDbo();
+	    //$db=Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $tablesarr = $db->setQuery('SHOW TABLES')->loadColumn();
 	    $table = $db->getPrefix().$table;
 	    return in_array($table, $tablesarr);
@@ -476,7 +490,8 @@ class XbmusicHelper extends ComponentHelper
      * @return boolean|NULL - false if table doesn't exist, null if column doesn't exist, if ok then true
      */
 	public static function checkTableColumn($table, $column) {
-	    $db=Factory::getDbo();
+	    //$db=Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    if (self::checkTable($table) != true) return false;
 	    if (!is_array($column)) {
 	        $column = (array) $column;
@@ -531,7 +546,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return object|null
 	 */
 	public static function getCat(int $catid) {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	       ->from('#__categories AS a ')
@@ -548,7 +564,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return object|null
 	 */
 	public static function getCatByAlias(string $catalias, $extension = 'com_xbmusic') {
-	    $db = Factory::getDbo();
+	    //$db = Factory::getDbo();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	       ->from('#__categories AS a ')
@@ -562,10 +579,11 @@ class XbmusicHelper extends ComponentHelper
 	 * @name getTag()
 	 * @desc gets a tag's details given its id
 	 * @param (int) $tagid
-	 * @return unknown|mixed
+	 * @return mixed
 	 */
 	public static function getTag($tagid) {
-	    $db = Factory::getDBO();
+	    //$db = Factory::getDBO();
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	    ->from('#__tags AS a ')

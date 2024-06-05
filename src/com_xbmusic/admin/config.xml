@@ -42,13 +42,14 @@
         
         <field name="genrecattag" type="radio"
         	label="ID Genre as Cat/Tag"
-        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'ID3genre' as parent"
+        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'ID3genre' as parent. Both wil create both a tag and category and assign the track to both."
  			class="btn-group btn-group-yesno"
 			default=""
 			>
-				<option value="">Ignore</option>
-				<option value="0">Category</option>
-				<option value="1">Tag</option>
+				<option value="0">Ignore</option>
+				<option value="1">Category</option>
+				<option value="2">Tag</option>
+				<option value="3">Both</option>
         </field>
 
         

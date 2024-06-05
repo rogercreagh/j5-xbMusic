@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.6.9 2nd June 2024
+ * @version 0.0.6.10 5th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -393,7 +393,29 @@ class TrackModel extends AdminModel {
             }
             if (isset($filedata['id3tags']['genre'])) {
                 $genre = $filedata['id3tags']['genre'];
-                if ($params->get('genrecattag','')==1){
+                $opt = $params->get('genrecattag',0);
+                if (($opt == 1) || ($opt == 3)) {
+                    //CATEGORY
+                    $cid = XbmusicHelper::getCatByAlias(ApplicationHelper::stringURLSafe($genre))->id;
+                    if ($cid>0) {
+                        $data['catid'] = $cid;
+                    } else{
+                        //get tracks category as parent
+                        $par = XbmusicHelper::getCatByAlias('tracks');
+                        if (is_null($pid)) {
+                            $pid = 1;
+                            $warnmsg .= Text::_('Category "tracks" does not exist so will create new category at top level');
+                        } else {
+                            $pid = $par->id;
+                        }
+                        $newcat = XbmusicHelper::createCategory(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
+                        if ($newcat->id) {
+                            $data['catid'] = $newcat->id;
+                        }                            
+                    } //endif cat already exists
+                } //end opt=1|3
+                if(($opt == 2) || ($opt == 3)) {
+                    //TAG
                     //if genre tag already exists
                     $tid = XbmusicHelper::checkValueExists(ApplicationHelper::stringURLSafe($genre), '#__tags', 'alias');
                     if ($tid>0) {
@@ -401,18 +423,19 @@ class TrackModel extends AdminModel {
                     } else{
                         $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
                         if (!$pid>0) {
-                            $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres', 
-                                'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.')));
+                            $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres',
+                                'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'),
+                                'note'=>Text::_('auto-created from id3 genre import')
+                            ));
                         }
-                        $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid));
+                        $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
                         if ($newtag->id) {
                             //add tag to item
-                            $data['tags'][] = $newtag->id; 
+                            $data['tags'][] = $newtag->id;
                         }
-                        
-                    }                   
-                }
-            }
+                    } //endif tag already exists
+                } //endif opt=2|3
+            } // endif id3 genre is set
             if (isset($filedata['playtime_seconds'])) $data['duration'] = (int)$filedata['playtime_seconds'];  
             $data['id3_data'] = json_encode($filedata);
             $data['created_by_alias'] = 'Created from ID3 Import';           
