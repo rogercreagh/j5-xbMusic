@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.6.9 2nd June 2024
+ * @version 0.0.6.11 2nd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -223,12 +223,12 @@ $input = Factory::getApplication()->getInput();
 						<legend>ID3 Comment Tags</legend>
 						<dl class="xbdl">
                     		<?php foreach ($this->item->id3_tags as $key=>$value) : ?>
-                    		    <dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                    			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
                     		<?php endforeach; ?>        
 						</dl>
 					</fieldset>
         		</div>
-        		<div class="col-12 col-md7">
+        		<div class="col-12 col-md-7">
         			<p>Reload ID3, display new, if diff option to resave with new</p>
         		</div>
         	</div>
@@ -241,17 +241,27 @@ $input = Factory::getApplication()->getInput();
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'albums', Text::_('Linked Items')); ?>
 			<div class="row">
-				<div class="col-12">
+				<div class="col-12 col-md-6">
 					<?php echo $this->form->renderField('album_id'); ?> 
+				</div>
+				<div class="col-12 col-md-3">
 					<?php echo $this->form->renderField('discno'); ?> 
+				</div>
+				<div class="col-12 col-md-3">
 					<?php echo $this->form->renderField('trackno'); ?> 
 				</div>
+			</div>
+			<div class="row">
 				<div class="col-12">
 					<?php echo $this->form->renderField('artistlist'); ?> 
 				</div>
+			</div>
+			<div class="row">
 				<div class="col-12">
 					<?php echo $this->form->renderField('songlist'); ?> 
 				</div>
+			</div>
+			<div class="row">
 				<div class="col-12">
 					Playlists
 				</div>

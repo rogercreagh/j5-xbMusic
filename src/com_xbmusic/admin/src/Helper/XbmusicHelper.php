@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.10 5th June 2024
+ * @version 0.0.6.11 6th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -86,11 +86,11 @@ class XbmusicHelper extends ComponentHelper
 	    }
 	    $id3tags = array();
 	    foreach ($ThisFileInfo['comments'] as $key => $valuearr) {
-//	        $id3tags[] = array('tagname' => $key, 'tagvalue' => $valuearr[0]);
-            $id3tags[$key] = implode(', ', $valuearr);
+	        // artist, album, genre and maybe others have been seen with mulitple entries
+	        // concat them with '|| ' which will look ok if printed as string but allows to explode to array to handle values separately
+            $id3tags[$key] = implode(' || ', $valuearr);
 	    }
 	    $result['id3tags'] = $id3tags;
-//	    $result['id3tags'] = $ThisFileInfo['comments'];
 	    return $result;
 	}
 	    

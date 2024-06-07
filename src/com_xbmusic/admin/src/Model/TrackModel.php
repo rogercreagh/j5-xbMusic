@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.6.10 5th June 2024
+ * @version 0.0.6.11 6th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -210,7 +210,6 @@ class TrackModel extends AdminModel {
                 if ( XbmusicHelper::checkValueExists($data['alias'], '#__xbmusic_tracks', 'alias')) {
                     $warnmsg .= 'Duplicate alias - this track appears to be already in the database. Data not saved';
                     $app->enqueueMessage($warnmsg,'Error');
-                    if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
                     return false;
                 }
             }
@@ -218,7 +217,7 @@ class TrackModel extends AdminModel {
             if (!$this->importID3data($data)) return false;
         } //endif newtrack
         
-        //there may have been manual changes to save back to id3
+        //check if there have been manual changes to save back to id3
         $id3changed = false;
         
         $olditem = parent::getItem($data['id']);
@@ -245,7 +244,9 @@ class TrackModel extends AdminModel {
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
         }
-               
+        
+        if ($id3changed) $warnmsg .= Text::_('ID3 data has soe values changed in form.');
+        
 //         if ((int) $data['catid'] > 0)
 //         {
 //             $data['catid'] = CategoriesHelper::validateCategoryId($data['catid'], 'com_xbmusic');
@@ -269,44 +270,75 @@ class TrackModel extends AdminModel {
         if (parent::save($data)) {
             $tid = $this->getState('track.id');
             if ($isnewtrack) {
-                $db = $this->getDbo();
+                $db = $this->getDatabase();
+                //$db = $this->getDbo();
                 $id3data = json_decode($data['id3_data'],true);
                 // do the same for artist - 
                 //check id3 song title against song table and add if missing (alias created from title)
                 if ($id3data['id3tags']['title'] != '') {
                     $songtitle = $id3data['id3tags']['title'];
+                    if (strpos($songtitle, ', ')>1) {
+                        $warnmsg .= Text::_('Possible multiple titles detected in SongTitle - is this a medley?').'<br />';
+                        // TODO return a flag to edit view to suggest possible split
+                    }
                     $songcomp = (isset($id3data['id3tags']['composer'])) ? $id3data['id3tags']['composer'] : '';
-                    $songid = $this->getCreateSong($songtitle,$tid, $songcomp);
+                    $songid = $this->getCreateSong($songtitle, $tid, $songcomp);
                     // what if two songs with same title
                     if (empty(XbmusicHelper::getItems('#__xbmusic_songtrack', 'song_id', $songid, 'track_id = '.$db->q($tid)))) {
                         $n = count($data['songlist']);
-                        $data['songlist']['songlist'.$n] = array('song_id' => $songid, 'note' =>'auto added with new track '.$tid);
-                        $infomsg .= Text::sprintf('Song %s added to track',$songtitle );
+                        $data['songlist']['songlist'.$n] = array('song_id' => $songid, 'note' =>Text::_('auto created from ID3'));
+                        $infomsg .= Text::sprintf('Song %s added to track',$songtitle ).'<br />';
                     } else {
-                        $infomsg .= Text::sprintf('Song %s already linked to track',$songtitle );
+                        $warnmsg .= Text::sprintf('Song %s already linked to track',$songtitle ).'<br />';
                     }
                 } else {
-                    $infomsg .= Text::_('No ID3 song title available for track');
+                    $warnmsg .= Text::_('No ID3 song title available for track').'<br />';
                 }
-                // do the same for album
-                //check album against album table and add if missing (alias created from artist-album)
-                //check artist against artist table and add if missing (alias from name)
+                // check if artist exists if not create and warn if name includes , or & or and or feat.
+                if ($id3data['id3tags']['artist'] != '') {
+                    // multiple artists possible in id3
+                    $artistarr = explode(' || ',$id3data['id3tags']['artist']);
+                    if ((count($artistarr)==1) && (preg_match('/(,)|( & )|( and )|( with )|( feat[\.| ])( featuring)/', $artistarr[0])>0)) {
+                        $warnmsg .= Text::sprintf('Artist name (%s) might include more than one artist - check and split manually if necessary',$artistarr[0]);
+                    }
+                    foreach ($artistarr as $name) {
+                        $artistid = $this->getCreateArtist($artistarr[0]);
+                        // add artist to artist list
+                        if (empty(XbmusicHelper::getItems('#__xbmusic_artisttrack', 'artist_id', $artistid, 'track_id = '.$db->q($tid)))) {
+                            $n = count($data['artistlist']);
+                            $data['artistlist']['artistlist'.$n] = array('artist_id' => $artistid, 'role'=>'', 'note' =>Text::_('auto created from ID3'));
+                            $infomsg .= Text::sprintf('Artist %s added to track',$artistarr[0] ).'<br />';
+                        } else {
+                            $warnmsg .= Text::sprintf('Artist %s already linked to track',$artistarr[0] ).'<br />';
+                        }    
+                        // link artist to song
+                        if ($this->createArtistSong($artistid, $songid, '', Text::_('auto created from ID3'))) {
+                            $infomsg .= $name.' '.Text::_('linked to').' '.$songtitle.'<br />';                       
+                        } else {
+                            $warnmsg .= Text::_('Problem linking artist to song - link ay already exist').'<br />';
+                        }
+                    }
+                } else {
+                    $infomsg .= Text::_('No ID3 artist available for track').'<br />';
+                }
+                
+                
                 //check album-artist against artist table and add if missing
             } else {
                 // $warnmsg .= 'if ID3 data in file has changed the changes will not be reflected here or in linked items';
             }
             $this->storeTrackSongs($tid, $data['songlist']);
- //           $this->storeTrackAlbums($tid, $data['albumlist']);
+            $this->storeTrackArtists($tid, $data['artistlist']);
             
             
             
             // Check possible workflow
-            if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
+            if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');            
             if ($warnmsg != '') $app->enqueueMessage($warnmsg, 'Warning');
             return true;
         }
         $app->enqueueMessage('Error saving track data','Error');
-        if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
+        if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');
         if ($warnmsg != '') $app->enqueueMessage($warnmsg, 'Warning');        
         return false;
     }
@@ -322,16 +354,24 @@ class TrackModel extends AdminModel {
             // get the artist name withoout "The " to use for sorting and in artwork filename
             if ($data['sortartist'] == '') {
                 if (isset($filedata['id3tags']['artist'])) {
-                    $data['sortartist'] = $this->stripThe($filedata['id3tags']['artist']);
+                    $artistarr = explode(' || ', $filedata['id3tags']['artist']);                    
+                    $data['sortartist'] = $this->stripThe($artistarr[0]);
+                    if (count($artistarr) > 1) {
+                        $warnmsg .= Text::_('More than one artist listed - only first used as Main Performer (sortname). Check and adjust sortname manually if required');
+                    }
                 }
             }
             //get album title for use in creating and linking album
-            $albumtitle = (isset($filedata['id3tags']['album'])) ? $filedata['id3tags']['album'] : '';
+            if (isset($filedata['id3tags']['album'])) {
+                $albumarr = explode(' || ', $filedata['id3tags']['album']);
+                $albumtitle = $albumarr[0];
+                if (count($albumarr)>1) $warnmsg .= Text::_('More than one album title listed - only the first is used. Check alternate title and if necessary change album title or create second album');
+            }
             //get album artist for use in image filename and creating album
             if (isset($filedata['id3tags']['band'])) {
                 $albumartist = $filedata['id3tags']['band'];
             } else {
-                $albumartist = (isset($filedata['id3tags']['artist'])) ? $filedata['id3tags']['artist'] : '';
+                $albumartist = (isset($filedata['id3tags']['artist'])) ? $data['sortartist'] : '';
             }
             // get artwork if not set and if available in ID3
             if (empty($data['artwork'])) {
@@ -339,7 +379,7 @@ class TrackModel extends AdminModel {
                     // filename for image will be "album-title-albumartist-name.ext"
                     // if track has no album listed but has image then "artist-name.ext" for all tracks by the artist
                     // path will finish with initial letter of title or "unknown"
-                    $folder = ($albumtitle == '') ? 'NoAlbum' : 'albums/'.strtolower($albumtitle[0]);
+                    $folder = ($albumtitle == '') ? 'singles/' : 'albums/'.strtolower($albumtitle[0]);
                     $artpath = '/images/xbmusic/artwork/'.$folder.'/';
                     if (!file_exists($artpath)) {
                         mkdir(JPATH_ROOT.$artpath,0775,true);
@@ -357,9 +397,11 @@ class TrackModel extends AdminModel {
                     unset($filedata['imageinfo']['data']);
                 }
             } //endif empty artwork, if no artwork no action needed
+            // get record and release dates
+            $datematch = '/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/';
             if ($data['rec_date'] == '') {
                 if (isset($filedata['id3tags']['recording_time'])) {
-                    if (preg_match('/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/',$filedata['id3tags']['recording_time'])==1) {
+                    if (preg_match($datematch,$filedata['id3tags']['recording_time'])==1) {
                         $data['rec_date'] = ($filedata['id3tags']['recording_time']);
                     } else {
                         $warnmsg .= 'Recording date '.$filedata['id3tags']['recording_time'].' doesn\'t match Y(-M(-D) format. Enter manually.<br />';
@@ -368,22 +410,24 @@ class TrackModel extends AdminModel {
             }
             if ($data['rel_date'] == '') {
                 if (isset($filedata['id3tags']['year'])) {
-                    if (preg_match('/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/',$filedata['id3tags']['year'])==1) {
+                    if (preg_match($datematch,$filedata['id3tags']['year'])==1) {
                         $data['rel_date'] = $filedata['id3tags']['year'];
                     } else {
                         $warnmsg .= 'Release date '.$filedata['id3tags']['year'].' doesn\'t match Y(-M(-D)) format. Enter manually.<br />';
                     }
                 }
             }
+            // create album
             if ($albumtitle != '') {
                 $numdiscs = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) explode('/',$filedata['id3tags']['part_of_a_set'])[1] :1;
                 $data['album_id'] = $this->getCreateAlbum($albumtitle,$tid, $albumartist, $data['rel_date'], $data['artwork'],$numdiscs );
                 $data['trackno'] = (isset($filedata['id3tags']['track_number'])) ? $filedata['id3tags']['track_number'] : 0;
                 $data['discno'] = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) $filedata['id3tags']['part_of_a_set'] : '';
-                $infomsg .= Text::sprintf('Album %s added to track',$albumtitle);
+                $infomsg .= Text::sprintf('Album %s added to track',$albumtitle).'<br />';
             } else {
-                $infomsg .= Text::_('No ID3 album info available for track');
+                $warnmsg .= Text::_('No ID3 album info available for track').'<br />';
             }
+            // track & song title
             if ($data['title'] == '') {
                 if ($filedata['id3tags']['title'] != '') {
                     $data['title'] = $filedata['id3tags']['title'];
@@ -391,55 +435,64 @@ class TrackModel extends AdminModel {
             } elseif ($data['title'] != $filedata['id3tags']['title']) {
                 $warnmsg .= 'Track title does not match ID3 title<br />';
             }
+            // genre
             if (isset($filedata['id3tags']['genre'])) {
-                $genre = $filedata['id3tags']['genre'];
                 $opt = $params->get('genrecattag',0);
-                if (($opt == 1) || ($opt == 3)) {
-                    //CATEGORY
-                    $cid = XbmusicHelper::getCatByAlias(ApplicationHelper::stringURLSafe($genre))->id;
-                    if ($cid>0) {
-                        $data['catid'] = $cid;
-                    } else{
-                        //get tracks category as parent
-                        $par = XbmusicHelper::getCatByAlias('tracks');
-                        if (is_null($pid)) {
-                            $pid = 1;
-                            $warnmsg .= Text::_('Category "tracks" does not exist so will create new category at top level');
-                        } else {
-                            $pid = $par->id;
-                        }
-                        $newcat = XbmusicHelper::createCategory(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
-                        if ($newcat->id) {
-                            $data['catid'] = $newcat->id;
-                        }                            
-                    } //endif cat already exists
-                } //end opt=1|3
-                if(($opt == 2) || ($opt == 3)) {
-                    //TAG
-                    //if genre tag already exists
-                    $tid = XbmusicHelper::checkValueExists(ApplicationHelper::stringURLSafe($genre), '#__tags', 'alias');
-                    if ($tid>0) {
-                        $data['tags'][] = $tid;
-                    } else{
-                        $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
-                        if (!$pid>0) {
-                            $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres',
-                                'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'),
-                                'note'=>Text::_('auto-created from id3 genre import')
-                            ));
-                        }
-                        $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
-                        if ($newtag->id) {
-                            //add tag to item
-                            $data['tags'][] = $newtag->id;
-                        }
-                    } //endif tag already exists
-                } //endif opt=2|3
+                $genres = explode(' || ', $filedata['id3tags']['genre']);
+                foreach ($genres as $genre) {
+                    $genre = $filedata['id3tags']['genre'];
+                    //handle multiple genre tags
+                    if (($opt == 1) || ($opt == 3)) {
+                        //CATEGORY
+                        $cid = XbmusicHelper::getCatByAlias(ApplicationHelper::stringURLSafe($genre))->id;
+                        if ($cid>0) {
+                            $data['catid'] = $cid;
+                            $infomsg .= Text::sprintf('Category %s assigned to track', $genre).'<br />';
+                        } else{
+                            //get tracks category as parent
+                            $par = XbmusicHelper::getCatByAlias('tracks');
+                            if (is_null($par)) {
+                                $pid = 1;
+                                $warnmsg .= Text::_('Category "Tracks" does not exist so will create new category at top level');
+                            } else {
+                                $pid = $par->id;
+                            }
+                            $newcat = XbmusicHelper::createCategory(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
+                            if ($newcat->id) {
+                                $data['catid'] = $newcat->id;
+                                $infomsg .= Text::sprintf('Category %s assigned to track', $genre).'<br />';
+                            }                            
+                        } //endif cat already exists
+                    } //end opt=1|3
+                    if(($opt == 2) || ($opt == 3)) {
+                        //TAG
+                        //if genre tag already exists
+                        $tid = XbmusicHelper::checkValueExists(ApplicationHelper::stringURLSafe($genre), '#__tags', 'alias');
+                        if ($tid>0) {
+                            $data['tags'][] = $tid;
+                            $infomsg .= Text::sprintf('Tag %s assigned to track', $genre).'<br />';
+                        } else{
+                            $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
+                            if (!$pid>0) {
+                                $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres',
+                                    'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'),
+                                    'note'=>Text::_('auto-created from id3 genre import')
+                                ));
+                            }
+                            $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
+                            if ($newtag->id) {
+                                //add tag to item
+                                $data['tags'][] = $newtag->id;
+                                $infomsg .= Text::sprintf('Tag %s assigned to track', $genre).'<br />';
+                            }
+                        } //endif tag already exists
+                    } //endif opt=2|3
+                } //end foreach genre
             } // endif id3 genre is set
-            if (isset($filedata['playtime_seconds'])) $data['duration'] = (int)$filedata['playtime_seconds'];  
+            if (isset($filedata['audioinfo']['playtime_seconds'])) $data['duration'] = (int)$filedata['audioinfo']['playtime_seconds'];  
             $data['id3_data'] = json_encode($filedata);
             $data['created_by_alias'] = 'Created from ID3 Import';           
-            $app->enqueueMessage($infomsg);
+            $app->enqueueMessage($infomsg,'Info');
             $app->enqueueMessage($warnmsg,'Warning');
         } else {
             $app->enqueueMessage('Impossible Error : file '.rtrim($data['pathname'],'/').'/'.$data['filename'].' does not exist', 'Error');
@@ -448,57 +501,36 @@ class TrackModel extends AdminModel {
         return true;
     }
     
-//    protected function preprocessForm(Form $form, $data, $group = 'content') {
-//         if ($this->canCreateCategory()) {
-//             $form->setFieldAttribute('catid', 'allowAdd', 'true');
-            
-//             // Add a prefix for categories created on the fly.
-//             $form->setFieldAttribute('catid', 'customPrefix', '#new#');
-//         }
-        
-//        parent::preprocessForm($form, $data, $group);
-//    }
-    
-//     public function getTrackAlbumList() {
-//         $db = $this->getDbo();
-//         $query = $db->getQuery(true);
-//         $query->select('a.id as album_id, ba.discno AS discno, ba.trackno AS trackno, ba.listorder AS oldorder');
-//         $query->from('#__xbmusic_albumtrack AS ba');
-//         $query->innerjoin('#__xbmusic_albums AS a ON ba.album_id = a.id');
-//         $query->where('ba.track_id = '.(int) $this->getItem()->id);
-//         $query->order('a.title ASC');
-//         $db->setQuery($query);
-//         return $db->loadAssocList();
-//     }
-    
     public function getTrackArtistList() {
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->select('a.id as artist_id, ba.role AS role, ba.note AS note');
+        $query->select('ba.artist_id as artist_id, ba.role AS role, ba.note AS note');
         $query->from('#__xbmusic_artisttrack AS ba');
-        $query->innerjoin('#__xbmusic_artists AS a ON ba.artist_id = a.id');
-        $query->where('ba.artist_id = '.(int) $this->getItem()->id);
-        $query->order('ba.listorder ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-    
-    public function getTrackSongList() {
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('a.id as song_id, ba.note AS note');
-        $query->from('#__xbmusic_songtrack AS ba');
-        $query->innerjoin('#__xbmusic_songs AS a ON ba.song_id = a.id');
+//        $query->innerjoin('#__xbmusic_artists AS a ON ba.artist_id = a.id');
         $query->where('ba.track_id = '.(int) $this->getItem()->id);
         $query->order('ba.listorder ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }
     
-    
+    public function getTrackSongList() {
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('ba.song_id as song_id, ba.note AS note');
+        $query->from('#__xbmusic_songtrack AS ba');
+//        $query->innerjoin('#__xbmusic_songs AS a ON ba.song_id = a.id');
+        $query->where('ba.track_id = '.(int) $this->getItem()->id);
+        $query->order('ba.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+      
     function storeTrackSongs($track_id, $songlist) {
         //delete existing role list
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->delete($db->quoteName('#__xbmusic_songtrack'));
         $query->where('track_id = '.$db->q($track_id));
@@ -512,7 +544,7 @@ class TrackModel extends AdminModel {
                 $query = $db->getQuery(true);
                 $query->insert($db->quoteName('#__xbmusic_songtrack'));
                 $query->columns('song_id,track_id,note,listorder');
-                $query->values('"'.$song['song_id'].'","'.$track_id.'","'.$trk['note'].'","'.$listorder.'"');
+                $query->values('"'.$song['song_id'].'","'.$track_id.'","'.$song['note'].'","'.$listorder.'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
@@ -524,40 +556,73 @@ class TrackModel extends AdminModel {
         }
     }
     
-//     function storeTrackAlbums($track_id, $albumlist) {
-//         //delete existing role list
-//         $db = $this->getDbo();
-//         $query = $db->getQuery(true);
-//         $query->delete($db->quoteName('#__xbmusic_albumtrack'));
-//         $query->where('track_id = '.$db->q($track_id));
-//         $db->setQuery($query);
-//         $db->execute();
-//         //restore the new list
-//         $listorder=0;
-//         foreach ($albumlist as $album) {
-//             if ($album['album_id'] > 0) {
-//                 $listorder = ($album['oldorder']>0) ? $album['oldorder'] : 0;
-//                 $query = $db->getQuery(true);
-//                 $query->insert($db->quoteName('#__xbmusic_albumtrack'));
-//                 $query->columns('album_id,track_id,discno, trackno,listorder');
-//                 $query->values('"'.$album['album_id'].'","'.$track_id.'","'.$album['discno'].'","'.$album['trackno'].'","'.$listorder.'"');
-//                 //try
-//                 $db->setQuery($query);
-//                 $db->execute();
-//             } else {
-//                 // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
-//                 //create person
-//                 //add filmperson with new id
-//             }
-//         }
-//     }
+    function storeTrackArtists($track_id, $artistlist) {
+        //delete existing role list
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_artisttrack'));
+        $query->where('track_id = '.$db->q($track_id));
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        $listorder=0;
+        foreach ($artistlist as $artist) {
+            if ($artist['artist_id'] > 0) {
+                $listorder ++;
+                $query = $db->getQuery(true);
+                $query->insert($db->quoteName('#__xbmusic_artisttrack'));
+                $query->columns('artist_id,track_id,role, note,listorder');
+                $query->values('"'.$artist['artist_id'].'","'.$track_id.'","'.$artist['role'].'","'.$artist['note'].'","'.$listorder.'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+            } else {
+                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
+                //create person
+                //add filmperson with new id
+            }
+        }
+    }
     
-    
+    public function getCreateArtist($name) {
+        $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $name));
+        //$db = $this->getDbo();
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('id')->from('#__xbmusic_artists')->where('alias = '.$db->q($newalias));
+        $db->setQuery($query);
+        $id = $db->loadResult();
+        if (empty($id)) {
+            $params = ComponentHelper::getParams('com_xbmusic');
+            //get artist default category
+            $catid = $params->get('defcat_artist',XbmusicHelper::getCatByAlias('uncategorised'));
+            $createmod = Factory::getDate()->toSql();
+            $createbyalias = 'created from ID3';
+            $query->clear();
+            $query->insert('#__xbmusic_artists');
+            $query->columns('name, alias, catid, status, access, created, modified, created_by_alias');
+            $query->values('"'.$name.'","'.$newalias.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
+            //            $query->values($db->quote($title, $newalias, $catid, $createmod, $createmod, $createbyalias));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                $dberr = $e->getMessage();
+                Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
+            }
+            $id = $db->insertid();
+            //           Factory::getApplication()->enqueueMessage(count(idarr).' '.Text::_('Songs with this title exist - please link manually','Warning'));
+            //           return false;
+        }
+        return $id;       
+    }
     
     public function getCreateSong($title, $tid, $composer = '') {
         //check if two songs have same title but different alias?
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title));
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('id')->from('#__xbmusic_songs')->where('alias = '.$db->q($newalias));
         $db->setQuery($query);
@@ -592,7 +657,8 @@ class TrackModel extends AdminModel {
         //what if artist releases two albums with same title?
         $sortartist = $this->stripThe($artist);
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title).' '.$sortartist);
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('id')->from('#__xbmusic_albums')->where('alias = '.$db->q($newalias));
         $db->setQuery($query);
@@ -635,7 +701,83 @@ class TrackModel extends AdminModel {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
     }
     
+    public function createArtistSong(int $artist_id, int $song_id, $role = '', $note = '') {
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('id')->from('#__xbmusic_artistsong')
+            ->where($db->qn('artist_id').' = '.$db->q($artist_id))
+            ->where($db->qn('song_id').' = '.$db->q($song_id));
+        $db->setQuery($query);
+        $res = $db->loadResult();
+        if ($res>0) return false;
+        $query->clear();
+        $query->insert('#__xbmusic_artistsong')
+            ->columns('artist_id','song_id','role','note')
+            ->values($db->q($artist_id), $db->q($song_id), $db->q($role), $db->q($note));
+        $db->setQuery($query);
+        try {
+            $res = $db->execute();
+        } catch (\Exception $e) {
+            $dberr = $e->getMessage();
+            Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
+        }
+        return $res;
+    }
+}
+
     /*** not needed?
+//    protected function preprocessForm(Form $form, $data, $group = 'content') {
+//         if ($this->canCreateCategory()) {
+//             $form->setFieldAttribute('catid', 'allowAdd', 'true');
+            
+//             // Add a prefix for categories created on the fly.
+//             $form->setFieldAttribute('catid', 'customPrefix', '#new#');
+//         }
+        
+//        parent::preprocessForm($form, $data, $group);
+//    }
+    
+//     public function getTrackAlbumList() {
+//         $db = $this->getDbo();
+//         $query = $db->getQuery(true);
+//         $query->select('a.id as album_id, ba.discno AS discno, ba.trackno AS trackno, ba.listorder AS oldorder');
+//         $query->from('#__xbmusic_albumtrack AS ba');
+//         $query->innerjoin('#__xbmusic_albums AS a ON ba.album_id = a.id');
+//         $query->where('ba.track_id = '.(int) $this->getItem()->id);
+//         $query->order('a.title ASC');
+//         $db->setQuery($query);
+//         return $db->loadAssocList();
+//     }
+    
+//     function storeTrackAlbums($track_id, $albumlist) {
+//         //delete existing role list
+//         $db = $this->getDbo();
+//         $query = $db->getQuery(true);
+//         $query->delete($db->quoteName('#__xbmusic_albumtrack'));
+//         $query->where('track_id = '.$db->q($track_id));
+//         $db->setQuery($query);
+//         $db->execute();
+//         //restore the new list
+//         $listorder=0;
+//         foreach ($albumlist as $album) {
+//             if ($album['album_id'] > 0) {
+//                 $listorder = ($album['oldorder']>0) ? $album['oldorder'] : 0;
+//                 $query = $db->getQuery(true);
+//                 $query->insert($db->quoteName('#__xbmusic_albumtrack'));
+//                 $query->columns('album_id,track_id,discno, trackno,listorder');
+//                 $query->values('"'.$album['album_id'].'","'.$track_id.'","'.$album['discno'].'","'.$album['trackno'].'","'.$listorder.'"');
+//                 //try
+//                 $db->setQuery($query);
+//                 $db->execute();
+//             } else {
+//                 // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
+//                 //create person
+//                 //add filmperson with new id
+//             }
+//         }
+//     }
+    
      public function validate($form, $data, $group = null) {
      if (!$this->getCurrentUser()->authorise('core.admin', 'com_xbmusic')) {
      if (isset($data['rules'])) {
@@ -647,7 +789,7 @@ class TrackModel extends AdminModel {
      }
      ****/
     
-    /*
+    /***
      protected function batchMove($value, $pks, $contexts) {
      
      if (empty($this->batchSet))
@@ -739,7 +881,6 @@ class TrackModel extends AdminModel {
      
      */
     
-}
 
 /////////////from getForm()
 //         $params = ComponentHelper::getParams('com_xbmusic');

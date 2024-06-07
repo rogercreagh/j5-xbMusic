@@ -83,15 +83,17 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Songs","desc"=>"default parent category for xbMusic Songs"),
                 array("title"=>"Tracks","desc"=>"default parent category for xbMaps Tracks")
             );
-            $message .= $this->createCategories($cats);
+            $message .= $this->createCategories($cats).'<br />';
             
             //create a top level tag to be parent for id3genre tags
 //            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));
             
             //create xbmusic image folder
-            if (!file_exists(JPATH_ROOT.'/images/xbmusic/albums/unknown')) {
-                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/albums/unknown',0775,true);
-                $message .= 'Music artwork folders created (/images/xbmusic/albums/).<br />';
+            if (!file_exists(JPATH_ROOT.'/images/xbmusic/albums')) {
+                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/albums/',0775,true);
+                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/singles/',0775,true);
+                mkdir(JPATH_ROOT.'/images/xbmusic/artists/',0775,true);
+                $message .= 'Music image folders created for albums, singles and artists(/images/xbmusic/).<br />';
             } else{
                 $message .= '"/images/xbmusic/albums" already exists.<br />';
             }

@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.6.8 31st May 2024
+# sql installation file for component xbMusic 0.0.6.11 6th June 2024
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(190) NOT NULL DEFAULT '',
   `alias` varchar(190) NOT NULL DEFAULT '',
-  `description` mediumtext,
+  `description` mediumtext NOT NULL DEFAULT '',
   `picture` mediumtext NOT NULL DEFAULT '',
   `year_started` date,
   `year_ended` date,
@@ -213,16 +213,17 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artisttrack` (
   KEY `idx_role` (`role`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS `#__xbmusic_albumtrack` (
+CREATE TABLE IF NOT EXISTS `#__xbmusic_artistsong` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `album_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `track_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `discno` varchar(10) NOT NULL DEFAULT '0',
-  `trackno` tinyint(4) NOT NULL DEFAULT '0',
+  `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `song_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `role` varchar(255) NOT NULL DEFAULT '',
+  `note` varchar(255) NOT NULL DEFAULT '',
   `listorder` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `idx_album_id` (`album_id`),
-  KEY `idx_track_id` (`track_id`)
+  KEY `idx_artist_id` (`artist_id`),
+  KEY `idx_track_id` (`song_id`),
+  KEY `idx_role` (`role`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_playlisttrack` (
