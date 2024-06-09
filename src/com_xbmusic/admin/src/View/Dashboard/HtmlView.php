@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.4.3 30th April 2024
+ * @version 0.0.6.12 7th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -33,7 +33,7 @@ class HtmlView extends BaseHtmlView {
         $taghelper = new TagsHelper();
         $params = ComponentHelper::getParams('com_xbmusic');
         $notres = '<span class="xbbadge badge-lt-green">not restricted</span>';
-        $catbadge = '<span class="xbbadge badge-cat">';
+        $catbadge = '<span class="xbbadge badge-cat">';        
         
         $rootcat_album = $params->get('rootcat_album',0);
         if ($rootcat_album == 0) {
@@ -47,12 +47,44 @@ class HtmlView extends BaseHtmlView {
         $albumtagparents = $params->get('albumtagparents');
         if (is_array($albumtagparents)) {
             $albumtagparents = $taghelper->getTagNames($albumtagparents);
-            $this->albumtagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            $this->albumtagparents = ''; //'<i>'.Text::_('XBMUSIC_NO_GROUPS_DEFINED').'</i>: ';
             foreach ($albumtagparents as $name) {
                 $this->albumtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
             $this->albumtagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+        }
+        
+        $genreparam = (int) $params->get('genrecattag',0);
+        $artalb = (int) $params->get('addgenre',0);
+        switch ($genreparam) {
+            case 1:
+                $this->id3genreuse = Text::_('as Category');
+                break;  
+            case 2:
+                $this->id3genreuse = Text::_('as Tag');
+                break;
+            case 3:
+                $this->id3genreuse = Text::_('Category &amp; Tag');
+                break;
+            default:
+                $this->id3genreuse = Text::_('not used');
+                break;
+        }
+        if ($genreparam > 1) {
+            switch ($artalb) {
+                case 1:
+                    $this->id3genreuse .= ', '.Text::_('also tag Song');
+                    break;
+                case 2:
+                    $this->id3genreuse .= ', '.Text::_('also tag Album');
+                    break;
+                case 3:
+                    $this->id3genreuse .= ', '.Text::_('also tag Song &amp; Album');
+                    break;                       
+                default:
+                break;
+            }               
         }
         //==========================
         
@@ -68,12 +100,12 @@ class HtmlView extends BaseHtmlView {
         $artisttagparents = $params->get('artisttagparents');
         if (is_array($artisttagparents)) {
             $artisttagparents = $taghelper->getTagNames($artisttagparents);
-            $this->artisttagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>:';
+            $this->artisttagparents =  ''; //'<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>:';
             foreach ($artisttagparents as $name) {
                 $this->artisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->artisttagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+            $this->artisttagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
         }
         //==========================
         
@@ -89,12 +121,12 @@ class HtmlView extends BaseHtmlView {
         $plisttagparents = $params->get('plisttagparents');
         if (is_array($plisttagparents)) {
             $plisttagparents = $taghelper->getTagNames($plisttagparents);
-            $this->plisttagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            $this->plisttagparents = ''; //'<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
             foreach ($plisttagparents as $name) {
                 $this->plisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->plisttagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+            $this->plisttagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
         }
         //==========================
         
@@ -110,12 +142,12 @@ class HtmlView extends BaseHtmlView {
         $songtagparents = $params->get('songtagparents');
         if (is_array($songtagparents)) {
             $songtagparents = $taghelper->getTagNames($songtagparents);
-            $this->songtagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            $this->songtagparents = ''; //'<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
             foreach ($songtagparents as $name) {
                 $this->songtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->songtagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+            $this->songtagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
         }
         //==========================
         
@@ -131,12 +163,12 @@ class HtmlView extends BaseHtmlView {
         $tracktagparents = $params->get('tracktagparents');
         if (is_array($tracktagparents)) {
             $tracktagparents = $taghelper->getTagNames($tracktagparents);
-            $this->tracktagparents = '<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
+            $this->tracktagparents = ''; //'<i>'.Text::_('XBMUSIC_CHILDREN_OF').'</i>: ';
             foreach ($tracktagparents as $name) {
                 $this->tracktagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->tracktagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+            $this->tracktagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
         }
         //==========================
         

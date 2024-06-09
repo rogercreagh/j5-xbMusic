@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.6.9 3rd June 2024
+ * @version 0.0.6.12 8th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -233,7 +233,9 @@ function stopProp(event) {
 								<br />
 								<span class="xbr09">
     								<?php if($item->rec_date != '') : ?>
-    									<?php echo Text::_('Rec.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rec_date); ?>
+    									<span class="xbpr20">
+        									<?php echo Text::_('Rec.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rec_date); ?>
+    									</span>
     								<?php endif; ?>
     								<?php if($item->rel_date != '') : ?>									
     									<?php echo Text::_('Rel.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rel_date); ?>
@@ -248,7 +250,10 @@ function stopProp(event) {
 						</td>
 						<td onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
 							<i><?php echo Text::_('Album'); ?></i>: 
-								<?php echo ($item->albumid >0) ? $item->albumtitle : '<i>'.Text::_('album link missing').'</i>'; ?>
+							<a href="index.php?option=com_xbmusic&task=album.edit&retview=tracks&id=<?php echo $item->albumid; ?>" title="Edit">
+								<?php echo ($item->albumid >0) ? $item->albumtitle : '<i>'.Text::_('album not listed').'</i>'; ?>
+							</a>
+							
 							<hr class="xbmt5 xbmb5" />
 							<?php if(count($item->songs)>0) : ?>
     							<?php if (count($item->songs) > 1) : ?>
@@ -256,14 +261,14 @@ function stopProp(event) {
     									<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
     									<ul>
     									<?php foreach ($item->songs as $song) : ?>
-    										<li><a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+    										<li><a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>" title="Edit">
     							                <?php echo $song['title']; ?></a></li>
     									<?php endforeach; ?>
     									</ul>
     								</details>
     							<?php elseif (count($item->songs)==1) : ?>
     								<i><?php echo Text::_('Song title'); ?></i>: 
-    								<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $song['id']; ?>">
+    								<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $item->songs[0]['id']; ?>" title="Edit">
     									<?php echo $item->songs[0]['title']; ?>
     								</a>
     							<?php endif; ?>
@@ -272,8 +277,30 @@ function stopProp(event) {
 							<?php endif; ?>
 							
 							<hr class="xbmt5 xbmb5" />
-							<i><?php echo Text::_('Main Artist'); ?></i>: 
-								<?php echo ($item->sortartist !='') ? $item->sortartist: '<i>'.Text::_('sort name missing').'</i>'; ?>
+							<?php if(count($item->artists)>0) : ?>
+    							<?php if (count($item->artists) > 1) : ?>
+    								<details class="xb09">
+    									<summary><?php echo count($item->artists).' '.Text::_('Performers listed'); ?></summary>
+    									<ul>
+    									<?php foreach ($item->artists as $artist) : ?>
+    										<li><a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $artist['id']; ?>">
+    							                <?php echo $artist['name']; ?></a></li>
+    									<?php endforeach; ?>
+    									</ul>
+    								</details>
+    							<?php elseif (count($item->artists)==1) : ?>
+    								<i><?php echo Text::_('Artists'); ?></i>: 
+    								<a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $artist['id']; ?>">
+    									<?php echo $item->artists[0]['name']; ?>
+    								</a>
+    							<?php endif; ?>
+							<?php else: ?>
+    							<i><?php echo Text::_('Main Artist'); ?></i>: 
+    								<?php echo ($item->sortartist !='') ? $item->sortartist: '<i>'.Text::_('sort name missing').'</i>'; ?>
+								<br /><span class="xbnit"><?php echo Text::_('no artist links'); ?></span>
+							<?php endif; ?>
+							
+								
 							<hr class="xbmt5 xbmb5" />
 							<i><?php echo Text::_('Playlists'); ?></i>: 
 							<?php if (count($item->playlists) >0) : ?>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TracksModel.php
- * @version 0.0.6.9 3rd June 2024
+ * @version 0.0.6.12 8th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -299,7 +299,8 @@ class TracksModel extends ListModel {
                     }
                 } //end if is_object
                 $item->songs = $this->getSongs($item->id);
-                $item->artists = array();
+                $item->artists = $this->getArtists($item->id);
+                
                 $item->playlists = array();
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.track' , $item->id);               
@@ -310,7 +311,7 @@ class TracksModel extends ListModel {
     } // end getItems
     
     public function getSongs($id) {
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('a.id, a.title, st.note, st.listorder');
         $query->from('#__xbmusic_songs AS a');
@@ -318,7 +319,19 @@ class TracksModel extends ListModel {
         $query->where('st.track_id = '.$id);
         $query->order('st.listorder ASC');
         $db->setQuery($query);
-        return $db->loadAssocList();       
+        return $db->loadAssocList();
+    }
+    
+    public function getArtists($id) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('a.id, a.name, b.role, b.note, b.listorder');
+        $query->from('#__xbmusic_artists AS a');
+        $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+        $query->where('b.track_id = '.$id);
+        $query->order('b.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
     }
     
 }

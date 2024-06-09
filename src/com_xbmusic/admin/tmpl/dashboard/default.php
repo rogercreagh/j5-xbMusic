@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.2.3 3rd April 2024
+ * @version 0.0.6.12 7th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -56,7 +56,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_track; ?>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?>:</span> <span class="xbbadge badge-cat"><?php echo $this->defcat_track; ?></span>
 							</td>
-							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->tracktagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->tracktagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -91,7 +91,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_song; ?>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_song; ?></span>
 							</td>
-							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->songtagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->songtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -125,7 +125,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_artist; ?>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_artist; ?></span>
 							</td>
-							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->artisttagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->artisttagparents; ?>
 							</td>
 						</tr>
 						</tr>
@@ -160,7 +160,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_album; ?>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_album; ?></span>
 							</td>
-							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->albumtagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->albumtagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -196,7 +196,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_plist; ?></span>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_plist; ?></span>
 							</td>
-							<td><span class="xbnit"><?php echo Text::_('XB_TAGGING_CONSTRAINTS'); ?></span>: <?php echo $this->plisttagparents; ?>
+							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->plisttagparents; ?>
 							</td>
 						</tr>
 					</table>
@@ -261,8 +261,10 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 	        			<p><?php echo Text::_('XBMUSIC_CONFIG_SETTINGS'); ?>:
 	        			</p>
 	        			<dl class="xbdlinline">
-	        				<dt><?php echo Text::_('XBMUSIC_TAG_GROUPS'); ?>: </dt> 
-	        					<dd>blah</dd>
+	        				<dt><?php echo Text::_('Music Folder'); ?>: </dt>
+	        					<dd><?php echo XbmusicHelper::getMusicBase(); ?></dd>
+	        				<dt><?php echo 'ID3 Genre'; ?></dt>
+	        					<dd><?php echo $this->id3genreuse; ?></dd>
 	        			</dl>
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
     				<?php echo HtmlHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_ABOUT'), 'about','xbaccordion'); ?>

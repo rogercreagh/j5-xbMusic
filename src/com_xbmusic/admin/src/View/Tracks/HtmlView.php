@@ -100,6 +100,13 @@ class HtmlView extends BaseHtmlView {
                 
         }
         
+        if ($canDo->get('core.edit.state')) {
+            // Add a batch button
+            $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
+            ->selector('collapseModal')
+            ->listCheck(true);                        
+        }
+        
         $dropdown = $toolbar->dropdownButton('views')
         ->text('Other Views')
         ->toggleSplit(false)
@@ -121,13 +128,6 @@ class HtmlView extends BaseHtmlView {
             ->listCheck(true);
         }
                 
-        if ($canDo->get('core.edit.state')) {
-            // Add a batch button
-            $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
-            ->selector('collapseModal')
-            ->listCheck(true);                        
-        }
-        
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');
             ToolbarHelper::preferences('com_xbmusic');
