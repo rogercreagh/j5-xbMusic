@@ -236,6 +236,7 @@ $input = Factory::getApplication()->getInput();
         
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
 			<div class="row">
+				<?php echo $this->form->renderFieldset('taggroups'); ?>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
@@ -244,10 +245,10 @@ $input = Factory::getApplication()->getInput();
 				<div class="col-12 col-md-6">
 					<?php echo $this->form->renderField('album_id'); ?> 
 				</div>
-				<div class="col-12 col-md-3">
+				<div class="col-12 col-md-3 xbctl150">
 					<?php echo $this->form->renderField('discno'); ?> 
 				</div>
-				<div class="col-12 col-md-3">
+				<div class="col-12 col-md-3 xbctl150">
 					<?php echo $this->form->renderField('trackno'); ?> 
 				</div>
 			</div>

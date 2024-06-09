@@ -150,6 +150,9 @@
 		/>
 	</fieldset>
 	
+	<fieldset name="taggroups" >
+	
+	</fieldset>
 
 	<fieldset name="image-info"
 		label="ID3 Embedded image info"

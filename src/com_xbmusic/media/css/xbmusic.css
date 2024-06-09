@@ -38,4 +38,8 @@
 	top: 0;
 }
 
+/** reduce width for controls label and input/select use this on parent div*/
+.xbctl150 .control-label, .xbctl150 input, .xbctl150 select {
+	max-width: 150px;
+}
 

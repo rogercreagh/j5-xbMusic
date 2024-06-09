@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbtagsField.php
- * @version 0.0.0.1 31st March 2024
+ * @version 0.0.6.13 9th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -29,7 +29,7 @@ class XbtagsField extends TagField
      * {@inheritDoc}
      * @see \Joomla\CMS\Form\Field\TagField::getOptions()
      * Modified Roger C-O Nov 2022 to allow options to limit values to children of a specified tag.
-     * Add a new property 'parent="[component].[optionname] to specify the parent of the tags to be listed as options
+     * Add a new property 'parent (int) the id of the parent of the tags to be listed as options
      * Also forces nested mode to prevent ajax going outside the specified branch
      */
     
@@ -40,17 +40,10 @@ class XbtagsField extends TagField
     {
         $published = (string) $this->element['published'] ?: array(0, 1);
         
-        $parent_id = 0;
         $levels = 0;
         $maxlevel = 0;
-        $parent = (string) $this->element['parent'];
+        $parent_id = (int) $this->element['parent'];
         $levels = (string) $this->element['levels'];
-        if ($parent && (substr($parent,0,4) == 'com_'))  { //we're looking in the option params for a component
-            //for php8 use str_starts_with($parent, string 'com_')
-            $parent = explode('.',$parent);
-            $params = ComponentHelper::getParams($parent[0]);
-            if ($params) $parent_id = $params->get($parent[1],1);
-        }
         if ($levels) {
             //if parent set get level
             $maxlevel = $levels;
