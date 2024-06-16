@@ -36,15 +36,6 @@
 			hint="Will default ID3 artist name(s)"
 			size="40" 
 		/>
-
-<!-- 
-		<field name="music_base" type="text" 
-			label="Music base folder"
-			description="Full path to the folder for music folders and files set in the options. Can't be changed once the track has been saved."
-			readonly="true"
-			size="40" 
-		/>
- -->		
 		
 		 <field name="pathname" type="xbfolderlist" 
 			label="File path" description="path from the music root directory as set in xbMusic Options" 
@@ -56,7 +47,7 @@
 		>
 		</field>
 
-		 <field name="filename" type="filelist" 
+		<field name="filename" type="filelist" 
 			label="File name" description="Filename" 
 			directory="/xbmusic"
 			hide_none="true" hide_default="true"
@@ -65,12 +56,17 @@
 		>
 			<option value="">Select file</option>
 		</field>
-
-	</fieldset>
 	
-<!-- rec-date, rel-date, description, status, access, ordering, cat, alltags, note -->
-	<fieldset name="general">
-	
+		<field name="loadid3" type="radio"
+			label="(re-)Load ID3 Data on save"
+			description="Load ID3 data from file. Will overwrite existing settings"
+ 			class="btn-group btn-group-yesno"
+			default="0"
+			>
+				<option value="0">No</option>
+				<option value="1">Yes</option>
+		</field>
+		
 		<field name="rel_date" type="text"
 			label="Release date" 
 			description="Date the album or track was released. Format YYYY[-MM[-DD]] - day &amp; month optional"
@@ -78,6 +74,7 @@
 			hint="YYYY or YYYY-MM or YYYY-MM-DD"
 			pattern="(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)"
 		/>
+		
 		<field name="rec_date" type="text"
 			label="Recording date" description="Date of track recording session. Format YYYY[-MM[-DD]] - day &amp; month optional"
 			class="inputbox" maxlength="10"
@@ -151,9 +148,10 @@
 	</fieldset>
 	
 	<fieldset name="taggroups" >
-	
+		<!-- dynamically created at run time -->
 	</fieldset>
 
+<!-- ID3 iage info -->
 	<fieldset name="image-info"
 		label="ID3 Embedded image info"
 	>
@@ -200,7 +198,6 @@
 			directory="xbmusic/artwork/albums"
 		/>
 	</fieldset>
-
 
 <!-- Album, artist(s), song, playlists -->	
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
@@ -254,28 +251,6 @@
 			</form>
 		</field>	
 		
-<!-- 
-		<field name="albumlist" type="subform"
-			label="Album"
-			description="Track may appear on more than one album - eg original and greatest hits or compilation"			
-			multiple="true" min= "0" max= "10"
-			buttons="add,remove"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="album_id" type="xbalbumlist" label="Album Title">
-					<option value=""> </option>	
-				</field>
-				<field name="discno" type="text" default="0" label="Disc No." size="5" maxlength="5"
-				/>
-				<field name="trackno" type="number" max="99" min="0" default="0" label="Track No." size="5" maxlength="5"
-				/>
-				<field name="oldorder" type="hidden" default="0" />
-			</form>
-		</field>	
- -->				
-				
 		<field name="artistlist" type="subform"
 			label="Artists(s)"
 			description="Track may have several artists, album artist may be listed separately"			
@@ -288,9 +263,11 @@
 				<field name="artist_id" type="xbartistlist" label="Artist Name">
 					<option value=""> </option>	
 				</field>
-				<field name="role" type="text" label="XB_ROLE" size="50" maxlength="190"
+				<field name="role" type="text" label="XB_ROLE" 
+					size="50" maxlength="190"
 				/>
-				<field name="note" type="text" label="XB_NOTE" size="30" maxlength="190"
+				<field name="note" type="text" label="XB_NOTE" 
+					size="30" maxlength="190"
 				/>
 			</form>
 		</field>			

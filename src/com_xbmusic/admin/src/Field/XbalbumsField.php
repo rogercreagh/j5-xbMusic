@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbalbumsField.php
- * @version 0.0.6.8 1st June 2024
+ * @version 0.0.6.14 10th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -29,6 +29,7 @@ class XbalbumsField extends ListField {
         //now get most recent 3 for top of list
         $query->clear('order');
         $query->order('created DESC')->setLimit('3');
+        $db->setQuery($query);
         $recent = $db->loadObjectList();
         //add a separator between recent and alpha
         $blank = new stdClass();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.6.0 15th May 2024
+ * @version 0.0.6.14 12th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,6 +30,7 @@ use Joomla\Filter\OutputFilter;
 use Joomla\Registry\Registry;
 use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use \SimpleXMLElement;
 use Symfony\Component\Validator\Constraints\IsNull;
 
 class SongModel extends AdminModel {
@@ -117,6 +118,7 @@ class SongModel extends AdminModel {
     
     public function getForm($data = [], $loadData = true) {
         $app  = Factory::getApplication();
+        $params = ComponentHelper::getParams('com_xbmusic');
         
         // Get the form.
         $form = $this->loadForm('com_xbmusic.song', 'song', ['control' => 'jform', 'load_data' => $loadData]);
@@ -124,7 +126,17 @@ class SongModel extends AdminModel {
         if (empty($form)) {
             return false;
         }
-//        $params = ComponentHelper::getParams('com_xbmusic');
+        
+        //dynamically add fields for any taggroups defined in options
+        $parentids = $params->get('songtagparents',[]);
+        if (!empty($parentids)) {
+            $taghelp = new TagsHelper;
+            $parr = $taghelp->getTags($parentids);
+            foreach ($parr as $id=>$parent) {
+                $element = new SimpleXMLElement('<field name="tags-'.$parent.'" type="tags" label="'.ucfirst($parent).'" mode="nested" multiple="true" custom="deny" />');
+                $form->setField($element, null, true, 'taggroups');
+            }
+        } // endforeach parenttag
         
         return $form;
     }
@@ -162,6 +174,19 @@ class SongModel extends AdminModel {
                 }
             }
             
+            //copy any tags in a taggroup folder back to their control
+            $tagsHelper = new TagsHelper;
+            $params = ComponentHelper::getParams('com_xbmusic');
+            $parentids = $params->get('songtagparents',[]);
+            if ((!empty($data->tags)) && (!empty($parentids))) {
+                $parr = $tagsHelper->getTags($parentids);
+                foreach ($parr as $pid=>$parent) {
+                    $grouptags = $tagsHelper->getTagTreeArray($pid);
+                    $groupname = 'tags-'.$parent;
+                    $data->$groupname = array_intersect($grouptags, explode(',', $data->tags));
+                }
+            }
+            
             // If there are params fieldsets in the form it will fail with a registry object
             if (isset($data->params) && $data->params instanceof Registry) {
                 $data->params = $data->params->toArray();
@@ -172,18 +197,17 @@ class SongModel extends AdminModel {
         
     public function save($data) {
         $app    = Factory::getApplication();
-        $input  = $app->getInput();
+        //$input  = $app->getInput();
+        $params = ComponentHelper::getParams('com_xbmusic');
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
 
         //alias is the title so we'll set and check it every time
-        $params = ComponentHelper::getParams('com_xbmusic');
         $newalias = OutputFilter::stringURLSafe($data['title']);
         if (($data['id'] == 0) && XbmusicHelper::checkValueExists($newalias, '#__xbmusic_songs', 'alias')) {
             $warnmsg .= 'Duplicate alias - this song title is already in the database';
-            $app->enqueueMessage($warnmsg,'Warning');
-            if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
+            $app->enqueueMessage($warnmsg,'Error');
             return false;
         }
         $data['alias'] = $newalias;        
@@ -192,24 +216,19 @@ class SongModel extends AdminModel {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
         }
         
+        //merge any tag groups back into tags
+        $parentids = $params->get('tracktagparents',[]);
+        if (!empty($parentids)) {
+            $thelp = new TagsHelper;
+            $parr = $thelp->getTags($parentids);
+            foreach ($parr as $id=>$parent) {
+                if (!empty($data['tags-'.$parent])) {
+                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['tags-'.$parent])) : $data['tags-'.$parent];
+                }
+            }
+        } // endforeach parenttag
         
-        //merge groups back into tags
-        /*
-         if ($data['taggroup1']) {
-            $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['taggroup1'])) : $data['taggroup1'];
-        }
-        if ($data['taggroup2']) {
-            $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['taggroup2'])) : $data['taggroup2'];
-        }
-        if ($data['taggroup3']) {
-            $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['taggroup3'])) : $data['taggroup3'];
-        }
-        if ($data['taggroup4']) {
-            $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['taggroup4'])) : $data['taggroup4'];
-        }
-         */      
-        
-        
+        // ok ready to save the song data
         if (parent::save($data)) {
             $sid = $this->getState('song.id');
             $this->storeSongTracks($sid, $data['tracklist']);
@@ -283,246 +302,10 @@ class SongModel extends AdminModel {
                 //try
                 $db->setQuery($query);
                 $db->execute();
-            } else {
-                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
-                //create person
-                //add filmperson with new id
             }
         }
     }
-    
-    /*** not needed?
-     public function validate($form, $data, $group = null) {
-     if (!$this->getCurrentUser()->authorise('core.admin', 'com_xbmusic')) {
-     if (isset($data['rules'])) {
-     unset($data['rules']);
-     }
-     }
-     
-     return parent::validate($form, $data, $group);
-     }
-     ****/
-    
-    /*
-     protected function batchMove($value, $pks, $contexts) {
-     
-     if (empty($this->batchSet))
-     {
-     // Set some needed variables.
-     $this->user = $this->getCurrentUser();
-     $this->table = $this->getTable();
-     $this->tableClassName = \get_class($this->table);
-     $this->contentType = new UcmType();
-     $this->type = $this->contentType->getTypeByTable($this->tableClassName);
-     }
-     
-     $categoryId = (int) $value;
-     
-     if (!$this->checkCategoryId($categoryId)) {
-     return false;
-     }
-     
-     PluginHelper::importPlugin('system');
-     
-     // Parent exists so we proceed
-     foreach ($pks as $pk) {
-     if (!$this->user->authorise('core.edit', $contexts[$pk])) {
-     $this->setError(Text::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
-     
-     return false;
-     }
-     
-     // Check that the row actually exists
-     if (!$this->table->load($pk)) {
-     if ($error = $this->table->getError()) {
-     // Fatal error
-     $this->setError($error);
-     
-     return false;
-     }
-     // Not fatal error
-     $this->setError(Text::sprintf('JLIB_APPLICATION_ERROR_BATCH_MOVE_ROW_NOT_FOUND', $pk));
-     continue;
-     }
-     
-     $fields = FieldsHelper::getFields('com_xbmusic.track', $this->table, true);
-     $fieldsData = array();
-     
-     if (!empty($fields)) {
-     $fieldsData['com_fields'] = array();
-     
-     foreach ($fields as $field) {
-     $fieldsData['com_fields'][$field->name] = $field->rawvalue;
-     }
-     }
-     
-     // Set the new category ID
-     $this->table->catid = $categoryId;
-     
-     //             // We don't want to modify tags - so remove the associated tags helper
-     //             if ($this->table instanceof TaggableTableInterface) {
-     //                 $this->table->clearTagsHelper();
-     //             }
-     
-     // Check the row.
-     if (!$this->table->check()) {
-     $this->setError($this->table->getError());
-     
-     return false;
-     }
-     
-     if (!empty($this->type))
-     {
-     $this->createTagsHelper($this->tagsObserver, $this->type, $pk, $this->typeAlias, $this->table);
-     }
-     
-     // Store the row.
-     if (!$this->table->store()) {
-     $this->setError($this->table->getError());
-     
-     return false;
-     }
-     
-     // Run event for moved track
-     Factory::getApplication()->triggerEvent('onContentAfterSave', ['com_xbmusic.track', &$this->table, false, $fieldsData]);
-     }
-     
-     // Clean the cache
-     $this->cleanCache();
-     
-     return true;
-     }
-     
-     */
+
     
 }
-
-/////////////from getForm()
-//         $params = ComponentHelper::getParams('com_xbmusic');
-//         if ($this->params->get('use_xbmusic', 1)) {
-//             $this->basemusicfolder = JPATH_ROOT.'xbmusic/'.$this->params->get('xbmusic_subfolder','');
-//         } else {
-//             $this->basemusicfolder = ($this->params->get('music_path','') != '') ? $this->params->get('music_path') : JPATH_ROOT.'/xbmusic/';
-//         }
-//         $form->setFieldAttribute('pathname','directory',$this->basemusicfolder,'general');
-
-
-/*
- // Object uses for checking edit state permission of track
- $record = new \stdClass();
- 
- $trackIdFromInput = $app->getInput()->getInt('id', 0);
- 
- $id = (int) $this->getState('track.id', $trackIdFromInput);
- 
- $record->id = $id;
- 
- // For new tracks we load the potential state + associations
- if ($id == 0 && $formField = $form->getField('catid')) {
- $assignedCatids = $data['catid'] ?? $form->getValue('catid');
- 
- $assignedCatids = \is_array($assignedCatids)
- ? (int) reset($assignedCatids)
- : (int) $assignedCatids;
- 
- // Try to get the category from the category field
- if (empty($assignedCatids)) {
- $assignedCatids = $formField->getAttribute('default', null);
- 
- if (!$assignedCatids) {
- // Choose the first category available
- $catOptions = $formField->options;
- 
- if ($catOptions && !empty($catOptions[0]->value)) {
- $assignedCatids = (int) $catOptions[0]->value;
- }
- }
- }
- 
- // Activate the reload of the form when category is changed
- $form->setFieldAttribute('catid', 'refresh-enabled', true);
- $form->setFieldAttribute('catid', 'refresh-cat-id', $assignedCatids);
- $form->setFieldAttribute('catid', 'refresh-section', 'track');
- 
- // Store ID of the category uses for edit state permission check
- $record->catid = $assignedCatids;
- } else {
- // Get the category which the track is being added to
- if (!empty($data['catid'])) {
- $catId = (int) $data['catid'];
- } else {
- $catIds  = $form->getValue('catid');
- 
- $catId = \is_array($catIds)
- ? (int) reset($catIds)
- : (int) $catIds;
- 
- if (!$catId) {
- $catId = (int) $form->getFieldAttribute('catid', 'default', 0);
- }
- }
- 
- $record->catid = $catId;
- }
- 
- // Modify the form based on Edit State access controls.
- if (!$this->canEditState($record)) {
- // Disable fields for display.
- $form->setFieldAttribute('featured', 'disabled', 'true');
- //            $form->setFieldAttribute('featured_up', 'disabled', 'true');
- //            $form->setFieldAttribute('featured_down', 'disabled', 'true');
- $form->setFieldAttribute('ordering', 'disabled', 'true');
- $form->setFieldAttribute('publish_up', 'disabled', 'true');
- $form->setFieldAttribute('publish_down', 'disabled', 'true');
- $form->setFieldAttribute('state', 'disabled', 'true');
- 
- // Disable fields while saving.
- // The controller has already verified this is an track you can edit.
- $form->setFieldAttribute('featured', 'filter', 'unset');
- //            $form->setFieldAttribute('featured_up', 'filter', 'unset');
- //            $form->setFieldAttribute('featured_down', 'filter', 'unset');
- $form->setFieldAttribute('ordering', 'filter', 'unset');
- $form->setFieldAttribute('publish_up', 'filter', 'unset');
- $form->setFieldAttribute('publish_down', 'filter', 'unset');
- $form->setFieldAttribute('state', 'filter', 'unset');
- }
- 
- // Don't allow to change the created_by user if not allowed to access com_users.
- if (!$this->getCurrentUser()->authorise('core.manage', 'com_users')) {
- $form->setFieldAttribute('created_by', 'filter', 'unset');
- }
- 
- */
-
-//////////////////////////////////////////// from loadFromData()
-//need to extract any genre tags and poke them into $data->genre
-//ie filter tag list (comma sep string) by parent
-// get genre_parent and if set
-//
-/*             $tagsHelper = new TagsHelper;
- $params = ComponentHelper::getParams('com_xbarticleman');
- $taggroup1_parent = $params->get('taggroup1_parent','');
- if ($taggroup1_parent && !(empty($data->tags))) {
- $taggroup1_tags = $tagsHelper->getTagTreeArray($taggroup1_parent);
- $data->taggroup1 = array_intersect($taggroup1_tags, explode(',', $data->tags->tags));
- }
- $taggroup2_parent = $params->get('taggroup2_parent','');
- if ($taggroup2_parent && !(empty($data->tags))) {
- $taggroup2_tags = $tagsHelper->getTagTreeArray($taggroup2_parent);
- $data->taggroup2 = array_intersect($taggroup2_tags, explode(',', $data->tags->tags));
- }
- $taggroup3_parent = $params->get('taggroup3_parent','');
- if ($taggroup3_parent && !(empty($data->tags))) {
- $taggroup3_tags = $tagsHelper->getTagTreeArray($taggroup3_parent);
- $data->taggroup3 = array_intersect($taggroup3_tags, explode(',', $data->tags->tags));
- }
- $taggroup4_parent = $params->get('taggroup4_parent','');
- if ($taggroup4_parent && !(empty($data->tags))) {
- $taggroup4_tags = $tagsHelper->getTagTreeArray($taggroup4_parent);
- $data->taggroup4 = array_intersect($taggroup4_tags, explode(',', $data->tags->tags));
- }
- */
-//allow content plugins to preprocess
-//$this->preprocessData('com_xbmusic.track', $data);
-
 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/songs/default.php
- * @version 0.0.6.3 19th May 2024
+ * @version 0.0.6.14 12th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -21,6 +21,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Session\Session;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 // HTMLHelper::_('behavior.multiselect');
 // HTMLHelper::_('formbehavior.chosen', 'select');
@@ -35,10 +36,10 @@ $app       = Factory::getApplication();
 $user  = Factory::getApplication()->getIdentity();
 $userId    = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
-$listDirn  = $this->escape($this->state->get('list.direction'));
-$saveOrder = $listOrder == 'a.ordering';
+$listDirn = $this->escape($this->state->get('list.direction'));
+//$saveOrder = $listOrder == 'a.ordering';
 
-$cvlink = '';
+$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
 $tvlink = '';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
@@ -51,10 +52,10 @@ if (strpos($listOrder, 'modified') !== false) {
     $dateOrderCol = 'modified';
 }
 
-if ($saveOrder && !empty($this->items)) {
-    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
-    HTMLHelper::_('draggablelist.draggable');
-}
+//if ($saveOrder && !empty($this->items)) {
+//    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
+//    HTMLHelper::_('draggablelist.draggable');
+//}
 
 ?>
 <div id="xbcomponent" >
@@ -77,10 +78,9 @@ if ($saveOrder && !empty($this->items)) {
 				<?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
 			</div>
 		<?php else : ?>
-			<?php $rowcnt = count($this->items); ?>	
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo 'Sorted by '.$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',2).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
@@ -88,57 +88,35 @@ if ($saveOrder && !empty($this->items)) {
           		</p>
           	</div>
 			
-			<table class="table table-striped table-hover xbtablelist" id="xbsongList">
-    			<colgroup>
-					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
-					<col class="nowrap center hidden-phone" style="width:25px;"><!-- ordering -->
-					<col class="nowrap center" style="width:55px;"><!-- status -->
-    				<col ><!-- title, alias -->
-    				<col ><!-- performers -->
-    				<col ><!-- tracks -->
-    				<col class="nowrap hidden-phone" ><!-- albums -->
-    				<col class="nowrap hidden-phone" ><!-- playlists -->
-    				<col class="nowrap hidden-phone" style="width:110px;" ><!-- category & tags -->
-    				<col class="nowrap hidden-phone xbtc" style="width:160px; padding:0;"><!-- date & id -->
-    			</colgroup>	
+			<div class="table-scroll">
+			<table class="table table-striped table-hover xbtablelist table-freeze" id="xbsongList">
 				<thead>
 					<tr>
-						<th >
+						<th class="center " style="width:25px;" >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
-						<th>
-							<?php echo HTMLHelper::_('searchtools.sort', '', 'a.ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-menu-2'); ?>
-						</th>
-						<th >
+						<th class="nowrap center" style="width:95px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th>Recordings
+						<th><?php echo Text::_('Recordings'); ?>
 						</th>
-						<th>Performers
+						<th><?php echo Text::_('Playlists'); ?>
 						</th>
-						<th>albums
-						</th>
-						<th>playlists
-						</th>
-						<th >
+						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
 							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
 						</th>
-						<th style="padding:0; text-align:center;"><span class="xb09">
+						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xb09">
 							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
 							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 							</span>
 						</th>
 					</tr>
 				</thead>
-				<?php if ($rowcnt > 9) : ?>
-					<tfoot>
-					</tfoot>
-				<?php endif; //rowcnt ?>
-				<body>
+				<tbody>
 				<?php foreach ($this->items as $i => $item) :
     				$item->max_ordering = 0;
     				$ordering   = ($listOrder == 'a.ordering');
@@ -153,30 +131,10 @@ if ($saveOrder && !empty($this->items)) {
     				$canEditOwnParCat = $user->authorise('core.edit.own',   'com_xbmusic.category.' . $item->parent_category_id) && $item->parent_category_uid == $userId;
     				?>
  					<tr class="row<?php echo $i % 2; ?>" sortable-group-id="<?php echo $item->catid; ?>">
-						<td>
+						<td class="center " style="width:25px;">
 							<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 						</td>
-						<td class="order">
-							<?php
-							$iconClass = '';
-							$numclass = '';
-							if (!$canChange) {
-							    $iconClass = ' inactive';
-							    $numclass = 'xbgrey';
-							} elseif (!$saveOrder) {
-							    $iconClass = ' inactive" title="' . Text::_('JORDERINGDISABLED');
-							    $numclass = 'xbgrey';
-							}
-							?>
-                            <span class="sortable-handler<?php echo $iconClass ?>">
-                                <span class="icon-ellipsis-v" aria-hidden="true"></span>
-                            </span>
-                            <?php if ($canChange && $saveOrder) : ?>
-                                <input type="text" name="order[]" size="5" value="<?php echo $item->ordering; ?>" class="width-20 text-area-order hidden">
-                            <?php endif; ?>             
-							<span class="<?php echo $numclass; ?>"><?php echo $item->ordering;?></span>
-						</td>
-						<td class="song-status">
+						<td class="song-status nowrap center">
 							<div style="float:left;">
                                 <?php
                                     $options = [
@@ -184,7 +142,6 @@ if ($saveOrder && !empty($this->items)) {
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];
-
                                     echo (new PublishedButton())->render((int) $item->status, $i, $options);
                                 ?>
                             </div>
@@ -217,39 +174,50 @@ if ($saveOrder && !empty($this->items)) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<?php if ($item->note != '') : ?>
-									<p class="xbpl20 xb085 xbmb5"><i><?php echo Text::_('XB_NOTE'); ?></i> <b><?php echo $item->note; ?></b>
-									</p>
-								<?php endif; ?>
+								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',2).$item->trkcnt.($item->trkcnt==1)? Xbtext::_('track',1) : Xbtext::_('tracks',1); ?>
+								</p>
 							</div>
 						</td>
-						<td><?php if (count($item->tracks) > 1) : ?>
+						<td onclick="stopProp(event);"><?php if (count($item->tracks) > 1) : ?>
 								<details class="xb09">
 									<summary><?php echo Text::sprintf('XBMUSIC_SONG_RECORDINGS',count($item->tracks)); ?></summary>
 									<ul>
 									<?php foreach ($item->tracks as $track) : ?>
-										<li><a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['id']; ?>">
-							                <?php echo $track['title']; ?></a>
-							                <br /><span class="xb09">(<?php echo $track['artists']; ?>)</span></li>
+										<li><a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['trackid']; ?>">
+							                <?php echo $track['trackname']; ?></a> 
+							                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
+							                <?php if($track['performers']) : ?>
+							                	<br /><span class="xbit xbpl20"><?php echo '<br />'.Xbtext::_('by',2).$track['performers']; ?>
+							                <?php endif; ?>
+							                <?php if($track['albumid']>0) : ?>
+							                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('on',2); ?>
+							                	<a href="index.php?option=com_xbmusic&task=album.edit&retview=songs&id=<?php echo $track['albumid']; ?>">
+							                	<?php echo $track['albumtitle']; ?></a>
+							                <?php endif; ?>
+							            </li>
 									<?php endforeach; ?>
 									</ul>
 								</details>
 							<?php elseif (count($item->tracks)==1) : ?>
-								<p class="xb09"><i><?php echo Text::_('Recording'); ?></i>: 
-								<a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['id']; ?>">
-									<?php echo $item->tracks[0]['title']; ?>
-								</a>
-								<br /><span class="xb09"><?php echo Text::sprintf('XBMUSIC_PERF_BY',$track['artists']); ?></p>
-							<?php endif; ?>						
+								<?php $track = $item->tracks[0]; ?>
+								<a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $item->tracks[0]['trackid']; ?>">
+				                <?php echo $track['trackname']; ?></a> 
+				                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
+				                <?php if($track['performers']) : ?>
+				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2).$track['performers']; ?>	
+				                <?php endif; ?>			                
+				                <?php if($track['albumid']>0) : ?>
+				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('on',2); ?></span>
+				                	<a href="index.php?option=com_xbmusic&task=album.edit&retview=songs&id=<?php echo $track['albumid']; ?>">
+				                	<?php echo $track['albumtitle']; ?></a>
+				                <?php endif; ?>
+							<?php else : ?>
+								<p class="xbnit xbr09"><?php echo Text::_('no tracks connected'); ?>
+							<?php endif; ?>
 						</td>
-						<td>Performers
-							
+						<td onclick="stopProp(event);">playlists
 						</td>
-						<td>albums
-						</td>
-						<td>playlists
-						</td>
-						<td>
+						<td class="nowrap">
 						<?php if ($item->catid > 0) : ?>
     						<p>
     							<a class="xblabel label-cat" href="<?php echo $cvlink.$item->catid; ?>" 
@@ -274,9 +242,10 @@ if ($saveOrder && !empty($this->items)) {
 							<?php echo (int) $item->id; ?>
 						</td>
                 <?php endforeach; //item ?>				
-				</body>
+				</tbody>
 			
 			</table>
+			</div>
 			<?php // Load the batch processing form. ?>
 			<?php if ($user->authorise('core.create', 'com_xbmusic')
 				&& $user->authorise('core.edit', 'com_xbmusic')

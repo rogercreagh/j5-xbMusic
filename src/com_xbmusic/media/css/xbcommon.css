@@ -1,11 +1,16 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version 1.0.0.0 14 May 2024
+ * @version xbmusic-J5 0.0.6.14 11th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
+
+/* reduce Atum bottom margin on details */
+#xbcomponent details {
+	margin: 0 0 0.5rem 0;
+}
 
 /* disable Joomla5 Atum template target hinting arrow-out-box using a:before */
 #xbcomponent a[target="_blank"]:before {
@@ -14,6 +19,11 @@
 /* disable Joomla5 Atum component forced underline on a inside table */
 #xbcomponent table a {
 	text-decoration:none;
+}
+
+/* fix for annoying change in Atum template which destroys white text in labels and badges */
+#xbcomponent a.xblabel, #xbcomponent a.xbbadge {
+	color: #fff; 
 }
 
 /* restore Joomla j5 template styles missing */
@@ -488,7 +498,8 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 #xbcomponent .xbcompacttable td {
 	padding: 4px 10px;	
 }
-/* definition list with term and definition on same line */
+
+/* definition list with term and definition on same line (NB overflow will not be indented */
 dl.xbdl dt{
   /*display: inline-block;*/
 	float: left;
@@ -509,4 +520,25 @@ dl.xbdl dd {
 	padding: 0 0 0.5em 0;
 	margin:0;
 }
+
+/** table freeze header row. wrap table in <div class="table-scroll and <table class="table-freeze **/
+.table-scroll {
+	max-height:80vh;
+	overflow:auto;
+	width:100%;
+}
+.table-freeze {
+	text-align: left;
+	position: relative;
+}
+.table-freeze th {
+	position: sticky;
+	top: 0;
+}
+
+/** reduce width for controls label and input/select - use this on parent div wraping the control(s) */
+.xbctl150 .control-label, .xbctl150 input, .xbctl150 select {
+	max-width: 150px;
+}
+
 

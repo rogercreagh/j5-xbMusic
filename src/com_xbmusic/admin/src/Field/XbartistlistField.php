@@ -44,6 +44,7 @@ class XbartistlistField extends ListField {
         //now get most recent 3 for top of list
         $query->clear('order');
         $query->order('created DESC')->setLimit('3');
+        $db->setQuery($query);
         $recent = $db->loadObjectList();
         //add a separator between recent and alpha
         $blank = new stdClass();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.6.11 2nd June 2024
+ * @version 0.0.6.14 12th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -102,7 +102,26 @@ $input = Factory::getApplication()->getInput();
     			<p>Track file : <?php echo $this->item->filename; ?></p>
     		</div>
     	<?php endif; ?>
+        </div>
+        <hr />
+        <div class="row form-horizontal">
+            <div class="col-md-1"></div>
+            <div class="col-md-9">
+                <div class="pull-left" style="max-width:600px;">
+    	            <?php echo $this->form->renderField('loadid3'); ?>
+                </div>
+                <div>
+                    <p class="xb09">
+                     	<?php if ($this->item->id == 0 ) : ?>
+                    		<?php echo Text::_('This will load any values available from the ID3 tags in the file and create album, artist, and song links, including creating the album, artists and songs if they are not already in the database'); ?>
+                    	<?php else: ?>
+                    		<?php echo Text::_('This will overwrite any existing track data with tag data if available. Existing Album, Songs and Artists links will not be removed, but new ones ay be added.'); ?>
+                    	<?php endif; ?>
+                    </p>
+                </div>
+            </div>
     	</div>
+    	<hr />
     	<div class="row form-vertical">
     		<div class="col-md-10">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.11 6th June 2024
+ * @version 0.0.6.14 16th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -275,17 +275,17 @@ class XbmusicHelper extends ComponentHelper
 	 * @name getItems
 	 * @param string $table - table name containing item(s)
 	 * @param string $column - column to search in
-	 * @param unknown $search - value to search for, for partial string match use %str%
+	 * @param string $search - value to search for, for partial string match use %str%
 	 * @param string $filter - optional string to use as andwhere clause
 	 * @return array of objects 
 	 */
-	public static function getItems(string $table, string $column, $search, $filter = '' ) {
+	public static function getItems(string $table, string $column, $search = '', $filter = '' ) {
 	    //TODO make case insenstive?
 	    //$db = Factory::getDbo();
 	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')->from($db->qn($table).' AS a');
-	    if ((is_string($search)) && (($search[0] == '%') || ($search[-1] == '%'))) {
+	    if (($search !='') && (($search[0] == '%') || ($search[-1] == '%'))) {
 	        $query->where($db->qn($column). 'LIKE ('.$db->q($search).')');
 	    } else {
 	        $query->where($db->qn($column).' = '.$db->q($search));
@@ -407,7 +407,7 @@ class XbmusicHelper extends ComponentHelper
 	            //we need to remove another tag
 	            $lasttagstart = strrpos($truncstr,'<');
 	            if ($lasttagstart) {
-	                $truncstr = substr($truncstr, 0, $lastagstart);
+	                $truncstr = substr($truncstr, 0, $lasttagstart);
 	            } else {
 	                $truncstr = substr($truncstr, 0, $maxlen);
 	            }
@@ -606,7 +606,7 @@ class XbmusicHelper extends ComponentHelper
 	    if (!empty($tagfilt)) {
 	        $tagfilt = ArrayHelper::toInteger($tagfilt);
 	        $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                WHERE tmap.type_alias = '.$db->quote($typealias).'
+                WHERE tmap.type_alias = \''.$typealias.'\''.'
                 AND tmap.content_item_id = a.id)';
 	        switch ($taglogic) {
 	            case 1: //all
@@ -674,6 +674,56 @@ class XbmusicHelper extends ComponentHelper
 	    return isset($mimemap[$mime]) ? $mimemap[$mime] : 'xyz';
 	}
 	
+	/**
+	 * @name uniqueNestedArray()
+	 * @desc given an array of arrays returns the array with any duplicate values on the given key to the inner arrays removed
+	 * @param array(array) $array - the nested array
+	 * @param $key - the key on the inner arrays to check for duplicates
+	 * @return array
+	 */
+	public static function uniqueNestedArray($array, $key) : array {
+	    $uniq_array = array();
+	    $key_array = array();
+	    
+	    foreach($array as $key1=>$val1) {
+	        if (!in_array($val1[$key], $key_array)) {
+	            $key_array[] = $val1[$key];
+	            $uniq_array[$key1] = $val1;
+	        }
+	    }
+	    return array($uniq_array);
+	}
 	
+	/**
+	 * @name setComponentOptions()
+	 * @desc sets a component options from an array of keys=>values
+	 * @param array $options
+	 * @param string $component
+	 * @return boolean
+	 */
+	public static function setComponentOptions(array $options, $component = 'com_xbmusic') {
+	    // Load the current component params.
+	    $params = ComponentHelper::getParams($component);
+	    // Set new value of param(s)
+	    foreach ($options as $key=>$value) {
+	        $params->set($key, $value);
+	    }	    
+	    // Save the parameters
+	    $componentid = ComponentHelper::getComponent($component)->id;
+	    $table = Table::getInstance('extension');
+	    $table->load($componentid);
+	    $table->bind(array('params' => $params->toString()));
+	    
+	    // check for error
+	    if (!$table->check()) {
+	        echo $table->getError();
+	        return false;
+	    }
+	    // Save to database
+	    if (!$table->store()) {
+	        echo $table->getError();
+	        return false;
+	    }
+	}
 }
 

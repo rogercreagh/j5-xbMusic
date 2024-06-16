@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.6.12 8th June 2024
+ * @version 0.0.6.14 12th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -21,6 +21,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Session\Session;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 // HTMLHelper::_('behavior.multiselect');
 // HTMLHelper::_('formbehavior.chosen', 'select');
@@ -36,9 +37,8 @@ $user  = Factory::getApplication()->getIdentity();
 $userId    = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
-$saveOrder = $listOrder == 'a.ordering';
 
-$cvlink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
+$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
 $tvlink = '';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
@@ -49,11 +49,6 @@ if (strpos($listOrder, 'modified') !== false) {
     $dateOrderCol = 'created';
 } else {
     $dateOrderCol = 'modified';
-}
-
-if ($saveOrder && !empty($this->items)) {
-    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=tracks.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
-    HTMLHelper::_('draggablelist.draggable');
 }
 
 ?>
@@ -82,92 +77,50 @@ function stopProp(event) {
 				<?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?>
 			</div>
 		<?php else : ?>
-			<?php $rowcnt = count($this->items); ?>	
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo 'Sorted by '.$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',true).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
           		<p class="xbtr xbnote xbmb5">Auto close details dropdowns<input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
           		</p>
           	</div>
-			
-			<table class="table table-striped table-hover xbtablelist" id="xbtrackList">
-    			<colgroup>
-					<col class="center hidden-phone" style="width:25px;"><!-- checkbox -->
-					<col class="nowrap center" style="width:95px;"><!-- status -->
-    				<col ><!-- title, alias, filename, rec/rel dates -->
-    				<col style="width:105px;"><!-- artwork -->
-    				<col ><!-- Albums, Artists, Playlists -->
-    				<col class="nowrap hidden-phone" style="width:110px;" ><!-- category & tags -->
-    				<col class="nowrap hidden-phone xbtc" style="width:160px; padding:0;"><!-- date & id -->
-    			</colgroup>	
+			<div class="table-scroll">
+			<table class="table table-striped table-hover xbtablelist table-freeze" id="xbtrackList">
 				<thead>
 					<tr>
-						<th >
+						<th class="center " style="width:25px;" >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
-						<th >
+						<th class="nowrap center " style="width:95px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
 						</th>
 						<th >
-							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>, 
 							<span class="xb09">
-								<?php echo Text::_('Recording'); ?> &amp;  
-								<?php echo HTMLHelper::_('searchtools.sort', 'Release', 'a.rel_date', $listDirn, $listOrder); ?>
-								<?php echo Text::_('dates');?>
+								<?php echo Text::_('Filename'); ?>, 
+								<?php echo HTMLHelper::_('searchtools.sort', 'Dates', 'a.rel_date', $listDirn, $listOrder); ?>
 							</span>
 						</th>
-						<th>Artwork
+						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
 						</th>
-						<th><?php echo HTMLHelper::_('searchtools.sort', 'Album', 'album.title', $listDirn, $listOrder); ?>, 
+						<th class=""><?php echo HTMLHelper::_('searchtools.sort', 'Album', 'album.title', $listDirn, $listOrder); ?>, 
 						<?php echo Text::_('Song(s)'); ?>,
 						<?php echo HTMLHelper::_('searchtools.sort', 'Artist', 'a.sortartist', $listDirn, $listOrder); ?>, 
 						<?php echo Text::_('Playlists'); ?>
 						</th>
-						<th >
+						<th class="nowrap " style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
 							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
 						</th>
-						<th style="padding:0; text-align:center;"><span class="xb09">
+						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xb09">
 							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
 							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 							</span>
 						</th>
 					</tr>
 				</thead>
-				<?php if ($rowcnt > 9) : ?>
-					<tfoot>
-    					<tr>
-    						<th >
-    							<?php echo HTMLHelper::_('grid.checkall'); ?>
-    						</th>
-    						<th >
-    							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
-    						</th>
-						<th >
-							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
-							Recording &amp; release dates
-						</th>
-						<th>Artwork
-						</th>
-						<th>Album(s), Artist(s), Playlists
-						</th>
-						<th>folder, filename
-						</th>
-    						<th >
-    							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
-    							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
-    						</th>
-    						<th style="padding:0; text-align:center;"><span class="xb09">
-    							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
-    							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
-    							</span>
-    						</th>
-    					</tr>
-					</tfoot>
-				<?php endif; //rowcnt ?>
 				<body>
 				<?php foreach ($this->items as $i => $item) :
     				$item->max_ordering = 0;
@@ -312,7 +265,7 @@ function stopProp(event) {
 						<td>
 						<?php if ($item->catid > 0) : ?>
     						<p>
-    							<a class="xblabel label-cat" href="<?php echo $cvlink.$item->catid; ?>" 
+    							<a class="xblabel label-cat" href="<?php echo $celink.$item->catid; ?>" 
     								title="<?php echo Text::_( 'XB_VIEW_CATEGORY' );?>::<?php echo $item->category_title; ?>">
     								<?php echo $item->category_title; ?>
     							</a>							
@@ -337,6 +290,7 @@ function stopProp(event) {
 				</body>
 			
 			</table>
+			</div>
 			<?php // Load the batch processing form. ?>
 			<?php if ($user->authorise('core.create', 'com_xbmusic')
 				&& $user->authorise('core.edit', 'com_xbmusic')
