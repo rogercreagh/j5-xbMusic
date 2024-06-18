@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Tracks/HtmlView.php
- * @version 0.0.4.3 30th April 2024
+ * @version 0.0.6.15 18th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -68,7 +68,7 @@ class HtmlView extends BaseHtmlView {
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_TRACKS_TITLE'), 'fas fa-link');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_TRACKS_TITLE'), 'fas fa-guitar');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         

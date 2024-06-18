@@ -292,7 +292,11 @@ class SongsModel extends ListModel {
                         $item->ext_links_list = $item->ext_links_list.'</ul>';                        
                     }
                 } //end if is_object
-                $item->tracks = $this->getTracks($item->id);
+                $item->tracks = $this->getSongTracksAlbums($item->id);
+                foreach ($item->tracks as &$track) {
+                    $artists = $this->getTrackArtists($track['trackid']);
+                    $track['artists'] = $artists;
+                }
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.song' , $item->id);     
                 
@@ -305,8 +309,8 @@ class SongsModel extends ListModel {
     public function getTracks($id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.filename AS trackname, t.rec_date AS rec_date, '
-            .' GROUP_CONCAT(p.name SEPARATOR '.$db->q(' | ').') AS performers, '
+        $query->select('t.id AS trackid, t.filename AS trackname, t.rel_date AS rel_date, '
+            .' GROUP_CONCAT(CONCAT(p.id,'|'.p.name) SEPARATOR '.$db->q(' | ').') AS performers, '
             .' st.note AS note, al.id AS albumid, al.title AS albumtitle');
         $query->from('#__xbmusic_tracks AS t');
         $query->join('LEFT','#__xbmusic_songtrack AS st ON st.track_id = t.id');
@@ -318,5 +322,30 @@ class SongsModel extends ListModel {
         $db->setQuery($query);
         return $db->loadAssocList();
     }
+
+    public function getSongTracksAlbums($sid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('t.id AS trackid, t.filename AS trackname, t.rel_date AS rel_date, '
+            .' st.note AS note, al.id AS albumid, al.title AS albumtitle');
+        $query->from('#__xbmusic_tracks AS t');
+        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_albums AS al ON al.id = t.album_id');
+        $query->where('st.song_id = '.$sid);
+        $query->order('t.rel_date DESC, t.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();       
+    }
     
+    public function getTrackArtists($tid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('a.id AS artistid, a.name AS name, b.role AS role, b.note AS stnote, b.listorder');
+        $query->from('#__xbmusic_artists AS a');
+        $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+        $query->where('b.track_id = '.$tid);
+        $query->order('b.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList('');
+    }
 }

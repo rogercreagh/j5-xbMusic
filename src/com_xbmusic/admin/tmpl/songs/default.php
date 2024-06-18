@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/songs/default.php
- * @version 0.0.6.14 12th June 2024
+ * @version 0.0.6.15 19th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -107,9 +107,9 @@ if (strpos($listOrder, 'modified') !== false) {
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
-							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
+							 &amp; <?php echo Text::_('XB_TAGS'); ?>
 						</th>
-						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xb09">
+						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xbr09">
 							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
 							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 							</span>
@@ -174,21 +174,28 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',2).$item->trkcnt.($item->trkcnt==1)? Xbtext::_('track',1) : Xbtext::_('tracks',1); ?>
-								</p>
+								<?php if($item->trkcnt > 0): ?>
+    								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',2).$item->trkcnt; 
+    								    echo ($item->trkcnt==1)? Xbtext::_('track',1) : Xbtext::_('tracks',1); ?>
+    								</p>
+								<?php endif; ?>
 							</div>
 						</td>
-						<td onclick="stopProp(event);"><?php if (count($item->tracks) > 1) : ?>
-								<details class="xb09">
+						<td class="xbr09" onclick="stopProp(event);"><?php if (count($item->tracks) > 1) : ?>
+								<details>
 									<summary><?php echo Text::sprintf('XBMUSIC_SONG_RECORDINGS',count($item->tracks)); ?></summary>
-									<ul>
+									<ul style="margin:5px;">
 									<?php foreach ($item->tracks as $track) : ?>
 										<li><a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['trackid']; ?>">
 							                <?php echo $track['trackname']; ?></a> 
 							                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
-							                <?php if($track['performers']) : ?>
-							                	<br /><span class="xbit xbpl20"><?php echo '<br />'.Xbtext::_('by',2).$track['performers']; ?>
-							                <?php endif; ?>
+            				                <?php if($track['artists']) : ?>
+            				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2); ?></span>
+            				                	<?php foreach ($track['artists'] as $artist) : ?>
+                				                	<a href="index.php?option=com_xbmusic&task=aartist.edit&retview=songs&id=<?php echo $artist['artistid']; ?>">
+                				                	<?php echo $artist['name']; ?></a>				                	    
+            				                	<?php endforeach; ?>
+            				                <?php endif; ?>			                
 							                <?php if($track['albumid']>0) : ?>
 							                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('on',2); ?>
 							                	<a href="index.php?option=com_xbmusic&task=album.edit&retview=songs&id=<?php echo $track['albumid']; ?>">
@@ -203,8 +210,12 @@ if (strpos($listOrder, 'modified') !== false) {
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $item->tracks[0]['trackid']; ?>">
 				                <?php echo $track['trackname']; ?></a> 
 				                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
-				                <?php if($track['performers']) : ?>
-				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2).$track['performers']; ?>	
+				                <?php if($track['artists']) : ?>
+				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2); ?></span>
+				                	<?php foreach ($track['artists'] as $artist) : ?>
+    				                	<a href="index.php?option=com_xbmusic&task=aartist.edit&retview=songs&id=<?php echo $artist['artistid']; ?>">
+    				                	<?php echo $artist['name']; ?></a>				                	    
+				                	<?php endforeach; ?>
 				                <?php endif; ?>			                
 				                <?php if($track['albumid']>0) : ?>
 				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('on',2); ?></span>
@@ -234,7 +245,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						<?php endforeach; ?>
 						</ul>						    											
 						</td>
-						<td class="nowrap xb09" style="padding:6px 0; text-align:center;">
+						<td class="nowrap xbr09" style="padding:6px 0; text-align:center;">
 							<?php
 							$date = $item->{$dateOrderCol};
 							echo $date > 0 ? HTMLHelper::_('date', $date, Text::_('D d M \'y')) : '-';

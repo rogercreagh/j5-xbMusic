@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.14 16th June 2024
+ * @version 0.0.6.15 19th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -683,15 +683,14 @@ class XbmusicHelper extends ComponentHelper
 	 */
 	public static function uniqueNestedArray($array, $key) : array {
 	    $uniq_array = array();
-	    $key_array = array();
-	    
+	    $key_array = array();	    
 	    foreach($array as $key1=>$val1) {
 	        if (!in_array($val1[$key], $key_array)) {
 	            $key_array[] = $val1[$key];
 	            $uniq_array[$key1] = $val1;
 	        }
 	    }
-	    return array($uniq_array);
+	    return $uniq_array;
 	}
 	
 	/**

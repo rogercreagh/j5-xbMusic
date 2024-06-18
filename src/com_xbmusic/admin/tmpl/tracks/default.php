@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.6.14 12th June 2024
+ * @version 0.0.6.15 18th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -98,23 +98,24 @@ function stopProp(event) {
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>, 
-							<span class="xb09">
+							<span class="xbr09">
 								<?php echo Text::_('Filename'); ?>, 
 								<?php echo HTMLHelper::_('searchtools.sort', 'Dates', 'a.rel_date', $listDirn, $listOrder); ?>
+								<?php echo HTMLHelper::_('searchtools.sort', 'Artist', 'a.sortartist', $listDirn, $listOrder); ?>
 							</span>
 						</th>
 						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
 						</th>
 						<th class=""><?php echo HTMLHelper::_('searchtools.sort', 'Album', 'album.title', $listDirn, $listOrder); ?>, 
 						<?php echo Text::_('Song(s)'); ?>,
-						<?php echo HTMLHelper::_('searchtools.sort', 'Artist', 'a.sortartist', $listDirn, $listOrder); ?>, 
+						<?php echo Text::_('Performers'); ?>, 
 						<?php echo Text::_('Playlists'); ?>
 						</th>
 						<th class="nowrap " style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
-							<span class="xbnit xb09">(<?php echo lcfirst(Text::_('XB_GROUP')); ?>)</span> - <?php echo Text::_('XB_TAGS'); ?>
+							&amp; <?php echo Text::_('XB_TAGS'); ?>
 						</th>
-						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xb09">
+						<th class="nowrap xbtc center " style="width:160px; padding:0;"><span class="xbr09">
 							<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_HEADING_DATE_' . strtoupper($dateOrderCol), 'a.' . $dateOrderCol, $listDirn, $listOrder); ?>
 							<br /><?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 							</span>
@@ -194,6 +195,8 @@ function stopProp(event) {
     									<?php echo Text::_('Rel.'); ?>: <?php echo XbmusicHelper::strDateReformat($item->rel_date); ?>
     								<?php endif; ?>
 								</span>
+								<br /><span class="xbr09"><span class="xbit"><?php echo Text::_('Artist')?></span>: 
+								<?php echo $item->sortartist; ?></span>
 								</p>
 							</div>
 						</td>
@@ -201,16 +204,20 @@ function stopProp(event) {
 								<img src="<?php echo $item->artwork; ?>" style="height:100px;" />
 							<?php endif; ?>
 						</td>
-						<td onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
+						<td class="xbr09" onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
 							<i><?php echo Text::_('Album'); ?></i>: 
-							<a href="index.php?option=com_xbmusic&task=album.edit&retview=tracks&id=<?php echo $item->albumid; ?>" title="Edit">
-								<?php echo ($item->albumid >0) ? $item->albumtitle : '<i>'.Text::_('album not listed').'</i>'; ?>
-							</a>
+							<?php if ($item->albumid >0) : ?>
+    							<a href="index.php?option=com_xbmusic&task=album.edit&retview=tracks&id=<?php echo $item->albumid; ?>" title="Edit">
+    								<?php echo $item->albumtitle; ?>
+    							</a>
+							<?php else: ?>
+								<i><?php echo Text::_('album not listed'); ?></i>
+							<?php endif; ?>
 							
 							<hr class="xbmt5 xbmb5" />
 							<?php if(count($item->songs)>0) : ?>
     							<?php if (count($item->songs) > 1) : ?>
-    								<details class="xb09">
+    								<details>
     									<summary><?php echo Text::sprintf('XBMUSIC_MEDLEY_OF_SONGS',count($item->songs)); ?></summary>
     									<ul>
     									<?php foreach ($item->songs as $song) : ?>
@@ -226,13 +233,13 @@ function stopProp(event) {
     								</a>
     							<?php endif; ?>
 							<?php else: ?>
-								<span class="xbnit"><?php echo Text::_('song link missing'); ?></span>
+								<span class="xbnit"><?php echo Text::_('no song linked'); ?></span>
 							<?php endif; ?>
 							
 							<hr class="xbmt5 xbmb5" />
 							<?php if(count($item->artists)>0) : ?>
     							<?php if (count($item->artists) > 1) : ?>
-    								<details class="xb09">
+    								<details>
     									<summary><?php echo count($item->artists).' '.Text::_('Performers listed'); ?></summary>
     									<ul>
     									<?php foreach ($item->artists as $artist) : ?>
@@ -247,10 +254,11 @@ function stopProp(event) {
     									<?php echo $item->artists[0]['name']; ?>
     								</a>
     							<?php endif; ?>
-							<?php else: ?>
-    							<i><?php echo Text::_('Main Artist'); ?></i>: 
-    								<?php echo ($item->sortartist !='') ? $item->sortartist: '<i>'.Text::_('sort name missing').'</i>'; ?>
-								<br /><span class="xbnit"><?php echo Text::_('no artist links'); ?></span>
+							<?php elseif($item->sortartist !='') : ?>
+    							<i><?php echo Text::_('Album Artist'); ?></i>: 
+    								<?php echo $item->sortartist; ?>
+    						<?php else : ?>
+								<span class="xbnit"><?php echo Text::_('no artist linked'); ?></span>
 							<?php endif; ?>
 							
 								
@@ -279,7 +287,7 @@ function stopProp(event) {
 						<?php endforeach; ?>
 						</ul>						    											
 						</td>
-						<td class="nowrap xb09" style="padding:6px 0; text-align:center;">
+						<td class="nowrap xbr09" style="padding:6px 0; text-align:center;">
 							<?php
 							$date = $item->{$dateOrderCol};
 							echo $date > 0 ? HTMLHelper::_('date', $date, Text::_('D d M \'y')) : '-';
