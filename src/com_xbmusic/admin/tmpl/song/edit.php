@@ -102,7 +102,7 @@ $input = Factory::getApplication()->getInput();
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
 		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
 		           				</div>
-								<div id="pv_desc" class="xbbox xbboxwht" style="height:80%; overflow-y:scroll;">
+								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
         					</div> 
         				</div>

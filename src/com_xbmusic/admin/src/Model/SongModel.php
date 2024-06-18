@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.6.14 12th June 2024
+ * @version 0.0.6.16 18th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -197,12 +197,32 @@ class SongModel extends AdminModel {
         
     public function save($data) {
         $app    = Factory::getApplication();
-        //$input  = $app->getInput();
+        $input  = $app->getInput();
         $params = ComponentHelper::getParams('com_xbmusic');
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
 
+        if ($input->get('task') == 'save2copy') {
+            $origTable = clone $this->getTable();
+            $origTable->load($input->getInt('id'));
+            
+            if ($data['title'] == $origTable->title) {
+                list($title, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['title']);
+                $data['title'] = $title;
+                $data['alias'] = $alias;
+            } else {
+                if ($data['alias'] == $origTable->alias) {
+                    $data['alias'] = '';
+                }
+            }
+            //need to add tracklinks
+            $this->storeSongTracks($origTable->id, $data['tracklist']);
+            // standard Joomla practice is to set the new copy record as unpublished
+            $data['status'] = 0;
+        }
+        
+       
         //alias is the title so we'll set and check it every time
         $newalias = OutputFilter::stringURLSafe($data['title']);
         if (($data['id'] == 0) && XbmusicHelper::checkValueExists($newalias, '#__xbmusic_songs', 'alias')) {

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Song/HtmlView.php
- * @version 0.0.6.0 15th May 2024
+ * @version 0.0.6.16 18th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -89,6 +89,7 @@ class HtmlView extends BaseHtmlView {
             $toolbar->apply('song.apply');
             $toolbar->save('song.save');
         }
+        ToolbarHelper::save2copy('song.save2copy');
         
         $toolbar->cancel('song.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
