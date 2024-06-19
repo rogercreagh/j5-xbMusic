@@ -1,14 +1,14 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/src/View/Songs/HtmlView.php
- * @version 0.0.5.0 15th May 2024
+ * @filesource admin/src/View/Albums/HtmlView.php
+ * @version 0.0.7.0 18th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
-namespace Crosborne\Component\Xbmusic\Administrator\View\Songs;
+namespace Crosborne\Component\Xbmusic\Administrator\View\Albums;
 
 defined('_JEXEC') or die;
 
@@ -59,13 +59,13 @@ class HtmlView extends BaseHtmlView {
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_SONGS_TITLE'), 'fas fa-music');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_ALBUMS_TITLE'), 'fas fa-compact-disc');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
         if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0)
         {
-            ToolbarHelper::addNew('song.add');
+            ToolbarHelper::addNew('album.add');
         }
         
         if ($canDo->get('core.edit.state') ) {
@@ -78,16 +78,16 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            $childBar->publish('songs.publish')->listCheck(true);
+            $childBar->publish('albums.publish')->listCheck(true);
             
-            $childBar->unpublish('songs.unpublish')->listCheck(true);
+            $childBar->unpublish('albums.unpublish')->listCheck(true);
             
-            $childBar->archive('songs.archive')->listCheck(true);
+            $childBar->archive('albums.archive')->listCheck(true);
             
             if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('songs.trash');
+                $childBar->trash('albums.trash');
             }
-            $childBar->checkin('songs.checkin');
+            $childBar->checkin('albums.checkin');
                 
         }
         
@@ -98,16 +98,16 @@ class HtmlView extends BaseHtmlView {
         ->buttonClass('btn btn-action')
         ->listCheck(false);
         $childBar = $dropdown->getChildToolbar();
-        $childBar->standardButton('dashboardview', 'Dashboard', 'songs.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
-        $childBar->standardButton('albumsview', 'Albums', 'songs.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
-        $childBar->standardButton('artistsview', 'Artists', 'songs.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistview', 'Playlists', 'songs.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
-        $childBar->standardButton('tracksview', 'Tracks', 'songs.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('catsview', 'Categories', 'songs.toCats')->listCheck(false)->icon('far fa-folder-open') ;
-        $childBar->standardButton('tagsview', 'Tags', 'songs.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        $childBar->standardButton('dashboardview', 'Dashboard', 'albums.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('songsview', 'Songs', 'albums.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('artistsview', 'Artists', 'albums.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistview', 'Playlists', 'albums.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('tracksview', 'Tracks', 'albums.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'Categories', 'albums.toCats')->listCheck(false)->icon('far fa-folder-open') ;
+        $childBar->standardButton('tagsview', 'Tags', 'albums.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('songs.delete', 'JTOOLBAR_EMPTY_TRASH')
+            $toolbar->delete('albums.delete', 'JTOOLBAR_EMPTY_TRASH')
             ->message('JGLOBAL_CONFIRM_DELETE')
             ->listCheck(true);
         }
@@ -124,7 +124,7 @@ class HtmlView extends BaseHtmlView {
             ToolbarHelper::preferences('com_xbmusic');
         }
         
-        $toolbar->help('xbMusic:Songs',false,'https://crosborne.uk/xbmusic/doc#albums');
+        $toolbar->help('xbMusic:Albums',false,'https://crosborne.uk/xbmusic/doc#albums');
         
     }
     

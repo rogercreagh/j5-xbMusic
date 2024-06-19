@@ -94,7 +94,7 @@ function stopProp(event) {
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
 						<th class="nowrap center " style="width:95px;" >
-							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.state', $listDirn, $listOrder); ?>
+							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.status', $listDirn, $listOrder); ?>
 						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>, 
