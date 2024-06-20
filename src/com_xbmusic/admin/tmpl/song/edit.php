@@ -107,8 +107,6 @@ $input = Factory::getApplication()->getInput();
         					</div> 
         				</div>
         			</div>
-            		<?php echo $this->form->renderField('ext_links');?>
-           		
 	   			</div>
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
@@ -141,6 +139,8 @@ $input = Factory::getApplication()->getInput();
 					Playlists
 				</div>
     		</div>
+            		<?php echo $this->form->renderField('ext_links');?>
+           		
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
          
 

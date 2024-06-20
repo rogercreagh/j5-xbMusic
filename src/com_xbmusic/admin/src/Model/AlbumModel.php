@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Model/SongModel.php
- * @version 0.0.6.16 18th June 2024
+ * @filesource admin/src/Model/AlbumModel.php
+ * @version 0.0.8.0 20th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -33,9 +33,9 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use \SimpleXMLElement;
 use Symfony\Component\Validator\Constraints\IsNull;
 
-class SongModel extends AdminModel {
+class AlbumModel extends AdminModel {
   
-    public $typeAlias = 'com_xbmusic.song';
+    public $typeAlias = 'com_xbmusic.album';
     
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
@@ -48,10 +48,10 @@ class SongModel extends AdminModel {
     
     protected function batchUntag($value, $pks, $contexts) {
         $taghelper = new TagsHelper();
-        $message = 'tag:'.$value.' removed from songs :';
+        $message = 'tag:'.$value.' removed from albums :';
         foreach ($pks as $pk) {
             if ($this->user->authorise('core.edit', $contexts[$pk])) {
-                $existing = $taghelper->getItemTags('com_xbmusic.song', $pk, false);
+                $existing = $taghelper->getItemTags('com_xbmusic.album', $pk, false);
                 $oldtags = array_column($existing,'tag_id');
                 $newtags = array();
                 for ($i = 0; $i<count($oldtags); $i++) {
@@ -78,29 +78,29 @@ class SongModel extends AdminModel {
             return false;
         }
         
-        return $this->getCurrentUser()->authorise('core.delete', 'com_xbmusic.song.' . (int) $record->id);
+        return $this->getCurrentUser()->authorise('core.delete', 'com_xbmusic.album.' . (int) $record->id);
     }
     
     protected function canEditState($record) {
         $user = $this->getCurrentUser();
         
-        // Check for existing song.
+        // Check for existing album.
         if (!empty($record->id)) {
-            return $user->authorise('core.edit.state', 'com_xbmusic.song.' . (int) $record->id);
+            return $user->authorise('core.edit.state', 'com_xbmusic.album.' . (int) $record->id);
         }
         
-        // New song, so check against the category.
+        // New album, so check against the category.
         if (!empty($record->catid)) {
             return $user->authorise('core.edit.state', 'com_xbmusic.category.' . (int) $record->catid);
         }
         
-        // Default to component settings if neither song nor category known.
+        // Default to component settings if neither album nor category known.
         return parent::canEditState($record);
     }
     
     protected function prepareTable($table) {
         
-        // Reorder the songs within the category so the new song is first
+        // Reorder the albums within the category so the new album is first
         if (empty($table->id)) {
             $table->reorder('catid = ' . (int) $table->catid . ' AND status >= 0');
         }
@@ -110,7 +110,7 @@ class SongModel extends AdminModel {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
-                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.song');                
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.album');                
             }
         }        
         return $item;
@@ -121,14 +121,14 @@ class SongModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         
         // Get the form.
-        $form = $this->loadForm('com_xbmusic.song', 'song', ['control' => 'jform', 'load_data' => $loadData]);
+        $form = $this->loadForm('com_xbmusic.album', 'album', ['control' => 'jform', 'load_data' => $loadData]);
         
         if (empty($form)) {
             return false;
         }
         
         //dynamically add fields for any taggroups defined in options
-        $parentids = $params->get('songtagparents',[]);
+        $parentids = $params->get('albumtagparents',[]);
         if (!empty($parentids)) {
             $taghelp = new TagsHelper;
             $parr = $taghelp->getTags($parentids);
@@ -144,15 +144,15 @@ class SongModel extends AdminModel {
     protected function loadFormData() {
         // Check the session for previously entered form data.
         $app  = Factory::getApplication();
-        $data = $app->getUserState('com_xbmusic.edit.song.data', []);
+        $data = $app->getUserState('com_xbmusic.edit.album.data', []);
         
         if (empty($data)) {
             $data = $this->getItem();
-            $data->tracklist = $this->getSongTrackList();
+            $data->tracklist = $this->getAlbumTrackList($data->id);
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
-            if (($this->getState('song.id') == 0) && ($retview != '')) {
+            if (($this->getState('album.id') == 0) && ($retview != '')) {
                 $filters = (array) $app->getUserState('com_xbmusic.'.$retview.'.filter');
                 $data->set(
                     'status',
@@ -177,7 +177,7 @@ class SongModel extends AdminModel {
             //copy any tags in a taggroup folder back to their control
             $tagsHelper = new TagsHelper;
             $params = ComponentHelper::getParams('com_xbmusic');
-            $parentids = $params->get('songtagparents',[]);
+            $parentids = $params->get('albumtagparents',[]);
             if ((!empty($data->tags)) && (!empty($parentids))) {
                 $parr = $tagsHelper->getTags($parentids);
                 foreach ($parr as $pid=>$parent) {
@@ -216,8 +216,8 @@ class SongModel extends AdminModel {
                     $data['alias'] = '';
                 }
             }
-            //need to add tracklinks
-            $this->storeSongTracks($origTable->id, $data['tracklist']);
+            //need to add albumlinks
+            $this->storeAlbumTracks($origTable->id, $data['tracklist']);
             // standard Joomla practice is to set the new copy record as unpublished
             $data['status'] = 0;
         }
@@ -225,8 +225,8 @@ class SongModel extends AdminModel {
        
         //alias is the title so we'll set and check it every time
         $newalias = OutputFilter::stringURLSafe($data['title']);
-        if (($data['id'] == 0) && XbmusicHelper::checkValueExists($newalias, '#__xbmusic_songs', 'alias')) {
-            $warnmsg .= 'Duplicate alias - this song title is already in the database';
+        if (($data['id'] == 0) && XbmusicHelper::checkValueExists($newalias, '#__xbmusic_albums', 'alias')) {
+            $warnmsg .= 'Duplicate alias - this album title is already in the database';
             $app->enqueueMessage($warnmsg,'Error');
             return false;
         }
@@ -237,7 +237,7 @@ class SongModel extends AdminModel {
         }
         
         //merge any tag groups back into tags
-        $parentids = $params->get('songtagparents',[]);
+        $parentids = $params->get('albumtagparents',[]);
         if (!empty($parentids)) {
             $thelp = new TagsHelper;
             $parr = $thelp->getTags($parentids);
@@ -248,10 +248,10 @@ class SongModel extends AdminModel {
             }
         } // endforeach parenttag
         
-        // ok ready to save the song data
+        // ok ready to save the album data
         if (parent::save($data)) {
-            $sid = $this->getState('song.id');
-            $this->storeSongTracks($sid, $data['tracklist']);
+            $sid = $this->getState('album.id');
+            $this->storeAlbumTracks($sid, $data['tracklist']);
             // Check possible workflow
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
@@ -262,7 +262,7 @@ class SongModel extends AdminModel {
     }
     
     protected function preprocessForm(Form $form, $data, $group = 'content') {
-        Factory::getApplication()->getSession()->set('songtitle', $data->title);
+        Factory::getApplication()->getSession()->set('albumtitle', $data->title);
         if ($this->canCreateCategory()) {
             $form->setFieldAttribute('catid', 'allowAdd', 'true');
             
@@ -292,33 +292,29 @@ class SongModel extends AdminModel {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
     }
     
-    public function getSongTrackList() {
-        $db = $this->getDbo();
+    public function getAlbumTrackList($album_id) {
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('a.id as track_id, ba.note AS note, ba.listorder AS oldorder');
-        $query->from('#__xbmusic_songtrack AS ba');
-        $query->innerjoin('#__xbmusic_tracks AS a ON ba.track_id = a.id');
-        $query->where('ba.song_id = '.(int) $this->getItem()->id);
-        $query->order('a.title ASC');
+        $query->select('t.id AS track_id, t.discno AS disc_no, t.trackno AS track_no');
+        $query->from('#__xbmusic_tracks AS t');
+        $query->where('t.album_id = '.$db->q($album_id));
+        $query->order('t.discno, t.trackno, t.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }
     
-    function storeSongTracks($song_id, $trackList) {
-        //delete existing role list
-        $db = $this->getDbo();
+    function storeAlbumTracks($album_id, $trackList) {
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_songtrack'));
-        $query->where('song_id = '.$song_id);
-        $db->setQuery($query);
-        $db->execute();
         //restore the new list
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
-                $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_songtrack'));
-                $query->columns('song_id,track_id,note,listorder');
-                $query->values('"'.$song_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$trk['oldorder'].'"');
+                $query->clear();
+                $query->update('#__xbmusic_tracks')
+                    ->set('album_id = '.$db->q($album_id))
+                    ->set('trackno = '.$db->q($trk['track_no']))
+                    ->set('discno = '.$db->q($trk['disc_no']));
+                $query->where('id = '.$db->q($trk['track_id']));
                 //try
                 $db->setQuery($query);
                 $db->execute();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.6.15 19th June 2024
+ * @version 0.0.8.0.20th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -531,7 +531,7 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static function penPont() {
 	    $params = ComponentHelper::getParams('com_xbmusic');
-	    $beer = trim($params->get('roger_beer'));
+	    $beer = trim($params->get('roger_beer',''));
 	    if ($beer == '') return false;
 	    //Factory::getApplication()->enqueueMessage(password_hash($beer));
 	    //$hashbeer = $params->get('penpont');

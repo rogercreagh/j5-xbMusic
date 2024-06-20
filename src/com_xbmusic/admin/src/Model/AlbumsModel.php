@@ -281,7 +281,7 @@ class AlbumsModel extends ListModel {
         if ($items) {
             $tagsHelper = new TagsHelper;
             foreach ($items as $item) {
-                $item->ext_links = json_decode($item->ext_links);
+                if($item->ext_links) $item->ext_links = json_decode($item->ext_links);
                 $item->ext_links_list ='';
                 $item->ext_links_cnt = 0;
                 if(is_object($item->ext_links)) {

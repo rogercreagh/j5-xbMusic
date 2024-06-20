@@ -1,14 +1,14 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/View/Song/HtmlView.php
- * @version 0.0.6.16 18th June 2024
+ * @filesource admin/src/View/Album/HtmlView.php
+ * @version 0.0.8.0 19th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
-namespace Crosborne\Component\Xbmusic\Administrator\View\Song;
+namespace Crosborne\Component\Xbmusic\Administrator\View\album;
 
 defined('_JEXEC') or die;
 
@@ -33,9 +33,19 @@ class HtmlView extends BaseHtmlView {
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
 //        $this->state = $this->get('State');
-        $this->canDo = ContentHelper::getActions('com_xbmusic', 'song', $this->item->id);
+        $this->canDo = ContentHelper::getActions('com_xbmusic', 'album', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');
+        
+        if ($this->params->get('use_xbmusic', 1)) {
+            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
+        } else {
+            if (is_dir(trim($this->params->get('music_path','')))) {
+                $this->basemusicfolder = trim($this->params->get('music_path'));
+            } else {
+                $this->basemusicfolder = JPATH_ROOT.'/';
+            }
+        }
                 
         // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
@@ -59,22 +69,21 @@ class HtmlView extends BaseHtmlView {
         $canDo = $this->canDo;
         
         ToolbarHelper::title(
-            Text::_('XBMUSIC_ADMIN_' . ($checkedOut ? 'VIEW_SONG_TITLE' : 'EDIT_SONG_TITLE')),
+            Text::_('XBMUSIC_ADMIN_' . ($checkedOut ? 'VIEW_ALBUM_TITLE' : 'EDIT_ALBUM_TITLE')),
             'pencil-alt'
             );
         
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         
         if (!$checkedOut && $itemEditable) {
-            $toolbar->apply('song.apply');
-            $toolbar->save('song.save');
+            $toolbar->apply('album.apply');
+            $toolbar->save('album.save');
         }
-        ToolbarHelper::save2copy('song.save2copy');
         
-        $toolbar->cancel('song.cancel', 'JTOOLBAR_CLOSE');
+        $toolbar->cancel('album.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
         $toolbar->inlinehelp();
-        $toolbar->help('Song: Edit',false,'https://crosborne.uk/xbmusic/doc#songedit');
+        $toolbar->help('Album: Edit',false,'https://crosborne.uk/xbmusic/doc#albumedit');
         
     }
 }
