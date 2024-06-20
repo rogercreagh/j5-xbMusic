@@ -15,6 +15,6 @@ use Joomla\CMS\Language\Text;
 <button type="button" class="btn" onclick="document.getElementById('batch-category-id').value='';document.getElementById('batch-tag-id').value=''" data-dismiss="modal">
 	<?php echo Text::_('JCANCEL'); ?>
 </button>
-<button type="submit" class="btn btn-success" onclick="Joomla.submitbutton('track.batch');">
+<button type="submit" class="btn btn-success" onclick="Joomla.submitbutton('album.batch');">
 	<?php echo Text::_('JGLOBAL_BATCH_PROCESS'); ?>
 </button>

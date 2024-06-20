@@ -138,7 +138,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<div style="float:left;">
                                 <?php
                                     $options = [
-                                        'task_prefix' => 'albums.',
+                                        'task_prefix' => 'album.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];

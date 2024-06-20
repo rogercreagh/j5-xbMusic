@@ -261,36 +261,36 @@ class AlbumModel extends AdminModel {
         return false;
     }
     
-    protected function preprocessForm(Form $form, $data, $group = 'content') {
-        Factory::getApplication()->getSession()->set('albumtitle', $data->title);
-        if ($this->canCreateCategory()) {
-            $form->setFieldAttribute('catid', 'allowAdd', 'true');
+//     protected function preprocessForm(Form $form, $data, $group = 'content') {
+//         Factory::getApplication()->getSession()->set('albumtitle', $data->title);
+//         if ($this->canCreateCategory()) {
+//             $form->setFieldAttribute('catid', 'allowAdd', 'true');
             
-            // Add a prefix for categories created on the fly.
-            $form->setFieldAttribute('catid', 'customPrefix', '#new#');
-        }
+//             // Add a prefix for categories created on the fly.
+//             $form->setFieldAttribute('catid', 'customPrefix', '#new#');
+//         }
         
-        parent::preprocessForm($form, $data, $group);
-    }
+//         parent::preprocessForm($form, $data, $group);
+//     }
     
-    public function saveorder($idArray = null, $lft_array = null)
-    {
-        // Get an instance of the table object.
-        $table = $this->getTable();
+//     public function saveorder($idArray = null, $lft_array = null)
+//     {
+//         // Get an instance of the table object.
+//         $table = $this->getTable();
         
-        if (!$table->saveorder($idArray, $lft_array))
-        {
-            $this->setError($table->getError());
+//         if (!$table->saveorder($idArray, $lft_array))
+//         {
+//             $this->setError($table->getError());
             
-            return false;
-        }
+//             return false;
+//         }
         
-        return true;
-    }
+//         return true;
+//     }
     
-    private function canCreateCategory() {
-        return $this->getCurrentUser()->authorise('core.create', 'com_content');
-    }
+//     private function canCreateCategory() {
+//         return $this->getCurrentUser()->authorise('core.create', 'com_content');
+//     }
     
     public function getAlbumTrackList($album_id) {
         $db = $this->getDatabase();

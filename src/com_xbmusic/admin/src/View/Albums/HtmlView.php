@@ -78,33 +78,18 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            $childBar->publish('albums.publish')->listCheck(true);
+            $childBar->publish('album.publish')->listCheck(true);
             
-            $childBar->unpublish('albums.unpublish')->listCheck(true);
+            $childBar->unpublish('album.unpublish')->listCheck(true);
             
-            $childBar->archive('albums.archive')->listCheck(true);
+            $childBar->archive('album.archive')->listCheck(true);
             
             if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('albums.trash');
+                $childBar->trash('album.trash');
             }
-            $childBar->checkin('albums.checkin');
+            $childBar->checkin('album.checkin');
                 
         }
-        
-        $dropdown = $toolbar->dropdownButton('views')
-        ->text('XBMUSIC_OTHER_VIEWS')
-        ->toggleSplit(false)
-        ->icon('icon-ellipsis-h')
-        ->buttonClass('btn btn-action')
-        ->listCheck(false);
-        $childBar = $dropdown->getChildToolbar();
-        $childBar->standardButton('dashboardview', 'Dashboard', 'albums.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
-        $childBar->standardButton('songsview', 'Songs', 'albums.toSongs')->listCheck(false)->icon('fas fa-music') ;
-        $childBar->standardButton('artistsview', 'Artists', 'albums.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistview', 'Playlists', 'albums.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
-        $childBar->standardButton('tracksview', 'Tracks', 'albums.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('catsview', 'Categories', 'albums.toCats')->listCheck(false)->icon('far fa-folder-open') ;
-        $childBar->standardButton('tagsview', 'Tags', 'albums.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
             $toolbar->delete('albums.delete', 'JTOOLBAR_EMPTY_TRASH')
@@ -118,6 +103,21 @@ class HtmlView extends BaseHtmlView {
             ->selector('collapseModal')
             ->listCheck(true);                        
         }
+        
+        $dropdown = $toolbar->dropdownButton('views')
+        ->text('XBMUSIC_OTHER_VIEWS')
+        ->toggleSplit(false)
+        ->icon('icon-ellipsis-h')
+        ->buttonClass('btn btn-action')
+        ->listCheck(false);
+        $childBar = $dropdown->getChildToolbar();
+        $childBar->standardButton('dashboardview', 'Dashboard', 'albums.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('artistsview', 'Artists', 'albums.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistview', 'Playlists', 'albums.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('songsview', 'Songs', 'albums.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('tracksview', 'Tracks', 'albums.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'Categories', 'albums.toCats')->listCheck(false)->icon('far fa-folder-open') ;
+        $childBar->standardButton('tagsview', 'Tags', 'albums.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');

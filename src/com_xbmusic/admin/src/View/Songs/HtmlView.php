@@ -78,17 +78,30 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            $childBar->publish('songs.publish')->listCheck(true);
+            $childBar->publish('song.publish')->listCheck(true);
             
-            $childBar->unpublish('songs.unpublish')->listCheck(true);
+            $childBar->unpublish('song.unpublish')->listCheck(true);
             
-            $childBar->archive('songs.archive')->listCheck(true);
+            $childBar->archive('song.archive')->listCheck(true);
             
             if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('songs.trash');
+                $childBar->trash('song.trash');
             }
-            $childBar->checkin('songs.checkin');
+            $childBar->checkin('song.checkin');
                 
+        }
+        
+        if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
+            $toolbar->delete('songs.delete', 'JTOOLBAR_EMPTY_TRASH')
+            ->message('JGLOBAL_CONFIRM_DELETE')
+            ->listCheck(true);
+        }
+                
+        if ($canDo->get('core.edit.state')) {
+            // Add a batch button
+            $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
+            ->selector('collapseModal')
+            ->listCheck(true);                        
         }
         
         $dropdown = $toolbar->dropdownButton('views')
@@ -105,19 +118,6 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('tracksview', 'Tracks', 'songs.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'Categories', 'songs.toCats')->listCheck(false)->icon('far fa-folder-open') ;
         $childBar->standardButton('tagsview', 'Tags', 'songs.toTags')->listCheck(false)->icon('fas fa-tags') ;
-        
-        if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('songs.delete', 'JTOOLBAR_EMPTY_TRASH')
-            ->message('JGLOBAL_CONFIRM_DELETE')
-            ->listCheck(true);
-        }
-                
-        if ($canDo->get('core.edit.state')) {
-            // Add a batch button
-            $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
-            ->selector('collapseModal')
-            ->listCheck(true);                        
-        }
         
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');

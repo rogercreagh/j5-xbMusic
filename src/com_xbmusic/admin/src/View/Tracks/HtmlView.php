@@ -100,6 +100,12 @@ class HtmlView extends BaseHtmlView {
                 
         }
         
+        if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
+            $toolbar->delete('tracks.delete', 'JTOOLBAR_EMPTY_TRASH')
+            ->message('JGLOBAL_CONFIRM_DELETE')
+            ->listCheck(true);
+        }
+                
         if ($canDo->get('core.edit.state')) {
             // Add a batch button
             $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
@@ -122,12 +128,6 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('catsview', 'Categories', 'tracks.toCats')->listCheck(false)->icon('far fa-folder-open') ;
         $childBar->standardButton('tagsview', 'Tags', 'tracks.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
-        if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('tracks.delete', 'JTOOLBAR_EMPTY_TRASH')
-            ->message('JGLOBAL_CONFIRM_DELETE')
-            ->listCheck(true);
-        }
-                
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');
             ToolbarHelper::preferences('com_xbmusic');

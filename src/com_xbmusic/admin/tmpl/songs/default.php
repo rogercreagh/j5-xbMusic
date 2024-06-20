@@ -138,7 +138,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<div style="float:left;">
                                 <?php
                                     $options = [
-                                        'task_prefix' => 'songs.',
+                                        'task_prefix' => 'song.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];
@@ -188,7 +188,7 @@ if (strpos($listOrder, 'modified') !== false) {
 									<?php foreach ($item->tracks as $track) : ?>
 										<li><a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $track['trackid']; ?>">
 							                <?php echo $track['trackname']; ?></a> 
-							                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
+							                <?php if($track['rel_date']) echo ' ('.$track['rel_date'].') '; ?>
             				                <?php if($track['artists']) : ?>
             				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2); ?></span>
             				                	<?php foreach ($track['artists'] as $artist) : ?>
@@ -209,7 +209,7 @@ if (strpos($listOrder, 'modified') !== false) {
 								<?php $track = $item->tracks[0]; ?>
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=songs&id=<?php echo $item->tracks[0]['trackid']; ?>">
 				                <?php echo $track['trackname']; ?></a> 
-				                <?php if($track['rec_date']) echo ' ('.$track->rec_date.') '; ?>
+				                <?php if($track['rel_date']) echo ' ('.$track['rel_date'].') '; ?>
 				                <?php if($track['artists']) : ?>
 				                	<br /><span class="xbit xbpl20"><?php echo Xbtext::_('by',2); ?></span>
 				                	<?php foreach ($track['artists'] as $artist) : ?>
