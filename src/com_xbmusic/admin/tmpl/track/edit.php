@@ -144,6 +144,7 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-9">
    					<div class="row xb09">
 		           		<div class="col-12 col-lg-5">
+    						<?php if (!empty($this->item->fileinfo)) : ?>
         					<fieldset id="filedets" class="xbbox xbboxwht xbyscroll">
         						<legend>File details</legend>
     		           			<dl class="xbdl">
@@ -165,6 +166,9 @@ $input = Factory::getApplication()->getInput();
     		           				<dd><?php echo number_format((1-$this->item->audioinfo->compression_ratio)*100,1).'%'; ?></dd>
     		           			</dl>
         					</fieldset>
+        					<?php else : ?>
+        						<p class="xbit"><?php echo Text::_('fileinfo not available from id3 data'); ?></p>
+        					<?php endif; ?>
 						</div>   					
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
@@ -210,15 +214,19 @@ $input = Factory::getApplication()->getInput();
 						<legend>Image details</legend>
     					<?php echo $this->form->renderField('image_type'); ?> 
     					<?php echo $this->form->renderField('image_desc'); ?> 
-						<dl class="xbdl">
-    						<dt><?php echo Text::_('Type'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_mime;?></dd>
-    						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_width;?>&nbsp;x&nbsp;
-    						<?php echo $this->item->imageinfo->image_height;?> px</dd>
-    						<dt><?php echo Text::_('Size'); ?>:</dt>
-    						<dd><?php echo number_format($this->item->imageinfo->datalength/1024, 2);?> kB</dd>
-						</dl>
+    					<?php if (!empty($this->item->imageinfo)) : ?>
+    						<dl class="xbdl">
+        						<dt><?php echo Text::_('Type'); ?>:</dt>
+        						<dd><?php echo $this->item->imageinfo->image_mime;?></dd>
+        						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
+        						<dd><?php echo $this->item->imageinfo->image_width;?>&nbsp;x&nbsp;
+        						<?php echo $this->item->imageinfo->image_height;?> px</dd>
+        						<dt><?php echo Text::_('Size'); ?>:</dt>
+        						<dd><?php echo number_format($this->item->imageinfo->datalength/1024, 2);?> kB</dd>
+    						</dl>
+    					<?php else : ?>
+    						<p class="xbit"><?php echo Text::_('imageinfo not available from id3 data'); ?></p>
+    					<?php endif; ?>
 					</fieldset>
 				</div>
         	</div>
@@ -236,14 +244,18 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('ID3 data')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-					<fieldset id="id3dets" class="xbbox xbboxwht ">
-						<legend>ID3 Comment Tags</legend>
-						<dl class="xbdl">
-                    		<?php foreach ($this->item->id3_tags as $key=>$value) : ?>
-                    			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
-                    		<?php endforeach; ?>        
-						</dl>
-					</fieldset>
+					<?php if (!empty($this->item->id3_tags)) : ?>
+    					<fieldset id="id3dets" class="xbbox xbboxwht ">
+    						<legend>ID3 Comment Tags</legend>
+    						<dl class="xbdl">
+                        		<?php foreach ($this->item->id3_tags as $key=>$value) : ?>
+                        			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                        		<?php endforeach; ?>        
+    						</dl>
+    					</fieldset>
+					<?php else : ?>
+						<p class="xbit"><?php echo Text::_('id3 data not yet loaded or not available'); ?></p>
+					<?php endif; ?>
         		</div>
         		<div class="col-12 col-md-7">
         			<p>Reload ID3, display new, if diff option to resave with new</p>

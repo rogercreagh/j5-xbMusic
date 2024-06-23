@@ -189,7 +189,7 @@ class HtmlView extends BaseHtmlView {
         if (count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }    
-        $this->updateable = false;
+        $this->updatable = false;
          // format the changelog
          $this->changelog = '<div style="margin:10px 0;">';
          if ((!is_array($changelog)) || (!$changelog)) {

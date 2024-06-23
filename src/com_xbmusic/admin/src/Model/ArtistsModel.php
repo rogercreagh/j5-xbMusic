@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.7.0 19th June 2024
+ * @filesource admin/src/Model/ArtistsModel.php
+ * @version 0.0.9.0 21st June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,7 +21,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class AlbumsModel extends ListModel {
+class ArtistsModel extends ListModel {
     
     public function __construct($config = array())
     {
@@ -29,7 +29,7 @@ class AlbumsModel extends ListModel {
         {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'title', 'a.title',
+                'name', 'a.name',
                 'alias', 'a.alias',
                 'checked_out', 'a.checked_out',
                 'checked_out_time', 'a.checked_out_time',
@@ -113,16 +113,16 @@ class AlbumsModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.subtitle, a.description, '
-                    .'a.albumartist, a.sortartist, a.artwork, a.format, a.rel_date, '
-                    .'a.num_discs, a.tot_tracks, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
+                'DISTINCT a.id, a.name, a.name, a.description, a.picture, '
+                    .'a.type, '
+                    .'a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
                     .'a.note'
                 )
             );
-        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_tracks AS tk WHERE tk.album_id = a.id) AS trkcnt');
-        $query->from('#__xbmusic_albums AS a');
+        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_artisttrack AS tk WHERE tk.artist_id = a.id) AS trkcnt');
+        $query->from('#__xbmusic_artists AS a');
                         
         // Join over the users for the checked out user.
         $query->select('uc.name AS editor')
@@ -214,7 +214,7 @@ class AlbumsModel extends ListModel {
 		    else
 		    {
 		        $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-		        $query->where('(a.title LIKE ' . $search . ' OR a.alias LIKE ' . $search . ')');
+		        $query->where('(a.name LIKE ' . $search . ' OR a.alias LIKE ' . $search . ')');
 		    }
 		} // endif $search 
 		
@@ -294,12 +294,9 @@ class AlbumsModel extends ListModel {
                         $item->ext_links_list = $item->ext_links_list.'</ul>';                        
                     }
                 } //end if is_object
-                $item->tracks = $this->getAlbumTracks($item->id);
-                $item->artists =[];
-                foreach ($item->tracks as $track) {
-                    $artists = $this->getTrackArtists($track['trackid']);
-                    $item->artists = array_merge($item->artists,$artists);
-                }
+                $item->singles = $this->getArtistSingles($item->id);
+                $item->albums = $this->getArtistAlbums($item->id);
+                $item->songs = $this->getArtistSongs($item->id);
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $item->id);     
                 
@@ -309,27 +306,41 @@ class AlbumsModel extends ListModel {
         
     } // end getItems
     
-    public function getAlbumTracks($aid) {
+    public function getArtistSingles($aid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.title AS trackname, CONCAT(t.pathname,"/",t.filename) AS pathfilename, t.sortartist, t.discno, t.trackno');
+        $query->select('t.id AS trackid, t.title AS tracktitle, t.artwork, t.rel_date');
+        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
-        $query->where('t.album_id = '.$aid);
-        $query->order('t.discno, t.trackno ASC');
+        $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
+        $query->order('t.rel_date, t.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }
 
-    public function getTrackArtists($tid) {
-         $db = $this->getDatabase();
-         $query = $db->getQuery(true);
-         $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
-         $query->from('#__xbmusic_artists AS a');
-         $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
-         $query->where('b.track_id = '.$tid);
-         $query->order('b.listorder ASC');
-         $db->setQuery($query);
-         return $db->loadAssocList('alias');
-        return false;
+    public function getArtistAlbums($aid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.artwork');
+        $query->from('#__xbmusic_albums AS a');
+        $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
+        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
+        $query->where('at.artist_id = '.$aid.' AND t.album_id > 0');
+        $query->order('a.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+    
+    public function getArtistSongs($aid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('s.id AS songid, s.title AS songtitle, s.composer');
+        $query->from('#__xbmusic_songs AS s');
+        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.song_id = s.id');
+        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = st.track_id');
+        $query->where('at.artist_id = '.$aid);
+        $query->order('s.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
     }
 }

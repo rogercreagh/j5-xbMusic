@@ -114,14 +114,14 @@ class TrackModel extends AdminModel {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');                
+                $id3data = json_decode($item->id3_data);
+                $item->id3_tags = $id3data->id3tags;
+                $item->audioinfo = $id3data->audioinfo;
+                $item->fileinfo = $id3data->fileinfo;
+                $item->imageinfo = $id3data->imageinfo;
+                $item->image_type = $id3data->imageinfo->picturetype;
+                $item->image_desc = $id3data->imageinfo->description;
             }
-            $id3data = json_decode($item->id3_data);
-            $item->id3_tags = $id3data->id3tags;
-            $item->audioinfo = $id3data->audioinfo;
-            $item->fileinfo = $id3data->fileinfo;
-            $item->imageinfo = $id3data->imageinfo;
-            $item->image_type = $id3data->imageinfo->picturetype;
-            $item->image_desc = $id3data->imageinfo->description;
         }        
         return $item;
     }

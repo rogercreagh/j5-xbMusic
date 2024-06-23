@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DashboardController.php
- * @version 0.0.4.3 30th April 2024
+ * @version 0.0.9.0 21st June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,6 +21,10 @@ class DashboardController extends AdminController
         return parent::getModel($name, $prefix, $config);
     }
 
+    //these redirect functions called from all list views 'other views' menu
+    public function toDashboard() {
+        $this->setRedirect('index.php?option=com_xbmusic&view=dashboard');
+    }
     public function toAlbums() {
         $this->setRedirect('index.php?option=com_xbmusic&view=albums');
     }

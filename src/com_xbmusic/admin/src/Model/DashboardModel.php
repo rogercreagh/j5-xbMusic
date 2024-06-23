@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.2.1 1st April 2024
+ * @version 0.0.9.0 22nd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -149,10 +149,22 @@ class DashboardModel extends ListModel {
         $query->select($db->qn('changelogurl'))->from('#__extensions')->where($db->qn('name').' = '.$db->q('com_xbmusic'));
         $db->setQuery($query);
         $url = $db->loadResult();
-        $xml = simplexml_load_file($url, null , LIBXML_NOCDATA);
-        $json = json_encode($xml);
-        $array = json_decode($json,TRUE);
+        $array = [];
+        if(XbmusicHelper::check_url($url)) {
+            $xml = simplexml_load_file($url, null , LIBXML_NOCDATA);
+            $json = json_encode($xml);
+            return json_decode($json,TRUE);
+        }
         return $array;
+    }
+    
+    public function urlExists($url) {
+        $file_headers = @get_headers($url);
+        if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
+            return false;
+        }
+        return true;
+        
     }
 
 }

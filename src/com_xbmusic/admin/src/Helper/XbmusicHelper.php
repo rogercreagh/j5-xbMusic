@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.8.0.20th June 2024
+ * @version 22nd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -503,6 +503,20 @@ class XbmusicHelper extends ComponentHelper
 	    }
 	    return true;
 	}
+	
+	/**
+	 * @name check_url()
+	 * @desc gets headers for url and returns true if status 300,301,302 returned
+	 * @param string $url
+	 * @return boolean
+	 */
+	public static function check_url(string $url) {
+	    $headers = @get_headers( $url);
+	    $headers = (is_array($headers)) ? implode( "\n ", $headers) : $headers;
+	    return (bool)preg_match('#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers);
+	}
+	
+	
 	
 /**
 	 * @name credit()
