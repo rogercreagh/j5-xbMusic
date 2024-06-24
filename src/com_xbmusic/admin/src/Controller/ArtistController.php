@@ -1,8 +1,8 @@
 <?php 
  /*******
  * @package xbMusic
- * @filesource admin/src/Controller/SongController.php
- * @version 0.0.8.0 19th June 2024
+ * @filesource admin/src/Controller/ArtistController.php
+ * @version 0.0.10.0 23rd June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,7 +19,7 @@ use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 
-class SongController extends FormController {
+class ArtistController extends FormController {
     
     public function __construct($config = array(), MVCFactoryInterface $factory = null, $app = null, $input = null) {
         
@@ -30,7 +30,7 @@ class SongController extends FormController {
         $ret = $this->input->get('retview');
         if ($ret) {
             $this->view_list = $ret;
-            $this->view_item = 'song&retview='.$ret;
+            $this->view_item = 'artist&retview='.$ret;
         }
     }
 
@@ -45,12 +45,12 @@ class SongController extends FormController {
         }
         
         // Check edit on the record asset (explicit or inherited)
-        if ($user->authorise('core.edit', 'com_xbmusic.song.' . $recordId)) {
+        if ($user->authorise('core.edit', 'com_xbmusic.artist.' . $recordId)) {
             return true;
         }
         
         // Check edit own on the record asset (explicit or inherited)
-        if ($user->authorise('core.edit.own', 'com_xbmusic.song.' . $recordId)) {
+        if ($user->authorise('core.edit.own', 'com_xbmusic.artist.' . $recordId)) {
             // Existing record already has an owner, get it
             $record = $this->getModel()->getItem($recordId);
             
@@ -68,9 +68,9 @@ class SongController extends FormController {
     public function checkin() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->checkin($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo );
     }
     
@@ -80,7 +80,7 @@ class SongController extends FormController {
         
         // Set the model
         /** @var \Joomla\Component\Content\Administrator\Model\ArticleModel $model */
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         
         // Preset the redirect
         $this->setRedirect((string)Uri::getInstance());
@@ -91,45 +91,45 @@ class SongController extends FormController {
     public function publish() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->publish($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo );
     }
     
     public function unpublish() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->publish($pid,0);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo );
     }
     
     public function archive() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->publish($pid,2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo);
     }
     
     public function delete() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->delete($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo );
     }
     
     public function trash() {
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
-        $model = $this->getModel('song');
+        $model = $this->getModel('artist');
         $wynik = $model->publish($pid,-2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=songs');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=artists');
         $this->setRedirect($redirectTo );
     }
     

@@ -1,7 +1,7 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/song/edit.php
+ * @filesource admin/tmpl/artist/edit.php
  * @version 0.0.6.1 17th May 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
@@ -70,7 +70,7 @@ $input = Factory::getApplication()->getInput();
 //                 });
 </script>
 <div id="xbcomponent">
-    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=song&layout=edit&id='. (int) $this->item->id); ?>"
+    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=artist&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<div class="row form-vertical">
     		<div class="col-md-10">
@@ -80,6 +80,31 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
+    	<div class="row">
+			<div class="row">
+           		<div class="col-12 col-lg-6">
+					<?php echo $this->form->renderField('type'); ?> 
+				</div>   	
+				<?php if (XbmusicHelper::checkComponent('com_xbpeople',true)) : ?>				
+           			<div class="col-12 col-lg-6">
+						<?php echo $this->form->renderField('group_id'); ?> 
+						<?php echo $this->form->renderField('person_id'); ?> 
+					</div>
+				<?php endif; ?>
+				<?php if (($this->item->type == 2) && (count($this->item->groupmembers > 0))) : ?>
+					<p class="xbr09"><span class="xbit"><?php echo Text::_('Group Members');?></span>:
+					<?php
+                        $list = '';  
+                        foreach ($this->item->groupmembers as $member) {
+                            $list .= $member['artistname'];
+                            if ($member['role']) $list.= ' ('.$member['role']. ')';
+                            $list .=', ';
+                        }
+                        echo trim($list,', ');
+                    ?></p>
+				<?php endif; ?>
+			</div>
+    	</div>
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
@@ -87,13 +112,6 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
-   					<div class="row xb09">
-		           		<div class="col-12 col-lg-5">
-						</div>   					
-		           		<div class="col-12 col-lg-7">
-        					<?php echo $this->form->renderField('comp_date'); ?> 
-        				</div>
-        			</div>
   					<div class="row">
 		  	     		<div class="col-12 col-lg-6">
         					<?php echo $this->form->renderField('description'); ?> 
@@ -131,13 +149,56 @@ $input = Factory::getApplication()->getInput();
 					<?php echo $this->form->renderField('tracklist'); ?>	
 				</div>
 				<div class="col-12">
-					Album
+					<?php echo Text::_('Albums'); ?><br />
+					<?php if (is_array($this->item->albums)) : ?>
+						<?php if (count($this->item->albums) > 1) : ?>
+							<details>
+								<summary>
+									<p class="xbit"><?php echo Text::sprintf('Found on %s albums',count($this->item->albums)); ?></p>
+								</summary>
+								<ul>
+									<?php foreach ($this->item->albums as $album) : ?>
+									    <li>
+									    	<?php echo $album['albumtitle'];
+									    	if ($album['rel_date']) echo ' ('.$album['rel_date'].')'; ?>
+									    </li>
+									<?php endforeach; ?>
+								</ul>
+							</details>
+						<?php elseif (count($this->item->albums)==1) :?>
+							<?php $album = $this->item->albums[0]; ?>
+							<p><?php echo $album['albumtitle'];
+                                if ($album['rel_date']) echo ' ('.$album['rel_date'].')'; ?>							
+						<?php endif; ?>
+					<?php else: ?>
+						<p class="xbit"><?php echo Text::_('Not found on any albums'); ?></p>
+					<?php endif; ?>
 				</div>
 				<div class="col-12">
-					Performers
-				</div>
-				<div class="col-12">
-					Playlists
+					<?php echo Text::_('Single tracks not listed with an album'); ?><br />
+					<?php if (is_array($this->item->singles)) : ?>
+						<?php if (count($this->item->singles) > 1) : ?>
+							<details>
+								<summary>
+									<p class="xbit"><?php echo Text::sprintf('%s single tracks found',count($this->item->singles)); ?></p>
+								</summary>
+								<ul>
+									<?php foreach ($this->item->singles as $single) : ?>
+									    <li>
+									    	<?php echo $single['tracktitle'];
+									    	if ($single['rel_date']) echo ' ('.$single['rel_date'].')'; ?>
+									    </li>
+									<?php endforeach; ?>
+								</ul>
+							</details>
+						<?php elseif (count($this->item->singles)==1) :?>
+							<?php $single = $this->item->singles[0]; ?>
+							<p><?php echo $single['albumtitle'];
+							if ($single['rel_date']) echo ' ('.$single['rel_date'].')'; ?>							
+						<?php endif; ?>
+					<?php else: ?>
+						<p class="xbit"><?php echo Text::_('No single tracks listed'); ?></p>
+					<?php endif; ?>
 				</div>
     		</div>
             		<?php echo $this->form->renderField('ext_links');?>
@@ -181,7 +242,7 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
     	<hr />
     </div>	
-    <input type="hidden" name="task" id="task" value="song.edit" />
+    <input type="hidden" name="task" id="task" value="artist.edit" />
     <?php echo HTMLHelper::_('form.token'); ?>
     </form>
     <div class="clearfix"></div>

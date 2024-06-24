@@ -113,7 +113,8 @@ class TrackModel extends AdminModel {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
-                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');                
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');    
+                
                 $id3data = json_decode($item->id3_data);
                 $item->id3_tags = $id3data->id3tags;
                 $item->audioinfo = $id3data->audioinfo;
@@ -214,7 +215,7 @@ class TrackModel extends AdminModel {
         $loadid3 = $data['loadid3'];
         //if new track we will automatically load the ID3 data if available
         $isnewtrack = ($data['id'] == 0);
-        if ($loadid3) {  
+        if ($isnewtrack) {  
             //this will create the album and category and tag from id3 genre if required
             if (!$this->importID3data($data)) return false; //?????
         } else {
@@ -261,7 +262,7 @@ class TrackModel extends AdminModel {
         if (parent::save($data)) {
             $tid = $this->getState('track.id');
             // if a new track we need to create and link any songs and artists and add genre to song and artist per options, 
-            if ($loadid3) {
+            if ($isnewtrack) {
                 $res = $this->postSaveID3($data,$tid);                
             } else {
                 // $warnmsg .= 'if ID3 data in file has changed the changes will not be reflected here or in linked items';
@@ -496,6 +497,7 @@ class TrackModel extends AdminModel {
      * @param integer $tid - the id of the saved track
      */
     public function postSaveID3(&$data, int $tid) {
+        $params = ComponentHelper::getParams('com_xbmusic');
         $infomsg = '';
         $warnmsg = '';
         $data['newsongs'] = [];

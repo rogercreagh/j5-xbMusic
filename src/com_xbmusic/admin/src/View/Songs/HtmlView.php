@@ -111,13 +111,13 @@ class HtmlView extends BaseHtmlView {
         ->buttonClass('btn btn-action')
         ->listCheck(false);
         $childBar = $dropdown->getChildToolbar();
-        $childBar->standardButton('dashboardview', 'Dashboard', 'songs.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
-        $childBar->standardButton('albumsview', 'Albums', 'songs.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
-        $childBar->standardButton('artistsview', 'Artists', 'songs.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistview', 'Playlists', 'songs.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
-        $childBar->standardButton('tracksview', 'Tracks', 'songs.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('catsview', 'Categories', 'songs.toCats')->listCheck(false)->icon('far fa-folder-open') ;
-        $childBar->standardButton('tagsview', 'Tags', 'songs.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        $childBar->standardButton('dashboardview', 'Dashboard', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('albumsview', 'Albums', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
+        $childBar->standardButton('artistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistview', 'Playlists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('tracksview', 'Tracks', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'Categories', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;
+        $childBar->standardButton('tagsview', 'Tags', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');

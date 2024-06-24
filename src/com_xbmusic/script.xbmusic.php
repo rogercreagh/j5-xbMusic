@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.6.9 3rd June 2024
+ * @version 0.0.10.1 24th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -61,6 +61,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
         $app = Factory::getApplication();
         $manifest = $parent->getManifest();
         $ext_mess = '<div style="position: relative; margin: 15px 15px 15px -15px; padding: 1rem; border:solid 1px #444; border-radius: 6px;">';
+        $message = '';
         if ($type == 'update') {
             //set message so that at least something is displayed if com_installed update bug not fixed
             $app->enqueueMessage('Updated '.$this->extname.' component from '.$this->oldver.' to v'.$parent->getManifest()->version.' Please see <a href="index.php?option=com_xbmusic">Dashboard</a> for more info.');
@@ -88,27 +89,22 @@ class Com_xbmusicInstallerScript extends InstallerScript
             //create a top level tag to be parent for id3genre tags
 //            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));
             
-            //create xbmusic image folder
-            if (!file_exists(JPATH_ROOT.'/images/xbmusic/albums')) {
-                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/albums/',0775,true);
-                mkdir(JPATH_ROOT.'/images/xbmusic/artwork/singles/',0775,true);
-                mkdir(JPATH_ROOT.'/images/xbmusic/artists/',0775,true);
-                $message .= 'Music image folders created for albums, singles and artists(/images/xbmusic/).<br />';
-            } else{
-                $message .= '"/images/xbmusic/albums" already exists.<br />';
-            }
+            //create xbmusic image folder. Check in case left after previous uninstall
+            $imgroot = JPATH_ROOT.'/images/xbmusic/';
+            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artwork/albums/',0775,true);
+            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artwork/singles/',0775,true);
+            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artists/',0775,true);
+            $message .= 'Music image folders created in <code>/images/xbmusic/</code>.<br />';
             //create /xbmusic folder
             if (!file_exists(JPATH_ROOT.'/xbmusic')) {
                 mkdir(JPATH_ROOT.'/xbmusic',0775);
-                $message .= 'Music folder created (/xbmusic/).<br />';
+                $message .= 'Music files folder <code>/xbmusic/</code> created.<br />';
             } else{
-                $message .= '"/xbmusic/" already exists.<br />';
+                $message .= 'Music files folder <code>/xbmusic/</code> already exists.<br />';
             }
-            
-            
+                       
             Factory::getApplication()->enqueueMessage($message,'Info');
-            
-            
+                       
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
             $ext_mess .= '<p>For help and information see <a href="https://crosborne.co.uk/'.$this->extslug.'/doc" target="_blank">www.crosborne.co.uk/'.$this->extslug.'/doc</a> ';
@@ -141,6 +137,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                     $category = Table::getInstance('Category');
                     $category->extension = $this->extension;
                     $category->title = $cat['title'];
+                    $category->alias = $cat['title'];
                     $category->description = $cat['desc'];
                     $category->published = 1;
                     $category->access = 1;

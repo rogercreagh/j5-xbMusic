@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.9.0 22nd June 2024
+ * @version 0.0.10.1 24th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -77,7 +77,7 @@ class DashboardModel extends ListModel {
         );
         //get states
         $cnts = array_merge($cnts,XbmusicHelper::statusCnts($table,'status','com_xbmusic'));
-        $db = Factory::getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         
         // get catcnt       
@@ -85,7 +85,7 @@ class DashboardModel extends ListModel {
         $query->from($db->qn($table));
         // both item & category must be published
         $db->setQuery($query);
-        $res = $db->loadResult;
+        $res = $db->loadResult();
         if ($res > 0) $cnts['catcnt'] = $res;
                 
         //get tagcnt
@@ -105,7 +105,7 @@ class DashboardModel extends ListModel {
      * @return array of arrays of category titles, states
      */
     public function getCats() {
-        $db = Factory::getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('a.id, a.title, a.published AS status')->from('#__categories AS a')->where('a.extension = '.$db->q('com_xbmusic'));
         $query->order('title ASC');
@@ -131,7 +131,7 @@ class DashboardModel extends ListModel {
         
         $tagcnts['total'] = XbmusicHelper::getItemCnt('#__tags');
         
-        $db = Factory::getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         
         $query->select('COUNT(DISTINCT(a.tag_id)) AS tagsused')
