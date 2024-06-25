@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.8.0 20th June 2024
+ * @version 0.0.10.1 24th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -95,6 +95,10 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('filename'); ?> 
     		</div>
     	<?php else: ?>
+          <div class="hide">
+    			<?php echo $this->form->renderField('pathname'); ?> 
+     			<?php echo $this->form->renderField('filename'); ?> 
+         </div>
     		<div class="col-md-6">
     			<p>Track folder : <?php echo $this->item->pathname; ?></p>
      		</div>
@@ -108,7 +112,7 @@ $input = Factory::getApplication()->getInput();
             <div class="col-md-1"></div>
             <div class="col-md-9">
                 <div class="pull-left" style="max-width:600px;">
-    	            <?php echo $this->form->renderField('loadid3'); ?>
+    	            <?php echo $this->form->renderField('saveid3'); ?>
                 </div>
                 <div>
                     <p class="xb09">

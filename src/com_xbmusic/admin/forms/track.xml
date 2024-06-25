@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.6.9 3rd June 2024 -->
+<!-- xbMusic Track Form file v0.0.10.1 24th June 2024 -->
 
 <form>
 	<config>
@@ -57,9 +57,9 @@
 			<option value="">Select file</option>
 		</field>
 	
-		<field name="loadid3" type="radio"
-			label="(re-)Load ID3 Data on save"
-			description="Load ID3 data from file. Will overwrite existing settings"
+		<field name="saveid3" type="radio"
+			label="Save ID3 to Music File"
+			description="Save updated ID3 fields back to the music file after saving track"
  			class="btn-group btn-group-yesno"
 			default="0"
 			>

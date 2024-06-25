@@ -46,7 +46,20 @@ class TrackController extends FormController {
 //             }
 //         }
 // }
-
+    public function loadid3() {
+        $model = $this->getModel('track');
+        $wynik = $model->loadId3();
+//        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect((string)Uri::getInstance());
+    }
+    
+    public function saveid3() {
+        $model = $this->getModel('track');
+        $wynik = $model->saveId3();
+        //        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+        $this->setRedirect((string)Uri::getInstance());
+    }
+    
     public function setfolder() {
         $app=Factory::getApplication();
         $nf = $this->input->get('jform','','string')['pathname'];
@@ -139,6 +152,7 @@ class TrackController extends FormController {
         
         return false;
     }
+    
     
     public function batch($model = null) {
         

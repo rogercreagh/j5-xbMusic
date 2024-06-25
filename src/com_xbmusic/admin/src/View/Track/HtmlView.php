@@ -101,7 +101,10 @@ class HtmlView extends BaseHtmlView {
         }
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');
-        $toolbar->divider();
+        $toolbar->separatorButton();
+        $toolbar->standardButton('loadid3','XBMUSIC_LOAD_ID3', 'track.loadid3')->icon('fas fa-file-arrow-down');
+        $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')->icon('fas fa-file-arrow-up');
+        
         $toolbar->inlinehelp();
         $toolbar->help('Track: Edit',false,'https://crosborne.uk/xbmusic/doc#trackedit');
         

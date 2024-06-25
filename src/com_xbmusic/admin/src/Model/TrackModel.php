@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.6.14 16th June 2024
+ * @version 0.0.10.1 24th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -76,6 +76,42 @@ class TrackModel extends AdminModel {
         return true;
     }
     
+    public function loadId3() {
+        $app  = Factory::getApplication();
+        $data = $app->getInput()->get('jform',[],'array');
+        $filename = $data['pathname'].'/'.$data['filename'];
+        if (file_exists($filename)) {
+            if ($this->importID3data($data)) {
+                if ($data['id']>0) {
+                    $this->postSaveID3($data, $data['id']);
+                }
+                $app->setUserState('com_xbmusic.edit.track.data', $data);
+                $this->loadFormData();
+                return true;
+            } else {
+                $app->enqueueMessage('Problem loading ID3 data','Warning');
+                return false;
+            }
+        } else {
+            $app->enqueueMessage('File not found','Warning');
+            return false;
+        }
+        return true;
+    }
+    
+    public function saveId3() {
+        $app  = Factory::getApplication();
+        $data = $app->getInput()->get('jform',[],'array');
+        $filename = $data['pathname'].'/'.$data['filename'];
+        if (file_exists($filename)) {
+            $app->enqueueMessage($filename);
+        } else {
+            $app->enqueueMessage('File not found','Warning');
+            return false;
+        }
+        return true;
+    }
+    
     protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
             return false;
@@ -114,14 +150,16 @@ class TrackModel extends AdminModel {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');    
-                
-                $id3data = json_decode($item->id3_data);
-                $item->id3_tags = $id3data->id3tags;
-                $item->audioinfo = $id3data->audioinfo;
-                $item->fileinfo = $id3data->fileinfo;
-                $item->imageinfo = $id3data->imageinfo;
-                $item->image_type = $id3data->imageinfo->picturetype;
-                $item->image_desc = $id3data->imageinfo->description;
+                if (isset($item->id3_data)) {
+                    $id3data = json_decode($item->id3_data);
+                    $item->id3_tags = $id3data->id3tags;
+                    $item->audioinfo = $id3data->audioinfo;
+                    $item->fileinfo = $id3data->fileinfo;
+                    $item->imageinfo = $id3data->imageinfo;
+                    $item->image_type = $id3data->imageinfo->picturetype;
+                    $item->image_desc = $id3data->imageinfo->description;
+                    
+                }
             }
         }        
         return $item;
@@ -187,10 +225,6 @@ class TrackModel extends AdminModel {
                 }
             }           
         }
-   //     if ($data->id == 0) {
-            
-  //          $form->setValue('loadid3',null, '1');
-  //      }
         
         return $data;
     }
@@ -212,12 +246,11 @@ class TrackModel extends AdminModel {
                 return false;
             }
         }
-        $loadid3 = $data['loadid3'];
         //if new track we will automatically load the ID3 data if available
         $isnewtrack = ($data['id'] == 0);
         if ($isnewtrack) {  
             //this will create the album and category and tag from id3 genre if required
-            if (!$this->importID3data($data)) return false; //?????
+            // if (!$this->importID3data($data)) return false; //?????
         } else {
             //check if any id3 elements we can manually change have changed
             $id3changed = false;
@@ -237,7 +270,7 @@ class TrackModel extends AdminModel {
             if ($id3changed) {
                 $data['id3_data'] = json_encode($oldid3data);
                 //TODO save changes back to file after saving (what about ?image data)
-                $warnmsg .= Text::_('ID3 data has soe values changed in form.'); 
+                $warnmsg .= Text::_('ID3 data has some values changed in form.'); 
             }           
         } //endif newtrack
         
@@ -262,11 +295,11 @@ class TrackModel extends AdminModel {
         if (parent::save($data)) {
             $tid = $this->getState('track.id');
             // if a new track we need to create and link any songs and artists and add genre to song and artist per options, 
-            if ($isnewtrack) {
+//            if ($isnewtrack) {
                 $res = $this->postSaveID3($data,$tid);                
-            } else {
+//            } else {
                 // $warnmsg .= 'if ID3 data in file has changed the changes will not be reflected here or in linked items';
-            } //endif postsave isnewtrack
+//            } //endif postsave isnewtrack
             
             $data['songlist'] = XbmusicHelper::uniqueNestedArray($data['songlist'], 'song_id');
             $this->storeTrackSongs($tid, $data['songlist']);
@@ -569,15 +602,15 @@ class TrackModel extends AdminModel {
         
         // add genres to album and song
         $addgenre = $params->get('addgenre',0);
-        if ((count($data['genres']) > 0 ) && ($addgenre > 0)) {
+        if ((isset($data['genres'])) && (count($data['genres']) > 0 ) && ($addgenre > 0)) {
             foreach ($data['genres'] as $tagid=>$tagname) {
                 if (($addgenre == 1) || ($addgenre == 3)) {
                     $this->addTagToItem('com_xbmusic.song', $songid, $tagid);
                     $infomsg .= Text::sprintf('Tag "%s" added to song "%s"',$tagname,$songtitle).'<br />';
                 }
                 if ($addgenre > 1) {
-                    //                            $this->addTagToItem('com_xbmusic.album', $songid, $data['album_id']);
-                    //                            $infomsg .= Text::sprintf('Tag "%s" added to album #%s',$tagname,$data['album_id']).'<br />';
+                    $this->addTagToItem('com_xbmusic.album', $songid, $data['album_id']);
+                    $infomsg .= Text::sprintf('Tag "%s" added to album #%s',$tagname,$data['album_id']).'<br />';
                 }
             }
         }
@@ -808,7 +841,7 @@ class TrackModel extends AdminModel {
         return $res;
     }
     
-        public function createArtistAlbum(int $artist_id, int $album_id, $role = '', $note = '') {
+    public function createArtistAlbum(int $artist_id, int $album_id, $role = '', $note = '') {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('id')->from('#__xbmusic_artistalbum')
