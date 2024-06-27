@@ -309,6 +309,22 @@ class XbmusicHelper extends ComponentHelper
 	    return $cnt;
 	}
 	
+    /** 
+     * @name getItemValue
+     * @desc returns a single value from a table given the id or null if not found
+     * @param string $table
+     * @param string $column
+     * @param int $id
+     */
+	public static function getItemValue(string $table, string $column, int $id) {
+	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select($column)->from($db->qn($table)) 
+	       ->where('id = '.$db->q($id));
+	   $db->setQuery($query);
+	   return $db->loadResult();	    
+	}
+	
 	/**
 	 * @name getItems
 	 * @param string $table - table name containing item(s)

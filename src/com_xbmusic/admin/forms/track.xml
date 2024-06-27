@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.10.1 24th June 2024 -->
+<!-- xbMusic Track Form file v0.0.10.1 25th June 2024 -->
 
 <form>
 	<config>
@@ -57,9 +57,9 @@
 			<option value="">Select file</option>
 		</field>
 	
-		<field name="saveid3" type="radio"
-			label="Save ID3 to Music File"
-			description="Save updated ID3 fields back to the music file after saving track"
+		<field name="getid3onsave" type="radio"
+			label="Read ID3 on Save"
+			description="Optionally read the ID3 data from musicfile when saving. Will overwrite any existing title and add albums, genres, and artists from ID3 data if available"
  			class="btn-group btn-group-yesno"
 			default="0"
 			>
@@ -155,6 +155,17 @@
 	<fieldset name="image-info"
 		label="ID3 Embedded image info"
 	>
+		<field name="picture_options" type="radio"
+			label="Artwork Options"
+			description="Either Save and re-read the ID3 artwork, or Save and copy the artwork from the album, or select picture below and then save"
+ 			class="btn-group btn-group-yesno"
+			default="0"
+			>
+				<option value="0">get from ID3</option>
+				<option value="1">get from Album</option>
+				<option value="3">select new image</option>
+		</field>
+		
 		<field name="artworkfilename" type="text" 
 		label="Image Filename"
 		
@@ -195,7 +206,8 @@
 		/>
 		<field name="picturefile" type="accessiblemedia"
 			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
-			directory="xbmusic/artwork/albums"
+			directory="xbmusic/artwork"
+			showon="picture_options:3"
 		/>
 	</fieldset>
 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.10.1 24th June 2024
+ * @version 0.0.10.1 26th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -76,7 +76,8 @@ $input = Factory::getApplication()->getInput();
     	<?php if ($this->item->id == 0 ) : ?>
     		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
    			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
-    	<?php else : ?>
+     		<?php $this->form->setFieldAttribute('getid3onsave','default','1'); ?>
+    	<?php else : ?> 
     	<?php endif; ?>
 		<?php 
             $session = Factory::getApplication()->getSession();
@@ -86,6 +87,7 @@ $input = Factory::getApplication()->getInput();
             $session->clear('musicfolder');
 		?>
     	</p>
+    	<?php echo $this->form->renderField('getid3onsave'); ?>
     	<div class="row form-vertical">
      	<?php if ($this->item->id == 0 ) : ?>
     		<div class="col-md-6">
@@ -108,24 +110,6 @@ $input = Factory::getApplication()->getInput();
     	<?php endif; ?>
         </div>
         <hr />
-        <div class="row form-horizontal">
-            <div class="col-md-1"></div>
-            <div class="col-md-9">
-                <div class="pull-left" style="max-width:600px;">
-    	            <?php echo $this->form->renderField('saveid3'); ?>
-                </div>
-                <div>
-                    <p class="xb09">
-                     	<?php if ($this->item->id == 0 ) : ?>
-                    		<?php echo Text::_('This will load any values available from the ID3 tags in the file and create album, artist, and song links, including creating the album, artists and songs if they are not already in the database'); ?>
-                    	<?php else: ?>
-                    		<?php echo Text::_('This will overwrite any existing track data with tag data if available. Existing Album, Songs and Artists links will not be removed, but new ones ay be added.'); ?>
-                    	<?php endif; ?>
-                    </p>
-                </div>
-            </div>
-    	</div>
-    	<hr />
     	<div class="row form-vertical">
     		<div class="col-md-10">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
@@ -209,9 +193,19 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<?php echo Text::_('id3 Image'); ?><br/>
-					<img src="<?php echo $this->item->artwork; ?>" />
-					<br />[LOAD NEW IMAGE] (modal selector)
+           			<?php if (empty($this->item->artwork)) : ?>
+           				<?php if ($this->item->id == 0) : ?>
+           					<p class="xbit"><?php echo Text::_('When you save file artwork will be loaded from ID3 data if available'); ?></p>
+           				<?php else: ?>
+           					<p class="xbit"><?php echo Text::_('No artowrk specified. You can either save and load from ID3 if the music file has been updated, or save and copy from the album if one is specified and has a picture, or choose a picture below - this will also become the album image if one does not exist when you save the track.'); ?>
+           					<?php $this->form->renderField('picture_options'); ?>
+							<?php $this->form->renderField('picturefile'); ?> 
+           				<?php endif; ?>
+           				<?php echo Text::_('')?>
+           			<?php else : ?>
+	           			<?php echo Text::_('Artwork'); ?><br/>
+						<img src="<?php echo $this->item->artwork; ?>" />
+					<?php endif; ?>
 				</div>        		
            		<div class="col-12 col-md-7">
 					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
@@ -236,7 +230,6 @@ $input = Factory::getApplication()->getInput();
         	</div>
 			<div class="row">
            		<div class="col-12 col-lg-6">
-					<?php //echo $this->form->renderField('picturefile'); ?> 
 				</div>
            		<div class="col-12 col-lg-6">
            			

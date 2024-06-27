@@ -2,20 +2,23 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.0.1</version>
-		<date>30th March 2024</date>
-		<title>First Devlopemt Trial</title>
+		<version>0.0.10.1</version>
+		<date>27th June 2024</date>
+		<title>First Alpha Release</title>
 		<addition>
-			<item><![CDATA[<h3>First Developemnt Release v0.0.1.0</h3> Updated 30th March 2024]]></item>
+			<item><![CDATA[<h3>First Alpha Release v0.0.10.1</h3> Updated 27th June 2024]]></item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
 		</change>
 		<other>
+			<item>Playlist functions missing</item>
+			<item>Data Management functions not yet implemented</item>
 		</other>
 		<language>
 			<item>en-GB only</item>
+			<item>Language files incomplete</item>
 		</language>
 		<security>
 		</security>

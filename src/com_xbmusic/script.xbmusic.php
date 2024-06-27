@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.10.1 24th June 2024
+ * @version 0.0.10.1 25th June 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -91,9 +91,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
             
             //create xbmusic image folder. Check in case left after previous uninstall
             $imgroot = JPATH_ROOT.'/images/xbmusic/';
-            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artwork/albums/',0775,true);
-            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artwork/singles/',0775,true);
-            if (!file_exists($imgroot.'albums/')) mkdir($imgroot.'artists/',0775,true);
+            if (!file_exists($imgroot.'artwork/albums/')) mkdir($imgroot.'artwork/albums/',0775,true);
+            if (!file_exists($imgroot.'artwork/singles/')) mkdir($imgroot.'artwork/singles/',0775,true);
+            if (!file_exists($imgroot.'artists/')) mkdir($imgroot.'artists/',0775,true);
             $message .= 'Music image folders created in <code>/images/xbmusic/</code>.<br />';
             //create /xbmusic folder
             if (!file_exists(JPATH_ROOT.'/xbmusic')) {
