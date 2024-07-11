@@ -133,7 +133,7 @@ class SongModel extends AdminModel {
             $taghelp = new TagsHelper;
             $parr = $taghelp->getTags($parentids);
             foreach ($parr as $id=>$parent) {
-                $element = new SimpleXMLElement('<field name="tags-'.$parent.'" type="tags" label="'.ucfirst($parent).'" mode="nested" multiple="true" custom="deny" />');
+                $element = new SimpleXMLElement('<field name="tags-'.$parent.'" type="tag" label="'.ucfirst($parent).'" mode="nested" multiple="true" custom="deny" />');
                 $form->setField($element, null, true, 'taggroups');
             }
         } // endforeach parenttag

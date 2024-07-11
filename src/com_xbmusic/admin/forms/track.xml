@@ -30,6 +30,13 @@
 			size="40" 
 		/>
 		
+		<field name="filepathname" type="text"
+			label="Selected File"
+			description=""
+			readonly="false"
+			size="80"
+		/>
+		
 		<field name="sortartist" type="text" 
 			label="Main Performer (sort name)"
 			description="Short name to identify the primary performer or band. Will be used for sorting tracks by artist so 'The ' should usually be removed"

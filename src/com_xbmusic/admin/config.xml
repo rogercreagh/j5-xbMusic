@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.2.2 2nd April 2024 -->
+<!-- xbMusic config file v0.0.11.0 9th July 2024 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -42,7 +42,7 @@
         
         <field name="genrecattag" type="radio"
         	label="ID Genre as Cat/Tag"
-        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'ID3genre' as parent. Both wil create both a tag and category and assign the track to both."
+        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (only saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'Id3Genres' as parent."
  			class="btn-group btn-group-yesno"
 			default="0"
 			>
@@ -65,6 +65,15 @@
 			<option value="3">Both</option>
         </field>
         
+       <field name="space3" type="spacer" hr="true" />
+        
+        <field name="imagesize" type="number" 
+        	label="Max Ht/Width for ID3 image" 
+        	description="Track images will be resized down to this size on height or width in pixels maintaing source aspect ratio (usually square)" 
+        	min="100" max="1000" step="10"
+         	default="500" 
+         />
+       
 	</fieldset>
 
 <!-- CATEGORIES TAB -->

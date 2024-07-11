@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.10.1 26th June 2024
+ * @version 0.0.11.2 11th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,7 +32,63 @@ $wa->useScript('keepalive')
 
 $input = Factory::getApplication()->getInput();
 
+HTMLHelper::_('jquery.framework');
+
 ?>
+<link rel="stylesheet" href="/media/com_xbmusic/css/filetree.css">
+<script type="text/javascript" >
+$(document).ready( function() {
+
+	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Generating Tree...' + '<li></ul>' );
+	
+	getfilelist( $('#container') , '<?php echo $this->basemusicfolder; ?>' );
+	
+	function getfilelist( cont, root ) {
+	
+		$( cont ).addClass( 'wait' );
+			
+		$.post( <?php echo "'/administrator/components/com_xbmusic/tmpl/track/Foldertree.php'"; ?>, { dir: root }, function( data ) {
+	
+			$( cont ).find( '.start' ).html( '' );
+			$( cont ).removeClass( 'wait' ).append( data );
+			if( 'Sample' == root ) 
+				$( cont ).find('UL:hidden').show();
+			else 
+				$( cont ).find('UL:hidden').slideDown({ duration: 500, easing: null });
+			
+		});
+	}
+	
+	var preventry = null;
+	$( '#container' ).on('click', 'LI A', function() {
+		var entry = $(this).parent();
+		//alert( $(this).attr('rel') );
+		if( entry.hasClass('folder') ) {
+			if( entry.hasClass('collapsed') ) {
+						
+				entry.find('UL').remove();
+				getfilelist( entry, escape( $(this).attr('rel') ));
+				entry.removeClass('collapsed').addClass('expanded');
+			}
+			else {
+				//alert( "No" );
+				entry.find('UL').slideUp({ duration: 500, easing: null });
+				entry.removeClass('expanded').addClass('collapsed');
+			}
+		} else {
+        	if (preventry!=null) {preventry.removeClass('selected')};
+          	entry.addClass('selected');
+          	preventry = entry;
+//			$( '#jform_filepathname' ).value( $(this).attr( 'rel' ));
+//			$( '#jform_filepathname' ).text( $(this).attr( 'rel' ));
+//			$( '#selected_file' ).text( $(this).attr( 'rel' ));
+			document.getElementById('jform_filepathname').value=$(this).attr( 'rel' );
+		}
+	return false;
+	});
+	
+});
+</script>
 <script>
 	function clearmd() {
     	var descMd = document.getElementById('jform_description').value;
@@ -74,9 +130,9 @@ $input = Factory::getApplication()->getInput();
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<p class="xbnit">
     	<?php if ($this->item->id == 0 ) : ?>
-    		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
    			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
      		<?php $this->form->setFieldAttribute('getid3onsave','default','1'); ?>
+     		
     	<?php else : ?> 
     	<?php endif; ?>
 		<?php 
@@ -87,27 +143,44 @@ $input = Factory::getApplication()->getInput();
             $session->clear('musicfolder');
 		?>
     	</p>
-    	<?php echo $this->form->renderField('getid3onsave'); ?>
-    	<div class="row form-vertical">
-     	<?php if ($this->item->id == 0 ) : ?>
-    		<div class="col-md-6">
-    			<?php echo $this->form->renderField('pathname'); ?> 
-    		</div>
-    		<div class="col-md-6">
-    			<?php echo $this->form->renderField('filename'); ?> 
-    		</div>
-    	<?php else: ?>
-          <div class="hide">
-    			<?php echo $this->form->renderField('pathname'); ?> 
-     			<?php echo $this->form->renderField('filename'); ?> 
-         </div>
-    		<div class="col-md-6">
-    			<p>Track folder : <?php echo $this->item->pathname; ?></p>
+     	<?php if (($this->item->id == 0) || (!file_exists($this->item->filepathname)) ) : ?>
+        	<div class="row form-vertical">
+       			<div class="col-md-6">
+       				<p><?php echo Text::_('Select music track')?>
+			    	<div id="container"> </div>
+        		</div>
+        		<div class="col-md-6">
+             		<p class="xbit"><?php echo Text::_('Default base folder to find music files from'); ?>
+            		 <code><?php echo $this->basemusicfolder; ?></code> 
+            		<?php echo Text::_('This is set in xbMusic Options'); ?>
+                	</p>
+                	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
+                	<p> </p>
+                	<?php echo $this->form->renderField('filepathname'); ?> 
+                 	<?php echo $this->form->renderField('getid3onsave'); ?>
+               </div>
      		</div>
-    		<div class="col-md-6">
-    			<p>Track file : <?php echo $this->item->filename; ?></p>
-    		</div>
+        	<div class="row">
+        	</div>
+    	<?php else: ?>
+        	<div class="row">
+        		<div class="col-md-6">
+        			<p><i><?php echo Text::_('Track folder'); ?></i> : <?php echo $this->item->pathname; ?></p>
+        			<p><i><?php echo Text::_('Track file'); ?></i> : <?php echo $this->item->filename; ?></p>
+         		</div>
+        		<div class="col-md-6">
+                    <audio controls>
+                    	<?php $localpath = '/xbmusic/'.str_replace($this->basemusicfolder,'',$this->item->pathname); ?>
+                      <source src="<?php echo $localpath.$this->item->filename; ?>">
+                       Your browser does not support the audio tag.
+                    </audio>        		
+        			<?php echo $this->form->renderField('getid3onsave'); ?>
+                </div>
+            </div>
     	<?php endif; ?>
+        <div class="hide">
+        	<?php echo $this->form->renderField('pathname'); ?> 
+        	<?php echo $this->form->renderField('filename'); ?> 
         </div>
         <hr />
     	<div class="row form-vertical">

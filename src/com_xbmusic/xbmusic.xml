@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>27th June 2024</creationDate>
-	<version>0.0.10.1</version>
+	<creationDate>11th July 2024</creationDate>
+	<version>0.0.11.2</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -35,8 +35,7 @@
 	<media destination="com_xbmusic" folder="media">
 		<file>joomla.asset.json</file>
 		<folder>css</folder>
-<!-- 	<folder>images</folder>
- -->		
+	 	<folder>images</folder>		
 		<folder>js</folder>
 	</media>
 		

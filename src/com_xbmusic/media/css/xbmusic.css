@@ -10,6 +10,10 @@
 /* Joomla system overrides/improvements */ 
 
 /*--------------------------------*/
+audio {
+	border: 1px solid gray;
+	border-radius: 20px;
+}
 
 #xbcomponent th {
   background-color: #e0ffff;
