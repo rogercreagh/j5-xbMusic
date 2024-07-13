@@ -137,7 +137,7 @@
 		/>
 	</fieldset>
 	
-	<fieldset name="taggroups" >
+	<fieldset name="taggroups" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<!-- dynamically created at run time -->
 	</fieldset>
 

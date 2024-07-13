@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/TrackController.php
- * @version 0.0.6.9 3rd June 2024
+ * @version 0.0.11.2 12 July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,6 +32,7 @@ class TrackController extends FormController {
             $this->view_list = $ret;
             $this->view_item = 'track&retview='.$ret;
         }
+        $this->registerTask('readid3', 'apply');
     }
 
 //     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {

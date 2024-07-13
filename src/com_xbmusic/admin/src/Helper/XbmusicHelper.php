@@ -16,10 +16,11 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Access\Access;
-use Joomla\CMS\Application\ApplicationHelper;
+//use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Filter\OutputFilter;
+//use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
@@ -30,7 +31,8 @@ use Joomla\Database\DatabaseQuery;
 use DOMDocument;
 use DateTime;
 use Exception;
-use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
+//use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
+//use Joomla\CMS\Filter\InputFilter;
 
 class XbmusicHelper extends ComponentHelper
 {
@@ -84,7 +86,13 @@ class XbmusicHelper extends ComponentHelper
 	    if (isset($ThisFileInfo['comments']['music_cd_identifier'])) { //this can contain binary chars and screws things up
 	        unset($ThisFileInfo['comments']['music_cd_identifier']);
 	    }
-	    $id3tags = array();
+	    if (isset($result['imageinfo']['description'])) { //fix for an album with odd encoding on picture description
+	        $desc = $result['imageinfo']['description'];
+	        $res = htmlentities($desc, ENT_QUOTES | ENT_IGNORE, 'UTF-8');
+	        $res =  preg_replace('/[\x00-\x1F\x7F-\x9F]/u', '', $res);
+	        $result['imageinfo']['description'] = $res;
+	    }
+        $id3tags = array();
 	    foreach ($ThisFileInfo['comments'] as $key => $valuearr) {
 	        // artist, album, genre and maybe others have been seen with mulitple entries
 	        // concat them with '|| ' which will look ok if printed as string but allows to explode to array to handle values separately

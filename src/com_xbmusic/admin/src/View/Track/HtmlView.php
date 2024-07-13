@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.4.0 25th April 2024
+ * @version 0.0.11.2 12th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -47,25 +47,9 @@ class HtmlView extends BaseHtmlView {
             }
         }
         
-//         $this->taggroups = $this->params->get('enable_taggroups',0);
-//         if ($this->taggroups) {
-//             $taggroup_ids = array();
-//             $this->taggroup1_parent = $this->params->get('taggroup1_parent',0);
-//             if ($this->taggroup1_parent) $taggroup_ids[] = $this->taggroup1_parent;
-//             $this->taggroup2_parent = $this->params->get('taggroup2_parent',0);
-//             if ($this->taggroup2_parent) $taggroup_ids[] = $this->taggroup2_parent;
-//             $this->taggroup3_parent = $this->params->get('taggroup3_parent',0);
-//             if ($this->taggroup3_parent) $taggroup_ids[] = $this->taggroup3_parent;
-//             $this->taggroup4_parent = $this->params->get('taggroup4_parent',0);
-//             if ($this->taggroup4_parent) $taggroup_ids[] = $this->taggroup4_parent;
-            
-//             $db = Factory::getDbo();
-//             $query = $db->getQuery(true);
-//             $query->select('id, title, description')->from($db->quoteName('#__tags'))
-//             ->where('id IN ('.implode(',',$taggroup_ids).')');
-//             $db->setQuery($query);
-//             $this->taggroupinfo = $db->loadAssocList('id');
-//         }
+        if (($this->item->id>0) && !file_exists($this->item->pathname.$this->item->filename)) {
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_ERROR_NO_MUSIC_FILE'), 'Error');
+        }
         
         // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
@@ -96,12 +80,18 @@ class HtmlView extends BaseHtmlView {
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         
         if (!$checkedOut && $itemEditable) {
-            $toolbar->apply('track.apply');
-            $toolbar->save('track.save');
+            if ($isNew) {
+                $toolbar->standardButton('readid3','XBMUSIC_READ_ID3', 'track.readid3')->icon('fas fa-file-arrow-down');                
+            } else {
+                $toolbar->apply('track.apply');
+                $toolbar->save('track.save');
+            }
         }
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');
-        $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')->icon('fas fa-file-arrow-up');
+        if (!$isNew) {
+            $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')->icon('fas fa-file-arrow-up');            
+        }
         
         $toolbar->inlinehelp();
         $toolbar->help('Track: Edit',false,'https://crosborne.uk/xbmusic/doc#trackedit');

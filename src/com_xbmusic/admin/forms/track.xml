@@ -65,7 +65,7 @@
 		</field>
 	
 		<field name="getid3onsave" type="radio"
-			label="Read ID3 on Save"
+			label="re-read ID3 on Save"
 			description="Optionally read the ID3 data from musicfile when saving. Will overwrite any existing title and add albums, genres, and artists from ID3 data if available"
  			class="btn-group btn-group-yesno"
 			default="0"
@@ -154,11 +154,11 @@
 		/>
 	</fieldset>
 	
-	<fieldset name="taggroups" >
+	<fieldset name="taggroups" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<!-- dynamically created at run time -->
 	</fieldset>
 
-<!-- ID3 iage info -->
+<!-- ID3 image info -->
 	<fieldset name="image-info"
 		label="ID3 Embedded image info"
 	>

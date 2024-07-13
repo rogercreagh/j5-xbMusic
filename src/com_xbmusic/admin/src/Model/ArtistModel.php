@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistModel.php
- * @version 0.0.10.0 23rd June 2024
+ * @version 0.0.11.3 13th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -132,14 +132,21 @@ class ArtistModel extends AdminModel {
             return false;
         }
         
-        //dynamically add fields for any taggroups defined in options
+        //dynamically add fields for any taggroups defined in options and add the tags for them
+        $tagsarr = explode(',',$form->getValue('tags',null,''));
         $parentids = $params->get('artisttagparents',[]);
         if (!empty($parentids)) {
             $taghelp = new TagsHelper;
             $parr = $taghelp->getTags($parentids);
-            foreach ($parr as $id=>$parent) {
-                $element = new SimpleXMLElement('<field name="tags-'.$parent.'" type="tag" label="'.ucfirst($parent).'" mode="nested" multiple="true" custom="deny" />');
+            foreach ($parr as $pid=>$parent) {
+                $groupname = $parent.'_tags';
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" />');
                 $form->setField($element, null, true, 'taggroups');
+                if (!empty($tagsarr)){
+                    $groupnametags = $taghelp->getTagTreeArray($pid);
+                    $grouptags = array_intersect($groupnametags, $tagsarr);
+                    $form->setValue($groupname,null,$grouptags);
+                }
             }
         } // endforeach parenttag
         
@@ -176,19 +183,6 @@ class ArtistModel extends AdminModel {
                         'access',
                         $app->getInput()->getInt('access', (!empty($filters['access']) ? $filters['access'] : $app->get('access')))
                         );
-                }
-            }
-            
-            //copy any tags in a taggroup folder back to their control
-            $tagsHelper = new TagsHelper;
-            $params = ComponentHelper::getParams('com_xbmusic');
-            $parentids = $params->get('artisttagparents',[]);
-            if ((!empty($data->tags)) && (!empty($parentids))) {
-                $parr = $tagsHelper->getTags($parentids);
-                foreach ($parr as $pid=>$parent) {
-                    $grouptags = $tagsHelper->getTagTreeArray($pid);
-                    $groupname = 'tags-'.$parent;
-                    $data->$groupname = array_intersect($grouptags, explode(',', $data->tags));
                 }
             }
             
@@ -246,9 +240,10 @@ class ArtistModel extends AdminModel {
         if (!empty($parentids)) {
             $thelp = new TagsHelper;
             $parr = $thelp->getTags($parentids);
-            foreach ($parr as $id=>$parent) {
-                if (!empty($data['tags-'.$parent])) {
-                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['tags-'.$parent])) : $data['tags-'.$parent];
+            foreach ($parr as $pid=>$parent) {
+                $groupname = $parent.'_tags';
+                if (!empty($data[$groupname])) {
+                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data[$groupname])) : $data[$groupname];
                 }
             }
         } // endforeach parenttag

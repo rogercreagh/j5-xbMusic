@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.11.2 11th July 2024
+ * @version 0.0.11.3 13th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -107,7 +107,7 @@ class TrackModel extends AdminModel {
             $app->enqueueMessage($filename);
             //do stuff
         } else {
-            $app->enqueueMessage('File not found','Warning');
+            $this->setError(Text::_('File not found'));
             return false;
         }
         return true;
@@ -177,14 +177,21 @@ class TrackModel extends AdminModel {
             return false;
         }
         
-        //dynamically add fields for any taggroups defined in options
+        //dynamically add fields for any taggroups defined in options and add the tags for them
+        $tagsarr = explode(',',$form->getValue('tags',null,''));
         $parentids = $params->get('tracktagparents',[]);
         if (!empty($parentids)) {
             $taghelp = new TagsHelper;
             $parr = $taghelp->getTags($parentids);
-            foreach ($parr as $id=>$parent) {
-                $element = new SimpleXMLElement('<field name="tags-'.$parent.'" type="tag" label="'.ucfirst($parent).'" mode="nested" multiple="true" custom="deny" />');
+            foreach ($parr as $pid=>$parent) {
+                $groupname = $parent.'_tags';
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" />');
                 $form->setField($element, null, true, 'taggroups');
+                if (!empty($tagsarr)){
+                    $groupnametags = $taghelp->getTagTreeArray($pid);
+                    $grouptags = array_intersect($groupnametags, $tagsarr);
+                    $form->setValue($groupname,null,$grouptags);
+                }
             }
         } // endforeach parenttag
         
@@ -213,19 +220,6 @@ class TrackModel extends AdminModel {
             $data->songlist = $this->getTrackSongList();
             $data->artistlist = $this->getTrackArtistList();
 //            $data->playlistlist = $this->getTrackPlayLists();
-            
-            //copy any tags in a taggroup folder back to their control
-            $tagsHelper = new TagsHelper;
-            $params = ComponentHelper::getParams('com_xbmusic');
-            $parentids = $params->get('tracktagparents',[]);
-            if ((!empty($data->tags)) && (!empty($parentids))) {
-                $parr = $tagsHelper->getTags($parentids);
-                foreach ($parr as $pid=>$parent) {
-                    $grouptags = $tagsHelper->getTagTreeArray($pid);
-                    $groupname = 'tags-'.$parent;
-                    $data->$groupname = array_intersect($grouptags, explode(',', $data->tags));
-                }
-            }           
         }
         
         return $data;
@@ -255,10 +249,12 @@ class TrackModel extends AdminModel {
             }
         }
         //if new track we will automatically load the ID3 data if available
-        $getid3 = ($data['getid3onsave'] == 1);
+        $getid3 = (($data['id']==0) || ($data['getid3onsave'] == 1)) ? true : false;
         if ($getid3) {  
             //this will create the album and category and tag from id3 genre if required
-            if (!$this->importID3data($data)) return false; //?????
+            if (!$this->importID3data($data)) {
+                return false; //?????
+            }
         } else {
             //check if any id3 elements we can manually change have changed
             $id3changed = '';
@@ -297,9 +293,10 @@ class TrackModel extends AdminModel {
         if (!empty($parentids)) {
             $thelp = new TagsHelper;
             $parr = $thelp->getTags($parentids);
-            foreach ($parr as $id=>$parent) {
-                if (!empty($data['tags-'.$parent])) {
-                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data['tags-'.$parent])) : $data['tags-'.$parent];                    
+            foreach ($parr as $pid=>$parent) {
+                $groupname = $parent.'_tags';
+                if (!empty($data[$groupname])) {
+                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data[$groupname])) : $data[$groupname];
                 }
             }
         } // endforeach parenttag
@@ -393,6 +390,7 @@ class TrackModel extends AdminModel {
                     unset($filedata['imageinfo']['data']);
                 }
             } //endif empty artwork, if no artwork no action needed
+            
             // get record and release dates
             $datematch = '/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/';
             if ($data['rec_date'] == '') {
@@ -439,6 +437,14 @@ class TrackModel extends AdminModel {
             }
             // genre
             if (isset($filedata['id3tags']['genre'])) {
+                $this->addTagToGroup('id3genres', 'tracktagparents');
+                $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
+                if ($pid == 0) {
+                    $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres',
+                        'description'=>Text::_('XBMUSIC_ID3GENRES_TAG_DESC'),
+                        'note'=>Text::_('XBMUSIC_ID3GENRES_TAG_NOTE')
+                        ));
+                }
                 $opt = $params->get('genrecattag',0);
                 $genrenames = explode(' || ', $filedata['id3tags']['genre']);
                 $genretags = [];
@@ -471,51 +477,17 @@ class TrackModel extends AdminModel {
                   foreach ($genrenames as $genre) {
                         //if genre tag already exists
                         $tid = XbmusicHelper::checkValueExists(ApplicationHelper::stringURLSafe($genre), '#__tags', 'alias');
-                        if ($tid>0) {
-                            $data['tags'][] = $tid;
-                            $infomsg .= Text::sprintf('Tag "%s" assigned to track', $genre).'<br />';
-                        } else{
-                            $pid = XbmusicHelper::checkValueExists('id3genres', '#__tags', 'alias');
-                            if (!$pid>0) {
-                                $pid = XbmusicHelper::createTag(array('title'=>'Id3Genres',
-                                    'description'=>Text::_('Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'),
-                                    'note'=>Text::_('auto-created from id3 genre import')
-                                ));
-                                //now add it to track options
-                                //$params = ComponentHelper::getParams($component);
-                                // Set new value of param(s)
-                                $tagpars = $params->get('tracktagparents',[]);
-                                if (!array_search($pid, $tagpars)){
-                                    $tagpars[] = $pid;
-                                    $params->set('tracktagparents', $tagpars);
-                                }
-                                
-                                // Save the parameters
-                                $componentid = ComponentHelper::getComponent('com_xbmusic')->id;
-                                $table = Table::getInstance('extension');
-                                $table->load($componentid);
-                                $table->bind(array('params' => $params->toString()));
-                                
-                                // check for error
-                                if (!$table->check()) {
-                                    echo $table->getError();
-                                    return false;
-                                }
-                                // Save to database
-                                if (!$table->store()) {
-                                    echo $table->getError();
-                                    return false;
-                                }
-                                
-                            }
-                            $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('auto-created from id3 genre')));
+                        if ($tid == 0) {                               
+                            $newtag = XbmusicHelper::createTag(array('title'=>$genre, 'parent_id'=>$pid, 'note'=>Text::_('XBMUSIC_ID3GENRES_TAG_NOTE')));
                             if ($newtag->id) {
                                 $tid = $newtag->id;
-                                //add tag to item
-                                $data['tags'][] = $tid;
-                                $infomsg .= Text::sprintf('Tag %s assigned to track', $genre);
+                                $infomsg .= Text::sprintf('Tag %s  created and assigned to track', $genre);
                             }
+                        } else{
+                            $infomsg .= Text::sprintf('Tag "%s" assigned to track', $genre).'<br />';
                         } //endif tag already exists                        
+                        //add tag to item
+                        $data['tags'][] = $tid;
                         $infomsg .= '<br />';
                         //need to also assign to album and song as per settings once they have been created after track has been saved
                         //do we have song and album ids? $data['album_id']
@@ -530,7 +502,8 @@ class TrackModel extends AdminModel {
             $app->enqueueMessage($infomsg,'Info');
             $app->enqueueMessage($warnmsg,'Warning');
         } else {
-            $app->enqueueMessage('Impossible Error : file '.rtrim($data['pathname'],'/').'/'.$data['filename'].' does not exist', 'Error');
+            $error = 'Impossible Error : file '.rtrim($data['pathname'],'/').'/'.$data['filename'].' does not exist';
+            $this->setError($error);
             return false;
         } //endif file exists
         return true;
@@ -916,9 +889,13 @@ class TrackModel extends AdminModel {
         return $res;
     }
     
-    public function addTagToGroup(string $tagname, string $group, $tagdesc = '') {
+    /**
+     * @name addTagToGroup
+     * @desc adds the given tag by alias to parent taggroup specified 
+     */
+    public function addTagToGroup(string $tagalias, string $group, $tagdesc = '') {
         //make name into alias
-        $tagalias = $tagname;
+        $tagalias;
         //get id of tag to add, create if it doesn't exist
         $pid = XbmusicHelper::checkValueExists($tagalias, '#__tags', 'alias');
         if ($pid == false) {
@@ -952,7 +929,7 @@ class TrackModel extends AdminModel {
                 return false;            
             }
         }        
-        return true;        
+        return $pid;        
     }
 }
 

@@ -143,7 +143,7 @@ $(document).ready( function() {
             $session->clear('musicfolder');
 		?>
     	</p>
-     	<?php if (($this->item->id == 0) || (!file_exists($this->item->filepathname)) ) : ?>
+     	<?php if (($this->item->id == 0) || (!file_exists($this->item->pathname.$this->item->filename)) ) : ?>
         	<div class="row form-vertical">
        			<div class="col-md-6">
        				<p><?php echo Text::_('Select music track')?>
@@ -157,7 +157,7 @@ $(document).ready( function() {
                 	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
                 	<p> </p>
                 	<?php echo $this->form->renderField('filepathname'); ?> 
-                 	<?php echo $this->form->renderField('getid3onsave'); ?>
+                 	<?php // echo $this->form->renderField('getid3onsave'); ?>
                </div>
      		</div>
         	<div class="row">
