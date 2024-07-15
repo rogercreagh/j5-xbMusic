@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 22nd June 2024
+ * @version 0.0.11.4 15th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -31,6 +31,7 @@ use Joomla\Database\DatabaseQuery;
 use DOMDocument;
 use DateTime;
 use Exception;
+use Symfony\Component\Validator\Constraints\Existence;
 //use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
 //use Joomla\CMS\Filter\InputFilter;
 
@@ -203,39 +204,43 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	/**
-	 * @name createTags()
+	 * @name getCreateTags()
 	 * @desc function to create a tag with title, parent_tag_id, status, and optional description
 	 * @param array $tagsarr which contains assoc array of data for each tag containing at least 'title' element
 	 * @param boolean $silent - enable messages if false. You'll still get a duplicate alias message if the tag already exists.
 	 * @return array of objects containg id and title of new tags
 	 */
-	public static function createTags(array $tagsarr, $silent = true) {
+	public static function getCreateTags(array $tagsarr, $silent = true) {
 	    $result = array();
 	    foreach ($tagsarr as $tag) {	        
-	        $wynik = self::createTag($tag, $silent);
+	        $wynik = self::getCreateTag($tag, $silent);
 	        if (!empty($wynik)) $result[] = $wynik;
 	    }
 	    return $result;
 	}
 		
 	/**
-	 * @name createTag()
+	 * @name getCreateTag()
 	 * @desc creates a tag with the passed title and optional other fields including parent_id and returns an object containg the id and title
-	 *     doesn't check if tag already exists - do this first with checkValueExists() or you'll get an error message.
 	 * @param array $tagdata - ['title'=>$mynewtitle
 	 * @param boolean $silent - supress messages if true. You'll still get a message if the tag already exists.
 	 * @return \stdClass - (id->int, title->string). WIll be empty if the function failed
 	 */
-	public static function createTag(array $tagdata, $silent = false) {
-	    $app = Factory::getApplication();
+	public static function getCreateTag(array $tagdata, $silent = false) {
 	    $errmsg = '';
 	    $infomsg = '';
         $wynik = new \stdClass();
-        //set defaults for status & parent
+        $tagid = self::checkValueExists($tagdata['title'], '#__tags', 'title');
+        if ($tagid) {
+            $wynik->id = $tagid;
+            $wynik->title = $tagdata['title'];
+            return $wynik;
+        }
+        // doesnt already exist so set defaults for status & parent
         if (!key_exists('published', $tagdata))  $tagdata['published'] = 1;
         if (!key_exists('parent_id', $tagdata))  $tagdata['parent_id'] = 1;
         if (!key_exists('langauge', $tagdata))  $tagdata['language'] = '*';
-        if (!key_exists('description', $tagdata))  $tagdata['description'] = '';       
+        if (!key_exists('description', $tagdata))  $tagdata['description'] = '';
         // Create new tag.
         $tagModel = Factory::getApplication()->bootComponent('com_tags')
            ->getMVCFactory()->createModel('Tag', 'Administrator', ['ignore_request' => true]);	        
@@ -247,11 +252,90 @@ class XbmusicHelper extends ComponentHelper
 	        $wynik->id = $tagid;
             $wynik->title = $tagdata['title'];	            
         }
-	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
-        if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');
+        if (!$silent) {
+    	    $app = Factory::getApplication();
+    	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
+            if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');           
+        }
         return $wynik;
 	}
 	
+	/**
+	 * @name addTagToItem()
+	 * @desc adds an existing tag to an item
+	 * @param string $compitem - the component item type in dotted lower case eg com_content.article
+	 * @param int|array $itemId - the id(s) of the item(s) the tag is being added to
+	 * @param int $tagId - the id of the tag being added
+	 * @return boolean - true on suceess, false on failure
+	 */
+	public static function addTagToItem($compitem, $itemIds, $tagId) {
+	    $arr=explode('.',$compitem);
+	    $app = Factory::getApplication();
+	    $factory = $app->bootComponent($arr[0])->getMVCFactory();
+	    $model = $factory->createModel(ucfirst($arr[1]), 'Administrator');
+	    $commands = array('tag'=>$tagId);
+	    if (!is_array($itemIds)) {
+	        $pks = [$itemIds];
+	    } else {
+	        $pks = $itemIds;
+	    }
+	    $contexts = array_combine($pks, $pks);
+	    foreach($contexts as $key=>$itemId) {
+	        $contexts[$key] = "$compitem.$itemId";
+	    }
+	    $res = $model->batch($commands, $pks, $contexts );
+	    return $res;
+	}
+	
+	/**
+	 */
+	
+	/**
+	 * @name addTagToGroup()
+	 * @desc adds the given tag by name to component & taggroup specified
+	 * NB This assumes you are requesting a valid tag list parameter in the config for a valid component
+	 * @param string $tagtitle - the title of the tag to add, will be created if doesn't exist
+	 * NB if tag it doesn't exist it will be created without a parent ie at top level
+	 * @param string - $compgroup component and params taggroupname in dotted form eg com_xbmusic.tracktagparents
+	 * @param string $tagdesc - optional tag description (eg 'Created as parent for Genre tags, do not delete')
+	 * @return boolean
+	 */
+	public static function addTagToGroup(string $tagtitle, string $compgroup, $tagdesc = '') {
+	    $cgarr = explode('.',$compgroup);
+	    //get id of tag to add, create if it doesn't exist
+	    $tid = self::getCreateTag(array('title'=>$tagtitle,
+	        'description'=>$tagdesc,
+	        'note'=>Text::_('created by addTagToGroup()').' '.$compgroup
+	    ))->id;
+	    //now add it to itemtype options
+	    $params = ComponentHelper::getParams($cgarr[0]);
+	    // Set new value of param(s)
+	    $grouptags = $params->get($cgarr[1],[]);
+	    if (!array_search($tid, $grouptags)){
+	        //add tag to group
+	        $grouptags[] = $tid;
+	        $params->set($cgarr[1], $grouptags);
+	        // Save the parameters
+	        $componentid = ComponentHelper::getComponent($cgarr[0])->id;
+	        $table = Table::getInstance('extension');
+	        $table->load($componentid);
+	        $table->bind(array('params' => $params->toString()));
+	        
+	        // check for error
+	        if (!$table->check()) {
+	            Factory::getApplication()->enqueueMessage($table->getError(),'Error');
+	            return false;
+	        }
+	        // Save to database
+	        if (!$table->store()) {
+	            Factory::getApplication()->enqueueMessage($table->getError(),'Error');
+	            return false;
+	        }
+	    }
+	    return $tid;
+	}
+
+
 	/**
 	 * @name checkValueExists()
 	 * @desc returns its id if given value exists in given table column (case insensitive)

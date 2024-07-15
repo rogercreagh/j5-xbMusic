@@ -181,7 +181,8 @@
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
-			multiple="true"			
+			multiple="true"	
+			remote-search = "false"		
 		/>
 		<field name ="artisttagnote" type="note"
 			label="XBMUSIC_CONFIG_ARTISTTAG_NOTE"

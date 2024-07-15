@@ -44,7 +44,7 @@ class XbtagsField extends TagField
         $maxlevel = 0;
         $parent_id = (int) $this->element['parent'];
         $levels = (string) $this->element['levels'];
-        if ($levels) {
+        if ($levels > 0) {
             //if parent set get level
             $maxlevel = $levels;
             if ($parent_id>1) {
@@ -65,10 +65,10 @@ class XbtagsField extends TagField
         
         // Limit options to only children of parent
         if ($parent_id > 1) {
-            $query->where('b.id = '. $parent_id);
+            $query->where('b.id = '. $db->q($parent_id));
         }
         //limit how far down the tree to go
-        if ($levels && $maxlevel) {
+        if (($levels > 0) && ($maxlevel > 0)) {
             $query->where($db->qn('a.level').' <= '.$db->q($maxlevel));
         }
         

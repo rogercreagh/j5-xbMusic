@@ -44,25 +44,14 @@
 			size="40" 
 		/>
 		
-		 <field name="pathname" type="xbfolderlist" 
-			label="File path" description="path from the music root directory as set in xbMusic Options" 
-			class="xbfilecontrol"
-			directory="/xbmusic"
-			hide_none="true" hide_default="true"
-			recursive="true"
-			onchange="document.getElementById('task').value='track.setfolder'; this.form.submit();"
-		>
-		</field>
+		 <field name="pathname" type="text" 
+			label="File path" 
+			description="path from the music root directory as set in xbMusic Options" 
+		/>
 
-		<field name="filename" type="filelist" 
+		<field name="filename" type="yexy" 
 			label="File name" description="Filename" 
-			directory="/xbmusic"
-			hide_none="true" hide_default="true"
-			class="xbfilecontrol"
-			default="" 
-		>
-			<option value="">Select file</option>
-		</field>
+		/>
 	
 		<field name="getid3onsave" type="radio"
 			label="re-read ID3 on Save"

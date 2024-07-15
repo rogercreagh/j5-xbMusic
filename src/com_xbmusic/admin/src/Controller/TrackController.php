@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/TrackController.php
- * @version 0.0.11.2 12 July 2024
+ * @version 0.0.11.4 15 July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,7 +32,7 @@ class TrackController extends FormController {
             $this->view_list = $ret;
             $this->view_item = 'track&retview='.$ret;
         }
-        $this->registerTask('readid3', 'apply');
+       // $this->registerTask('readid3', 'save');
     }
 
 //     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
@@ -59,13 +59,6 @@ class TrackController extends FormController {
         $wynik = $model->saveId3();
         //        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
         $this->setRedirect((string)Uri::getInstance());
-    }
-    
-    public function setfolder() {
-        $app=Factory::getApplication();
-        $nf = $this->input->get('jform','','string')['pathname'];
-        $app->getSession()->set('musicfolder',$nf);
-        $this->setRedirect((string)Uri::getInstance());       
     }
     
     public function publish() {

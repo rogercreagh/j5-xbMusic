@@ -81,7 +81,7 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             if ($isNew) {
-                $toolbar->standardButton('readid3','XBMUSIC_READ_ID3', 'track.readid3')->icon('fas fa-file-arrow-down');                
+                $toolbar->standardButton('readid3','XBMUSIC_READ_ID3', 'track.apply')->icon('fas fa-file-arrow-down');                
             } else {
                 $toolbar->apply('track.apply');
                 $toolbar->save('track.save');

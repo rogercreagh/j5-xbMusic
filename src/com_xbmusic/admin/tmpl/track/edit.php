@@ -165,6 +165,7 @@ $(document).ready( function() {
     	<?php else: ?>
         	<div class="row">
         		<div class="col-md-6">
+               	<?php echo $this->form->renderField('filepathname'); ?> 
         			<p><i><?php echo Text::_('Track folder'); ?></i> : <?php echo $this->item->pathname; ?></p>
         			<p><i><?php echo Text::_('Track file'); ?></i> : <?php echo $this->item->filename; ?></p>
          		</div>
@@ -178,7 +179,7 @@ $(document).ready( function() {
                 </div>
             </div>
     	<?php endif; ?>
-        <div class="hide">
+        <div >
         	<?php echo $this->form->renderField('pathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
         </div>
