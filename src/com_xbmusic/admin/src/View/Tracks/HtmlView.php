@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Tracks/HtmlView.php
- * @version 0.0.6.15 18th June 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -47,15 +47,17 @@ class HtmlView extends BaseHtmlView {
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
         
-        if ($this->params->get('use_xbmusic', 1)) {
-            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
-        } else {
-            if (is_dir(trim($this->params->get('music_path','')))) {
-                $this->basemusicfolder = trim($this->params->get('music_path'));
-            } else {
-                $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //xbmusic/ added
-            }
-        }
+//         if ($this->params->get('use_xbmusic', 1)) {
+//             $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
+//         } else {
+//             if (is_dir(trim($this->params->get('music_path','')))) {
+//                 $this->basemusicfolder = trim($this->params->get('music_path'));
+//             } else {
+//                 $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //xbmusic/ added
+//             }
+//         }
+        $this->basemusicfolder = XbmusicHelper::$musicBase;
+        
         $this->addToolbar();
         
         return parent::display($tpl);

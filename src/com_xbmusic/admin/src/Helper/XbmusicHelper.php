@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.11.4 15th July 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -38,6 +38,8 @@ use Symfony\Component\Validator\Constraints\Existence;
 class XbmusicHelper extends ComponentHelper
 {
 	public static $extension = 'com_xbmusic';
+	
+	public static $musicBase = JPATH_ROOT.'/xbmusic/';
 
 	public static function getActions($categoryid = 0) {
 	    $user 	=Factory::getApplication()->getIdentity();
@@ -103,15 +105,9 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 	    
-	public static function getMusicBase() {
-	    $params = ComponentHelper::getParams('com_xbmusic');
-	    if ($params->get('use_xbmusic', 1)) {
-	        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$params->get('xbmusic_subfolder','');
-	    } else {
-	        $basemusicfolder = (trim($params->get('music_path','')) != '') ? trim($params->get('music_path')) : JPATH_ROOT.'/xbmusic/';
-	    }
-	    return $basemusicfolder;
-	}
+// 	public static function getMusicBase() {
+// 	    return self::$musicBase; 
+// 	}
 	    
 	public static function getArtistAlbums($aid) {
 	    $db = Factory::getContainer()->get(DatabaseInterface::class);

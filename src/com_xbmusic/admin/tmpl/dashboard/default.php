@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.6.12 7th June 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -262,7 +262,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 	        			</p>
 	        			<dl class="xbdlinline">
 	        				<dt><?php echo Text::_('Music Folder'); ?>: </dt>
-	        					<dd><?php echo XbmusicHelper::getMusicBase(); ?></dd>
+	        					<dd><?php echo XbmusicHelper::$musicBase; ?></dd>
 	        				<dt><?php echo 'ID3 Genre'; ?></dt>
 	        					<dd><?php echo $this->id3genreuse; ?></dd>
 	        			</dl>

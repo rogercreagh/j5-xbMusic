@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.11.2 11th July 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -130,8 +130,8 @@ $(document).ready( function() {
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<p class="xbnit">
     	<?php if ($this->item->id == 0 ) : ?>
-   			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
-     		<?php $this->form->setFieldAttribute('getid3onsave','default','1'); ?>
+   			<?php //$this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
+     		<?php //$this->form->setFieldAttribute('getid3onsave','default','1'); ?>
      		
     	<?php else : ?> 
     	<?php endif; ?>
@@ -150,10 +150,6 @@ $(document).ready( function() {
 			    	<div id="container"> </div>
         		</div>
         		<div class="col-md-6">
-             		<p class="xbit"><?php echo Text::_('Default base folder to find music files from'); ?>
-            		 <code><?php echo $this->basemusicfolder; ?></code> 
-            		<?php echo Text::_('This is set in xbMusic Options'); ?>
-                	</p>
                 	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
                 	<p> </p>
                 	<?php echo $this->form->renderField('filepathname'); ?> 
@@ -163,23 +159,26 @@ $(document).ready( function() {
         	<div class="row">
         	</div>
     	<?php else: ?>
+        	<?php $localpath = str_replace($this->basemusicfolder,'',$this->item->pathname); ?>
         	<div class="row">
         		<div class="col-md-6">
-               	<?php echo $this->form->renderField('filepathname'); ?> 
-        			<p><i><?php echo Text::_('Track folder'); ?></i> : <?php echo $this->item->pathname; ?></p>
-        			<p><i><?php echo Text::_('Track file'); ?></i> : <?php echo $this->item->filename; ?></p>
+        			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
+        				<?php echo $this->basemusicfolder; ?></p>
+        			<p><i><?php echo Text::_('Track folder'); ?></i> : 
+        				<?php echo $localpath; ?></p>
          		</div>
         		<div class="col-md-6">
+        			<p><i><?php echo Text::_('Track file'); ?></i> : 
+        				<b><?php echo $this->item->filename; ?></b></p>
                     <audio controls>
-                    	<?php $localpath = '/xbmusic/'.str_replace($this->basemusicfolder,'',$this->item->pathname); ?>
-                      <source src="<?php echo $localpath.$this->item->filename; ?>">
-                       Your browser does not support the audio tag.
+                    	<source src="<?php echo '/xbmusic/'.$localpath.$this->item->filename; ?>">
+                    	Your browser does not support the audio tag.
                     </audio>        		
-        			<?php echo $this->form->renderField('getid3onsave'); ?>
+        			<?php //echo $this->form->renderField('getid3onsave'); ?>
                 </div>
             </div>
     	<?php endif; ?>
-        <div >
+        <div class="hide">
         	<?php echo $this->form->renderField('pathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
         </div>

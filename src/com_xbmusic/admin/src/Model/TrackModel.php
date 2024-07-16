@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.11.4 15th July 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -110,7 +110,7 @@ class TrackModel extends AdminModel {
     public function saveId3(int $tkid) {
         $app  = Factory::getApplication();
         $data = $app->getInput()->get('jform',[],'array');
-        $filename = $data['pathname'].'/'.$data['filename'];
+        $filename = rtrim($data['pathname'],'/').'/'.$data['filename'];
         if (file_exists($filename)) {
             $app->enqueueMessage($filename);
             //do stuff
@@ -236,19 +236,23 @@ class TrackModel extends AdminModel {
         
         //set alias for track to path from basemusicfolder plus filename
         if ($data['alias'] == '') {
-            $basemusicfolder = XbmusicHelper::getMusicBase();
+            $basemusicfolder = XbmusicHelper::$musicBase;
             $data['alias'] = OutputFilter::stringURLSafe(str_replace($basemusicfolder, '' , $data['filepathname']));
             if ( XbmusicHelper::checkValueExists($data['alias'], '#__xbmusic_tracks', 'alias')) {
-                $warnmsg .= 'Duplicate alias - this track appears to be already in the database. Data not saved';
-                $app->enqueueMessage($warnmsg,'Error');
+                $warnmsg .= Text::_('Duplicate alias - this track appears to be already in the database. Data not saved');
+                $app->enqueueMessage($warnmsg,'Warning');
                 return false;
             }
+            
         }
         //if new track we will automatically load the ID3 data if available
-        $getid3 = (($data['id']==0) || ($data['getid3onsave'] == 1)) ? true : false;
+//        $getid3 = (($data['id']==0) || (/** detect task ==getid3? **/)) ? true : false;
+        $getid3 = ($data['id']==0) ? true : false;
         if ($getid3) {  
             //this will create the album and category and tag from id3 genre if required
             if (!$this->importID3data($data)) {
+                $warnmsg .= Text::_('Failed to import ID3 data. Data not saved');
+                $app->enqueueMessage($warnmsg,'Error');
                 return false; //?????
             }
         } else {
@@ -274,7 +278,7 @@ class TrackModel extends AdminModel {
             if ($id3changed!='') {
                 $data['id3_data'] = json_encode($oldid3data);
                 //TODO save changes back to file after saving (what about ?image data)
-                $warnmsg .= Text::_('Some ID3 tag data has been changed manually, new data will be saved with track but music file will not be updated.'); 
+                $warnmsg .= Text::_('Some ID3 tag data has been changed manually, new data will be saved locally with track but music file will not be updated.'); 
                 $warnmsg .= '<br />'.$id3changed;
             }           
         } //endif newtrack

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.11.2 12th July 2024
+ * @version 0.0.11.5 16th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -20,6 +20,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -36,16 +37,18 @@ class HtmlView extends BaseHtmlView {
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'track', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');
+
+        $this->basemusicfolder = XbmusicHelper::$musicBase;
         
-        if ($this->params->get('use_xbmusic', 1)) {
-            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
-        } else {
-            if (is_dir(trim($this->params->get('music_path','')))) {
-                $this->basemusicfolder = trim($this->params->get('music_path'));
-            } else {
-                $this->basemusicfolder = JPATH_ROOT.'/';
-            }
-        }
+//        if ($this->params->get('use_xbmusic', 1)) {
+//            $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
+//        } else {
+//            if (is_dir(trim($this->params->get('music_path','')))) {
+//                $this->basemusicfolder = trim($this->params->get('music_path'));
+//            } else {
+//                $this->basemusicfolder = JPATH_ROOT.'/';
+//            }
+//        }
         
         if (($this->item->id>0) && !file_exists($this->item->pathname.$this->item->filename)) {
             Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_ERROR_NO_MUSIC_FILE'), 'Error');

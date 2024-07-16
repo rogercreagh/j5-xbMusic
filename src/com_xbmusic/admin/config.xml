@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.11.0 9th July 2024 -->
+<!-- xbMusic config file v0.0.11.5 16th July 2024 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -20,7 +20,13 @@
 		/>	
         
         <field name="space1" type="spacer" hr="true" />
-        
+
+		<field name="musicbasenote" type="note"
+			label="XBCONFIG_MUSICNOTE_LABEL"
+			description="XBCONFIG_MUSICNOTE_DESC"
+			class="info"
+		/>
+<!-- 
   		<field name="use_xbmusic" type="radio"
 			label="Folder for Music files"
 			description="Either use the /xbmusic area within the website, or enter full filesystem path to music folder"
@@ -38,6 +44,7 @@
 			size="60"
 			showon="use_xbmusic:0"
         />
+ -->       
        <field name="space2" type="spacer" hr="true" />
         
         <field name="genrecattag" type="radio"
