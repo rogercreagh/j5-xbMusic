@@ -177,7 +177,8 @@
 	</fieldset>		
 	
 <!-- TAGS TAB -->
-	<fieldset name="tags"
+	<fieldset
+		name="tags"
 		label="XBMUSIC_CONFIG_TAGS_SET"
 		description="XBMUSIC_CONFIG_TAGS_SET_DESC"
 	>
@@ -189,16 +190,18 @@
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"	
+			levels="1"
 			remote-search = "false"		
 		/>
 		<field name ="artisttagnote" type="note"
 			label="XBMUSIC_CONFIG_ARTISTTAG_NOTE"
 		/>
-		<field name="artisttagparents" type="tag"
+		<field name="artisttagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
+			levels="1"
 		/>
 		<field name ="plisttagnote" type="note"
 			label="XBMUSIC_CONFIG_PLISTTAG_NOTE"
@@ -208,6 +211,7 @@
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
+			levels="1"
 		/>
 		<field name ="songtagnote" type="note"
 			label="XBMUSIC_CONFIG_SONGTAG_NOTE"
@@ -217,6 +221,7 @@
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
+			levels="1"
 		/>
 		<field name ="tracktagnote" type="note"
 			label="XBMUSIC_CONFIG_TRACKTAG_NOTE"
@@ -226,6 +231,7 @@
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
 			multiple="true"			
+			levels="1"
 		/>
 		
 	</fieldset>		

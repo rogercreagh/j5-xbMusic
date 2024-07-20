@@ -43,8 +43,8 @@
 			<option value="">XB_SELECT_CAT_LEVELS</option>
 		</field>
 		
-		<field
-			name="tagfilt" type="tag"
+		<field  addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
+			name="tagfilt" type="xbtags"
 			label="JOPTION_FILTER_TAG"
 			description="JOPTION_FILTER_TAG_DESC"
 			multiple="true"

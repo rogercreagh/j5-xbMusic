@@ -27,6 +27,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 // HTMLHelper::_('formbehavior.chosen', 'select');
 HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
+//HTMLHelper::_('webcomponent', '/webcomponents/joomla-field-fancy-select.min.js', ['version' => 'auto', 'relative' => true]);
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('table.columns')

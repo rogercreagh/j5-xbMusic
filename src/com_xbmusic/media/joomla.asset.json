@@ -22,6 +22,17 @@
 		  "description": "showdown markdown utilties",
 		  "type": "script",
 		  "uri": "com_xbmusic/showdown.js"
-	  }
+	  },
+     {
+		  "name": "xbtags.field-fancy-select",
+		  "description": "modified version of joomla-fancy-field-select.js",
+		  "type": "script",
+		  "uri": "com_xbmusic/xbtags-field-fancy-select.js",
+      "dependencies": [
+        "wcpolyfill",
+        "choicesjs"
+      ]
+    }
+	  
     ]
 }

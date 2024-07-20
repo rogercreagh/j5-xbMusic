@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.11.6 16th July 2024
+ * @version 0.0.11.6 17th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -59,15 +59,6 @@ $input = Factory::getApplication()->getInput();
  		document.getElementById('task').value='track.setfolder';
  		this.form.submit();
  	}
-//     	var userdata = {'id':mydata,'name':myname};
-//         jQuery.ajax({
-//                 type: "POST",
-//                 url: "YOUR PHP URL HERE",
-//                 data:userdata, 
-//                 success: function(data){
-//                     console.log(data);
-//                 }
-//                 });
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
@@ -87,13 +78,6 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
-   					<div class="row xb09">
-		           		<div class="col-12 col-lg-5">
-						</div>   					
-		           		<div class="col-12 col-lg-7">
-        					<?php echo $this->form->renderField('comp_date'); ?> 
-        				</div>
-        			</div>
   					<div class="row">
 		  	     		<div class="col-12 col-lg-6">
         					<?php echo $this->form->renderField('description'); ?> 
@@ -125,22 +109,12 @@ $input = Factory::getApplication()->getInput();
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'Tracks', Text::_('Linked Items')); ?>
 			<div class="row">
 				<div class="col-12">
 					<?php echo $this->form->renderField('tracklist'); ?>	
 				</div>
-				<div class="col-12">
-					Album
-				</div>
-				<div class="col-12">
-					Performers
-				</div>
-				<div class="col-12">
-					Playlists
-				</div>
     		</div>
-            		<?php echo $this->form->renderField('ext_links');?>
            		
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
          
