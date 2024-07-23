@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.11.3 13th July 2024
+ * @version 0.0.11.7 22nd July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -135,7 +135,7 @@ class AlbumModel extends AdminModel {
             $parr = $taghelp->getTags($parentids);
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
-                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" />');
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" class="xbtags" />');
                 $form->setField($element, null, true, 'taggroups');
                 if (!empty($tagsarr)){
                     $groupnametags = $taghelp->getTagTreeArray($pid);

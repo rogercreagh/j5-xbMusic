@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.11.6 16th July 2024
+ * @version 0.0.11.7 22nd July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -37,7 +37,9 @@ class HtmlView extends BaseHtmlView {
         
         $this->params      = $this->get('State')->get('params');
                 
-        // Check for errors.
+        $this->tagparentids = $this->params->get('playlisttagparents',[]);
+            
+            // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }

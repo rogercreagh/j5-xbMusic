@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.11.6 16th July 2024
+ * @version 0.0.11.7 23rd July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -138,7 +138,7 @@ class PlaylistModel extends AdminModel {
             $parr = $taghelp->getTags($parentids);
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
-                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" />');
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" class="xbtags" />');
                 $form->setField($element, null, true, 'taggroups');
                 if (!empty($tagsarr)){
                     $groupnametags = $taghelp->getTagTreeArray($pid);
@@ -293,11 +293,11 @@ class PlaylistModel extends AdminModel {
     public function getPlaylistTrackList() {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->select('a.id as track_id, ba.note AS note, ba.listorder AS oldorder');
+        $query->select('a.id as track_id, ba.note AS note, ba.seqno AS seqno, ba.listorder AS oldorder');
         $query->from('#__xbmusic_playlisttrack AS ba');
         $query->innerjoin('#__xbmusic_tracks AS a ON ba.track_id = a.id');
         $query->where('ba.playlist_id = '.(int) $this->getItem()->id);
-        $query->order('a.title ASC');
+        $query->order('ba.listorder ASC', 'a.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }

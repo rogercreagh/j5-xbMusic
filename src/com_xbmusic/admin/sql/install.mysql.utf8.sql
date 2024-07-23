@@ -243,6 +243,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlisttrack` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `playlist_id` int(10) unsigned NOT NULL DEFAULT '0',
   `track_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `note` varchar(255) NOT NULL DEFAULT '',
   `seqno` int(10) unsigned NOT NULL DEFAULT '0',
   `listorder` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),

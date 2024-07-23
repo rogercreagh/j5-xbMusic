@@ -215,7 +215,7 @@ class XbtagsField extends ListField
         // REMOVED as this is only relevant to com_tags.tag
         
         // Merge any additional options in the XML definition.
- //       $options = array_merge(get_parent_class(get_parent_class(get_class($this)))::getOptions(), $options);
+//        $options = array_merge(get_parent_class(get_parent_class(get_class($this)))::getOptions(), $options);
         $options = array_merge(parent::getOptions(), $options);
         
         return $options;

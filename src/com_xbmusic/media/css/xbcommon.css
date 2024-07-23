@@ -541,4 +541,34 @@ dl.xbdl dd {
 	max-width: 150px;
 }
 
+/** xbtags field specific modifications to choicesjs **/
+.xbtags .choices__list--multiple .choices__item {
+    color: #fff;
+    background-color: #3f61db;
+    /** original  choicesjs settings
+    border: 1px solid #00a5bb;
+    border-radius: 20px;
+    margin-bottom: 3.75px;
+    margin-right: 3.75px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    **/
+    display: inline-block;
+    font-size: 0.8rem;
+	line-height: 1.0rem;
+	padding: 4px 6px 5px 6px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px; 
+}
+
+	.xbtags .is-selected { 
+    	color: #9b9;
+        background-color: #f7f7f7;
+        cursor: none;
+    }
+    .xbtags .choices__item { 
+        padding: 3px 10px;
+    }
 

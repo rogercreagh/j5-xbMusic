@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Album/HtmlView.php
- * @version 0.0.11.5 16th July 2024
+ * @version 0.0.11.7 22nd July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -38,7 +38,8 @@ class HtmlView extends BaseHtmlView {
         
         $this->params      = $this->get('State')->get('params');
         
-//         if ($this->params->get('use_xbmusic', 1)) {
+        $this->tagparentids = $this->params->get('albumtagparents',[]);
+        //         if ($this->params->get('use_xbmusic', 1)) {
 //             $this->basemusicfolder = JPATH_ROOT.'/xbmusic/'; //.$this->params->get('xbmusic_subfolder','');
 //         } else {
 //             if (is_dir(trim($this->params->get('music_path','')))) {

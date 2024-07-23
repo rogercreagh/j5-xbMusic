@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.11.5 16th July 2024 -->
+<!-- xbMusic Track Form file v0.0.11.7 22nd July 2024 -->
 
 <form>
 	<config>
@@ -49,7 +49,7 @@
 			description="path from the music root directory as set in xbMusic Options" 
 		/>
 
-		<field name="filename" type="yexy" 
+		<field name="filename" type="text" 
 			label="File name" description="Filename" 
 		/>
 	
@@ -139,7 +139,8 @@
 			label="All tags, incl. groups"
 			description="XB_FIELD_TAGS_ADD_REMOVE_DESC"
 			multiple="true" mode="ajax"
-			custom="deny"
+			remote-search="false" custom="deny"
+			class="xbtags"
 		/>
 	</fieldset>
 	

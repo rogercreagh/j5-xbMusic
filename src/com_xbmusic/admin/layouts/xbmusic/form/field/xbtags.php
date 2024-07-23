@@ -1,6 +1,15 @@
 <?php
+/*******
+ * @package xbMusic
+ * @filesource admin/layouts/xbmusic/form/field/xbtags.php
+ * @version 0.0.11.7 21st July 2024
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ ******/
 
 /**
+ * modification of Joomla tags layout
  * @package     Joomla.Site
  * @subpackage  Layout
  *
@@ -128,13 +137,4 @@ Factory::getApplication()->getDocument()->getWebAssetManager()
 //    ->useScript('xbchoicesjs')
     ->useScript('xbtags.field-fancy-select');
 ?>
-<style type="text/css" media="screen">
-	.is-selected { 
-            color: #686;
-            cursor: none;
-        }
-    xbtags-field-fancy-select .choices__item { 
-        padding: 3px 10px;
-    }
-</style>
 <xbtags-field-fancy-select <?php echo $attr2; ?>><?php echo implode($html); ?></xbtags-field-fancy-select>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.11.6 17th July 2024
+ * @version 0.0.11.7 22nd July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -102,13 +102,15 @@ $input = Factory::getApplication()->getInput();
            		</div>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-
+	<?php if (!empty($this->tagparentids)) : ?>
+        if (!empty($parentids)) {
+	    )?>
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
 			<div class="row">
 				<?php echo $this->form->renderFieldset('taggroups'); ?>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-
+	<?php endif; ?>
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'Tracks', Text::_('Linked Items')); ?>
 			<div class="row">
 				<div class="col-12">

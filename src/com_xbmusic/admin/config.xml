@@ -196,7 +196,7 @@
 		<field name ="artisttagnote" type="note"
 			label="XBMUSIC_CONFIG_ARTISTTAG_NOTE"
 		/>
-		<field name="artisttagparents" type="xbtags"
+		<field name="artisttagparents" type="tag"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
 			mode="nested"
