@@ -1,8 +1,8 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/artists/default.php
- * @version 0.0.9.0 21st June 2024
+ * @filesource admin/tmpl/playlists/default.php
+ * @version 0.0.12.0 7th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -59,8 +59,8 @@ if (strpos($listOrder, 'modified') !== false) {
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=artists'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_ARTISTS'); ?></h3>
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playists'); ?>" method="post" name="adminForm" id="adminForm">
+		<h3><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -101,9 +101,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th><?php echo Text::_('Albums & Singles'); ?>
-						</th>
-						<th><?php echo Text::_('Songs'); ?>
+						<th><?php echo Text::_('Tracks'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -121,10 +119,10 @@ if (strpos($listOrder, 'modified') !== false) {
     				$item->max_ordering = 0;
     				$ordering   = ($listOrder == 'a.ordering');
     				$canCreate  = $user->authorise('core.create',     'com_xbmusic.category.' . $item->catid);
-    				$canEdit    = $user->authorise('core.edit',       'com_xbmusic.artist.' . $item->id);
+    				$canEdit    = $user->authorise('core.edit',       'com_xbmusic.playlist.' . $item->id);
     				$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
-    				$canEditOwn = $user->authorise('core.edit.own',   'com_xbmusic.artist.' . $item->id) && $item->created_by == $userId;
-    				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.artist.' . $item->id) && $canCheckin;
+    				$canEditOwn = $user->authorise('core.edit.own',   'com_xbmusic.playlist.' . $item->id) && $item->created_by == $userId;
+    				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.playlist.' . $item->id) && $canCheckin;
     				$canEditCat    = $user->authorise('core.edit',       'com_xbmusic.category.' . $item->catid);
     				$canEditOwnCat = $user->authorise('core.edit.own',   'com_xbmusic.category.' . $item->catid) && $item->category_uid == $userId;
     				$canEditParCat    = $user->authorise('core.edit',       'com_xbmusic.category.' . $item->parent_category_id);
@@ -138,7 +136,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<div style="float:left;">
                                 <?php
                                     $options = [
-                                        'task_prefix' => 'artist.',
+                                        'task_prefix' => 'playlist.',
                                         'disabled' => !$canChange,
                                         'id' => 'state-' . $item->id,
                                     ];
@@ -160,110 +158,38 @@ if (strpos($listOrder, 'modified') !== false) {
 								<?php endif; ?>
 								<?php if ($canEdit || $canEditOwn) : ?>
 									<a class="hasTooltip" href="
-									<?php echo Route::_('index.php?option=com_xbmusic&task=artist.edit&id=' . $item->id).'&retview=artists';?>
+									<?php echo Route::_('index.php?option=com_xbmusic&task=playlist.edit&id=' . $item->id).'&retview=playlists';?>
 									" title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
-										<?php echo $this->escape($item->name); ?></a> 
+										<?php echo $this->escape($item->title); ?></a> 
 								<?php else : ?>
 									<span title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
-										<?php echo $this->escape($item->name); ?></span>
+										<?php echo $this->escape($item->title); ?></span>
 								<?php endif; ?>
-								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=artist&tmpl=component&id='.$item->id)."'"; ?>
-          						<?php $pvtit = "'".$item->name."'"; ?>
+								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=playlist&tmpl=component&id='.$item->id)."'"; ?>
+          						<?php $pvtit = "'".$item->title."'"; ?>
                                 <span  data-bs-toggle="modal" data-bs-target="#pvModal" data-bs-source="<?php echo $pvuri; ?>" 
-                                	data-bs-itemtitle="<?php echo $item->name; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
+                                	data-bs-itemtitle="<?php echo $item->title; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<?php if($item->trkcnt > 0): ?>
-    								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',2).$item->trkcnt; 
-    								    echo ($item->trkcnt==1)? Xbtext::_('track',1, true) : Xbtext::_('tracks',1, true).'. ';     								    
-    								    echo (count($item->albums) == 1) ? Xbtext::_('album',1,true) : Xbtext::_('albums',1,true);
-    								    if (count($item->singles) > 0) echo count($item->singles) . Xbtext::_('single tracks',1);?>
-    								</p>
-								<?php endif; ?>
 							</div>
 						</td>
 						<td class="xbr09" onclick="stopProp(event);">
-							<?php if (count($item->albums) > 1) : ?>
+							<?php if($item->trkcnt > 0): ?>
 								<details>
-									<summary><?php echo Text::sprintf('XBMUSIC_N_ALBUMS',count($item->albums)); ?></summary>
-									<ul style="margin:5px;">
-									<?php foreach ($item->albums as $album) : ?>
-										<li>
-											<?php if($album['artwork']!='') :?>
-												<img src="<?php echo $album['artwork']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
-											<?php endif; ?>
-										`	<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
-							                <?php echo $album['albumtitle']; ?></a> 
-							                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
-							            </li>
-									<?php endforeach; ?>
-									</ul>
+									<summary class="xbnit"><?php echo $item->trkcnt; 
+								        echo ($item->trkcnt==1)? Xbtext::_('track',1, true) : Xbtext::_('tracks',1, true); ?>
+								    </summary>
+								    <div class="xbmh400 xbyscroll">
+    									<ul style="margin:5px;list-style: none;">
+    									<?php foreach ($item->tracks as $track) : ?>
+    										<li><?php echo $track['tracktitle'].' - <i>'.$track['artistname'].'</i>'; ?></li>
+    									<?php endforeach; ?>
+    									</ul>
+								    </div>
 								</details>
-							<?php elseif (count($item->albums)==1) : ?>
-								<?php $album = $item->albums[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Album'); ?></span><br />
-								<?php if($album['artwork']!='') :?>
-									<img src="<?php echo $album['artwork']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
-								<?php endif; ?>
-								<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
-					                <?php echo $album['albumtitle']; ?></a> 
-					                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
-					            </p>
-							<?php else : ?>
-								<p class="xbnit"><?php echo Text::_('no albums listed'); ?>
-							<?php endif; ?>
-							<?php if (count($item->singles) > 1) : ?>
-								<details>
-									<summary><?php echo Text::sprintf('XBMUSIC_N_SINGLES',count($item->singles)); ?></summary>
-									<ul style="margin:5px;">
-									<?php foreach ($item->singles as $single) : ?>
-										<li>
-											<?php if($single['artwork']!='') :?>
-												<img src="<?php echo $single['artwork']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="50" height="50" class="xbml10" />
-											<?php endif; ?>
-											<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
-							                <?php echo $single['albumtitle']; ?></a> 
-							                <?php if($single['rel_date']) echo ' ('.$single['rel_date'].') '; ?>
-							            </li>
-									<?php endforeach; ?>
-									</ul>
-								</details>
-							<?php elseif (count($item->singles)==1) : ?>
-								<?php $single = $item->singles[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Single Track'); ?></span><br />
-								<?php if($single['artwork']!='') :?>
-									<img src="<?php echo $single['artwork']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="100" height="100" class="xbml10" />
-								<?php endif; ?>
-								<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
-					                <?php echo $single['tracktitle']; ?></a> 
-					                <?php if($single['rel_date']) echo ' ('.$single['rel_date'].') '; ?>
-					            </p>
-							<?php endif; ?>
-						</td>
-						<td onclick="stopProp(event);">
-							<?php if (count($item->songs) > 1) : ?>
-								<details>
-									<summary><?php echo Text::sprintf('XBMUSIC_N_SONGS',count($item->songs)); ?></summary>
-									<ul style="margin:5px;">
-									<?php foreach ($item->songs as $song) : ?>
-										<li>
-											<a href="index.php?option=com_xbmusic&task=song.edit&retview=artists&id=<?php echo $song['songid']; ?>">
-							                <?php echo $song['songtitle']; ?></a> 
-							                <?php if($song['composer']) echo ' ('.$song['composer'].') '; ?>
-							            </li>
-									<?php endforeach; ?>
-									</ul>
-								</details>
-							<?php elseif (count($item->songs)==1) : ?>
-								<?php $song = $item->songs[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Single Songs'); ?></span><br />
-									<a href="index.php?option=com_xbmusic&task=song.edit&retview=artists&id=<?php echo $song['songid']; ?>">
-					                <?php echo $song['songtitle']; ?></a> 
-					                <?php if($song['composer']) echo ' ('.$song['composer'].') '; ?>
-					            </p>
-							<?php else : ?>
-								<p class="xbnit"><?php echo Text::_('no songs listed'); ?>
+							<?php else: ?>
+								<p class="xbit"><?php echo Text::_('no items in playlist'); ?></p>
 							<?php endif; ?>
 						</td>
 						<td class="nowrap">
@@ -315,12 +241,12 @@ if (strpos($listOrder, 'modified') !== false) {
 				'bootstrap.renderModal',
 				'pvModal',
 				array(
-					'title'  => Text::_('XBMUSIC_ARTIST_PREVIEW'),
+					'title'  => Text::_('XBMUSIC_PLAYLIST_PREVIEW'),
 					'footer' => '',
 				    'height' => '900vh',
 				    'bodyHeight' => '90',
 				    'modalWidth' => '80',
-				    'url' => Uri::root().'index.php?option=com_xbmusic&view=artist&id='.'x'
+				    'url' => Uri::root().'index.php?option=com_xbmusic&view=playlist&id='.'x'
 				),
 			); ?>
 

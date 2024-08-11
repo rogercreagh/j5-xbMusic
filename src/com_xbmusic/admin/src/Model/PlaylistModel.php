@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.11.7 23rd July 2024
+ * @version 0.0.11.7 2nd August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -111,9 +111,6 @@ class PlaylistModel extends AdminModel {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.playlist');  
-                if ($item->type == 2) {
-                    $item->groupmembers = XbmusicHelper::getGroupMembers($item->id);
-                }
             }
         }        
         return $item;
@@ -260,7 +257,7 @@ class PlaylistModel extends AdminModel {
     }
     
     protected function preprocessForm(Form $form, $data, $group = 'content') {
-        Factory::getApplication()->getSession()->set('playlistname', $data->name);
+        Factory::getApplication()->getSession()->set('playlistname', $data->title);
         if ($this->canCreateCategory()) {
             $form->setFieldAttribute('catid', 'allowAdd', 'true');
             
