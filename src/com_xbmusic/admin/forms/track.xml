@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.11.7 22nd July 2024 -->
+<!-- xbMusic Track Form file v0.0.12.1 16th August 2024 -->
 
 <form>
 	<config>
@@ -288,27 +288,33 @@
 	<fieldset name="pub">
 
 		<field name="created" type="calendar"
-			label="XBCULTURE_CREATED_LBL" 
-			description="XBCULTURE_CREATED_DESC"
-			class="inputbox" size="20" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+			label="XB_CREATED_LBL" 
+			description="XB_CREATED_DESC"
+			class="inputbox" size="20" 			
+			translateformat="true"
+			showtime="true"
+			filter="user_utc" />
 
 		<field name="created_by" type="user"
-			label="XBCULTURE_CREATED_BY_LBL" 
-			description="XBCULTURE_CREATED_BY_DESC" />
+			label="XB_CREATED_BY_LBL" 
+			description="XB_CREATED_BY_DESC" />
 		
 		<field name="created_by_alias" type="text"
-			label="XBCULTURE_CREATED_BY_ALIAS_LBL" 
-			description="XBCULTURE_CREATED_BY_ALIAS_DESC"
+			label="XB_CREATED_BY_ALIAS_LBL" 
+			description="XB_CREATED_BY_ALIAS_DESC"
 			class="inputbox" size="20" />
 
 		<field name="modified" type="calendar"
-			label="XBCULTURE_FIELD_MODIFIED_LBL" 
-			description="XBCULTURE_FIELD_MODIFIED_DESC"
-			class="inputbox" size="20" format="%Y-%m-%d %H:%M:%S" filter="user_utc" />
+			label="XB_FIELD_MODIFIED_LBL" 
+			description="XB_FIELD_MODIFIED_DESC"
+			class="inputbox" size="20" 			
+			translateformat="true"
+			showtime="true"
+			filter="user_utc" />
 
 		<field name="modified_by" type="user"
-			label="XBCULTURE_FIELD_MODIFIED_BY_LBL" 
-			description="XBCULTURE_FIELD_MODIFIED_BY_DESC" />
+			label="XB_FIELD_MODIFIED_BY_LBL" 
+			description="XB_FIELD_MODIFIED_BY_DESC" />
 		
 		<field name="ordering" type="text" 
 			label="JFIELD_ORDERING_LABEL"

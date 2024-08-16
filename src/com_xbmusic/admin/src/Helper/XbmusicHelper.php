@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.11.5 16th July 2024
+ * @version 0.0.12.1 16th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -125,10 +125,10 @@ class XbmusicHelper extends ComponentHelper
 	public static function getGroupMembers($gid) {
 	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
-	    $query->select('a.id AS artistid, a.name AS artistname, g.role, gm.from, gm.until, gm.note');
-	    $query->join('LEFT','#__xbmusic_artist AS a ON a.id = gm.artist_id');
+	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
+	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
 	    $query->from('#__xbmusic_groupmember AS gm');
-	    $query->where('g.group_id = '.$db->q($gid));
+	    $query->where('gm.group_id = '.$db->q($gid));
 	    $query->order('gm.listorder ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();

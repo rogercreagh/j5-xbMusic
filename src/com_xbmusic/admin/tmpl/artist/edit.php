@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.12.1 16th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -91,7 +91,7 @@ $input = Factory::getApplication()->getInput();
 						<?php echo $this->form->renderField('person_id'); ?> 
 					</div>
 				<?php endif; ?>
-				<?php if (($this->item->type == 2) && (count($this->item->groupmembers > 0))) : ?>
+				<?php if (($this->item->type == 2) && ($this->item->groupmembers)) : ?>
 					<p class="xbr09"><span class="xbit"><?php echo Text::_('Group Members');?></span>:
 					<?php
                         $list = '';  
