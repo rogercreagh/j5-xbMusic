@@ -1,7 +1,7 @@
 <?php 
  /*******
  * @package xbMusic
- * @filesource admin/src/Controller/PlaylistsController.php
+ * @filesource admin/src/Controller/PlaylistlistController.php
  * @version 0.0.13.1 16th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
@@ -17,9 +17,9 @@ use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\Router\Route;
 use Joomla\Utilities\ArrayHelper;
 
-class PlaylistsController extends AdminController {
+class PlaylistlistController extends AdminController {
     
-    public function getModel($name = 'playlists', $prefix = 'Administrator', $config = array('ignore_request' => true)) {
+    public function getModel($name = 'playlistlist', $prefix = 'Administrator', $config = array('ignore_request' => true)) {
         return parent::getModel($name, $prefix, $config);
     }
         

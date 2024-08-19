@@ -1,8 +1,8 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.12.0 7th August 2024
+ * @filesource admin/src/Model/PlaylistlistModel.php
+ * @version 0.0.13.1 16th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,25 +21,25 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class PlaylistsModel extends ListModel {
+class PlaylistlistModel extends ListModel {
     
     public function __construct($config = array())
     {
         if (empty($config['filter_fields']))
         {
             $config['filter_fields'] = array(
-                'id', 'a.id',
-                'title', 'a.title',
-                'alias', 'a.alias',
-                'checked_out', 'a.checked_out',
-                'checked_out_time', 'a.checked_out_time',
-                'catid', 'a.catid', 'category_title',
-                'status', 'a.status',
-                'created', 'a.created',
-                'modified', 'a.modified',
-                'created_by', 'a.created_by',
-                'created_by_alias', 'a.created_by_alias',
-                'ordering', 'a.ordering',
+                'id', 'pt.id',
+                'track_id', 'pt.track_id',
+                'track_title', 't.title',
+                'artist_name', 'a.name',
+                'album_title', 'c.title',
+                'catid', 'p.catid', 'category_title',
+                'status', 'p.status',
+                'created', 'p.created',
+                'modified', 'p.modified',
+                'created_by', 'p.created_by',
+                'created_by_alias', 'p.created_by_alias',
+                'ordering', 'p.ordering',
                 'category_id', 'level'
             );
             
@@ -48,7 +48,7 @@ class PlaylistsModel extends ListModel {
         parent::__construct($config);
     }
     
-    protected function populateState($ordering = 'a.id', $direction = 'desc')
+    protected function populateState($ordering = 'pt.listorder', $direction = 'desc')
     {
         $app = Factory::getApplication();
         
