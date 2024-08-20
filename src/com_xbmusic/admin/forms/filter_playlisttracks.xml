@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Playlisttracks Filter Form file v0.13.0 20th August 2024 -->
+<form>
+	<fields name="filter">
+		<field
+			name="search" type="text"
+			label="Title Search"
+			description="in Track Title or prefix with 'a:' for artist, 'b:' for album"
+			hint="JSEARCH_FILTER"
+		/>
+
+		<field
+			name="track_title" type="text"
+			label="Track Title"
+			description=""
+			hint=""
+		/>
+
+		<field
+			name="artist" type="text"
+			label="Artist"
+			description=""
+			hint=""
+		/>
+
+		<field
+			name="album_title" type="text"
+			label="Album Title"
+			description=""
+			hint=""
+		/>			
+
+		<input type="hidden" name="form_submited" value="1"/>
+	</fields>
+
+	<fields name="list">
+		<field
+			name="fullordering" type="list"
+			label="COM_CONTENT_LIST_FULL_ORDERING"
+			description="COM_CONTENT_LIST_FULL_ORDERING_DESC"
+			onchange="this.form.submit();"
+			default="a.title ASC"
+			>
+			<option value="">JGLOBAL_SORT_BY</option>
+			<option value="pt.listorder ASC">JGRID_HEADING_ORDERING_ASC</option>
+			<option value="pt.listorder DESC">JGRID_HEADING_ORDERING_DESC</option>
+			<option value="t.title ASC">Track Title ASC</option>
+			<option value="t.title DESC">Track Title DESC</option>
+			<option value="t.sortartist ASC">Artist ASC</option>
+			<option value="t.sortartist DESC">Artist DESC</option>
+			<option value="a.title ASC">Album Title ASC</option>
+			<option value="a.title DESC">Album Title DESC</option>
+			<option value="pt.id ASC">JGRID_HEADING_ID_ASC</option>
+			<option value="pt.id DESC">JGRID_HEADING_ID_DESC</option>
+		</field>
+
+		<field
+			name="limit" type="limitbox"
+			label="COM_CONTENT_LIST_LIMIT"
+			description="COM_CONTENT_LIST_LIMIT_DESC"
+			class="input-mini"
+			default="25"
+			onchange="this.form.submit();"
+		/>
+	</fields>
+</form>

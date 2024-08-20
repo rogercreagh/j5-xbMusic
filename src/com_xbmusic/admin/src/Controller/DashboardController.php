@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DashboardController.php
- * @version 0.0.9.0 21st June 2024
+ * @version 0.0.13.0 20th August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -12,6 +12,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\Controller;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\AdminController;
 
 class DashboardController extends AdminController
@@ -33,6 +34,11 @@ class DashboardController extends AdminController
     }
     public function toPlaylists() {
         $this->setRedirect('index.php?option=com_xbmusic&view=playlists');
+    }
+    public function toPlaylisttracks() {
+        $jip =  Factory::getApplication()->input;
+        $pid =  $jip->get('cid');
+        $this->setRedirect('index.php?option=com_xbmusic&view=playlisttracks&id='.$pid[0]);
     }
     public function toSongs() {
         $this->setRedirect('index.php?option=com_xbmusic&view=songs');
