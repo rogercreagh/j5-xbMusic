@@ -42,8 +42,8 @@
 			default="a.title ASC"
 			>
 			<option value="">JGLOBAL_SORT_BY</option>
-			<option value="pt.listorder ASC">JGRID_HEADING_ORDERING_ASC</option>
-			<option value="pt.listorder DESC">JGRID_HEADING_ORDERING_DESC</option>
+			<option value="ordering ASC">JGRID_HEADING_ORDERING_ASC</option>
+			<option value="ordering DESC">JGRID_HEADING_ORDERING_DESC</option>
 			<option value="t.title ASC">Track Title ASC</option>
 			<option value="t.title DESC">Track Title DESC</option>
 			<option value="t.sortartist ASC">Artist ASC</option>

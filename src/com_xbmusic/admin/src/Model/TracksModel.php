@@ -309,7 +309,7 @@ class TracksModel extends ListModel {
         return $items;
         
     } // end getItems
-    
+
     public function getSongs($id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);

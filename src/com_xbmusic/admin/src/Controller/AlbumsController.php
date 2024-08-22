@@ -22,30 +22,5 @@ class AlbumsController extends AdminController {
     public function getModel($name = 'Albums', $prefix = 'Administrator', $config = array('ignore_request' => true)) {
         return parent::getModel($name, $prefix, $config);
     }
-    
-    public function toDashboard() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=dashboard');
-    }
-    public function toAlbums() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=albums');
-    }
-    public function toArtists() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=artists');
-    }
-    public function toPlaylists() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=playlists');
-    }
-    public function toSongs() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=songs');
-    }
-    public function toTracks() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=tracks');
-    }
-    public function toCats() {
-        $this->setRedirect('index.php?option=com_categories&view=categories&extension=com_xbmusic');
-    }
-    public function toTags() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=tags');
-    }
-    
+        
 }

@@ -56,3 +56,11 @@ audio {
 #toolbar-views, #toolbar-saveid3 {
 	margin-left:4rem;
 }
+
+/** subform compact **/
+.xbsubcompact table tbody td {
+  padding:1px;
+}
+.xbsubcompact table tbody td .control-group {
+  margin-bottom:2px;
+}

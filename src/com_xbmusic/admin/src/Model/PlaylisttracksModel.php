@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylisttracksModel.php
- * @version 0.0.13.0 20th August 2024
+ * @version 0.0.13.0 21st August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -23,6 +23,8 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class PlaylisttracksModel extends ListModel {
     
+    protected $id;
+    
     public function __construct($config = array())
     {
         if (empty($config['filter_fields']))
@@ -42,7 +44,7 @@ class PlaylisttracksModel extends ListModel {
         parent::__construct($config);
     }
     
-    protected function populateState($ordering = 'pt.listorder', $direction = 'desc')
+    protected function populateState($ordering = 'ordering', $direction = 'desc')
     {
         $app = Factory::getApplication();
         
@@ -115,14 +117,16 @@ WHERE pt.playlist_id = 1
         $query->select(
             $this->getState(
                 'list.select',
-                'pt.id AS id, pt.track_id, pt.listorder AS ordering,'.
-                't.title AS track_title, t.sortartist AS artist, b.title AS album_title'
+                'pt.id AS id, pt.track_id, pt.listorder AS ordering, '.
+                't.title AS track_title, t.sortartist AS artist, b.title AS album_title, 1 AS catid, '.
+                't.checked_out AS checked_out, t.checked_out_time AS checked_out_time, '.
+                't.status AS status, t.access AS access, t.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, t.modified AS modified, t.note AS note'
                 )
             );
         $query->from('#__xbmusic_playlisttrack AS pt');
         $query->join('INNER', $db->qn('#__xbmusic_tracks'). ' AS t ON t.id = pt.track_id');
         $query->join('LEFT', $db->qn('#__xbmusic_albums'). ' AS b ON b.id = t.album_id');
-        $query->where('pt.playlist_id = 1'); //.$this->id
+        $query->where('pt.playlist_id = 1'); //.$this->id); 
         
         //search in track title
         
@@ -137,7 +141,7 @@ WHERE pt.playlist_id = 1
         //filter by album title
         
         // Add the list ordering clause.
-		$orderCol  = $this->state->get('list.ordering', 'pt.listorder');
+		$orderCol  = $this->state->get('list.ordering', 'ordering');
 		$orderDirn = $this->state->get('list.direction', 'ASC');
 		
 		
@@ -152,5 +156,10 @@ WHERE pt.playlist_id = 1
         return $items;
         
     } // end getItems
-        
+
+    public function saveorder($pks = [], $order = null){
+        Factory::getApplication()->enqueueMessage('in saveorder id='.$this->id);
+    }
+    
+    
 }

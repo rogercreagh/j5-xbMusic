@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlisttracks/default.php
- * @version 0.0.12.1 16th August 2024
+ * @version 0.0.13.0 21st August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -33,33 +33,23 @@ $wa->useScript('table.columns');
 $wa->useScript('multiselect');
 
 $app       = Factory::getApplication();
-$user  = Factory::getApplication()->getIdentity();
+$user  = $app->getIdentity();
 $userId    = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
-//$saveOrder = $listOrder == 'a.ordering';
-
-$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
-$tvlink = '';
+$saveOrder = $listOrder == 'ordering';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
 
-if (strpos($listOrder, 'modified') !== false) {
-    $dateOrderCol = 'modified';
-} elseif (strpos($listOrder, 'created') !== false) {
-    $dateOrderCol = 'created';
-} else {
-    $dateOrderCol = 'modified';
+if ($saveOrder && !empty($this->items)) {
+    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=playlisttracks.saveOrderAjax&tmpl=component&'.Session::getFormToken().'=1';
+//    HTMLHelper::_('sortablelist.sortable', 'xbbooksList', 'adminForm', strtolower($listDirn), $saveOrderingUrl);
+    HTMLHelper::_('draggablelist.draggable');
 }
-
-//if ($saveOrder && !empty($this->items)) {
-//    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
-//    HTMLHelper::_('draggablelist.draggable');
-//}
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playists'); ?>" method="post" name="adminForm" id="adminForm">
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlisttracks'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
 		
 		<?php // Search tools bar
@@ -95,6 +85,12 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th class="center " style="width:25px;" >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
+						<th scope="col" class="w-1 text-center d-none d-md-table-cell">
+							<?php echo HTMLHelper::_('searchtools.sort', '', 'ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-sort'); ?>
+						</th>
+						<th class="nowrap center " style="width:95px;" >
+							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.status', $listDirn, $listOrder); ?>
+						</th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'Track Title', 't.title', $listDirn, $listOrder); ?>
 						</th>
@@ -108,14 +104,59 @@ if (strpos($listOrder, 'modified') !== false) {
 						</th>
 					</tr>
 				</thead>
-				<tbody>
+				<tbody <?php if ($saveOrder) : ?> 
+    					class="js-draggable" data-url="<?php echo $saveOrderingUrl; ?>" 
+    					data-direction="<?php echo strtolower($listDirn); ?>" data-nested="true"
+					<?php endif; ?>>
 				<?php foreach ($this->items as $i => $item) :
     				$item->max_ordering = 0;
-    				$ordering   = ($listOrder == 'a.ordering');
+    				$ordering   = ($listOrder == 'ordering');
+    				$canEdit    = $user->authorise('core.edit',       'com_xbmusic.track.' . $item->id);
+    				$canEditOwn = $user->authorise('core.edit.own',   'com_xbmusic.track.' . $item->id) && $item->created_by == $userId;
+    				$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
+    				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.track.' . $item->id) && $canCheckin;
     				?>
  					<tr class="row<?php echo $i % 2; ?>" sortable-group-id="">
 						<td class="center " style="width:25px;">
-							<?php echo HTMLHelper::_('grid.id', $i, $item->listorder); ?>
+							<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+						</td>
+                        <td class="text-center d-none d-md-table-cell">
+                            <?php
+                            $iconClass = '';
+                            if (!$canChange) {
+                                $iconClass = ' inactive';
+                            } elseif (!$saveOrder) {
+                                $iconClass = ' inactive" title="' . Text::_('JORDERINGDISABLED');
+                            }
+                            ?>
+                            <span class="sortable-handler<?php echo $iconClass; ?>">
+                                <span class="icon-ellipsis-v" aria-hidden="true"></span>
+                            </span>
+                            <?php if ($canChange && $saveOrder) : ?>
+                                <input type="text" name="order[]" size="5"
+                                    value="<?php echo $item->ordering; ?>" class="width-20 text-area-order hidden">
+                            <?php endif; ?>
+                            <?php echo $item->ordering; ?>
+                        </td>
+						
+						<td class="track-status">
+							<div style="float:left;">
+                                <?php
+                                    $options = [
+                                        'task_prefix' => 'track.',
+                                        'disabled' => !$canChange,
+                                        'id' => 'state-' . $item->id,
+                                    ];
+                                    echo (new PublishedButton())->render((int) $item->status, $i, $options);
+                                ?>
+                            </div>
+                            <div>
+                                <?php if ($item->note !='') :?>
+                                	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
+                                		title="<?php echo $item->note; ?>"></span>
+								<?php endif; ?>
+                             </div>
+                                   
 						</td>
 						<td class="has-context">
 							<div class="pull-left">
