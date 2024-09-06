@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylisttracksModel.php
- * @version 0.0.13.0 21st August 2024
+ * @version 0.0.13.0 31st August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -48,8 +48,9 @@ class PlaylisttracksModel extends ListModel {
     {
         $app = Factory::getApplication();
         
-        $this->id = $app->input->post->get('id');
- //       $this->setState('filter.category_id', $categoryId);
+        $this->id = $app->input->get('id',0);
+        $this->setState('id',$this->id);
+        //       $this->setState('filter.category_id', $categoryId);
         
         // Adjust the context to support modal layouts.
         if ($layout = $app->input->get('layout'))
@@ -59,26 +60,15 @@ class PlaylisttracksModel extends ListModel {
         
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
-        
-        $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
-        $this->setState('filter.published', $published);
-        
-        $level = $this->getUserStateFromRequest($this->context . '.filter.level', 'filter_level');
-        $this->setState('filter.level', $level);
-        
-        
-        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
-//        $artlist        = $this->getUserStateFromRequest($this->context . '.filter.artlist', 'filter_artlist', '1');
-//        $scfilt        = $this->getUserStateFromRequest($this->context . '.filter.scfilt', 'filter_scfilt', '');
-        
+                                
         $formSubmited = $app->input->post->get('form_submited');
         if ($formSubmited)
         {
 //            $artlist = $app->input->post->get('artlist');
 //            $this->setState('filter.artlist', $artlist);
             
-            $categoryId = $app->input->post->get('category_id');
-            $this->setState('filter.category_id', $categoryId);
+//            $categoryId = $app->input->post->get('category_id');
+//            $this->setState('filter.category_id', $categoryId);
             
 //            $scfilt = $app->input->post->get('scfilt');
 //            $this->setState('filter.artlist', $scfilt);
@@ -95,7 +85,6 @@ class PlaylisttracksModel extends ListModel {
         $id .= ':' . $this->getState('filter.search');
         $id .= ':' . serialize($this->getState('filter.access'));
         $id .= ':' . $this->getState('filter.status');
-        $id .= ':' . serialize($this->getState('filter.category_id'));
         
         return parent::getStoreId($id);
     }
@@ -120,13 +109,13 @@ WHERE pt.playlist_id = 1
                 'pt.id AS id, pt.track_id, pt.listorder AS ordering, '.
                 't.title AS track_title, t.sortartist AS artist, b.title AS album_title, 1 AS catid, '.
                 't.checked_out AS checked_out, t.checked_out_time AS checked_out_time, '.
-                't.status AS status, t.access AS access, t.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, t.modified AS modified, t.note AS note'
+                't.status AS status, t.access AS access, t.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, t.modified AS modified, t.note AS note, 0 AS category_id'
                 )
             );
         $query->from('#__xbmusic_playlisttrack AS pt');
         $query->join('INNER', $db->qn('#__xbmusic_tracks'). ' AS t ON t.id = pt.track_id');
         $query->join('LEFT', $db->qn('#__xbmusic_albums'). ' AS b ON b.id = t.album_id');
-        $query->where('pt.playlist_id = 1'); //.$this->id); 
+        $query->where('pt.playlist_id = '.$this->id); 
         
         //search in track title
         

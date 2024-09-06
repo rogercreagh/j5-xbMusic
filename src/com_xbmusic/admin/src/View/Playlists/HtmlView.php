@@ -113,8 +113,9 @@ class HtmlView extends BaseHtmlView {
         $childBar = $dropdown->getChildToolbar();
         $childBar->standardButton('dashboardview', 'Dashboard', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
         $childBar->standardButton('albumsview', 'Albums', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('artistview', 'Artistists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlisttracksview', 'Playlist Tracks', 'dashboard.toPlaylisttracks')->listCheck(true)->icon('far fa-rectangle-list') ;
+        $childBar->standardButton('artistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        $childBar->standardButton('playlistsview', 'Playlists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-rectangle-list') ;
+        $childBar->standardButton('playlisttracksview', 'Playlist Tracks', 'dashboard.toPlaylisttracks')->listCheck(true)->icon('far fa-headphones') ;
         $childBar->standardButton('songsview', 'Songs', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('tracksview', 'Tracks', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'Categories', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;

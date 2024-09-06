@@ -1,7 +1,7 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/src/Model/PlaylistModel.php
+ * @filesource admin/src/Model/PlaylisttrackModel.php
  * @version 0.0.11.7 2nd August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024

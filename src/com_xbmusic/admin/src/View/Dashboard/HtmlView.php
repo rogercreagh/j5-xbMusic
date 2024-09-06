@@ -276,7 +276,7 @@ class HtmlView extends BaseHtmlView {
         $childBar = $dropdown->getChildToolbar();
         $childBar->standardButton('albumsview', 'Albums', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
         $childBar->standardButton('artistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistview', 'Playlists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('playlistsview', 'Playlists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
         $childBar->standardButton('songsview', 'Songs', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('trackview', 'Tracks', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'Categories', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;

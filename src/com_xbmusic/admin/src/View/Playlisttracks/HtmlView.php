@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlisttracks/HtmlView.php
- * @version 0.0.13.0 7th August 2024
+ * @version 0.0.13.2 31st August 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -46,7 +46,10 @@ class HtmlView extends BaseHtmlView {
         $this->activeFilters = $this->get('ActiveFilters');
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
-        
+
+        $this->id = $this->state->get('id',0);
+        $this->title = ($this->id>0) ? XbmusicHelper::getItemValue('#__xbmusic_playlists', 'title', $this->id) : 'xxx';
+                
         $this->addToolbar();
         
         return parent::display($tpl);
@@ -75,7 +78,7 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('dashboardview', 'Dashboard', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
         $childBar->standardButton('albumsview', 'Albums', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-users-line') ;
         $childBar->standardButton('artistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistsview', 'Artists', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('playlistsview', 'Artists', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
         $childBar->standardButton('songsview', 'Songs', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('tracksview', 'Tracks', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'Categories', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;
