@@ -85,7 +85,7 @@ if ($saveOrder && !empty($this->items)) {
 						<th class="center " style="width:25px;" >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
-						<th scope="col" class="w-1 text-center d-none d-md-table-cell">
+						<th scope="col" class="text-center d-none d-md-table-cell" style="width:125px;">
 							<?php echo HTMLHelper::_('searchtools.sort', '', 'ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-sort'); ?>
 						</th>
 						<th class="nowrap center " style="width:95px;" >
@@ -117,11 +117,11 @@ if ($saveOrder && !empty($this->items)) {
     				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.track.' . $item->id) && $canCheckin;
     				?>
  					<tr class="row<?php echo $i % 2; ?>"  data-draggable-group="1">
-						<td class="center " style="width:25px;">
-                                    <?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->track_title); ?>
+						<td class="center" style="width:25px;">
+                            <?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->track_title); ?>
 							<?php //echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 						</td>
-                        <td class="text-center d-none d-md-table-cell">
+                        <td class="text-center d-none d-md-table-cell xbw125">
                             <?php
                             $iconClass = '';
                             if (!$canChange) {
@@ -131,13 +131,10 @@ if ($saveOrder && !empty($this->items)) {
                             }
                             ?>
                             <span class="sortable-handler<?php echo $iconClass; ?>">
-                                <span class="icon-ellipsis-v" aria-hidden="true"></span>
+                                <span class="icon-ellipsis-v" aria-hidden="true"> </span>
                             </span>
-                            <?php if ($canChange && $saveOrder) : ?>
-                                <input type="text" name="order[]" size="5"
-                                    value="<?php echo $item->ordering; ?>" class="width-20 text-area-order hidden">
-                            <?php endif; ?>
-                            <?php // echo $item->ordering; ?>
+							<input type="text" name="order[]" size="5" readonly="true" 
+                            	value="<?php echo $item->ordering; ?>" class="text-area-order xborderip" />
                         </td>
 						
 						<td class="track-status">

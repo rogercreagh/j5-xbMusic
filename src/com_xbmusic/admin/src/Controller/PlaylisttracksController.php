@@ -15,6 +15,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Utilities\ArrayHelper;
 
 class PlaylisttracksController extends AdminController {
@@ -22,8 +23,31 @@ class PlaylisttracksController extends AdminController {
     public function getModel($name = 'playlisttracks', $prefix = 'Administrator', $config = array('ignore_request' => true)) {
         return parent::getModel($name, $prefix, $config);
     }
+     
+    public function toTop() {
+        $pks   = (array) $this->input->post->get('cid', [], 'int');
+        $model = $this->getModel();
+        $model->totop($pks);
+        $this->setRedirect((string)Uri::getInstance());        
+    }
+       
+    public function toEnd() {
+        $pks   = (array) $this->input->post->get('cid', [], 'int');
+        $model = $this->getModel();
+        $model->toend($pks);
+        $this->setRedirect((string)Uri::getInstance());
         
-    public function SaveOrderAjax() {
+    }
+    
+    public function remove() {
+        $pks   = (array) $this->input->post->get('cid', [], 'int');
+        $model = $this->getModel();
+        $model->remove($pks);
+        $this->setRedirect((string)Uri::getInstance());
+        
+    }
+/*
+     public function SaveOrderAjax() {
         // Check for request forgeries.
         $this->checkToken();
         
@@ -56,4 +80,5 @@ class PlaylisttracksController extends AdminController {
         return true;
         
     }
+ */
 }

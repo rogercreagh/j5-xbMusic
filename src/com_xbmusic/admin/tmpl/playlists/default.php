@@ -59,7 +59,7 @@ if (strpos($listOrder, 'modified') !== false) {
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playists'); ?>" method="post" name="adminForm" id="adminForm">
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlists'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
 		
 		<?php // Search tools bar

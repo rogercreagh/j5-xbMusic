@@ -154,7 +154,7 @@ WHERE pt.playlist_id = 1
             return false;
         }
         
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
                          
         foreach ($pks as $i => $pk) {
@@ -170,8 +170,132 @@ WHERE pt.playlist_id = 1
                     return false;
             }               
         }
-                       
+        $plid = Factory::getApplication()->input->get('id',0);
+        $this->resetorder($plid);
         return true;
     }
-     
+    
+/**
+ * @name remove()
+ * @desc this remooves items from a playlist by their id 
+ * @param array $pks
+ * @return boolean
+ */
+    public function remove($pks) {
+        if (empty($pks)) {
+            Factory::getApplication()->enqueueMessage(Text::_($this->text_prefix . '_ERROR_NO_ITEMS_SELECTED'), 'error');
+            return false;
+        }
+//       $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        
+        foreach ($pks as $pk) {
+            $query->clear();
+            $query->delete('#__xbmusic_playlisttrack')
+                ->where($db->qn('id').' = '.$db->q($pk));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                $this->setError($e);
+                return false;
+            }
+        }
+        $plid = Factory::getApplication()->input->get('id',0);
+        $this->resetorder($plid);
+        return true;     
+    }
+    
+    /**
+     * @name totop()
+     * @desc moves item(s) by their id to top of list
+     * NB if more than one item is moved to to the order they will end up in the order
+     * they are in the the array parameter
+     * @param array or int $pks
+     */
+    public function totop($ids) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        foreach ($ids as $id) {
+            $query->clear();
+            $query->update('#__xbmusic_playlisttrack');
+            $query->set('listorder = '.$db->q('0'))
+            ->where('id = '.$db->q($id));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                $this->setError($e);
+                return false;
+            }
+        }
+        $plid = Factory::getApplication()->input->get('id',0);
+        $this->resetorder($plid);
+    }
+    
+    /**
+     * @name totop()
+     * @desc moves item(s) by their id to top of list
+     * NB if more than one item is moved to to the order they will end up in the order
+     * they are in the the array parameter
+     * @param array or int $pks
+     */
+    public function toend($ids) {
+        $db = $this->getDatabase();
+        $db->setQuery('SELECT MAX(listorder) FROM '.$db->qn('#__xbmusic_playlisttrack').' WHERE '.$db->qn('playlist_id').' = 1');
+        $end = $db->loadResult();
+        
+        $query = $db->getQuery(true);
+        
+        foreach ($ids as $id) {
+            $end ++;
+            $query->clear();
+            $query->update('#__xbmusic_playlisttrack');
+            $query->set('listorder = '.$db->q($end))
+            ->where('id = '.$db->q($id));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                $this->setError($e);
+                return false;
+            }
+        }
+        $plid = Factory::getApplication()->input->get('id',0);
+        $this->resetorder($plid);
+    }
+    
+    /**
+     * @name resetorder()
+     * @desc - use after saveorder or remove or moveto
+     * @return boolean
+     */
+    public function resetorder($plid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select($db->qn('id'))->from('#__xbmusic_playlisttrack');
+        $query->where($db->qn('playlist_id').' = '.$db->q($plid));
+        $query->order($db->qn('listorder'));
+        $db->setQuery($query);
+        $ids = $db->loadColumn();
+        $n = 0;
+        foreach ($ids as $id) {
+            $n ++;
+            $query->clear();
+            $query->update('#__xbmusic_playlisttrack');
+            $query->set('listorder = '.$db->q($n))
+                ->where('id = '.$db->q($id));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                $this->setError($e);
+                return false;
+            }
+        }
+        Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_RESET_LIST_ORDER',$n));
+        return true;
+    }
+    
 }

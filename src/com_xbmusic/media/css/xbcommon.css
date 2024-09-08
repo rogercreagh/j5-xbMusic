@@ -443,6 +443,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 /* widths */
 .xbw18 {width: 18px; }
 .xbw100 {width:100px; }
+.xbw125 {width:125px; }
 
 .xbwp100 {width:100%; }
 .xbwp60 {width:60%; }
@@ -563,12 +564,19 @@ dl.xbdl dd {
 	border-radius: 4px; 
 }
 
-	.xbtags .is-selected { 
-    	color: #9b9;
-        background-color: #f7f7f7;
-        cursor: none;
-    }
-    .xbtags .choices__item { 
-        padding: 3px 10px;
-    }
+.xbtags .is-selected { 
+   	color: #9b9;
+       background-color: #f7f7f7;
+       cursor: none;
+   }
+   .xbtags .choices__item { 
+       padding: 3px 10px;
+   }
 
+/** styles for ordering column, make order visible */
+.xborderip {
+	text-align:right;
+	width:60px;
+	border:1px solid #888;
+	background-color:#f7f7f7;
+} 
