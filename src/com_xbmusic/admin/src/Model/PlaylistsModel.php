@@ -293,11 +293,11 @@ class PlaylistsModel extends ListModel {
     public function getPlaylistTracks($pid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.title AS tracktitle, t.sortartist AS artistname');
+        $query->select('t.id AS trackid, t.title AS tracktitle, t.sortartist AS artistname, pt.listorder AS ordering');
         $query->join('LEFT','#__xbmusic_playlisttrack AS pt ON pt.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
         $query->where('pt.playlist_id = '.$pid);
-        $query->order('pt.seqno, t.title ASC');
+        $query->order('pt.listorder, t.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }

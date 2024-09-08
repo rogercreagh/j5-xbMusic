@@ -290,7 +290,7 @@ class PlaylistModel extends AdminModel {
     public function getPlaylistTrackList() {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->select('a.id as track_id, ba.note AS note, ba.seqno AS seqno, ba.listorder AS oldorder');
+        $query->select('a.id as track_id, ba.note AS note, ba.listorder AS ordering, ba.listorder AS oldorder');
         $query->from('#__xbmusic_playlisttrack AS ba');
         $query->innerjoin('#__xbmusic_tracks AS a ON ba.track_id = a.id');
         $query->where('ba.playlist_id = '.(int) $this->getItem()->id);

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylisttracksModel.php
- * @version 0.0.13.0 31st August 2024
+ * @version 0.0.13.3 8th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -15,10 +15,12 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\TagsHelper;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
+use Joomla\Database\DatabaseInterface;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class PlaylisttracksModel extends ListModel {
@@ -35,10 +37,8 @@ class PlaylisttracksModel extends ListModel {
                 'track_title', 't.title',
                 'artist', 't.sortartist',
                 'album_title', 'b.title',
-                'ordering', 'pt.listorder',
-                'category_id', 'level'
-            );
-            
+                'ordering', 'pt.listorder'
+            );           
         }
         
         parent::__construct($config);
@@ -106,10 +106,10 @@ WHERE pt.playlist_id = 1
         $query->select(
             $this->getState(
                 'list.select',
-                'pt.id AS id, pt.track_id, pt.listorder AS ordering, '.
+                'pt.id AS id, pt.track_id, pt.listorder AS ordering,'.
                 't.title AS track_title, t.sortartist AS artist, b.title AS album_title, 1 AS catid, '.
                 't.checked_out AS checked_out, t.checked_out_time AS checked_out_time, '.
-                't.status AS status, t.access AS access, t.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, t.modified AS modified, t.note AS note, 0 AS category_id'
+                't.status AS status, t.access AS access, t.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, t.modified AS modified, t.note AS note'
                 )
             );
         $query->from('#__xbmusic_playlisttrack AS pt');
@@ -142,13 +142,36 @@ WHERE pt.playlist_id = 1
     public function getItems() {
         $items  = parent::getItems();
 
+        
         return $items;
         
     } // end getItems
 
-    public function saveorder($pks = [], $order = null){
-        Factory::getApplication()->enqueueMessage('in saveorder id='.$this->id);
+    public function saveorder($pks = [], $order = null) {
+        
+        if (empty($pks)) {
+            Factory::getApplication()->enqueueMessage(Text::_($this->text_prefix . '_ERROR_NO_ITEMS_SELECTED'), 'error');            
+            return false;
+        }
+        
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true);
+                         
+        foreach ($pks as $i => $pk) {
+            $query->clear();
+            $query->update('#__xbmusic_playlisttrack');
+            $query->set('listorder = '.$db->q($order[$i]))
+                ->where('id = '.$db->q($pk));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                    $this->setError($e);                    
+                    return false;
+            }               
+        }
+                       
+        return true;
     }
-    
-    
+     
 }

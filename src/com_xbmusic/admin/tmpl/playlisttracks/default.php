@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlisttracks/default.php
- * @version 0.0.13.2 31st August 2024
+ * @version 0.0.13.3 7th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -49,9 +49,9 @@ if ($saveOrder && !empty($this->items)) {
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlisttracks'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo '<i>'.Text::_('XBMUSIC_PLAYLIST').'</i> : '.$this->title; ?></h3>
-		
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlisttracks&id='.$this->id); ?>" method="post" name="adminForm" id="adminForm">
+		<h3><?php echo '<i>'.Text::_('XBMUSIC_PLAYLISTTRACKS').'</i> : '.$this->title; ?></h3>
+		<p class=xbit"><?php echo Text::_('XBMUSIC_PLAYLISTTRACKS_INFO');?>
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>
@@ -116,7 +116,7 @@ if ($saveOrder && !empty($this->items)) {
     				$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
     				$canChange  = $user->authorise('core.edit.state', 'com_xbmusic.track.' . $item->id) && $canCheckin;
     				?>
- 					<tr class="row<?php echo $i % 2; ?>"  data-draggable-group="<?php echo $item->catid; ?>">
+ 					<tr class="row<?php echo $i % 2; ?>"  data-draggable-group="1">
 						<td class="center " style="width:25px;">
                                     <?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->track_title); ?>
 							<?php //echo HTMLHelper::_('grid.id', $i, $item->id); ?>
@@ -137,7 +137,7 @@ if ($saveOrder && !empty($this->items)) {
                                 <input type="text" name="order[]" size="5"
                                     value="<?php echo $item->ordering; ?>" class="width-20 text-area-order hidden">
                             <?php endif; ?>
-                            <?php echo $item->ordering; ?>
+                            <?php // echo $item->ordering; ?>
                         </td>
 						
 						<td class="track-status">

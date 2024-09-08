@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Playlisttrack Form file v0.0.13.3 6th September 2024 -->
+<form>
+	<config>
+		<inlinehelp button="show"/>
+	</config>
+	<fieldset name="general"
+	>
+		<field name="id" type="number" 
+			label="JGLOBAL_FIELD_ID_LABEL"
+			description="JGLOBAL_FIELD_ID_DESC" 
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+
+		<field name="playlist_id" type="number" 
+			label="Playlist ID"
+			description=" "
+			class=""
+			size="10"  
+		/>
+
+		<field name="track_id" type="number" 
+			label="Track ID"
+			description=""
+			size="10" 
+		/>
+		
+		<field
+			name="note" type="textarea"
+			label="XB_ADMIN_NOTE"
+			description="XB_FIELD_ADMIN_NOTE_DESC"
+			class="span12" size="40" rows="3"
+			maxlength="255"
+		/>
+
+		<field 
+			name="ordering" type="number" 
+			label="Ordering"
+			description="" 
+			size="10"
+		/>
+		
+		<field name="catid" type="hidden" value="1" />
+
+	</fieldset>
+
+
+</form>
