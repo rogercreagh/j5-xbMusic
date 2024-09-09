@@ -13,14 +13,9 @@ namespace Crosborne\Component\Xbmusic\Administrator\Field;
 
 defined('JPATH_BASE') or die;
 
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Form\Field\ListField;
-use Joomla\CMS\Log\Log;
-use Joomla\Utilities\ArrayHelper;
 use \stdClass;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class XbtracklistField extends ListField {
     
@@ -66,7 +61,7 @@ class XbtracklistField extends ListField {
         
         // Merge any additional options in the XML definition.
         $options = array_merge(parent::getOptions(), $like, $recent, $result);
-        return $options;
-        
+        return $options;       
     }
+    
 }

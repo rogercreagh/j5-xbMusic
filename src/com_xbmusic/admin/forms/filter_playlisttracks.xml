@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- xbMusic Playlisttracks Filter Form file v0.13.0 20th August 2024 -->
 <form>
-	<fields name="filter">
+	<fields name="filter"  addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<field
 			name="search" type="text"
 			label="Title Search"
-			description="in Track Title or prefix with 'a:' for artist, 'b:' for album"
+			description="Search in Track Title, or prefix with 'a:' for artist, 'b:' for album"
 			hint="JSEARCH_FILTER"
 		/>
 
 		<field
-			name="track_title" type="text"
-			label="Track Title"
-			description=""
-			hint=""
-		/>
+			name="artist" type="xbartistlist"
+			label="Artist Artist"
+			description="Filter by Artist"
+			recent="4"
+			onchange="this.form.submit();"
+		>
+			<option value="">Select Artist</option>
+		</field>			
 
 		<field
-			name="artist" type="text"
-			label="Artist"
-			description=""
-			hint=""
-		/>
-
-		<field
-			name="album_title" type="text"
+			name="album" type="xbalbumlist"
 			label="Album Title"
-			description=""
-			hint=""
-		/>			
+			description="Filter by album"
+			recent="4"
+			onchange="this.form.submit();"
+		>
+			<option value="">Select Album</option>
+		</field>			
 
 		<input type="hidden" name="form_submited" value="1"/>
 	</fields>

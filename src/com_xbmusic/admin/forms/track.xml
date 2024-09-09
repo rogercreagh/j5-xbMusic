@@ -212,7 +212,7 @@
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
 		name="links" 
 	>
-		<field name="album_id" type="xbalbums"
+		<field name="album_id" type="xbalbumlist"
 			label="Album"
 			description="A track can belong to only one album, if it is not already in the list it will be created from the ID3 tag data if avaiable"
 		>
@@ -269,7 +269,7 @@
 			groupByFieldset="false" 
 		>
 			<form>
-				<field name="artist_id" type="xbartistlist" label="Artist Name">
+				<field name="artist_id" type="xbartistlist" label="Artist Name" recent="4" >
 					<option value=""> </option>	
 				</field>
 				<field name="role" type="text" label="XB_ROLE" 
