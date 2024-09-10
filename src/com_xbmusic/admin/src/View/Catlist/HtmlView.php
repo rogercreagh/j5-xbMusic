@@ -1,14 +1,14 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/src/View/Playlists/HtmlView.php
- * @version 0.0.12.0 7th August 2024
+ * @filesource admin/src/View/Catlist/HtmlView.php
+ * @version 0.0.14.0 10th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
-namespace Crosborne\Component\Xbmusic\Administrator\View\Playlists;
+namespace Crosborne\Component\Xbmusic\Administrator\View\Catlist;
 
 defined('_JEXEC') or die;
 
@@ -31,7 +31,6 @@ class HtmlView extends BaseHtmlView {
     protected $items;
     protected $pagination;
     protected $state;
-    protected $categories;
     
     public $filterForm;
     
@@ -46,6 +45,16 @@ class HtmlView extends BaseHtmlView {
         $this->activeFilters = $this->get('ActiveFilters');
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
+        $this->rootcat_album = $this->params->get('rootcat_album');
+        $this->defcat_album = $this->params->get('defcat_album');
+        $this->rootcat_artist = $this->params->get('rootcat_artist');
+        $this->defcat_artist = $this->params->get('defcat_artist');
+        $this->rootcat_playlist = $this->params->get('rootcat_playlist');
+        $this->defcat_playlist = $this->params->get('defcat_playlist');
+        $this->rootcat_song = $this->params->get('rootcat_song');
+        $this->defcat_song = $this->params->get('defcat_song');
+        $this->rootcat_track = $this->params->get('rootcat_track');
+        $this->defcat_track = $this->params->get('defcat_track');
         
         $this->addToolbar();
         
@@ -55,19 +64,23 @@ class HtmlView extends BaseHtmlView {
 
     protected function addToolbar()
     {
+        $user  = Factory::getApplication()->getIdentity();
         // Get the toolbar object instance
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_PLAYLISTS_TITLE'), 'fas fa-headphones');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORIES_TITLE'), 'fas fa-compact-disc');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
-        if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0)
-        {
-            ToolbarHelper::addNew('playlist.add');
+        if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0) {
+            ToolbarHelper::custom('catlist.categoryNew','new','','XB_CATEGORY_NEW',false);
         }
         
+        if ($canDo->get('core.admin')) {
+            ToolbarHelper::editList('catlist.categoryEdit', 'XB_CATEGORY_EDIT');
+        }
+/*         
         if ($canDo->get('core.edit.state') ) {
             $dropdown = $toolbar->dropdownButton('status-group')
             ->text('JTOOLBAR_CHANGE_STATUS')
@@ -78,21 +91,21 @@ class HtmlView extends BaseHtmlView {
             
             $childBar = $dropdown->getChildToolbar();
             
-            $childBar->publish('playlist.publish')->listCheck(true);
+            $childBar->publish('categories.publish')->listCheck(true);
             
-            $childBar->unpublish('playlist.unpublish')->listCheck(true);
+            $childBar->unpublish('categories.unpublish')->listCheck(true);
             
-            $childBar->archive('playlist.archive')->listCheck(true);
+            $childBar->archive('categories.archive')->listCheck(true);
             
             if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('playlist.trash');
+                $childBar->trash('categories.trash');
             }
-            $childBar->checkin('playlist.checkin');
+            $childBar->checkin('categories.checkin');
                 
         }
         
         if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('playlist.delete', 'JTOOLBAR_EMPTY_TRASH')
+            $toolbar->delete('categories.delete', 'JTOOLBAR_EMPTY_TRASH')
             ->message('JGLOBAL_CONFIRM_DELETE')
             ->listCheck(true);
         }
@@ -104,22 +117,20 @@ class HtmlView extends BaseHtmlView {
             ->listCheck(true);                        
         }
         
-        $toolbar->standardButton('playlisttracksview', 'Tracks List', 'dashboard.toPlaylisttracks')->listCheck(true)->icon('fas fa-headphones') ;
-        
+ */        
         $dropdown = $toolbar->dropdownButton('views')
-        ->text('XBMUSIC_OTHER_VIEWS')
-        ->toggleSplit(false)
-        ->icon('icon-ellipsis-h')
-        ->buttonClass('btn btn-action')
-        ->listCheck(false);
+            ->text('XBMUSIC_OTHER_VIEWS')
+            ->toggleSplit(false)
+            ->icon('icon-ellipsis-h')
+            ->buttonClass('btn btn-action')
+            ->listCheck(false);
         $childBar = $dropdown->getChildToolbar();
         $childBar->standardButton('dashboardview', 'XB_DASHBOARD', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
         $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
         $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-rectangle-list') ;
+        $childBar->standardButton('playlistview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('tracksview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-open') ;
         $childBar->standardButton('tagsview', 'XB_TAGS', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
         if ($canDo->get('core.admin')) {
@@ -127,7 +138,7 @@ class HtmlView extends BaseHtmlView {
             ToolbarHelper::preferences('com_xbmusic');
         }
         
-        $toolbar->help('xbMusic:Playlists',false,'https://crosborne.uk/xbmusic/doc#playlists');
+        $toolbar->help('xbMusic:Categories',false,'https://crosborne.uk/xbmusic/doc#categories');
         
     }
     

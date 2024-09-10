@@ -64,3 +64,16 @@ audio {
 .xbsubcompact table tbody td .control-group {
   margin-bottom:2px;
 }
+
+/* additional badge/label colours with info(blue) success(green), warning(orange) important(red) */
+.catcnt {
+    border: solid 1px #31708f;
+      color: #31708f !important;
+}
+.albumcnt { background-color: #deefef !important;  }           
+.artistcnt { background-color: #deefde !important;  }      
+.playlistcnt { background-color: #efdeef !important;  }      
+.songcnt { background-color: #efefef !important;  }    
+.trackcnt { background-color: #efefef !important;  }    
+.othercnt { background-color: #efefef !important;  }    
+

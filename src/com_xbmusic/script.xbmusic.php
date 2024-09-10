@@ -82,7 +82,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Artists","desc"=>"default parent category for xbMusic Artists"),
                 array("title"=>"Playlists","desc"=>"default parent category for xbMusic Playlists"),
                 array("title"=>"Songs","desc"=>"default parent category for xbMusic Songs"),
-                array("title"=>"Tracks","desc"=>"default parent category for xbMaps Tracks")
+                array("title"=>"Tracks","desc"=>"default parent category for xbMusic Tracks")
             );
             $message .= $this->createCategories($cats).'<br />';
             

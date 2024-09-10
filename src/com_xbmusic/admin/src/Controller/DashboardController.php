@@ -47,7 +47,7 @@ class DashboardController extends AdminController
         $this->setRedirect('index.php?option=com_xbmusic&view=tracks');
     }
     public function toCats() {
-        $this->setRedirect('index.php?option=com_categories&view=categories&extension=com_xbmusic');
+        $this->setRedirect('index.php?option=com_xbmusic&view=catlist');
     }
     public function toTags() {
         $this->setRedirect('index.php?option=com_xbmusic&view=tags');

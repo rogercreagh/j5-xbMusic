@@ -125,7 +125,7 @@
 		<field name ="plistcatnote" type="note"
 			label="XBMUSIC_CONFIG_PLISTCAT_NOTE"
 		/>
-		<field name="rootcat_plist" type="category"
+		<field name="rootcat_playlist" type="category"
 			label="XBMUSIC_CONFIG_PARENT_CAT" 
 			description="XBMUSIC_CONFIG_CATBRANCH_DESC" 
 			extension="com_xbmusic" 
@@ -133,7 +133,7 @@
 			<option value="0">XBMUSIC_NO_RESTRICT</option>
 		</field>
 		<field
-			name="defcat_plist" type="category"
+			name="defcat_playlist" type="category"
 			label="XBCONFIG_CAT_DEF_LABEL"
 			description="XBCONFIG_CAT_DEF_DESC"
 			extension="com_xbmusic"

@@ -109,14 +109,14 @@ class HtmlView extends BaseHtmlView {
         }
         //==========================
         
-        $rootcat_plist = $params->get('rootcat_plist',0);
-        if ($rootcat_plist == 0) {
-            $defcat_plist = $params->get('defcat_plist',0);
+        $rootcat_playlist = $params->get('rootcat_playlist',0);
+        if ($rootcat_playlist == 0) {
+            $defcat_playlist = $params->get('defcat_playlist',0);
         } else {
-            $defcat_plist = $params->get('defrescat_plist',0);
+            $defcat_playlist = $params->get('defrescat_plist',0);
         }
-        $this->rootcat_plist = ($rootcat_plist == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_plist)->title.'</span>';
-        $this->defcat_plist = ($defcat_plist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_plist)->title;
+        $this->rootcat_playlist = ($rootcat_playlist == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_playlist)->title.'</span>';
+        $this->defcat_playlist = ($defcat_playlist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_playlist)->title;
         
         $plisttagparents = $params->get('plisttagparents');
         if (is_array($plisttagparents)) {

@@ -193,8 +193,8 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							</td>
 						</tr>
 						<tr>
-							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_plist; ?></span>
-								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_plist; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_playlist; ?></span>
+								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_playlist; ?></span>
 							</td>
 							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->plisttagparents; ?>
 							</td>
@@ -203,8 +203,8 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradcat">
-					<h3 class="xbmb20"><i class='far fa-folder-open' ></i> <a href="index.php?option=com_categories&view=categories&extension=com_xbmusic"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
-					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATS'); ?></span>
+					<h3 class="xbmb20"><i class='far fa-folder-open' ></i> <a href="index.php?option=com_xbmusic&view=catlist"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
+					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></span>
 						<span class="xbbadge badge-cat"><?php echo $this->catcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->catcnts['published']==0) ? 'label-grey' : 'label-green';?>"

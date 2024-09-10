@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic admin/forms/filter_categories.xml v0.14.0 10th September 2024 -->
+<form>
+	<fields name="filter" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
+		<field
+			name="search"
+			type="text"
+			label="COM_CONTENT_FILTER_SEARCH_DESC"
+			description="Search Category Title, or prefix with 'd:' to search description"
+			hint="JSEARCH_FILTER"
+		/>
+		<field
+			name="published"
+			type="status"
+			label="COM_CONTENT_FILTER_PUBLISHED"
+			description="COM_CONTENT_FILTER_PUBLISHED_DESC"
+			onchange="this.form.submit();"
+			>
+			<option value="">JOPTION_SELECT_PUBLISHED</option>
+		</field>
+		<field
+			name="branch"
+			type="sql"
+			label="XB_CATEGORY_BRANCH"
+			description="XB_CATEGORY_BRANCH_DESC"
+			query="SELECT DISTINCT t.id, t.path, t.alias AS alias, t.title AS title FROM `#__categories` AS t WHERE t.extension = 'com_xbmusic' ORDER BY t.path"
+  			key_field="id"
+  			value_field="title"
+			onchange="this.form.submit();"
+			>
+			<option value="">All Categories</option>
+		</field>
+	</fields>
+	<fields name="list">
+		<field
+			name="limit"
+			type="limitbox"
+			class="inputbox input-mini"
+			default="20"
+			label="COM_CONTENT_LIST_LIMIT"
+			description="COM_CONTENT_LIST_LIMIT_DESC"
+			onchange="this.form.submit();"
+		/>
+	</fields>
+</form>
