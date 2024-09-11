@@ -2,7 +2,7 @@
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
 	<creationDate>11th September 2024</creationDate>
-	<version>0.0.14.1</version>
+	<version>0.0.15.0</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -63,7 +63,7 @@
 				<params>
 					<menu-quicktask-title>XBMUSIC_VIEW_ALBUMS</menu-quicktask-title>
 					<menu-quicktask-icon>eye</menu-quicktask-icon>
-					<menu-quicktask>/index.php?option=com_xbmusic&amp;view=album</menu-quicktask>
+					<menu-quicktask>/index.php?option=com_xbmusic&amp;view=albums</menu-quicktask>
 				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=artists" >
@@ -76,15 +76,15 @@
 			<menu link="option=com_xbmusic&amp;view=playlists" >
 				xbmusic_iconmenu_playlists
 				<params>
-					<menu-quicktask-title>XBMUSIC_NEW_PLAYLIST</menu-quicktask-title>
-					<menu-quicktask>index.php?option=com_xbmusic&amp;view=playlist&amp;layout=edit</menu-quicktask>
+					<menu-quicktask-title>XBMUSIC_VIEW_PLAYLISTS</menu-quicktask-title>
+					<menu-quicktask-icon>eye</menu-quicktask-icon>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=playlists</menu-quicktask>
 				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=songs" >
 				xbmusic_iconmenu_songs
 				<params>
-					<menu-quicktask-title>XBMUSIC_VIEW_SONGS</menu-quicktask-title>
-					<menu-quicktask-icon>fas fa-music</menu-quicktask-icon>
+					<menu-quicktask-title>XBMUSIC_NEW_SONG</menu-quicktask-title>
 					<menu-quicktask>index.php?option=com_xbmusic&amp;view=song&amp;layout=edit</menu-quicktask>
 				</params>
 			</menu>
