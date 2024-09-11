@@ -25,12 +25,12 @@ class CatlistController extends AdminController {
         return parent::getModel($name, $prefix, $config);
     }
        
-    protected function categoryEdit() {
+    public function catEdit() {
         $pks   = (array) $this->input->post->get('cid', [], 'int');
-        $this->setRedirect($this->edcatlink.$pks[0],'a message for you');
+        $this->setRedirect($this->edcatlink.$pks[0]);
     }
 
-    protected function categoryNew() {
+    public function catNew() {
         $pks   = (array) $this->input->post->get('cid', [], 'int');
         $this->setRedirect($this->edcatlink.'0');
     }

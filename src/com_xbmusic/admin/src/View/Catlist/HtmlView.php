@@ -74,11 +74,11 @@ class HtmlView extends BaseHtmlView {
         $canDo = ContentHelper::getActions('com_xbmusic');
         
         if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0) {
-            ToolbarHelper::custom('catlist.categoryNew','new','','XB_CATEGORY_NEW',false);
+            ToolbarHelper::custom('catlist.catNew','new','','XB_CATEGORY_NEW',false);
         }
         
         if ($canDo->get('core.admin')) {
-            ToolbarHelper::editList('catlist.categoryEdit', 'XB_CATEGORY_EDIT');
+            ToolbarHelper::editList('catlist.catyEdit', 'XB_CATEGORY_EDIT');
         }
 /*         
         if ($canDo->get('core.edit.state') ) {
