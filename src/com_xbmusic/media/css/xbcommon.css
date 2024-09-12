@@ -476,6 +476,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbbook, .xbgreen { color: #008040;}
 .xbdarkgrey { color: #555;}
 .xbgrey, .xbnote, .xbdim {color:#888;}
+.xblightgrey { color: #CCC;}
 
 .xbaoycol {color: #e56b8e !important;}
 

@@ -45,10 +45,7 @@ class HtmlView extends BaseHtmlView {
         $this->addToolBar();
          
         parent::display($tpl);
-    }
-    
-    
-    }
+    } 
 
     protected function addToolbar()
     {
@@ -57,55 +54,12 @@ class HtmlView extends BaseHtmlView {
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORIES_TITLE'), 'fas fa-compact-disc');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORY_TITLE'), 'folder-open');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
-        if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0) {
-            ToolbarHelper::custom('catlist.catNew','new','','XB_CATEGORY_NEW',false);
-        }
+        ToolbarHelper::custom('catinfo.catList', 'fas fa-folder-tree', '', 'XB_CATEGORY_LIST', false) ;
         
-        if ($canDo->get('core.admin')) {
-            ToolbarHelper::editList('catlist.catyEdit', 'XB_CATEGORY_EDIT');
-        }
-/*         
-        if ($canDo->get('core.edit.state') ) {
-            $dropdown = $toolbar->dropdownButton('status-group')
-            ->text('JTOOLBAR_CHANGE_STATUS')
-            ->toggleSplit(false)
-            ->icon('icon-ellipsis-h')
-            ->buttonClass('btn btn-action')
-            ->listCheck(true);
-            
-            $childBar = $dropdown->getChildToolbar();
-            
-            $childBar->publish('categories.publish')->listCheck(true);
-            
-            $childBar->unpublish('categories.unpublish')->listCheck(true);
-            
-            $childBar->archive('categories.archive')->listCheck(true);
-            
-            if ($this->state->get('filter.status') != -2) {
-                $childBar->trash('categories.trash');
-            }
-            $childBar->checkin('categories.checkin');
-                
-        }
-        
-        if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('categories.delete', 'JTOOLBAR_EMPTY_TRASH')
-            ->message('JGLOBAL_CONFIRM_DELETE')
-            ->listCheck(true);
-        }
-                
-        if ($canDo->get('core.edit.state')) {
-            // Add a batch button
-            $toolbar->popupButton('batch', 'JTOOLBAR_BATCH')
-            ->selector('collapseModal')
-            ->listCheck(true);                        
-        }
-        
- */        
         $dropdown = $toolbar->dropdownButton('views')
             ->text('XBMUSIC_OTHER_VIEWS')
             ->toggleSplit(false)

@@ -69,7 +69,7 @@ class HtmlView extends BaseHtmlView {
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORIES_TITLE'), 'fas fa-compact-disc');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORIES_TITLE'), 'fas fa-folder-tree');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
@@ -78,7 +78,7 @@ class HtmlView extends BaseHtmlView {
         }
         
         if ($canDo->get('core.admin')) {
-            ToolbarHelper::editList('catlist.catyEdit', 'XB_CATEGORY_EDIT');
+            ToolbarHelper::editList('catlist.catEdit', 'XB_CATEGORY_EDIT');
         }
 /*         
         if ($canDo->get('core.edit.state') ) {

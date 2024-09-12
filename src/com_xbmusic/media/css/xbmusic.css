@@ -1,7 +1,7 @@
 /*******
  * @package xbMusic
  * @filesource media/css/xbmusic.cdd
- * @version 0.0.10.1 26th June 2024
+ * @version 0.0.15.0 12th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -21,10 +21,10 @@ audio {
 }
 
 /* the preview eye button */
-.icon-eye {
+#xbcomponent .icon-eye {
 	color:#448; 
 }
-.icon-eye:hover {
+#xbcomponent .icon-eye:hover {
 	color:#185ba1;
 	cursor:pointer;
 }

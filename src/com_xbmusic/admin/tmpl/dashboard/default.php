@@ -203,7 +203,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 
 				<div class="xbbox gradcat">
-					<h3 class="xbmb20"><i class='far fa-folder-open' ></i> <a href="index.php?option=com_xbmusic&view=catlist"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-folder-tree' ></i> <a href="index.php?option=com_xbmusic&view=catlist"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></span>
 						<span class="xbbadge badge-cat"><?php echo $this->catcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>

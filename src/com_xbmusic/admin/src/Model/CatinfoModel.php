@@ -59,19 +59,19 @@ class CatinfoModel extends ItemModel {
                     $query->where('c.id='.$item->id);
                     $query->order('b.title');
                     $db->setQuery($query);
-                    $item->albums = $db->loadObjectList();
+                    $item->albums = $db->loadAssocList();
                 } else {
                     $item->albums = '';
                 }
                 if ($item->artistcnt > 0) {
                     $query->clear();
-                    $query->select('b.id AS id, b.name AS name')
+                    $query->select('b.id AS id, b.name AS title')
                         ->from('#__categories AS c');
                     $query->join('LEFT','#__xbmusic_artists AS b ON b.catid = c.id');
                     $query->where('c.id='.$item->id);
-                    $query->order('b.title');
+                    $query->order('b.name');
                     $db->setQuery($query);
-                    $item->artists = $db->loadObjectList();
+                    $item->artists = $db->loadAssocList();
                 } else {
                     $item->artists = '';
                 }
@@ -83,7 +83,7 @@ class CatinfoModel extends ItemModel {
                     $query->where('c.id='.$item->id);
                     $query->order('b.title');
                     $db->setQuery($query);
-                    $item->playlists = $db->loadObjectList();
+                    $item->playlists = $db->loadAssocList();
                 } else {
                     $item->playlists = '';
                 }
@@ -95,7 +95,7 @@ class CatinfoModel extends ItemModel {
                     $query->where('c.id='.$item->id);
                     $query->order('b.title');
                     $db->setQuery($query);
-                    $item->songs = $db->loadObjectList();
+                    $item->songs = $db->loadAssocList();
                 } else {
                     $item->songs = '';
                 }
@@ -107,7 +107,7 @@ class CatinfoModel extends ItemModel {
                     $query->where('c.id='.$item->id);
                     $query->order('b.title');
                     $db->setQuery($query);
-                    $item->tracks = $db->loadObjectList();
+                    $item->tracks = $db->loadAssocList();
                 } else {
                     $item->tracks = '';
                 }
