@@ -15,6 +15,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ItemModel;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class CatinfoModel extends ItemModel {
     
@@ -32,7 +33,7 @@ class CatinfoModel extends ItemModel {
             $id    = is_null($id) ? $this->getState('catinfo.id') : $id;
             $db = $this->getDatabase();
             $query = $db->getQuery(true);
-            $query->select('c.id AS id, c.path AS path, c.title AS title, c.description AS description, c.alias AS alias, c.note As note, c.metadata AS metadata' );
+            $query->select('c.id AS id, c.path AS path, c.title AS title, c.description AS description, c.alias AS alias, c.level, c.parent_id, c.note As note, c.metadata AS metadata' );
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_albums AS al WHERE al.catid = c.id) AS albumcnt');
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_artists AS ar WHERE ar.catid = c.id) AS artistcnt');
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_playlists AS pl WHERE pl.catid = c.id) AS playlistcnt');
@@ -111,6 +112,8 @@ class CatinfoModel extends ItemModel {
                 } else {
                     $item->tracks = '';
                 }
+                $item->children = XbmusicHelper::getCatChildren($item->path);
+                $item->parent_title = ($item->parent_id > 1) ? XbmusicHelper::getCat($item->parent_id)->title : '';
             }
             
             return $this->item;

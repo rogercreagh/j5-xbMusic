@@ -26,7 +26,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Database\DatabaseInterface;
+//use Joomla\Database;
+//use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
 use DOMDocument;
 use DateTime;
@@ -110,7 +111,8 @@ class XbmusicHelper extends ComponentHelper
 // 	}
 	    
 	public static function getArtistAlbums($aid) {
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.artwork');
 	    $query->from('#__xbmusic_albums AS a');
@@ -123,7 +125,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function getGroupMembers($gid) {
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
 	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
@@ -135,7 +138,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function getArtistSingles($aid) {
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+//	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('t.id AS trackid, t.title AS tracktitle, t.artwork, t.rel_date');
 	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
@@ -342,8 +346,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return int|boolean - id if value is found in column, otherwise false
 	 */
 	public static function checkValueExists( $value,  $table, $col, $where = '') {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('id')->from($db->quoteName($table))
 	    ->where('LOWER('.$db->quoteName($col).')='.$db->quote(strtolower($value)));
@@ -379,8 +383,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return integer
 	 */
 	public static function getItemCnt(string $table, $filter = '') {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('COUNT(*)')->from($db->quoteName($table));
 	    if ($filter !='') {
@@ -405,7 +409,8 @@ class XbmusicHelper extends ComponentHelper
      * @param int $id
      */
 	public static function getItemValue(string $table, string $column, int $id) {
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select($column)->from($db->qn($table)) 
 	       ->where('id = '.$db->q($id));
@@ -423,8 +428,8 @@ class XbmusicHelper extends ComponentHelper
 	 */
 	public static function getItems(string $table, string $column, $search = '', $filter = '' ) {
 	    //TODO make case insenstive?
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')->from($db->qn($table).' AS a');
 	    if (($search !='') && (($search[0] == '%') || ($search[-1] == '%'))) {
@@ -565,8 +570,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function statusCnts(string $table = '#__content', string $colname = 'state', string $ext='com_content') {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('DISTINCT a.'.$colname.', a.alias')
 	    ->from($db->quoteName($table).' AS a');
@@ -594,8 +599,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return boolean|number - true= installed and enabled, 0= installed not enabled, null = not installed
 	 */
 	public static function checkComponent($name, $usesess = true) {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db->setQuery('SELECT enabled FROM #__extensions WHERE element = '.$db->quote($name));
 	    $res = $db->loadResult();
 	    if ($usesess) {
@@ -617,8 +622,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return boolean - true if the table exists
 	 */
 	public static function checkTable(string $table) {
-	    //$db=Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db=Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $tablesarr = $db->setQuery('SHOW TABLES')->loadColumn();
 	    $table = $db->getPrefix().$table;
 	    return in_array($table, $tablesarr);
@@ -632,8 +637,8 @@ class XbmusicHelper extends ComponentHelper
      * @return boolean|NULL - false if table doesn't exist, null if column doesn't exist, if ok then true
      */
 	public static function checkTableColumn($table, $column) {
-	    //$db=Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db=Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    if (self::checkTable($table) != true) return false;
 	    if (!is_array($column)) {
 	        $column = (array) $column;
@@ -702,8 +707,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return object|null
 	 */
 	public static function getCat(int $catid) {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	       ->from('#__categories AS a ')
@@ -720,8 +725,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return object|null
 	 */
 	public static function getCatByAlias(string $catalias, $extension = 'com_xbmusic') {
-	    //$db = Factory::getDbo();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	       ->from('#__categories AS a ')
@@ -730,6 +735,29 @@ class XbmusicHelper extends ComponentHelper
 	    return $db->loadObject();
 	}
 	
+	/**
+	 * @name getCatChildren()
+	 * @desc retruns all descendents of given category
+	 * @param int $id
+	 */
+	public static function getCatChildren($pathorid) {
+	    if (is_int($pathorid)) {	        
+	        $path = self::getCat($catid)->path;
+	    } else if (is_string($pathorid)) {
+	        $path = $pathorid;
+	    } else { 
+	        return false;
+	    }
+//	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db= Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*')->from($db->qn('#__categories'));
+	    $query->where($db->qn('path').' LIKE '.$db->q($path.'/%'));
+	    $query->order($db->qn('path'));
+	    $db->setQuery($query);
+	    $result = $db->loadAssocList();	    
+	    return $result;
+	}
 	
 	/**
 	 * @name getTag()
@@ -738,8 +766,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return mixed
 	 */
 	public static function getTag($tagid) {
-	    //$db = Factory::getDBO();
-	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDBO();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')
 	    ->from('#__tags AS a ')

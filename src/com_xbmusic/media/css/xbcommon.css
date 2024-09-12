@@ -175,6 +175,9 @@ ul.nav-tabs {
 .xbboxwht, .xbbgwht {
 	background-color: #f7f7f7; /* to lift from pure white bckgrnd */
 }
+.xbbggy {
+	background-color: #eee;
+}
 
 /* box gradientbackgrounds */
 .gradpink { background-image: linear-gradient(#ffffff, #ffc0c0); }

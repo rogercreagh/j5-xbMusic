@@ -39,7 +39,7 @@ $userId    = $user->get('id');
 $item = $this->item;
 $celink = 'index.php?option=com_categories&task=category.edit&id=';
 $xblink = 'index.php?option=com_xbmusic';
-
+$cinflink = 'index.php?option=com_xbmusic&view=catinfo&id=';
 //$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
 $albumslink = 'index.php?option=com_xbmusic&view=albums&catid=';
 $artistslink = 'index.php?option=com_xbmusic&view=artists&catid=';
@@ -105,13 +105,32 @@ $longlist = 4;
 				</div>
 			</div>
 		</div>
-          		<p class="xbtr xbnote xbmb5">Auto close details dropdowns<input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
+		<?php if ($item->level > 1) : ?>
+				<p class="xbmb5"><?php echo Text::_('Parent of this category'); ?>
+					<a href="<?php echo $cinflink.$item->parent_id; ?>"   
+						class="xblabel label-cat xbml15" ><?php echo $item->parent_title; ?></a>
+				</p>
+		<?php endif; ?>
+		<div>		
+			<?php if ($item->children) : ?>
+				<p class="xbmb5 xbit"><?php echo Text::_('Descendents of this category'); ?></p>
+				<ul class="inline" style="margin-left:40px;>
+					<?php foreach ($item->children as $child) : ?>
+						<li><a href="<?php echo $cinflink.$child['id']; ?>" 
+							class="xblabel label-cat"><?php echo $child['title']; ?></a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			<?php endif; ?>
+		</div>
+          		<p class="xbtc xbnote xbmb5">Auto close details dropdowns<input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
           		</p>
           	</div>
 		<div class="row">
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->albumcnt>0) ? 'gradyellow' : 'xblightgrey'; ?>">
-					<p><?php echo $item->albumcnt.' '.Text::_('XBMUSIC_ALBUMS').' '.Text::_('XB_IN_CATEGORY'); ?>  
+				<div class="xbbox <?php echo ($item->albumcnt>0) ? 'gradyellow' : 'xbbggy'; ?>">
+					<p><?php echo ($item->albumcnt==0) ? Text::_('JNO') : $item->albumcnt==0;
+					   echo Xbtext::_('XBMUSIC_ALBUMS',3,true).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->albumcnt > 0) : ?>
     					<?php if ($item->albumcnt < $longlist+1) : ?>
@@ -141,8 +160,9 @@ $longlist = 4;
 				</div>
 			</div>
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->artistcnt > 0) ? 'gradblue' : 'xblightgrey'; ?>">
-					<p><?php echo $item->artistcnt.' '.Text::_('XBMUSIC_ARTISTS').' '.Text::_('XB_IN_CATEGORY'); ?>  
+				<div class="xbbox <?php echo ($item->artistcnt > 0) ? 'gradblue' : 'xbbggy'; ?>">
+					<p><?php echo ($item->artistcnt > 0) ? $item->artistcnt : Text::_('JNO');
+					   echo Xbtext::_('XBMUSIC_ARTISTS',3,true).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->artistcnt > 0) : ?>
     					<?php if ($item->artistcnt < $longlist+1) : ?>
@@ -172,8 +192,9 @@ $longlist = 4;
 				</div>
 			</div>
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->playlistcnt > 0) ? 'gradpink' : 'xblightgrey'; ?>">
-					<p><?php echo $item->playlistcnt.' '.Text::_('XBMUSIC_PLAYLISTS').' '.Text::_('XB_IN_CATEGORY'); ?>  
+				<div class="xbbox <?php echo ($item->playlistcnt > 0) ? 'gradpink' : 'xbbggy'; ?>">
+					<p><?php echo ($item->playlistcnt > 0) ? $item->playlistcnt : Text::_('JNO');
+        				echo Xbtext::_('XBMUSIC_PLAYLISTS',3,true).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->playlistcnt > 0) : ?>
     					<?php if ($item->playlistcnt < $longlist+1) : ?>
@@ -205,8 +226,9 @@ $longlist = 4;
 		</div>
 		<div class="row">
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->songcnt>0) ? 'gradcyan' : 'xblightgrey'; ?>">
-					<p><?php echo $item->songcnt.' '.Text::_('XBMUSIC_SONGS').' '.Text::_('XB_IN_CATEGORY'); ?>  
+				<div class="xbbox <?php echo ($item->songcnt>0) ? 'gradcyan' : 'xbbggy'; ?>">
+					<p><?php echo ($item->songcnt>0) ? $item->songcnt : Text::_('JNO');
+					echo Xbtext::_('XBMUSIC_SONGS',3,true).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->songcnt > 0) : ?>
     					<?php if ($item->songcnt < $longlist+1) : ?>
@@ -236,8 +258,9 @@ $longlist = 4;
 				</div>
 			</div>
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->trackcnt > 0) ? 'gradgreen' : 'xblightgrey'; ?>">
-					<p><?php echo $item->trackcnt.' '.Text::_('XBMUSIC_TRACKS').' '.Text::_('XB_IN_CATEGORY'); ?>  
+				<div class="xbbox <?php echo ($item->trackcnt > 0) ? 'gradgreen' : 'xbbggy'; ?>">
+					<p><?php echo ($item->trackcnt > 0) ? $item->trackcnt : Text::_('JNO');
+					echo Xbtext::_('XBMUSIC_TRACKS',3,true).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->trackcnt > 0) : ?>
     					<?php if ($item->trackcnt < $longlist+1) : ?>
