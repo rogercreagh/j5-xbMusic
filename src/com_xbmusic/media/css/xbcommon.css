@@ -475,10 +475,11 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 /* fg colours */
 .xbgold { color:#edc500; }
 .xbred { color:#c00000; }
-.xbblue, .xbinfo, .xbhelp { color: #22d;}
+.xbblue, .xbhelp { color: #22d;}
 .xbbook, .xbgreen { color: #008040;}
 .xbdarkgrey { color: #555;}
 .xbgrey, .xbnote, .xbdim {color:#888;}
+.xbinfo {color: #88e;}
 .xblightgrey { color: #CCC;}
 
 .xbaoycol {color: #e56b8e !important;}

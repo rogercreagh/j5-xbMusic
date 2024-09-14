@@ -88,16 +88,16 @@ $longlist = 4;
 			<div class="col-sm-5">
 				<div class="row">
 		            <div class="col-sm-7">
-		                <p><?php echo '<i>'.Text::_('XB_ALIAS').'</i>: '.$item->alias; ?></p>
+		                <p><i class="xbpr20"><?php echo Text::_('XB_ALIAS'); ?>:</i> <?php echo $item->alias; ?></p>
 		            </div>
 					<div class= "col-sm-5">
-						<p><?php echo '<i>'.Text::_('JGRID_HEADING_ID').'</i>: '.$item->id; ?></p>
+						<p><i class="xbpr20"><?php echo Text::_('JGRID_HEADING_ID'); ?>:</i><?php echo $item->id; ?></p>
 		 			</div>
 				</div>
 				<div class="row">
 					<div class= "col">
 							<p>
-								<i><?php echo Text::_('XB_CATEGORY').' '.Text::_('XB_HIERARCHY'); ?>: </i> 
+								<i class="xbpr20"><?php echo Text::_('XB_CATEGORY').' '.Text::_('XB_HIERARCHY'); ?>:</i> 
 								<?php $path = str_replace('/', ' - ', $item->path);
 								echo ' root - '.$path; ?>
 							</p>
@@ -106,7 +106,7 @@ $longlist = 4;
 			</div>
 		</div>
 		<?php if ($item->level > 1) : ?>
-				<p class="xbmb5"><?php echo Text::_('Parent of this category'); ?>
+				<p class="xbmb5"><i><?php echo Text::_('Parent of this category'); ?></i>
 					<a href="<?php echo $cinflink.$item->parent_id; ?>"   
 						class="xblabel label-cat xbml15" ><?php echo $item->parent_title; ?></a>
 				</p>
@@ -114,10 +114,11 @@ $longlist = 4;
 		<div>		
 			<?php if ($item->children) : ?>
 				<p class="xbmb5 xbit"><?php echo Text::_('Descendents of this category'); ?></p>
-				<ul class="inline" style="margin-left:40px;>
+				<ul class="inline xbml20" style="margin-left:20px;">
 					<?php foreach ($item->children as $child) : ?>
 						<li><a href="<?php echo $cinflink.$child['id']; ?>" 
-							class="xblabel label-cat"><?php echo $child['title']; ?></a>
+							class="xblabel label-cat xbml20"><?php echo $child['title']; ?></a>
+							(<?php echo $child['itemcnt']['total'];?>)
 						</li>
 					<?php endforeach; ?>
 				</ul>

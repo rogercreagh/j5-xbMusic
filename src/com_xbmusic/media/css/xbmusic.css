@@ -52,8 +52,13 @@ audio {
 	max-width: 150px;
 }
 
-/** spacer before the OtherViews and saveId3 buttons in Toolbar **/
-#toolbar-views, #toolbar-saveid3 {
+/** spacer before the OtherViews button in Toolbar **/
+#toolbar-views {
+	margin-left:auto !important;
+}
+
+/** spacer before the saveId3 button in Toolbar **/
+#toolbar-saveid3 {
 	margin-left:4rem;
 }
 

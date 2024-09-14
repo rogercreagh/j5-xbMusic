@@ -1,8 +1,8 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/catlist/default.php
- * @version 0.0.14.0 10th September 2024
+ * @filesource admin/tmpl/taglist/default.php
+ * @version 0.0.16.0 14th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -32,28 +32,28 @@ $wa = $this->document->getWebAssetManager();
 //$wa->useScript('table.columns');
 $wa->useScript('multiselect');
 
-$app       = Factory::getApplication();
-$user  = Factory::getApplication()->getIdentity();
-$userId    = $user->get('id');
+$app = Factory::getApplication();
+$user = $app->getIdentity();
+$userId = $user->get('id');
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 //$saveOrder = $listOrder == 'a.ordering';
 
-$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
-$catlink = 'index.php?option=com_xbmusic&view=catinfo&id=';
-$albumslink = 'index.php?option=com_xbmusic&view=albums&catid=';
-$artistslink = 'index.php?option=com_xbmusic&view=artists&catid=';
-$playlistslink = 'index.php?option=com_xbmusic&view=playlists&catid=';
-$songslink = 'index.php?option=com_xbmusic&view=songs&catid=';
-$trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
+$telink = 'index.php?option=com_tags&view=tag&task=tag.edit&id=';
+$taglink = 'index.php?option=com_xbmusic&view=taginfo&id=';
+$albumslink = 'index.php?option=com_xbmusic&view=albums&tagid=';
+$artistslink = 'index.php?option=com_xbmusic&view=artists&tagid=';
+$playlistslink = 'index.php?option=com_xbmusic&view=playlists&tagid=';
+$songslink = 'index.php?option=com_xbmusic&view=songs&tagid=';
+$trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
 
 //$rowcnt = (empty($this->items)) ? 0 : count($this->items);
 
 ?>
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=catlist'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></h3>
-      	<p class="xb095"><?php echo Text::_('XBMUSIC_CATSPAGE_SUBTITLE'); ?></p>
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=taglist'); ?>" method="post" name="adminForm" id="adminForm">
+		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TAGS'); ?></h3>
+      	<p class="xb095"><?php echo Text::_('XBMUSIC_TAGSPAGE_SUBTITLE'); ?></p>
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
@@ -77,13 +77,13 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
         		</p>
 			</div>
 			<div class="table-scroll">
-			<table class="table table-striped table-hover xbtablelist table-freeze" id="xbcategoryList">
+			<table class="table table-striped table-hover xbtablelist table-freeze" id="xbtagList">
             	<thead>
             		<tr>
             			<th class="hidden-phone center" style="width:25px;">
             				<?php echo HTMLHelper::_('grid.checkall'); ?>
             			</th>
-            			<th style="width:70px;">
+            			<th style="width:95px;">
             				<?php echo Text::_('JSTATUS'); ?>
             			</th>
             			<th>
@@ -108,6 +108,9 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
             			<th style="text-align:center;">
             				<?php echo HTMLHelper::_('searchtools.sort', ('XBMUSIC_TRACKS'), 'trackcnt', $listDirn, $listOrder );?>
             			</th>
+            			<th>
+            				<?php echo Text::_('XB_OTHERS') ;?>
+            			</th>
             			<th class="nowrap hidden-tablet hidden-phone" style="width:45px;">
             				<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'id', $listDirn, $listOrder );?>
             			</th>
@@ -115,52 +118,51 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
             	</thead>
         		<tbody>
         			<?php foreach ($this->items as $i => $item) : 
-        				$canEdit    = $user->authorise('core.edit',       'com_categories.category.' . $item->id);
+        				$canEdit    = $user->authorise('core.edit',       'com_tags.tag.' . $item->id);
         				$canCheckin = $user->authorise('core.manage',     'com_checkin') || $item->checked_out == $userId || $item->checked_out == 0;
-        				$canEditOwn = $user->authorise('core.edit.own',   'com_categories.category.' . $item->id) && $item->created_user_id == $userId;
-        				$canChange  = $user->authorise('core.edit.state', 'com_categories.category.' . $item->id) && $canCheckin;
+        				$canChange  = $user->authorise('core.edit.state', 'com_tags.tag.' . $item->id) && $canCheckin;
         			?>
         			<tr class="row<?php echo $i % 2; ?>" >	
-        					<td class="center hidden-phone">
-        						<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
-        					</td>
-    						<td class="album-status nowrap center">
-    							<div style="float:left;">
-                                    <?php
-                                        $options = [
-                                            'task_prefix' => 'category.',
-                                            'disabled' => !$canChange,
-                                            'id' => 'state-' . $item->id,
-                                        ];
-                                        echo (new PublishedButton())->render((int) $item->status, $i, $options);
-                                    ?>
-                                </div>
-                                <div>
-                                    <?php if ($item->note !='') :?>
-                                    	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
-                                    		title="<?php echo $item->note; ?>"></span>
-    								<?php endif; ?>
-                                 </div>
-    						</td>
-     						<td>
+    					<td class="center hidden-phone">
+    						<?php echo HTMLHelper::_('grid.id', $i, $item->id); ?>
+    					</td>
+						<td class="tag-status nowrap center">
+							<div style="float:left;">
+                                <?php
+                                    $options = [
+                                        'task_prefix' => 'tag.',
+                                        'disabled' => !$canChange,
+                                        'id' => 'state-' . $item->id,
+                                    ];
+                                    echo (new PublishedButton())->render((int) $item->status, $i, $options);
+                                ?>
+                            </div>
+                            <div>
+                                <?php if ($item->note !='') :?>
+                                	<span class="icon-info-circle xbpl5 xbinfo" style="font-size:1.6rem;" 
+                                		title="<?php echo $item->note; ?>"></span>
+								<?php endif; ?>
+                             </div>
+						</td>
+ 						<td>
     							<?php if ($item->checked_out) : ?>
-    								<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'artimgs.', $canCheckin); ?>
+    								<?php echo HTMLHelper::_('jgrid.checkedout', $i, $item->editor, $item->checked_out_time, 'tags.', $canCheckin); ?>
     							<?php endif; ?>
     							<?php $slashes = substr_count($item->path,'/'); 
-    							$prefix = '';
+    							$prefix = str_replace('/',' ─ ',substr($item->path,0,strrpos($item->path, '/')));
         						if ($slashes >0) :?>
                     				<span class="xbnote"> 
                  					<?php if ($listOrder=='path') {
-                       				    $prefix .= '<span style="padding-left:'.($slashes*15).'px">';
-                       				    $prefix .= '└─&nbsp;</span>';					        
+                       				   // $prefix .= '<span style="padding-left:'.($slashes*15).'px">';
+                 					    $prefix .= ' ─ '; //'└─&nbsp;</span>';					        
                    					} else {
-                                        $prefix = substr($item->path,0,strrpos($item->path, '/')).'<br />';
+                                        $prefix .= '<br /> └─&nbsp;';
                                     }       
                                     echo $prefix; ?>
     								</span>
                                 <?php endif; ?>
-            					<a href="<?php echo Route::_($catlink . $item->id); ?>" title="Details" 
-            						class="xblabel label-cat" style="padding:2px 8px;">
+            					<a href="<?php echo Route::_($taglink . $item->id); ?>" title="Details" 
+            						class="xblabel label-tag" style="padding:2px 8px;">
             						<span class="xb11"><?php echo $item->title; ?></span>
             					</a>
         					</td>
@@ -199,6 +201,13 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
                					<?php if ($item->trackcnt >0) : ?> 
                						<span class="xbbadge badge-ltgreen">
                							<a href="<?php echo $trackslink.$item->id;?>"><?php echo $item->trackcnt; ?>
+               						</a></span>
+               					<?php endif; ?>
+               				</td>
+                			<td style="text-align:center;">
+               					<?php if ($item->othcnt >0) : ?> 
+               						<span class="xbbadge badge-ltgrey">
+               							<a href="<?php echo $aglink.$item->id;?>"><?php echo $item->trackcnt; ?>
                						</a></span>
                					<?php endif; ?>
                				</td>

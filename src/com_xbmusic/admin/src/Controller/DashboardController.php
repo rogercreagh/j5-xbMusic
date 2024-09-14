@@ -50,7 +50,7 @@ class DashboardController extends AdminController
         $this->setRedirect('index.php?option=com_xbmusic&view=catlist');
     }
     public function toTags() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=tags');
+        $this->setRedirect('index.php?option=com_xbmusic&view=taglist');
     }
 }
 

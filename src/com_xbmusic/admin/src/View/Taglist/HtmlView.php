@@ -1,14 +1,14 @@
 <?php 
 /*******
  * @package xbMusic
- * @filesource admin/src/View/Catlist/HtmlView.php
- * @version 0.0.14.0 10th September 2024
+ * @filesource admin/src/View/Taglist/HtmlView.php
+ * @version 0.0.16.0 14th September 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
-namespace Crosborne\Component\Xbmusic\Administrator\View\Catlist;
+namespace Crosborne\Component\Xbmusic\Administrator\View\Taglist;
 
 defined('_JEXEC') or die;
 
@@ -43,19 +43,8 @@ class HtmlView extends BaseHtmlView {
         $this->state         = $this->get('State');
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
-               
-        $this->params      = ComponentHelper::getParams('com_xbmusic');;
-        $this->rootcat_album = $this->params->get('rootcat_album');
-        $this->defcat_album = $this->params->get('defcat_album');
-        $this->rootcat_artist = $this->params->get('rootcat_artist');
-        $this->defcat_artist = $this->params->get('defcat_artist');
-        $this->rootcat_playlist = $this->params->get('rootcat_playlist');
-        $this->defcat_playlist = $this->params->get('defcat_playlist');
-        $this->rootcat_song = $this->params->get('rootcat_song');
-        $this->defcat_song = $this->params->get('defcat_song');
-        $this->rootcat_track = $this->params->get('rootcat_track');
-        $this->defcat_track = $this->params->get('defcat_track');
-        
+        $this->searchTitle = $this->state->get('filter.search');
+                
         $this->addToolbar();
         
         return parent::display($tpl);
@@ -69,16 +58,16 @@ class HtmlView extends BaseHtmlView {
         $toolbar = Toolbar::getInstance('toolbar');
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
-        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_CATEGORIES_TITLE'), 'fas fa-folder-tree');
+        ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_TAGS_TITLE'), 'tags');
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
         if ($canDo->get('core.create') || count($user->getAuthorisedCategories('com_xbmusic', 'core.create')) > 0) {
-            ToolbarHelper::custom('catlist.catNew','new','','XB_CATEGORY_NEW',false);
+            ToolbarHelper::custom('taglist.tagNew','new','','XB_TAG_NEW',false);
         }
         
         if ($canDo->get('core.admin')) {
-            ToolbarHelper::editList('catlist.catEdit', 'XB_CATEGORY_EDIT');
+            ToolbarHelper::editList('taglist.tagEdit', 'XB_TAG_EDIT');
         }
    
         $dropdown = $toolbar->dropdownButton('views')
@@ -94,7 +83,7 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('playlistview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('tracksview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('tagsview', 'XB_TAGS', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        $childBar->standardButton('catlistview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         
         if ($canDo->get('core.admin')) {
             //$toolbar->link('Options','index.php?option=com_config&view=component&component=com_xbmusic');
@@ -102,7 +91,7 @@ class HtmlView extends BaseHtmlView {
             ToolbarHelper::preferences('com_xbmusic');
         }
         
-        $toolbar->help('xbMusic:Categories',false,'https://crosborne.uk/xbmusic/doc#categories');
+        $toolbar->help('xbMusic:Tags',false,'https://crosborne.uk/xbmusic/doc#tags');
         
     }
     

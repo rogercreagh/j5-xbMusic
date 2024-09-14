@@ -151,8 +151,16 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	
-/****************** xbLibrary functions ***********/	
+/****************** xbLibrary functions ***********/
+	/** Sections
+	 * 1. Categories
+	 * 2. Tags
+	 * 3. Text
+	 * 
+	 */
 
+/**************** Category Functions ********************/
+	
 	/**
 	 * @name createCategories()
 	 * @desc function to create several categories
@@ -202,6 +210,92 @@ class XbmusicHelper extends ComponentHelper
 	    if ($infomsg != '') $app->enqueueMessage($infomsg,'Info');
 	    return $wynik;
 	}
+	
+	/**
+	 * @name getCat()
+	 * @desc given category id returns full row
+	 * @param int $catid
+	 * @return object|null
+	 */
+	public static function getCat(int $catid) {
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('*')
+	    ->from('#__categories AS a ')
+	    ->where('a.id = '.$db->q($catid));
+	    $db->setQuery($query);
+	    return $db->loadObject();
+	}
+	
+	/**
+	 * @name getCatByAlias()
+	 * @desc given category alias returns full row
+	 * @param string $catalias
+	 * @param string $extension
+	 * @return object|null
+	 */
+	public static function getCatByAlias(string $catalias, $extension = 'com_xbmusic') {
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('*')
+	    ->from('#__categories AS a ')
+	    ->where('a.alias = '.$db->q($catalias));
+	    $db->setQuery($query);
+	    return $db->loadObject();
+	}
+	
+	/**
+	 * @name getCatChildren()
+	 * @desc retruns all descendents of given category
+	 * @param int $id
+	 */
+	public static function getCatChildren($pathorid) {
+	    if (is_int($pathorid)) {
+	        $path = self::getCat($catid)->path;
+	    } else if (is_string($pathorid)) {
+	        $path = $pathorid;
+	    } else {
+	        return false;
+	    }
+	    //	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->select('(SELECT COUNT(*) FROM '.$db->qn('#__categories').' AS ccnt WHERE ccnt.parent_id = c.id) AS childcnt');
+	    $query->from($db->qn('#__categories').' AS c');
+	    $query->where($db->qn('path').' LIKE '.$db->q($path.'/%'));
+	    $query->order($db->qn('path'));
+	    $db->setQuery($query);
+	    $result = $db->loadAssocList();
+	    if (!is_null($result)) {
+	        foreach($result as $i=>$item) {
+	            $result[$i]['itemcnt'] = self::getCatItemCnts($result[$i]['id']);
+	        }
+	    }
+	    return $result;
+	}
+	
+	public static function getCatItemCnts($cid) {
+	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
+	    $db = Factory::getDbo();
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_albums AS a WHERE a.catid = '.$db->q($cid));
+	    $res['albumcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_artists AS a WHERE a.catid = '.$db->q($cid));
+	    $res['artistcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_playlists AS a WHERE a.catid = '.$db->q($cid));
+	    $res['playlistcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_songs AS a WHERE a.catid = '.$db->q($cid));
+	    $res['songcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_tracks AS a WHERE a.catid = '.$db->q($cid));
+	    $res['trackcnt'] = $db->loadResult();
+	    $tot = array_sum($res);
+	    $res['total'] = $tot;
+	    return $res;
+	}
+	
+/**************** Tag Functions ********************/
 	
 	/**
 	 * @name getCreateTags()
@@ -288,9 +382,6 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	/**
-	 */
-	
-	/**
 	 * @name addTagToGroup()
 	 * @desc adds the given tag by name to component & taggroup specified
 	 * NB This assumes you are requesting a valid tag list parameter in the config for a valid component
@@ -335,7 +426,8 @@ class XbmusicHelper extends ComponentHelper
 	    return $tid;
 	}
 
-
+/**************** Databas Functions ********************/
+	
 	/**
 	 * @name checkValueExists()
 	 * @desc returns its id if given value exists in given table column (case insensitive)
@@ -447,6 +539,28 @@ class XbmusicHelper extends ComponentHelper
 	    }
 	    return $res;	    
 	}
+
+	public static function statusCnts(string $table = '#__content', string $colname = 'state', string $ext='com_content') {
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT a.'.$colname.', a.alias')
+	    ->from($db->quoteName($table).' AS a');
+	    if ($table == '#__categories') {
+	        $query->where('extension = '.$db->quote($ext));
+	    }
+	    $db->setQuery($query);
+	    $col = $db->loadColumn();
+	    $vals = array_count_values($col);
+	    $result['total'] = count($col);
+	    $result['published'] = key_exists('1',$vals) ? $vals['1'] : 0;
+	    $result['unpublished'] = key_exists('0',$vals) ? $vals['0'] : 0;
+	    $result['archived'] = key_exists('2',$vals) ? $vals['2'] : 0;
+	    $result['trashed'] = key_exists('-2',$vals) ? $vals['-2'] : 0;
+	    return $result;
+	}
+	
+/**************** Text Functions ********************/
 	
 	public static function abridgeText(string $source, int $maxstart = 6, int $maxend = 4, $wordbrk = true) {
 	    $source = trim($source);
@@ -569,26 +683,6 @@ class XbmusicHelper extends ComponentHelper
 	    return $truncstr.'...';
 	}
 	
-	public static function statusCnts(string $table = '#__content', string $colname = 'state', string $ext='com_content') {
-	    $db = Factory::getDbo();
-	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT a.'.$colname.', a.alias')
-	    ->from($db->quoteName($table).' AS a');
-	    if ($table == '#__categories') {
-	        $query->where('extension = '.$db->quote($ext));
-	    }
-	    $db->setQuery($query);
-	    $col = $db->loadColumn();
-	    $vals = array_count_values($col);
-	    $result['total'] = count($col);
-	    $result['published'] = key_exists('1',$vals) ? $vals['1'] : 0;
-	    $result['unpublished'] = key_exists('0',$vals) ? $vals['0'] : 0;
-	    $result['archived'] = key_exists('2',$vals) ? $vals['2'] : 0;
-	    $result['trashed'] = key_exists('-2',$vals) ? $vals['-2'] : 0;
-	    return $result;
-	}
-	
 	/**
 	 * @name checkComponent()
 	 * @desc test whether a component is installed and enabled.
@@ -662,9 +756,7 @@ class XbmusicHelper extends ComponentHelper
 	    $headers = (is_array($headers)) ? implode( "\n ", $headers) : $headers;
 	    return (bool)preg_match('#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers);
 	}
-	
-	
-	
+			
 /**
 	 * @name credit()
 	 * @desc tests if reg code is installed and returns blank, or credit for site and PayPal button for admin
@@ -698,65 +790,6 @@ class XbmusicHelper extends ComponentHelper
 	    //$hashbeer = $params->get('penpont');
 	    if (password_verify($beer,'$2y$10$l8jx1ia8RJ3Kie2AyVgBlOBgm9sVL9dQsV8eBy8g5JOE30lw1HzhG')) { return true; }
 	    return false;
-	}
-	
-	/**
-	 * @name getCat()
-	 * @desc given category id returns full row
-	 * @param int $catid
-	 * @return object|null
-	 */
-	public static function getCat(int $catid) {
-	    $db = Factory::getDbo();
-	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $query = $db->getQuery(true);
-	    $query->select('*')
-	       ->from('#__categories AS a ')
-	       ->where('a.id = '.$db->q($catid));
-	    $db->setQuery($query);
-	    return $db->loadObject();
-	}
-	
-	/**
-	 * @name getCatByAlias()
-	 * @desc given category alias returns full row
-	 * @param string $catalias
-	 * @param string $extension
-	 * @return object|null
-	 */
-	public static function getCatByAlias(string $catalias, $extension = 'com_xbmusic') {
-	    $db = Factory::getDbo();
-	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $query = $db->getQuery(true);
-	    $query->select('*')
-	       ->from('#__categories AS a ')
-	       ->where('a.alias = '.$db->q($catalias));
-	    $db->setQuery($query);
-	    return $db->loadObject();
-	}
-	
-	/**
-	 * @name getCatChildren()
-	 * @desc retruns all descendents of given category
-	 * @param int $id
-	 */
-	public static function getCatChildren($pathorid) {
-	    if (is_int($pathorid)) {	        
-	        $path = self::getCat($catid)->path;
-	    } else if (is_string($pathorid)) {
-	        $path = $pathorid;
-	    } else { 
-	        return false;
-	    }
-//	    $db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $db= Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('*')->from($db->qn('#__categories'));
-	    $query->where($db->qn('path').' LIKE '.$db->q($path.'/%'));
-	    $query->order($db->qn('path'));
-	    $db->setQuery($query);
-	    $result = $db->loadAssocList();	    
-	    return $result;
 	}
 	
 	/**
