@@ -207,7 +207,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
                 			<td style="text-align:center;">
                					<?php if ($item->othcnt >0) : ?> 
                						<span class="xbbadge badge-ltgrey">
-               							<a href="<?php echo $aglink.$item->id;?>"><?php echo $item->trackcnt; ?>
+               							<a href="<?php echo $aglink.$item->id;?>"><?php echo $item->othcnt; ?>
                						</a></span>
                					<?php endif; ?>
                				</td>

@@ -56,7 +56,7 @@ class TaglistModel extends ListModel {
         $query->select('(SELECT COUNT(*) FROM #__contentitem_tag_map AS pl WHERE pl.tag_id = t.id AND pl.type_alias='.$db->quote('com_xbmusic.playlist').') AS playlistcnt');
         $query->select('(SELECT COUNT(*) FROM #__contentitem_tag_map AS sg WHERE sg.tag_id = t.id AND sg.type_alias='.$db->quote('com_xbmusic.song').') AS songcnt');
         $query->select('(SELECT COUNT(*) FROM #__contentitem_tag_map AS tr WHERE tr.tag_id = t.id AND tr.type_alias='.$db->quote('com_xbmusic.track').') AS trackcnt');
-        $query->select('(SELECT COUNT(*) FROM #__contentitem_tag_map AS toth WHERE toth.tag_id = t.id AND toth.type_alias NOT LIKE '.$db->quote('com_xbfilms%').') AS othcnt');
+        $query->select('(SELECT COUNT(*) FROM #__contentitem_tag_map AS toth WHERE toth.tag_id = t.id AND toth.type_alias NOT LIKE '.$db->quote('com_xbmusic%').') AS othcnt');
                 
         // Filter by published state
         $published = $this->getState('filter.published');

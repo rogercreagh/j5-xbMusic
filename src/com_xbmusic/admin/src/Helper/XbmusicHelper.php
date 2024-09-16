@@ -253,7 +253,7 @@ class XbmusicHelper extends ComponentHelper
 	 */
 	public static function getCatChildren($pathorid) {
 	    if (is_int($pathorid)) {
-	        $path = self::getCat($catid)->path;
+	        $path = self::getCat($pathorid)->path;
 	    } else if (is_string($pathorid)) {
 	        $path = $pathorid;
 	    } else {
@@ -277,18 +277,18 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 	
-	public static function getCatItemCnts($cid) {
+	public static function getCatItemCnts($id) {
 	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
 	    $db = Factory::getDbo();
-	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_albums AS a WHERE a.catid = '.$db->q($cid));
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_albums AS a WHERE a.catid = '.$db->q($id));
 	    $res['albumcnt'] = $db->loadResult();
-	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_artists AS a WHERE a.catid = '.$db->q($cid));
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_artists AS a WHERE a.catid = '.$db->q($id));
 	    $res['artistcnt'] = $db->loadResult();
-	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_playlists AS a WHERE a.catid = '.$db->q($cid));
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_playlists AS a WHERE a.catid = '.$db->q($id));
 	    $res['playlistcnt'] = $db->loadResult();
-	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_songs AS a WHERE a.catid = '.$db->q($cid));
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_songs AS a WHERE a.catid = '.$db->q($id));
 	    $res['songcnt'] = $db->loadResult();
-	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_tracks AS a WHERE a.catid = '.$db->q($cid));
+	    $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_tracks AS a WHERE a.catid = '.$db->q($id));
 	    $res['trackcnt'] = $db->loadResult();
 	    $tot = array_sum($res);
 	    $res['total'] = $tot;
@@ -426,7 +426,58 @@ class XbmusicHelper extends ComponentHelper
 	    return $tid;
 	}
 
-/**************** Databas Functions ********************/
+	/**
+	 * @name getCatChildren()
+	 * @desc retruns all descendents of given category
+	 * @param int $id
+	 */
+	public static function getTagChildren($pathorid) {
+	    if (is_int($pathorid)) {
+	        $path = self::getTag($pathorid)->path;
+	    } else if (is_string($pathorid)) {
+	        $path = $pathorid;
+	    } else {
+	        return false;
+	    }
+	    //	    $db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->select('(SELECT COUNT(*) FROM '.$db->qn('#__tags').' AS ccnt WHERE ccnt.path LIKE '.$db->q($path.'/%').') AS desccnt');
+	    $query->from($db->qn('#__categories').' AS c');
+	    $query->where($db->qn('path').' LIKE '.$db->q($path.'/%'));
+	    $query->order($db->qn('path'));
+	    $db->setQuery($query);
+	    $result = $db->loadAssocList();
+	    if (!is_null($result)) {
+	        foreach($result as $i=>$item) {
+	            $result[$i]['itemcnt'] = self::getTagItemCnts($result[$i]['id']);
+	        }
+	    }
+	    return $result;
+	}
+	
+	static function getTagItemCnts($id) {
+	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
+	    $db = Factory::getDbo();
+	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
+	    $res['albumcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
+	    $res['artistcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
+	    $res['playlistcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
+	    $res['songcnt'] = $db->loadResult();
+	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
+	    $res['trackcnt'] = $db->loadResult();
+	    $tot = array_sum($res);
+	    $res['total'] = $tot;
+	    return $res;
+	    
+	}
+	
+	
+/**************** Database Functions ********************/
 	
 	/**
 	 * @name checkValueExists()
@@ -508,6 +559,16 @@ class XbmusicHelper extends ComponentHelper
 	       ->where('id = '.$db->q($id));
 	   $db->setQuery($query);
 	   return $db->loadResult();	    
+	}
+	
+	public static function getItem($table, $id) {
+	    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('*')->from($db->qn($table));
+	    $query->where($db->qn('id').' = '.$db->q($id));
+	    $db->setQuery($query);
+	    return $db->loadObject();
 	}
 	
 	/**
