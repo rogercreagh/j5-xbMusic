@@ -48,7 +48,7 @@
        <field name="space2" type="spacer" hr="true" />
         
         <field name="genrecattag" type="radio"
-        	label="ID3 Genre as Cat/Tag"
+        	label="ID3 Genre as Track Cat/Tag"
         	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (only saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'Id3Genres' as parent."
  			class="btn-group btn-group-yesno"
 			default="0"
@@ -60,7 +60,7 @@
         </field>
 
         <field name="addgenre" type="radio"
-        	label="Add tag to album and song"
+        	label="Also tag album and song"
         	description="Also add genre tag to albums and/or songs"
  			class="btn-group btn-group-yesno"
 			default=""
