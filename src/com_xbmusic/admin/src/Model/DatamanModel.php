@@ -26,10 +26,27 @@ use ReflectionClass;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use CBOR\OtherObject\TrueObject;
 
-class DatamanModel extends ListModel {
+class DatamanModel extends AdminModel {
     
 //    public function getForm($data = [], $loadData = true) {
 //        
 //    }
-
+    public function getForm($data = array(), $loadData = true) {
+        $form = $this->loadForm('com_xbmusic.dataman', 'dataman',
+            array('control' => 'jform', 'load_data' => $loadData));
+        if (empty($form)) {
+            return false;
+        }
+        return $form;
+    }
+    
+    public function parseMP3Files($files, $catid) {
+        Factory::getApplication()->enqueueMessage(print_r($files,true));
+        if (is_string($files)) {
+            //get files in folder to array
+            
+        }
+            
+    }
+    
 }

@@ -56,6 +56,10 @@ audio {
 #toolbar-views {
 	margin-left:auto !important;
 }
+/** remove left margin on Options button is OtherViews present **/
+#toolbar-views + .ms-auto {
+	margin-left:20px !important;
+}
 
 /** spacer before the saveId3 button in Toolbar **/
 #toolbar-saveid3 {

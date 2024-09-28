@@ -28,8 +28,14 @@ use Joomla\CMS\Helper\TagsHelper;
 
 class HtmlView extends BaseHtmlView {
     
+    protected $form;
+    
     public function display($tpl = null) {
 
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $this->form = $this->get('Form');
+        $this->basemusicfolder = XbmusicHelper::$musicBase;
+        
         $this->addToolbar();
         
         return parent::display($tpl);
@@ -45,7 +51,7 @@ class HtmlView extends BaseHtmlView {
         ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_DATAMAN_TITLE'), 'database');
         
         $dropdown = $toolbar->dropdownButton('views')
-        ->text('Other Views')
+        ->text('XBMUSIC_OTHER_VIEWS')
         ->toggleSplit(false)
         ->icon('icon-ellipsis-h')
         ->buttonClass('btn btn-action')
@@ -57,16 +63,15 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
-        $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tre') ;
+        $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGS', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
-        $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('database') ;
+        
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');
             ToolbarHelper::preferences('com_xbmusic');
         }
-        
         $toolbar->help('Dataman:',false,'https://crosborne.uk/xbmusic/doc#dataman');
         
     }

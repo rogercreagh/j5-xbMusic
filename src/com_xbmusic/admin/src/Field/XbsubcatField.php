@@ -22,6 +22,13 @@ use Joomla\CMS\Log\Log;
 use Joomla\Utilities\ArrayHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
+/**
+ * @name Xbsubcatfield
+ * @desc 
+ * @elements
+ * @author rogerco
+ *
+ */
 class XbsubcatField extends ListField {
     
     public function getOptions() {

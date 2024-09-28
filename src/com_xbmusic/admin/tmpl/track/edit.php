@@ -75,6 +75,7 @@ $(document).ready( function() {
 				entry.find('UL').slideUp({ duration: 500, easing: null });
 				entry.removeClass('expanded').addClass('collapsed');
 			}
+//			document.getElementById('jform_foldername').value=$(this).attr( 'rel' );
 		} else {
         	if (preventry!=null) {preventry.removeClass('selected')};
           	entry.addClass('selected');

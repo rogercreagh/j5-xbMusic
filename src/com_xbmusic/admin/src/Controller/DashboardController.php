@@ -52,5 +52,8 @@ class DashboardController extends AdminController
     public function toTags() {
         $this->setRedirect('index.php?option=com_xbmusic&view=taglist');
     }
+    public function toDataman() {
+        $this->setRedirect('index.php?option=com_xbmusic&view=dataman');
+    }
 }
 
