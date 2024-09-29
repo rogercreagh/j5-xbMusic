@@ -49,7 +49,12 @@ UL.filetree A {
 UL.filetree A:hover {
 	background: #BDF;
 }
+/* modified below to only highlight the current, not the children
+also doesn't hide the icon in the background 
 UL.filetree LI.selected {
+  background: #acef;
+}*/
+UL.filetree>LI.selected>a {
   background: #acef;
 }
 

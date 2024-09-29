@@ -13,7 +13,7 @@
 /***** original source and copyright:
  Folder Tree with PHP and jQuery.
  R. Savoul Pelister
- http://techlister.com
+https://techlister.com/php/simple-folder-tree-with-php-and-jquery/
 *****/
 
 class treeview {
@@ -49,7 +49,7 @@ class treeview {
 	 * @return string - list of folders snd files sorted by name
 	 */
 	function create_tree($filt = '') {
-			
+		$extarr = ($filt == '') ? null : explode(',',strtolower($filt));	
 		if( count( $this->files ) > 2 ) { /* First 2 entries are . and ..  -skip them */
 			natcasesort( $this->files );
 			$list = '<ul class="filetree" style="display: none;">';
@@ -63,8 +63,9 @@ class treeview {
 			// Group all files
 			foreach( $this->files as $file ) {
 				if( file_exists( $this->folder . $file ) && $file != '.' && $file != '..' && !is_dir( $this->folder . $file )) {
-				    $ext = pathinfo($file, PATHINFO_EXTENSION);
-				    if (($filt == '') || ($ext == $filt)) {
+				    $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+//				    if (($filt == '') || ($ext == $filt)) {
+				    if ((is_null($extarr)) || (in_array($ext, $extarr))) {
 				        $list .= '<li class="file ext_' . $ext . '"><a href="#" rel="' . htmlentities( $this->folder . $file ) . '">' . htmlentities( $file ) . '</a></li>';
 				    }
 				}

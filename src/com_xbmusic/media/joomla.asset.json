@@ -18,6 +18,12 @@
         "uri": "com_xbmusic/xbcommon.css"
       },
       {
+		  "name": "xbmusic.foldertree",
+		  "description": "foldertree ajax file/folder selection",
+		  "type": "script",
+		  "uri": "com_xbmusic/foldertree.js"
+	  },
+      {
 		  "name": "xbmusic.showdown",
 		  "description": "showdown markdown utilties",
 		  "type": "script",

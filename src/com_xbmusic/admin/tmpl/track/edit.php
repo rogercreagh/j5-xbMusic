@@ -20,10 +20,13 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
+HTMLHelper::_('jquery.framework');
+
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
+->useScript('xbmusic.foldertree')
 ->useScript('xbmusic.showdown');
 
 // Create shortcut to parameters.
@@ -32,11 +35,10 @@ $wa->useScript('keepalive')
 
 $input = Factory::getApplication()->getInput();
 
-HTMLHelper::_('jquery.framework');
-
 ?>
-<link rel="stylesheet" href="/media/com_xbmusic/css/filetree.css">
+<link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
 <script type="text/javascript" >
+/************************
 $(document).ready( function() {
 
 	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Generating Tree...' + '<li></ul>' );
@@ -89,6 +91,7 @@ $(document).ready( function() {
 	});
 	
 });
+**************/
 </script>
 <script>
 	function clearmd() {
@@ -129,6 +132,9 @@ $(document).ready( function() {
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
+      <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
+      <input type="hidden" id="extlist" value="mp3" />
+      <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
     	<p class="xbnit">
     	<?php if ($this->item->id == 0 ) : ?>
    			<?php //$this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>

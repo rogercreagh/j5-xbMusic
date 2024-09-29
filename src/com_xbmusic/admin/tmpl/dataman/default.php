@@ -15,94 +15,42 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 //HTMLHelper::_('behavior.multiselect');
 //HTMLHelper::_('formbehavior.chosen', 'select');
+HTMLHelper::_('jquery.framework');
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
+->useScript('xbmusic.foldertree')
 ->useScript('xbmusic.showdown');
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
 
-$input = Factory::getApplication()->getInput();
-
-HTMLHelper::_('jquery.framework');
+//$input = Factory::getApplication()->getInput();
 
 ?>
-<link rel="stylesheet" href="/media/com_xbmusic/css/filetree.css">
+<link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
 <script type="text/javascript" >
-$(document).ready( function() {
-
-	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Generating Tree...' + '<li></ul>' );
-	
-	getfilelist( $('#container') , '<?php echo $this->basemusicfolder; ?>' );
-	
-	function getfilelist( cont, root ) {
-	
-		$( cont ).addClass( 'wait' );
-			
-		$.post( <?php echo "'/administrator/components/com_xbmusic/vendor/Foldertree.php'"; ?>, { dir: root, ext: 'mp3' }, function( data ) {
-	
-			$( cont ).find( '.start' ).html( '' );
-			$( cont ).removeClass( 'wait' ).append( data );
-			if( 'Sample' == root ) 
-				$( cont ).find('UL:hidden').show();
-			else 
-				$( cont ).find('UL:hidden').slideDown({ duration: 500, easing: null });
-			
-		});
-	}
-	
-	var preventry = null;
-	var prevvalue = null;
-	var basefolder = '<?php echo $this->basemusicfolder; ?>';
-	$( '#container' ).on('click', 'LI A', function() {
-		var entry = $(this).parent();
-		if( entry.hasClass('folder') ) {
-            document.getElementById('jform_filepathname').value = null;
-			document.getElementById('jform_foldername').value = $(this).attr( 'rel' ).replace(basefolder,'');
-			if( entry.hasClass('collapsed') ) {						
-				entry.find('UL').remove();
-				getfilelist( entry, escape( $(this).attr('rel') ));
-				entry.removeClass('collapsed').addClass('expanded');
-			}
-			else {
-				entry.find('UL').slideUp({ duration: 500, easing: null });
-				entry.removeClass('expanded').addClass('collapsed');
-			}
-		} else {
-//        	if (preventry!=null) {preventry.removeClass('selected')};
-          	entry.addClass('selected');
-          	preventry = entry;
-          	prevvalue = document.getElementById('jform_filepathname').value;          	
-			document.getElementById('jform_filepathname').value = prevvalue + $(this).attr( 'rel' ).replace(basefolder,'') + "\n";
-		}
-	return false;
-	});
-	
-});
-
 	function confirmImportMp3(){
 		if (confirm('This will import from MP3 data\n Are you really sure?')){
-			document.getElementById('task').value='dataman.importmp3';
+			document.getElementById('task').value='dataman.importMp3';
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
- 	function postFolder() {
- 		document.getElementById('task').value='track.setfolder';
- 		this.form.submit();
- 	}
 </script>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
+      <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
+      <input type="hidden" id="extlist" value="mp3" />
+      <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
         <h3>xbMusic Data Manager</h3>
         <p class="xbinfo">
         <?php echo Text::_('Import tab to import tracks from MP3 file ID3 data by folder or selected files, and to import m3u or pls playlists');?>
