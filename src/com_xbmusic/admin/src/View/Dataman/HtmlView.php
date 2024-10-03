@@ -35,6 +35,8 @@ class HtmlView extends BaseHtmlView {
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->form = $this->get('Form');
         $this->basemusicfolder = XbmusicHelper::$musicBase;
+        $this->info = $this->get('Info');
+        $this->warnings = $this->get('Warnings');
         
         $this->addToolbar();
         

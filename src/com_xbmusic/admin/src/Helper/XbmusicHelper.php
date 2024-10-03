@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.12.1 16th August 2024
+ * @version 0.0.18.3 1st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -155,8 +155,9 @@ class XbmusicHelper extends ComponentHelper
 	/** Sections
 	 * 1. Categories
 	 * 2. Tags
+	 * 3. Database
 	 * 3. Text
-	 * 
+	 * 4. Files
 	 */
 
 /**************** Category Functions ********************/
@@ -486,7 +487,7 @@ class XbmusicHelper extends ComponentHelper
 	 * @param string $table - the table to check in
 	 * @param string $col- the column to check
 	 * @param string $where - optional additional where condition (AND). should be quoted
-	 * @return int|boolean - id if value is found in column, otherwise false
+	 * @return int|boolean - id if value is found in column, otherwise false (first match only)
 	 */
 	public static function checkValueExists( $value,  $table, $col, $where = '') {
 	    $db = Factory::getDbo();
@@ -622,6 +623,18 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 /**************** Text Functions ********************/
+
+    /**
+     * @name stripThe()
+     * @param string $name - string to strip the leading 'the ' from
+     * @return string  eg The Rolling Stones -> Rolling Stones
+     */
+	public static function stripThe(string $name) {
+	    if (substr(strtolower(ltrim($name)), 0, 4) == 'the ') {
+	        $name = substr($name,4);
+	    }
+	    return $name;
+	}
 	
 	public static function abridgeText(string $source, int $maxstart = 6, int $maxend = 4, $wordbrk = true) {
 	    $source = trim($source);
@@ -744,6 +757,25 @@ class XbmusicHelper extends ComponentHelper
 	    return $truncstr.'...';
 	}
 	
+/**************** File Functions *******************/
+	
+	/**
+	 * @name newestFile()
+	 * @desc finds the most recently modified file in a folder
+	 * use directory iterator methods like file->getPathname() to access info 
+	 * @param string $path
+	 * @return \DirectoryIterator instance
+	 */
+	public static function newestFile(string $path) {
+	    foreach(new \DirectoryIterator($path) as $item) {
+    	    if ($item->isFile() && (empty($file) || $item->getMTime() > $file->getMTime())) {
+    	        $file = clone $item;
+    	    }
+    	}
+	    return $file;
+	}
+	
+/**************** Unsorted *************************/	
 	/**
 	 * @name checkComponent()
 	 * @desc test whether a component is installed and enabled.

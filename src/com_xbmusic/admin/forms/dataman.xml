@@ -15,39 +15,38 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		<field name="foldername" type="text"
 			label="Selected Folder"
 			description=""
-			readonly="false"
+			readonly="true"
 			size="80"
 		/>
 		<field name="filepathname" type="textarea"
 			label="Selected Files"
 			description="Selected files will be cleared by closing folder"
-			readonly="false"
+			readonly="true"
 			size="80"
 			rows="6"
 		/>
-		<field
-			name="defcat_track" type="xbsubcat"
-			label="Category for Imported Tracks"
-			description="XBCONFIG_CAT_DEF_DESC"
-			extension="com_xbmusic"
-			useglobal="true"
-			>	
-			<option value="-1">Use Genre as category</option>		
-		</field>
-		
-		<field name="errlist" type="editor"
-			label="Parsing Errors" description="Most recent at the bottom, delete the ones you've dealt with."
-			class="inputbox" 
-			filter="ComponentHelper::filterText"  buttons="false" 
-			
-		/>
-		<field name="warnlist" type="editor"
-			label="Parsing Warnings" description="Most recent at the bottom, delete the ones you've dealt with."
-			class="inputbox" 
-			filter="ComponentHelper::filterText"  buttons="false" 
-			
-		/>
-		
+		<field name="impcat" type="radio"
+			label="Joomla Category"
+			description="Default for track will be ID3 Genre if that is specified in global options. "
+			class="btn-group "
+ 			default="2"
+		>
+			<option value="2">Use Item Defaults</option>
+			<option value="1">Create from Date</option>
+		</field>	
 	
+		<field name="logfile" type="filelist" 
+        	default="0" 
+        	label="Select log to view" 
+        	description="Log files are named 'import_YYYY-MM-DD.log'" 
+        	directory="xbmusic-logs" 
+        	filter="\.mp3" 
+        	exclude="false" stripext="false"
+        	hide_none="true" hide_default="true"
+        >
+        	<option value="0">Most Recent</option>
+        </field>
+<!--        	onchange="this.form.submit();" -->
+       	
 	</fieldset>
 </form>

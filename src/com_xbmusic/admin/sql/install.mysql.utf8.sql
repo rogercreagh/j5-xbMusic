@@ -171,7 +171,6 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `description` mediumtext,
   `artwork` mediumtext NOT NULL DEFAULT '',
   `id3_data` mediumtext,
-  `music_base` varchar(190) NOT NULL DEFAULT '',
   `filename` varchar(190) NOT NULL,
   `pathname` varchar(190) NOT NULL DEFAULT '',
   `sortartist` varchar(190) NOT NULL DEFAULT '',

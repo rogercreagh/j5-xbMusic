@@ -44,6 +44,12 @@
 			size="40" 
 		/>
 		
+		<field name="foldername" type="text"
+			label="Selected Folder"
+			description=""
+			readonly="false"
+			size="80"
+		/>
 		 <field name="pathname" type="text" 
 			label="File path" 
 			description="path from the music root directory as set in xbMusic Options" 

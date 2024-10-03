@@ -18,18 +18,22 @@ use Joomla\CMS\MVC\Controller\FormController;
 
 class DatamanController extends FormController
 {
-    function importMp3() {
-        $jinput = Factory::getApplication()->input;
-        $post   = $jinput->get('jform', 'array()', 'ARRAY');
+    function importmp3() {
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
         $model = $this->getModel('dataman');
-        if ($post['filepathnames']) {
-            $files = explode("/n", $post['filepathnames']);
+        if ($post['filepathname']) {
+            $files = explode("\n", trim($post['filepathname'],"\n"));
+            foreach ($files as &$file) {
+                $file = $post['foldername'].$file;
+            }
         } else {
             $files = $post['foldername'];
         }
-        $wynik = $model->parseMP3Files($files, $post['impcat']); 
+        $wynik = $model->parseFilesMp3($files, $post['impcat']); 
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
+        return $wynik;
         
     }
     

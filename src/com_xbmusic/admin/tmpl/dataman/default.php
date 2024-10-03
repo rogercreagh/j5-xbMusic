@@ -39,7 +39,7 @@ $wa->useScript('keepalive')
 <script type="text/javascript" >
 	function confirmImportMp3(){
 		if (confirm('This will import from MP3 data\n Are you really sure?')){
-			document.getElementById('task').value='dataman.importMp3';
+			document.getElementById('task').value='dataman.importmp3';
 			return true;
 		} else {
 			return false;
@@ -67,6 +67,7 @@ $wa->useScript('keepalive')
 	<summary><span class="xbr11 xbbold">
 		<?php echo Text::_('Import ID3 data from music folder/files'); ?></span>
 	</summary>	
+		<?php echo $this->form->renderField('impcat'); ?>
 		<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
 		<br /><?php echo Text::_('If you select one or more files then only those files will be imported')?></p>	
 	<div class="row form-vertical">
@@ -79,7 +80,7 @@ $wa->useScript('keepalive')
         	<p> </p>
         	<?php echo $this->form->renderField('foldername'); ?> 
         	<?php echo $this->form->renderField('filepathname'); ?> 
-         	<?php echo $this->form->renderField('defcat_track'); ?>
+         	<?php echo $this->form->renderField('impcat'); ?>
        </div>
 	</div>
 	<button id="impmp3" class="btn btn-warning" type="submit" 
@@ -87,6 +88,24 @@ $wa->useScript('keepalive')
 		<i class="icon-upload icon-white"></i> 
 		<?php echo Text::_('Import'); ?>
 	</button>
+	<hr />
+	<h4>Import Logs</h4>
+		<div class="row">
+			<div class="col-md-6">
+				<h4><?php echo Text::_('Log File')?></h4>
+				<div class="xbbox gradyellow xbyscroll xbmh300">
+					<?php if ($this->log == '') : ?>
+						<p><i>no log loaded</i></p>
+					<?php else: ?>
+						<?php echo $this->log; ?>
+					<?php endif; ?>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<h4><?php echo Text::_('Select Log File')?></h4>
+				<?php echo $this->form->renderField('logfile'); ?>
+			</div>
+		</div>
 				
 </details>
 <hr />
@@ -178,7 +197,7 @@ Functionality expected here:</p>
         	<hr />
          </div>
 
-		<input type="hidden" name="task" value="" />
+		<input type="hidden" id="task" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<?php echo HTMLHelper::_('form.token'); ?>
 

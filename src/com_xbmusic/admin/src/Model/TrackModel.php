@@ -334,12 +334,14 @@ class TrackModel extends AdminModel {
         $infomsg = '';
         $filepathname = rtrim($data['pathname'],'/').'/'.$data['filename'];
         if (file_exists($filepathname)) {
+            //check if the file already in db
+            
             $filedata = XbmusicHelper::getFileId3($filepathname);
             // get the artist name without "The " to use for sorting and in artwork filename
             if ($data['sortartist'] == '') {
                 if (isset($filedata['id3tags']['artist'])) {
                     $artistarr = explode(' || ', $filedata['id3tags']['artist']);                    
-                    $data['sortartist'] = $this->stripThe($artistarr[0]);
+                    $data['sortartist'] = XbmusicHelper::stripThe($artistarr[0]);
                     if (count($artistarr) > 1) {
                         $warnmsg .= Text::_('More than one artist listed - only first used as Main Performer (sortname). Check and adjust sortname manually if required').'<br />';
                     }
@@ -374,7 +376,7 @@ class TrackModel extends AdminModel {
                     // path will finish with initial letter of title or "unknown"
                     $folder = ($albumtitle == '') ? 'singles/' : 'albums/'.strtolower($albumtitle[0]);
                     $artpath = '/images/xbmusic/artwork/'.$folder.'/';
-                    if (!file_exists($artpath)) {
+                    if (file_exists($artpath)==false) {
                         mkdir(JPATH_ROOT.$artpath,0775,true);
                     }
                     $artfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $albumtitle.' '.$data['sortartist'])).'.'.XbmusicHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
@@ -783,7 +785,7 @@ class TrackModel extends AdminModel {
     
     public function getCreateAlbum($title, $artist, $reldate, $artwork, $numdiscs) {
         //what if artist releases two albums with same title?
-        $sortartist = $this->stripThe($artist);
+        $sortartist = XbmusicHelper::stripThe($artist);
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title).' '.$sortartist);
         $db = $this->getDatabase();
         //$db = $this->getDbo();
@@ -817,14 +819,7 @@ class TrackModel extends AdminModel {
         }
         return $id;
     }
-    
-    public function stripThe($name) {
-        if (substr(strtolower($name), 0, 4) == 'the ') {
-            $name = substr($name,4);
-        }
-        return $name;
-    }
-    
+        
     private function canCreateCategory() {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
     }
