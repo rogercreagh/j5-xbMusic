@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.18.0 17th September 2024
+ * @version 0.0.18.4 9th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -35,6 +35,15 @@ class DatamanController extends FormController
         $this->setRedirect($redirectTo );
         return $wynik;
         
+    }
+    
+    public function loadLogfile() {
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $model = $this->getModel('dataman');
+        $wynick = $model->loadLog($post['logfile'], $post['logfilter']);
+        $redirectTo =('index.php?option=com_xbmusic&view=dataman');
+        $this->setRedirect($redirectTo );
     }
     
     public function saveErrors() {

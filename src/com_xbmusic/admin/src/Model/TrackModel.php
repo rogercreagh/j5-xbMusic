@@ -550,7 +550,7 @@ class TrackModel extends AdminModel {
             }
             if (empty(XbmusicHelper::getItems('#__xbmusic_songtrack', 'song_id', $songid, 'track_id = '.$db->q($tid)))) {
                 $n = (isset($data['songlist'])) ? count($data['songlist']) : 0;
-                $data['songlist']['songlist'.$n] = array('song_id' => $songid, 'note' =>Text::_('auto created from ID3'));
+                $data['songlist']['songlist'.$n] = array('song_id' => $songid, 'note' =>Text::_('created from ID3 import'));
                 $infomsg .= Text::sprintf('Song "%s" added to track',$songtitle ).'<br />';
             } else {
                 $warnmsg .= Text::sprintf('Song "%s" already linked to track',$songtitle ).'<br />';
@@ -581,12 +581,14 @@ class TrackModel extends AdminModel {
                 } else {
                     $warnmsg .= Text::sprintf('Artist "%s" already linked to track',$name ).'<br />';
                 }
+                /***
                 // link artist to song
                 if ($this->createArtistSong($artistid, $songid, '', Text::_('auto created from ID3'))) {
                     $infomsg .= Text::sprintf('%s added to %s %s',$name, 'song', '"'.$songtitle.'"').'<br />';
                 } else {
                     $warnmsg .= Text::_('Problem linking artist to song - link may already exist').'<br />';
                 }
+                ***/
                 // link artist to track
                 if ( ($data['album_id'] >0) 
                     && ($this->createArtistAlbum($artistid, $data['album_id'], '', Text::_('auto created from ID3')))) {
@@ -823,7 +825,8 @@ class TrackModel extends AdminModel {
     private function canCreateCategory() {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
     }
-    
+
+    /****
     public function createArtistSong(int $artist_id, int $song_id, $role = '', $note = '') {
         $db = $this->getDatabase();
         //$db = $this->getDbo();
@@ -847,6 +850,7 @@ class TrackModel extends AdminModel {
         }
         return $res;
     }
+    ***/
     
     public function createArtistAlbum(int $artist_id, int $album_id, $role = '', $note = '') {
         $db = $this->getDatabase();

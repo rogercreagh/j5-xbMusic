@@ -47,11 +47,21 @@
  -->       
        <field name="space2" type="spacer" hr="true" />
         
+	</fieldset>
+
+<!-- ID3 TAB -->
+	<fieldset name="id3"
+		label="XBMUSIC_CONFIG_ID3_SET"
+		description="XBMUSIC_CONFIG_ID3_SET_DESC"
+	>
+		<field name ="id3note" type="note"
+			description="ID3 data can be read from the MP3 file when creating new tracks and used for the basic track data. A Song item will also be created based on the ID3 track title, and Album and Artist items may also be created if they are present in the ID3. The options below will be used both when creating new individual tracks from a file, and when bulk importing using the Data Manager view. The Category option can be overidden during datamanger import."
+		/>
         <field name="genrecattag" type="radio"
         	label="ID3 Genre as Track Cat/Tag"
-        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla  Tag or a Category or ignore it (only saved in ID3 data). Genre categories would be created under 'tracks', tags would be created under 'Id3Genres' as parent."
+        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag and/or Category for track. Genre categories have 'Tracks' as parent category, Genre tags have 'Genres' as parent tag. When bulk importing from ID3 data using DataManager you can override the category option to create date based categories"
  			class="btn-group btn-group-yesno"
-			default="0"
+			default="2"
 			>
 				<option value="0">Ignore</option>
 				<option value="1">Category</option>
@@ -59,28 +69,64 @@
 				<option value="3">Both</option>
         </field>
 
-        <field name="addgenre" type="radio"
-        	label="Also tag album and song"
-        	description="Also add genre tag to albums and/or songs"
+        <field name="genrealbsong" type="radio"
+        	label="ID3 genre as album and song tag"
+        	description="Add genre tags to albums and/or songs"
  			class="btn-group btn-group-yesno"
 			default=""
-			showon="genrecattag:2[OR]genrecattag:3"
         >
-			<option value="">Ignore</option>
+			<option value="0">Ignore</option>
 			<option value="1">Song</option>
 			<option value="2">Album</option>
 			<option value="3">Both</option>
         </field>
         
+		<field name ="genrenote" type="note"
+			description="The following options concern the processing of genre names from the ID3 data to create consistency. eg 'Folk Rock', 'Folk/Rock', and 'Folk-Rock' are all found in the wild and should produce the same tag or category name."
+		/>
+        <field name="genrehyphen" type="radio"
+        	label="Slash and Hyphen handling"
+        	description=""
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			>
+				<option value="0">Leave as-is</option>
+				<option value="1">Slash to Hyphen</option>
+				<option value="2">Hyphen to Slash</option>
+        </field>
+
+        <field name="genrespaces" type="radio"
+        	label="Space handling"
+        	description="Space to Genres will break the ID3 name into 2 or more separate genres at the space(s)"
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			>
+				<option value="0">Leave as-is</option>
+				<option value="1">Space to Hyphen</option>
+				<option value="2">Space to Slash</option>
+				<option value="3">Separate Genres</option>
+        </field>
+
+        <field name="genrecase" type="radio"
+        	label="Initial Upper/Lower Case names"
+        	description="Initial Capital will convert 'FOLK' to 'Folk' and 'folk-rock' to 'Folk-rock'"
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			>
+				<option value="1">Initial Capital</option>
+				<option value="2">All Lower Case</option>
+        </field>        
+        
        <field name="space3" type="spacer" hr="true" />
         
-        <field name="imagesize" type="number" 
-        	label="Max Ht/Width for ID3 image" 
-        	description="Track images will be resized down to this size on height or width in pixels maintaing source aspect ratio (usually square)" 
-        	min="100" max="1000" step="10"
-         	default="500" 
-         />
+       <field name="imagesize" type="number" 
+       	label="Max Ht/Width for ID3 image" 
+       	description="Track images will be resized down to this size width in pixels maintaing source aspect ratio (usually square)" 
+       	min="100" max="1000" step="10"
+        	default="500" 
+        />
        
+	
 	</fieldset>
 
 <!-- CATEGORIES TAB -->

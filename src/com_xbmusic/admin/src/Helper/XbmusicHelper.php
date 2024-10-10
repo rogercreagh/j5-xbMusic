@@ -562,12 +562,21 @@ class XbmusicHelper extends ComponentHelper
 	   return $db->loadResult();	    
 	}
 	
-	public static function getItem($table, $id) {
+	/**
+	 * @name getItem()
+	 * @desc returns a single item row as an object. If column values are not unique will return the first found
+	 * @param string $table - the table name
+	 * @param string $val - the value to match
+	 * @param string $col - the column to look in, defaults to 'id'
+	 * @return object|NULL
+	 */
+	public static function getItem(string $table, string $val, $col ='id', $where = '') {
 	    $db = Factory::getDbo();
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
 	    $query->select('*')->from($db->qn($table));
-	    $query->where($db->qn('id').' = '.$db->q($id));
+	    $query->where($db->qn($col).' = '.$db->q($val));
+	    if ($where != '') $query->where($where);
 	    $db->setQuery($query);
 	    return $db->loadObject();
 	}
