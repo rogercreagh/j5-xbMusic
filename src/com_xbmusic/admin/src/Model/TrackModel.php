@@ -610,13 +610,13 @@ class TrackModel extends AdminModel {
                 if (($addgenre == 1) || ($addgenre == 3)) {
                     //check id3genres is in taggroups for songs
                     XbmusicHelper::addTagToGroup('Genres', 'com_xbmusic.songtagparents');
-                    XbmusicHelper::addTagToItem('com_xbmusic.song', $songid, $tagid);
+                    XbmusicHelper::addTagToItems('com_xbmusic.song', $songid, $tagid);
                     $infomsg .= Text::sprintf('Tag "%s" added to song "%s"',$tagname,$songtitle).'<br />';
                 }
                 if ($addgenre > 1) {
                     //check if id3genres is in taggroups for albums
                     XbmusicHelper::addTagToGroup('Genres', 'com_xbmusic.albumtagparents');
-                    XbmusicHelper::addTagToItem('com_xbmusic.album', $data['album_id'], $tagid);
+                    XbmusicHelper::addTagToItems('com_xbmusic.album', $data['album_id'], $tagid);
                     $infomsg .= Text::sprintf('Tag "%s" added to album %s', $tagname, $albumtitle).'<br />';
                 }
             }

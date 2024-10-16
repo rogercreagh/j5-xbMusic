@@ -212,6 +212,11 @@ class XbmusicHelper extends ComponentHelper
 	    return $wynik;
 	}
 	
+	public static function getCreateCat(array $catdata, $silent = false ) {
+	    $catid = self::checkValueExists($catdata['alias'], '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+	    if (catid == false) $catid = self::createCategory($catdata, $silent)->id;
+	    return $catid;
+	}
 	/**
 	 * @name getCat()
 	 * @desc given category id returns full row
@@ -356,14 +361,14 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	/**
-	 * @name addTagToItem()
-	 * @desc adds an existing tag to an item
+	 * @name addTagToItems()
+	 * @desc adds an existing tag to one or more items of a given type
 	 * @param string $compitem - the component item type in dotted lower case eg com_content.article
 	 * @param int|array $itemId - the id(s) of the item(s) the tag is being added to
 	 * @param int $tagId - the id of the tag being added
 	 * @return boolean - true on suceess, false on failure
 	 */
-	public static function addTagToItem($compitem, $itemIds, $tagId) {
+	public static function addTagToItems($compitem, $itemIds, $tagId) {
 	    $arr=explode('.',$compitem);
 	    $app = Factory::getApplication();
 	    $factory = $app->bootComponent($arr[0])->getMVCFactory();
@@ -382,7 +387,27 @@ class XbmusicHelper extends ComponentHelper
 	    return $res;
 	}
 	
-	/**
+		/**
+	 * @name addTagsToItem()
+	 * @desc adds one or more existing tags to an item of a given type
+	 * @param string $compitem - the component item type in dotted lower case eg com_content.article
+	 * @param int $itemId - the id(s) of the item(s) the tag is being added to
+	 * @param int $tagId - the id of the tag being added
+	 * @return boolean - true on suceess, false on failure
+	 */
+	public static function addTagsToItem($compitem, int $itemId, $tagIds) {
+	    $arr=explode('.',$compitem);
+	    $app = Factory::getApplication();
+	    $factory = $app->bootComponent($arr[0])->getMVCFactory();
+	    $model = $factory->createModel(ucfirst($arr[1]), 'Administrator');
+	    $commands = array('tag'=>$tagId);
+        $pks = [$itemId];
+        $contexts = array($itemId => $compitem.$itemId);
+	    $res = $model->batch($commands, $pks, $contexts );
+	    return $res;
+	}
+	
+/**
 	 * @name addTagToGroup()
 	 * @desc adds the given tag by name to component & taggroup specified
 	 * NB This assumes you are requesting a valid tag list parameter in the config for a valid component

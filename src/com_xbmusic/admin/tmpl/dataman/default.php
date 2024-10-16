@@ -64,8 +64,8 @@ $wa->useScript('keepalive')
     
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'import', Text::_('Import')); ?>
 <details>
-	<summary><span class="xbr11 xbbold">
-		<?php echo Text::_('Import ID3 data from music folder/files'); ?></span>
+	<summary>
+		<span class="xbr11 xbbold"><?php echo Text::_('Import Tracks using ID3 data from music folder/files'); ?></span>
 	</summary>	
 		<?php echo $this->form->renderField('impcat'); ?>
 		<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
@@ -88,6 +88,22 @@ $wa->useScript('keepalive')
 		<i class="icon-upload icon-white"></i> 
 		<?php echo Text::_('Import'); ?>
 	</button>
+</details>
+<hr />
+<details>
+	<summary>
+		<span class="xbr11 xbbold"><?php echo Text::_('Import Data from CSV file')?></span>
+	</summary>
+	<p>tba </p>
+</details>
+<hr />
+<details>
+	<summary>
+		<span class="xbr11 xbbold"><?php echo Text::_('Import Playlist from PLS/3U file')?></span>
+    </summary>		
+	<p>tba </p>
+</details>
+	
 	<hr />
 	<h4>Import Logs</h4>
 		<div class="row">
@@ -107,17 +123,6 @@ $wa->useScript('keepalive')
 			</div>
 		</div>
 				
-</details>
-<hr />
-<summary><h4><?php echo Text::_('Import Data from CSV file')?></h4>
-	<details>
-	</details>
-</summary>			
-<hr />
-<summary><h4><?php echo Text::_('Import Playlist from PLS/3U file')?></h4>
-	<details>
-	</details>
-</summary>			
 <hr />
 <p>Functionality expected here:</p>
 <ol>
