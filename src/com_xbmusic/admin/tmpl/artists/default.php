@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artists/default.php
- * @version 0.0.9.0 21st June 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -190,8 +190,8 @@ if (strpos($listOrder, 'modified') !== false) {
 									<ul style="margin:5px;">
 									<?php foreach ($item->albums as $album) : ?>
 										<li>
-											<?php if($album['artwork']!='') :?>
-												<img src="<?php echo $album['artwork']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
+											<?php if($album['imgfile']!='') :?>
+												<img src="<?php echo $album['imgfile']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
 											<?php endif; ?>
 										`	<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
 							                <?php echo $album['albumtitle']; ?></a> 
@@ -203,8 +203,8 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php elseif (count($item->albums)==1) : ?>
 								<?php $album = $item->albums[0]; ?>
 								<p><span class="xbit"><?php echo Text::_('Album'); ?></span><br />
-								<?php if($album['artwork']!='') :?>
-									<img src="<?php echo $album['artwork']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
+								<?php if($album['imgfile']!='') :?>
+									<img src="<?php echo $album['imgfile']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
 								<?php endif; ?>
 								<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
 					                <?php echo $album['albumtitle']; ?></a> 
@@ -219,8 +219,8 @@ if (strpos($listOrder, 'modified') !== false) {
 									<ul style="margin:5px;">
 									<?php foreach ($item->singles as $single) : ?>
 										<li>
-											<?php if($single['artwork']!='') :?>
-												<img src="<?php echo $single['artwork']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="50" height="50" class="xbml10" />
+											<?php if($single['imgfile']!='') :?>
+												<img src="<?php echo $single['imgfile']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="50" height="50" class="xbml10" />
 											<?php endif; ?>
 											<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
 							                <?php echo $single['albumtitle']; ?></a> 
@@ -232,8 +232,8 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php elseif (count($item->singles)==1) : ?>
 								<?php $single = $item->singles[0]; ?>
 								<p><span class="xbit"><?php echo Text::_('Single Track'); ?></span><br />
-								<?php if($single['artwork']!='') :?>
-									<img src="<?php echo $single['artwork']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="100" height="100" class="xbml10" />
+								<?php if($single['imgfile']!='') :?>
+									<img src="<?php echo $single['imgfile']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="100" height="100" class="xbml10" />
 								<?php endif; ?>
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
 					                <?php echo $single['tracktitle']; ?></a> 

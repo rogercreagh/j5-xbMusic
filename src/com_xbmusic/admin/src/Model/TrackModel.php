@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.18.5 21st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -12,29 +12,29 @@ namespace Crosborne\Component\Xbmusic\Administrator\Model;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
-use Joomla\CMS\Form\Form;
+use Joomla\Filter\OutputFilter;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\String\PunycodeHelper;
-use Joomla\CMS\Table\Table;
-use Joomla\CMS\Table\TableInterface;
-use Joomla\CMS\UCM\UCMType;
-use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
-use Joomla\Database\ParameterType;
-use Joomla\Filter\OutputFilter;
-use Joomla\Registry\Registry;
-use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
-use Symfony\Component\Validator\Constraints\IsNull;
-use \SimpleXMLElement;
-use Crosborne\Component\Xbmusic\Administrator\Extension\XbmusicComponent;
 use Joomla\CMS\Uri\Uri;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use \SimpleXMLElement;
+//use Joomla\Registry\Registry;
+//use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
+//use Symfony\Component\Validator\Constraints\IsNull;
+//use Crosborne\Component\Xbmusic\Administrator\Extension\XbmusicComponent;
+//use Joomla\CMS\Form\Form;
+//use Joomla\CMS\Plugin\PluginHelper;
+//use Joomla\CMS\String\PunycodeHelper;
+//use Joomla\CMS\Table\Table;
+//use Joomla\CMS\Table\TableInterface;
+//use Joomla\CMS\UCM\UCMType;
+//use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
+//use Joomla\Database\ParameterType;
 
 class TrackModel extends AdminModel {
   
@@ -332,10 +332,10 @@ class TrackModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $warnmsg = '';
         $infomsg = '';
-        $filepathname = rtrim($data['pathname'],'/').'/'.$data['filename'];
+        $filepathname = JPATH_ROOT.'/xbmusic/'.rtrim($data['foldername'],'/').'/'.$data['filename'];
         if (file_exists($filepathname)) {
             //check if the file already in db
-            
+            $data['pathname'] = $filepathname;
             $filedata = XbmusicHelper::getFileId3($filepathname);
             // get the artist name without "The " to use for sorting and in artwork filename
             if ($data['sortartist'] == '') {
@@ -369,7 +369,7 @@ class TrackModel extends AdminModel {
                 $albumartist = (isset($filedata['id3tags']['artist'])) ? $data['sortartist'] : '';
             }
             // get artwork if not set and if available in ID3
-            if (empty($data['artwork'])) {
+            if (empty($data['imgfile'])) {
                 if (isset($filedata['imageinfo']['data'])){
                     // filename for image will be "album-title-albumartist-name.ext"
                     // if track has no album listed but has image then "artist-name.ext" for all tracks by the artist
@@ -383,10 +383,10 @@ class TrackModel extends AdminModel {
                     $artpathfile = JPATH_ROOT.$artpath.$artfilename;
                     $arturl = Uri::root().$artpath.$artfilename;
                     if (file_exists($artpathfile)) {
-                        $data['artwork'] = $arturl;
+                        $data['imgfile'] = $arturl;
                     } else {
                         if (file_put_contents($artpathfile, $filedata['imageinfo']['data'])) {
-                            $data['artwork'] = $arturl;
+                            $data['imgfile'] = $arturl;
                         }
                     }
                     unset($filedata['imageinfo']['data']);
@@ -416,7 +416,7 @@ class TrackModel extends AdminModel {
             // create album
             if ($albumtitle != '') {
                 $numdiscs = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) explode('/',$filedata['id3tags']['part_of_a_set'])[1] :1;
-                $albumid = $this->getCreateAlbum($albumtitle, $albumartist, $data['rel_date'], $data['artwork'],$numdiscs );
+                $albumid = $this->getCreateAlbum($albumtitle, $albumartist, $data['rel_date'], $data['imgfile'],$numdiscs );
                 if ($albumid < 0) {
                     $albumid *= -1;
                     $infomsg .= Text::sprintf('Existing album "%s" added to track',$albumtitle).'<br />';
@@ -785,7 +785,7 @@ class TrackModel extends AdminModel {
         return $id;
     }
     
-    public function getCreateAlbum($title, $artist, $reldate, $artwork, $numdiscs) {
+    public function getCreateAlbum($title, $artist, $reldate, $imgfile, $numdiscs) {
         //what if artist releases two albums with same title?
         $sortartist = XbmusicHelper::stripThe($artist);
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title).' '.$sortartist);
@@ -805,8 +805,8 @@ class TrackModel extends AdminModel {
             $createbyalias = 'created from ID3';
             $query->clear();
             $query->insert('#__xbmusic_albums');
-            $query->columns('title, alias, albumartist, sortartist, rel_date, artwork, num_discs, catid, status, access, created, modified, created_by_alias');
-            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$artwork.'","'.$numdiscs.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
+            $query->columns('title, alias, albumartist, sortartist, rel_date, imgfile, num_discs, catid, status, access, created, modified, created_by_alias');
+            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$imgfile.'","'.$numdiscs.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
             //            $query->values($db->quote($title, $newalias, $catid, $createmod, $createmod, $createbyalias));
             $db->setQuery($query);
             try {

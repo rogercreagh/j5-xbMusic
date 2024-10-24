@@ -309,7 +309,7 @@ class ArtistsModel extends ListModel {
     public function getArtistSingles($aid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.title AS tracktitle, t.artwork, t.rel_date');
+        $query->select('t.id AS trackid, t.title AS tracktitle, t.imgfile, t.rel_date');
         $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
         $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
@@ -321,7 +321,7 @@ class ArtistsModel extends ListModel {
     public function getArtistAlbums($aid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.artwork');
+        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgfile');
         $query->from('#__xbmusic_albums AS a');
         $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
         $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');

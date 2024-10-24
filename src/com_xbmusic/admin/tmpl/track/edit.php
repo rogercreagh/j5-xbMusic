@@ -38,60 +38,6 @@ $input = Factory::getApplication()->getInput();
 ?>
 <link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
 <script type="text/javascript" >
-/************************
-$(document).ready( function() {
-
-	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Generating Tree...' + '<li></ul>' );
-	
-	getfilelist( $('#container') , '<?php echo $this->basemusicfolder; ?>' );
-	
-	function getfilelist( cont, root ) {
-	
-		$( cont ).addClass( 'wait' );
-			
-		$.post( <?php echo "'/administrator/components/com_xbmusic/tmpl/track/Foldertree.php'"; ?>, { dir: root }, function( data ) {
-	
-			$( cont ).find( '.start' ).html( '' );
-			$( cont ).removeClass( 'wait' ).append( data );
-			if( 'Sample' == root ) 
-				$( cont ).find('UL:hidden').show();
-			else 
-				$( cont ).find('UL:hidden').slideDown({ duration: 500, easing: null });
-			
-		});
-	}
-	
-	var preventry = null;
-	$( '#container' ).on('click', 'LI A', function() {
-		var entry = $(this).parent();
-		//alert( $(this).attr('rel') );
-		if( entry.hasClass('folder') ) {
-			if( entry.hasClass('collapsed') ) {
-						
-				entry.find('UL').remove();
-				getfilelist( entry, escape( $(this).attr('rel') ));
-				entry.removeClass('collapsed').addClass('expanded');
-			}
-			else {
-				//alert( "No" );
-				entry.find('UL').slideUp({ duration: 500, easing: null });
-				entry.removeClass('expanded').addClass('collapsed');
-			}
-//			document.getElementById('jform_foldername').value=$(this).attr( 'rel' );
-		} else {
-        	if (preventry!=null) {preventry.removeClass('selected')};
-          	entry.addClass('selected');
-          	preventry = entry;
-//			$( '#jform_filepathname' ).value( $(this).attr( 'rel' ));
-//			$( '#jform_filepathname' ).text( $(this).attr( 'rel' ));
-//			$( '#selected_file' ).text( $(this).attr( 'rel' ));
-			document.getElementById('jform_filepathname').value=$(this).attr( 'rel' );
-		}
-	return false;
-	});
-	
-});
-**************/
 </script>
 <script>
 	function clearmd() {
@@ -119,15 +65,6 @@ $(document).ready( function() {
  		document.getElementById('task').value='track.setfolder';
  		this.form.submit();
  	}
-//     	var userdata = {'id':mydata,'name':myname};
-//         jQuery.ajax({
-//                 type: "POST",
-//                 url: "YOUR PHP URL HERE",
-//                 data:userdata, 
-//                 success: function(data){
-//                     console.log(data);
-//                 }
-//                 });
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
@@ -150,7 +87,7 @@ $(document).ready( function() {
             $session->clear('musicfolder');
 		?>
     	</p>
-     	<?php if (($this->item->id == 0) || (!file_exists($this->item->pathname.$this->item->filename)) ) : ?>
+     	<?php if (($this->item->id == 0) || (!file_exists($this->item->pathname)) ) : ?>
         	<div class="row form-vertical">
        			<div class="col-md-6">
        				<p><?php echo Text::_('Select music track')?>
@@ -159,6 +96,7 @@ $(document).ready( function() {
         		<div class="col-md-6">
                 	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
                 	<p> </p>
+        	<?php echo $this->form->renderField('foldername'); ?> 
                 	<?php echo $this->form->renderField('filepathname'); ?> 
                  	<?php // echo $this->form->renderField('getid3onsave'); ?>
                </div>
@@ -166,7 +104,7 @@ $(document).ready( function() {
         	<div class="row">
         	</div>
     	<?php else: ?>
-        	<?php $localpath = str_replace($this->basemusicfolder,'',$this->item->pathname); ?>
+        	<?php $localpath = str_replace($this->basemusicfolder,'',pathinfo($this->item->pathname, PATHINFO_DIRNAME)).'/'; ?>
         	<div class="row">
         		<div class="col-md-6">
         			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
@@ -273,7 +211,7 @@ $(document).ready( function() {
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<?php if (empty($this->item->artwork)) : ?>
+           			<?php if (empty($this->item->imgfile)) : ?>
            				<?php if ($this->item->id == 0) : ?>
            					<p class="xbit"><?php echo Text::_('When you save file artwork will be loaded from ID3 data if available'); ?></p>
            				<?php else: ?>
@@ -284,7 +222,7 @@ $(document).ready( function() {
            				<?php echo Text::_('')?>
            			<?php else : ?>
 	           			<?php echo Text::_('Artwork'); ?><br/>
-						<img src="<?php echo $this->item->artwork; ?>" />
+						<img src="<?php echo $this->item->imgfile; ?>" />
 					<?php endif; ?>
 				</div>        		
            		<div class="col-12 col-md-7">

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.3 1st October 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -13,6 +13,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\Helper;
 defined('_JEXEC') or die;
 
 //require_once(JPATH_COMPONENT_ADMINISTRATOR.'/src/Helper/getid3/getid3.php');
+require_once (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Access\Access;
@@ -60,7 +61,7 @@ class XbmusicHelper extends ComponentHelper
 	}
 
 	public static function getFileId3($filename, $image = '') {
-	    require (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
+//	    require_once (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
 	    $ThisFileInfo = getIdData($filename);
 	    $result = array();	 
 	    $result['audioinfo'] = array();
@@ -114,7 +115,7 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.artwork');
+	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgfile');
 	    $query->from('#__xbmusic_albums AS a');
 	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
 	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
@@ -141,7 +142,7 @@ class XbmusicHelper extends ComponentHelper
 //	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('t.id AS trackid, t.title AS tracktitle, t.artwork, t.rel_date');
+	    $query->select('t.id AS trackid, t.title AS tracktitle, t.imgfile, t.rel_date');
 	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->where('t.album_id = 0 AND at.artist_id = '.$aid);

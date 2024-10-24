@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TracksModel.php
- * @version 0.0.6.12 8th June 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -116,7 +116,7 @@ class TracksModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.artwork,'
+                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.imgfile,'
                     .'a.rec_date, a.rel_date, a.sortartist, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
                     .'a.note, album.title AS albumtitle, a.album_id AS albumid'

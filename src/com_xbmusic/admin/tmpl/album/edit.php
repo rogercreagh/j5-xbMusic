@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -146,7 +146,7 @@ $input = Factory::getApplication()->getInput();
         	<div class="row">
            		<div class="col-12 col-md-5">
            			<?php echo Text::_('id3 Image'); ?><br/>
-					<img src="<?php echo $this->item->artwork; ?>" />
+					<img src="<?php echo $this->item->imgfile; ?>" />
 					<br />[LOAD NEW IMAGE] (modal selector)
 				</div>        		
            		<div class="col-12 col-md-7">

@@ -1,7 +1,7 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/track/Foldertree.php
+ * @filesource admin/tmpl/track/XFoldertree.php
  * @version 0.0.11.1 10th July 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024

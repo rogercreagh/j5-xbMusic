@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.7.0 19th June 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -114,7 +114,7 @@ class AlbumsModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.subtitle, a.description, '
-                    .'a.albumartist, a.sortartist, a.artwork, a.format, a.rel_date, '
+                    .'a.albumartist, a.sortartist, a.imgfile, a.format, a.rel_date, '
                     .'a.num_discs, a.tot_tracks, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '

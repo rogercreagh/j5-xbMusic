@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.6.15 18th June 2024
+ * @version 0.0.18.5 20th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -201,8 +201,8 @@ function stopProp(event) {
 								</p>
 							</div>
 						</td>
-						<td><?php if ($item->artwork != '') : ?>
-								<img src="<?php echo $item->artwork; ?>" style="height:100px;" />
+						<td><?php if ($item->imgfile != '') : ?>
+								<img src="<?php echo $item->imgfile; ?>" style="height:100px;" />
 							<?php endif; ?>
 						</td>
 						<td class="xbr09" onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->

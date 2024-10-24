@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.18.0 25th September 2024
+ * @version 0.0.18.5 17th October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -67,9 +67,6 @@ $wa->useScript('keepalive')
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('Import Tracks using ID3 data from music folder/files'); ?></span>
 	</summary>	
-		<?php echo $this->form->renderField('impcat'); ?>
-		<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
-		<br /><?php echo Text::_('If you select one or more files then only those files will be imported')?></p>	
 	<div class="row form-vertical">
 		<div class="col-md-6">
 			<p><?php echo Text::_('Select folder or tracks')?>
@@ -77,7 +74,8 @@ $wa->useScript('keepalive')
 		</div>
 		<div class="col-md-6">
         	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
-        	<p> </p>
+			<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
+				<br /><?php echo Text::_('If you select one or more files then only those files will be imported')?></p>	
         	<?php echo $this->form->renderField('foldername'); ?> 
         	<?php echo $this->form->renderField('filepathname'); ?> 
          	<?php echo $this->form->renderField('impcat'); ?>
