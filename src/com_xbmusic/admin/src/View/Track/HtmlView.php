@@ -52,7 +52,7 @@ class HtmlView extends BaseHtmlView {
 //        }
         
 //       if (($this->item->id>0) && !file_exists($this->item->pathname.$this->item->filename)) {
-        if (($this->item->id>0) && !file_exists($this->item->pathname)) {
+        if (($this->item->id>0) && !file_exists($this->item->filepathname)) {
                 Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_ERROR_NO_MUSIC_FILE'), 'Error');
         }
         

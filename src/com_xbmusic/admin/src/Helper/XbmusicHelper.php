@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.5 20th October 2024
+ * @version 0.0.18.6 1st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -30,6 +30,7 @@ use Joomla\CMS\Uri\Uri;
 //use Joomla\Database;
 //use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
+use Joomla\Filter\OutputFilter;
 use DOMDocument;
 use DateTime;
 use Exception;
@@ -151,6 +152,145 @@ class XbmusicHelper extends ComponentHelper
 	    return $db->loadAssocList();
 	}
 	
+	/**
+	 * @name createMusicItem()
+	 * @desc Creates an xbMusic item with supplied data. 
+	 * status, access, created & modified dates will be default values if missing, 
+	 * Created_by will be set to user, alias will be created from title if missing (not if no title)
+	 * @param array $data
+	 * @param string $table
+	 * @return \stdClass
+	 */
+	public static function createMusicItem(array $data, string $itemtype) {
+	    $app = Factory::getApplication();
+	    if (strpos(' track song playlist artist album ', $itemtype) == false) {
+	        $app->enqueueMessage('Invalid itemtype to create','Error');
+	        return false;
+	    }
+	    $itemid = false;
+	    $sqldate = Factory::getDate()->toSql();
+	    $user 	= $app->getIdentity();
+	    if (!key_exists('status', $data))  $data['status'] = 1;
+	    if (!key_exists('access', $data))  $data['access'] = 1;
+	    if (!key_exists('created', $data))  $data['created'] = $sqldate;
+	    if (!key_exists('modified', $data))  $data['modified'] = $sqldate;
+	    if (!key_exists('created_by', $data))  $data['created_by'] = $user;
+	    if ((!key_exists('alias', $data)) && (key_exists('title', $data))) 
+	        $data['alias'] = self::makeAliasUnique(OutputFilter::stringURLSafe($data['title']),'#__xbmusic_'.$itemtype);
+	    
+//	    $itemmodel = $this->getMVCFactory()->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
+	    $itemmodel = $app->bootComponent('com_xbmusic')->getMVCFactory()
+	       ->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
+	    if ($itemtype == 'track') {
+	        if (!$itemmodel->simpleSave($data)) {
+	            $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
+	            return false;
+	        }
+	        $itemid = $itemmodel->getState($itemtype.'.id');
+	        return $itemid;
+	        
+	    } else {
+    	    if (!$itemmodel->save($data)) {
+    	        $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
+    	        return false;
+    	    }
+            $itemid = $itemmodel->getState($itemtype.'.id');
+    	    return $itemid;
+	    }
+	    return false;
+	}
+	
+	public static function createImageFile(array $imgdata, string $imgfilename, string &$flogmsg) {
+	    $imgpath = pathinfo($imgfilename, PATHINFO_DIRNAME);
+	    //create the folder if it doesn't exist (eg new initial)
+	    if (file_exists($imgpath)==false) {
+	        mkdir(JPATH_ROOT.$imgpath,0775,true);
+	        $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."\n";
+	    }
+	    $imgext = XbmusicHelper::imageMimeToExt($imgdata['image_mime']);
+	    $imgfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $imgfilename)).'.'.$imgext;
+	    $imgpathfile = JPATH_ROOT.$imgfilename;
+	    $imgurl = Uri::root().$imgfilename;
+	    $imgok = false;
+	    if (file_exists($imgpathfile)) {
+	        $imgok = true;
+	        $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."\n";
+	    } else {
+	        $params = ComponentHelper::getParams('com_xbmusic');
+	        $maxpx = $params->get('imagesize',500);
+	        if ($imgdata['image_height'] > $maxpx) {
+	            //need to resize image
+	            $image = imagecreatefromstring($imgdata['data']);
+	            $newimage = imagescale($image, $maxpx);
+	            switch ($imgext) {
+	                case 'jpg':
+	                    $imgok = imagejpeg($newimage, $imgpathfile);
+	                    break;
+	                case 'png':
+	                    $imgok = imagejpeg($newimage, $imgpathfile);
+	                    break;
+	                case 'gif':
+	                    $imgok = imagejpeg($newimage, $imgpathfile);
+	                    break;
+	                default:
+	                    $imgok = false;
+	                    break;
+	            }
+	        } else {
+	            $imgok = file_put_contents($imgpathfile, $imgdata['data']);
+	        }
+	    } //endif artfile !exists
+	    if ($imgok) return $imgurl;
+	    
+	    return false;
+	}
+	
+	public static function createGenres($genrenames, &$ilogmsg) {
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $opthyphen = $params->get('genrehyphen',1);
+	    $optspaces = $params->get('genrespaces',1);
+	    $optcase = $params->get('genrecase',1);
+	    $genres = [];
+	    $genrenames = explode(' || ', $genrenames);
+	    //split name with spaces into two or more genres "Folk Rock" -> "Folk" | "Rock"
+	    if ($optspaces == 3) {
+	        $tempnames = array();
+	        foreach ($tempnames as $genre) {
+	            $multi = explode(' ',$genre);
+	            $newgenrenames = array_merge($tempnames, $multi);
+	            if (count($multi) > 1) {
+	                $ilogmsg .= '"'.$genre.Text::sprintf("split into %s genres.\n",count($multi),2);
+	            }
+	        }
+	        $genrenames = $newgenrenames;
+	    }
+	    foreach ($genrenames as &$genre) {
+	        $cnt = 0;
+	        if ($opthyphen == 1) {
+	            $genre = str_replace('/','-',$genre, $cnt);
+	        } elseif ($opthyphen==2) {
+	            $genre = str_replace('-','/',$genre, $cnt);
+	        }
+	        if ($optspaces == 1)  {
+	            $genre = str_replace(' ','-',$genre, $cnt);
+	        } elseif ($optspaces == 2) {
+	            $genre = str_replace(' ','/',$genre, $cnt);
+	        }
+	        if ($cnt > 0) $ilogmsg .= $genre.' normalized'."\n";
+	        $genre = strtolower($genre);
+	        if ($optcase == 2) {
+	            $genre = ucfirst($genre);
+	        }
+	        //get the parent tag for genre tags
+	        $tpid = self::getCreateTag(array('title'=>'Genres'));
+	        //get or create the genre tag id and title
+	        $newtag = self::getCreateTag(array('title'=>$genre, 'parent_id'=>$tpid), true);
+	        if ($newtag) $genres[] = $newtag;
+	    } //end foreach genre
+	    return $genres;
+	}
+	
+	
 	
 /****************** xbLibrary functions ***********/
 	/** Sections
@@ -161,7 +301,7 @@ class XbmusicHelper extends ComponentHelper
 	 * 4. Files
 	 */
 
-/**************** Category Functions ********************/
+/**************** 1. Category Functions ********************/
 	
 	/**
 	 * @name createCategories()
@@ -208,14 +348,14 @@ class XbmusicHelper extends ComponentHelper
 	        $wynik->id = $catid;
 	        $wynik->title = $catdata['title'];
 	    }
-	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
-	    if ($infomsg != '') $app->enqueueMessage($infomsg,'Info');
+	    if ($errmsg != '') $app->enqueueMessage('createCategory() '.$errmsg, 'Warning');
+	    if ($infomsg != '') $app->enqueueMessage('createCategory() '.$infomsg,'Info');
 	    return $wynik;
 	}
 	
 	public static function getCreateCat(array $catdata, $silent = false ) {
 	    $catid = self::checkValueExists($catdata['alias'], '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-	    if (catid == false) $catid = self::createCategory($catdata, $silent)->id;
+	    if ($catid == false) $catid = self::createCategory($catdata, $silent)->id;
 	    return $catid;
 	}
 	/**
@@ -302,7 +442,7 @@ class XbmusicHelper extends ComponentHelper
 	    return $res;
 	}
 	
-/**************** Tag Functions ********************/
+/**************** 2. Tag Functions ********************/
 	
 	/**
 	 * @name getCreateTags()
@@ -355,8 +495,8 @@ class XbmusicHelper extends ComponentHelper
         }
         if (!$silent) {
     	    $app = Factory::getApplication();
-    	    if ($errmsg != '') $app->enqueueMessage($errmsg, 'Warning');
-            if ($infomsg != '') $app->enqueueMessage($infomsg, 'Info');           
+    	    if ($errmsg != '') $app->enqueueMessage('getCreateTag() '.$errmsg, 'Warning');
+    	    if ($infomsg != '') $app->enqueueMessage('getCreateTag() '.$infomsg, 'Info');           
         }
         return $wynik;
 	}
@@ -441,12 +581,12 @@ class XbmusicHelper extends ComponentHelper
 	        
 	        // check for error
 	        if (!$table->check()) {
-	            Factory::getApplication()->enqueueMessage($table->getError(),'Error');
+	            Factory::getApplication()->enqueueMessage('addTagToGroup()check '.$table->getError(),'Error');
 	            return false;
 	        }
 	        // Save to database
 	        if (!$table->store()) {
-	            Factory::getApplication()->enqueueMessage($table->getError(),'Error');
+	            Factory::getApplication()->enqueueMessage('addTagToGroup()store '.$table->getError(),'Error');
 	            return false;
 	        }
 	    }
@@ -504,7 +644,7 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	
-/**************** Database Functions ********************/
+/**************** 3. Database Functions ********************/
 	
 	/**
 	 * @name checkValueExists()
@@ -566,7 +706,7 @@ class XbmusicHelper extends ComponentHelper
 	        $cnt = $db->loadResult();
 	    } catch (\Exception $e) {
 	        $dberr = $e->getMessage();
-	        Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
+	        Factory::getApplication()->enqueueMessage('getItemCnt() '.$dberr.'<br />Query: '.$query->dump(), 'error');
 	    }
 	    return $cnt;
 	}
@@ -632,7 +772,7 @@ class XbmusicHelper extends ComponentHelper
 	        $res = $db->loadObjectList();
 	    } catch (\Exception $e) {
 	        $dberr = $e->getMessage();
-	        Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), 'error');
+	        Factory::getApplication()->enqueueMessage('getItems() '.$dberr.'<br />Query: '.$query->dump(), 'error');
 	    }
 	    return $res;	    
 	}
@@ -657,7 +797,17 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 	
-/**************** Text Functions ********************/
+	public static function makeAliasUnique(string $alias, string $table) {
+	    $temp = $alias;
+	    $i = 0;
+	    while (self::checkValueExists($temp, $table, 'alias') !== false) {
+	        $i ++;
+	        $temp = $alias.'-'.sprintf("%02d",$i);
+	    }
+	    return $temp;
+	}
+	
+	/**************** Text Functions ********************/
 
     /**
      * @name stripThe()

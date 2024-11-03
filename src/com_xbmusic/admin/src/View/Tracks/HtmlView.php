@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Tracks/HtmlView.php
- * @version 0.0.11.5 16th July 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,7 +116,7 @@ class HtmlView extends BaseHtmlView {
         }
         
         $dropdown = $toolbar->dropdownButton('views')
-        ->text('Other Views')
+        ->text('XBMUSIC_OTHER_VIEWS')
         ->toggleSplit(false)
         ->icon('icon-ellipsis-h')
         ->buttonClass('btn btn-action')

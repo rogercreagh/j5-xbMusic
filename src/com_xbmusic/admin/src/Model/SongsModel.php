@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongsModel.php
- * @version 0.0.6.14 13th June 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -306,6 +306,7 @@ class SongsModel extends ListModel {
         
     } // end getItems
     
+/**    
     public function getTracks($id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
@@ -322,7 +323,8 @@ class SongsModel extends ListModel {
         $db->setQuery($query);
         return $db->loadAssocList();
     }
-
+**/
+    
     public function getSongTracksAlbums($sid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.18.0 17th September 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -36,6 +36,7 @@ class HtmlView extends BaseHtmlView {
         $this->form = $this->get('Form');
         $this->basemusicfolder = XbmusicHelper::$musicBase;
         $this->log = $this->get('LastImportLog');
+        $this->log = str_replace("\n", '<br />', $this->log);
         $this->warnings = $this->get('Warnings');
         
         $this->addToolbar();

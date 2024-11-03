@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.18.5 17th October 2024
+ * @version 0.0.18.6 3rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -49,6 +49,7 @@ $wa->useScript('keepalive')
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
       <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
+      <input type="hidden" id="multi" value="1" />
       <input type="hidden" id="extlist" value="mp3" />
       <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
         <h3>xbMusic Data Manager</h3>
@@ -77,7 +78,9 @@ $wa->useScript('keepalive')
 			<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
 				<br /><?php echo Text::_('If you select one or more files then only those files will be imported')?></p>	
         	<?php echo $this->form->renderField('foldername'); ?> 
+        	<?php echo $this->form->renderField('selectedfiles'); ?> 
         	<?php echo $this->form->renderField('filepathname'); ?> 
+        	<?php echo $this->form->renderField('filename'); ?> 
          	<?php echo $this->form->renderField('impcat'); ?>
        </div>
 	</div>

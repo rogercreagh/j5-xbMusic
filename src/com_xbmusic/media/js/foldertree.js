@@ -1,7 +1,7 @@
 /**
  * @package xbmusic
  * @filesource /media/js/foldertree.js
- * @version 0.0.18.1 29th September 2024
+ * @version 0.0.18.6 3rd November 2024
  * @desc used by filetree element
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2019
@@ -14,6 +14,7 @@ $(document).ready( function() {
 	var basefolder = document.getElementById('basefolder').value; //'<?php echo $this->basemusicfolder; ?>';
 	var extlist = document.getElementById('extlist').value;
 	var posturi = document.getElementById('posturi').value;
+	var multi = document.getElementById('multi').value;
 	$( '#container' ).html( '<ul class="filetree start"><li class="wait">' + 'Generating Tree...' + '<li></ul>' );
 	
 	getfilelist( $('#container') , basefolder  );
@@ -50,7 +51,7 @@ $(document).ready( function() {
             };
           	entry.addClass('selected');
 			prevfolder = entry;
-            document.getElementById('jform_filepathname').value = null;
+            document.getElementById('jform_selectedfiles').value = null;
 			document.getElementById('jform_foldername').value = $(this).attr( 'rel' ).replace(basefolder,'');
 			if( entry.hasClass('collapsed') ) {						
 				entry.find('UL').remove();
@@ -62,13 +63,17 @@ $(document).ready( function() {
 				entry.removeClass('expanded').addClass('collapsed');
 			}
 		} else {
-        	if (prevfolder!=null) {prevfolder.removeClass('selected')};
-//        	if (preventry!=null) {preventry.removeClass('selected')};
           	entry.addClass('selected');
+        	if (prevfolder!=null) {prevfolder.removeClass('selected')};
+          	if (multi == 1) {
+	          	prevvalue = document.getElementById('jform_selectedfiles').value;          	
+	//			document.getElementById('jform_filepathname').value = prevvalue + $(this).attr( 'rel' ).replace(basefolder,'') + "\n";
+				document.getElementById('jform_selectedfiles').value = prevvalue + $(this).attr('rel').split('\\').pop().split('/').pop() + "\n";
+			} else {	  
+	        	if (preventry!=null) {preventry.removeClass('selected')};
+				document.getElementById('jform_selectedfiles').value = $(this).attr( 'rel' ).split('\\').pop().split('/').pop();
+			}
           	preventry = entry;
-          	prevvalue = document.getElementById('jform_filepathname').value;          	
-//			document.getElementById('jform_filepathname').value = prevvalue + $(this).attr( 'rel' ).replace(basefolder,'') + "\n";
-			document.getElementById('jform_filepathname').value = prevvalue + $(this).attr( 'rel' ).split('\\').pop().split('/').pop() + "\n";
 		}
 	return false;
 	});

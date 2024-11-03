@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.12.1 16th August 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -40,7 +40,8 @@ $listDirn = $this->escape($this->state->get('list.direction'));
 //$saveOrder = $listOrder == 'a.ordering';
 
 $celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
-$tvlink = '';
+$cvlink = 'index.php?option=com_xbmusic&view=catinfo&id=';
+$tvlink = 'index.php?option=com_xbmusic&view=taginfo&id=';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
 
@@ -260,8 +261,6 @@ if (strpos($listOrder, 'modified') !== false) {
     </form>
     <script language="JavaScript" type="text/javascript"
       src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
-    <script language="JavaScript" type="text/javascript"
-      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/setifsrc.js" ></script>
     
     <div class="clearfix"></div>
     <?php echo XbmusicHelper::credit('xbMusic');?>

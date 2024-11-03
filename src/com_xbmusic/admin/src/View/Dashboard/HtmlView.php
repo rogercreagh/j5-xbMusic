@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.6.12 7th June 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -47,12 +47,12 @@ class HtmlView extends BaseHtmlView {
         $albumtagparents = $params->get('albumtagparents');
         if (is_array($albumtagparents)) {
             $albumtagparents = $taghelper->getTagNames($albumtagparents);
-            $this->albumtagparents = ''; //'<i>'.Text::_('XBMUSIC_NO_GROUPS_DEFINED').'</i>: ';
+            $this->albumtagparents = ''; //'<i>'.Text::_('XB_NO_TAG_GROUPS').'</i>: ';
             foreach ($albumtagparents as $name) {
                 $this->albumtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->albumtagparents = Text::_('XBMUSIC_ALL_TAGS_ALLOWED');
+            $this->albumtagparents = Text::_('XB_NO_TAG_GROUPS');
         }
         
         $genreparam = (int) $params->get('genrecattag',0);
@@ -105,7 +105,7 @@ class HtmlView extends BaseHtmlView {
                 $this->artisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->artisttagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
+            $this->artisttagparents = Text::_('XB_NO_TAG_GROUPS');
         }
         //==========================
         
@@ -126,7 +126,7 @@ class HtmlView extends BaseHtmlView {
                 $this->plisttagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->plisttagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
+            $this->plisttagparents = Text::_('XB_NO_TAG_GROUPS');
         }
         //==========================
         
@@ -147,7 +147,7 @@ class HtmlView extends BaseHtmlView {
                 $this->songtagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->songtagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
+            $this->songtagparents = Text::_('XB_NO_TAG_GROUPS');
         }
         //==========================
         
@@ -168,7 +168,7 @@ class HtmlView extends BaseHtmlView {
                 $this->tracktagparents .= '<span class="xbbadge badge-tag xbpl10">'.$name.'</span>';
             }
         } else {
-            $this->tracktagparents = Text::_('XBMUSIC_NO_GROUPS_DEFINED');
+            $this->tracktagparents = Text::_('XB_NO_TAG_GROUPS');
         }
         //==========================
         
@@ -268,7 +268,7 @@ class HtmlView extends BaseHtmlView {
         ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_DASHBOARD_TITLE'), 'fas fa-info-circle');
         
         $dropdown = $toolbar->dropdownButton('views')
-        ->text('Other Views')
+        ->text('XBMUSIC_OTHER_VIEWS')
         ->toggleSplit(false)
         ->icon('icon-ellipsis-h')
         ->buttonClass('btn btn-action')

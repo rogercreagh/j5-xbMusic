@@ -226,9 +226,7 @@ if ($saveOrder && !empty($this->items)) {
     </form>
     <script language="JavaScript" type="text/javascript"
       src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
-    <script language="JavaScript" type="text/javascript"
-      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/setifsrc.js" ></script>
-    
+   
     <div class="clearfix"></div>
     <?php echo XbmusicHelper::credit('xbMusic');?>
 </div>

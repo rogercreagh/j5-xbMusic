@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.18.3 30th September 2024
+ * @version 0.0.18.6 3rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -86,6 +86,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Tracks","desc"=>"default parent category for xbMusic Tracks")
             );
             $message .= $this->createCategories($cats).'<br />';
+            $message .= $this->createTag('Genres').'<br />';
             
             //create a top level tag to be parent for id3genre tags
 //            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));
@@ -114,7 +115,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                        
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
-            $ext_mess .= '<p>For help and information see <a href="https://crosborne.co.uk/'.$this->extslug.'/doc" target="_blank">www.crosborne.co.uk/'.$this->extslug.'/doc</a> ';
+            $ext_mess .= '<p>For help and information see <a href="https://crosborne.co.uk/'.$this->extslug.'/doc" target="_blank" style="font-weight:bold; color:black;">www.crosborne.co.uk/'.$this->extslug.'/doc</a> ';
             $ext_mess .= 'or use Help button in <a href="index.php?option='.$this->extension.'" class="btn btn-small btn-info" style="color:#fff;">'.$this->extname.' Dashboard</a></p>';
             $ext_mess .= '</div>';
             echo $ext_mess;
@@ -158,7 +159,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                         if ($category->store(true)) {
                             // Build the path for our category
                             $category->rebuildPath($category->id);
-                            $message .= $cat['title'].' id:'.$category->id.' created ok. ';
+                            $message .= $cat['title'].' :'.$category->id.', ';
                         } else {
                             throw new Exception(500, $category->getError());
                             //return '';
@@ -179,7 +180,32 @@ class Com_xbmusicInstallerScript extends InstallerScript
      * @param assoc array $tagdata
      * @return boolean|int new (or existing) tagid of false in case of error
      */
-    public function createTag(array $tagdata) {
+    public function createTag($title) {
+        $db = Factory::getDbo();
+        //$db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true);
+        $query->select('id')->from($db->quoteName('#__tags'))
+        ->where('LOWER('.$db->quoteName('title').')='.$db->quote(strtolower($title)));
+        $db->setQuery($query);
+        $res = $db->loadResult();
+        if ($res > 0) {
+            return 'Tag '.$title.' already exists';
+        }
+        // doesnt already exist so set defaults for status & parent
+        $tagdata = array('title'=>$title, 'published'=>1, 'parent_id'=>1, 'language'=>'*', 'description'=>'Parent tag for genres. Do not remove, new genres may be added automatically from track files.');
+        // Create new tag.
+        $tagModel = Factory::getApplication()->bootComponent('com_tags')
+            ->getMVCFactory()->createModel('Tag', 'Administrator', ['ignore_request' => true]);
+         if (!$tagModel->save($tagdata)) {
+                return '<span style="color:red;">'.$tagModel->getError().'</span>';
+            } else {
+                $tagid = $tagModel->getState('tag.id');
+                return 'New tag '.$title.' created';
+            }
+            return '';
+        }
+        
+/*         
         Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
         $app = Factory::getApplication();
         //check if alias already exists (dupe id)
@@ -224,4 +250,5 @@ class Com_xbmusicInstallerScript extends InstallerScript
         return $table->id;
     }
     
+ */
 }

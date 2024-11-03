@@ -70,7 +70,7 @@
         </field>
 
         <field name="genrealbsong" type="radio"
-        	label="ID3 genre as album and song tag"
+        	label="ID3 Genre as Album/Song Tag"
         	description="Add genre tags to albums and/or songs"
  			class="btn-group btn-group-yesno"
 			default=""

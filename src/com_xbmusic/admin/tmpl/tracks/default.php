@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.18.5 20th October 2024
+ * @version 0.0.18.6 31st October 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -40,7 +40,9 @@ $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 
 $celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
-$tvlink = '';
+$cvlink = 'index.php?option=com_xbmusic&view=catinfo&id=';
+
+$tvlink = 'index.php?option=com_xbmusic&view=taginfo&id=';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
 
@@ -274,7 +276,7 @@ function stopProp(event) {
 						<td>
 						<?php if ($item->catid > 0) : ?>
     						<p>
-    							<a class="xblabel label-cat" href="<?php echo $celink.$item->catid; ?>" 
+    							<a class="xblabel label-cat" href="<?php echo $cvlink.$item->catid; ?>" 
     								title="<?php echo Text::_( 'XB_VIEW_CATEGORY' );?>::<?php echo $item->category_title; ?>">
     								<?php echo $item->category_title; ?>
     							</a>							
@@ -339,8 +341,8 @@ function stopProp(event) {
     </form>
     <script language="JavaScript" type="text/javascript"
       src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
-    <script language="JavaScript" type="text/javascript"
-      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/setifsrc.js" ></script>
+<!--     <script language="JavaScript" type="text/javascript" -->
+<!--      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/setifsrc.js" ></script>  -->
     
     <div class="clearfix"></div>
     <?php echo XbmusicHelper::credit('xbMusic');?>

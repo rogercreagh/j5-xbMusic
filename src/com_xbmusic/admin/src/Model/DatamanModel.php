@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.18.5 24th October 2024
+ * @version 0.0.18.6 3rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -63,10 +63,9 @@ class DatamanModel extends AdminModel {
 
         $params = ComponentHelper::getParams('com_xbmusic');
         //start log
-        $loghead = 'Import ID3 Started '.date('H:i:s D jS M Y')."<br />";
+        $loghead = 'Import ID3 Started '.date('H:i:s D jS M Y')."\n";
         $logmsg = '';
         
-//        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
         //are we doing a whole folder, or selected files?
         if (is_string($files)) {
             $folder = trim($files);
@@ -81,14 +80,14 @@ class DatamanModel extends AdminModel {
         } elseif (!is_array($files)) {
             $errmsg .= Text::_('Invalid files list');
             Factory::getApplication()->enqueueMessage($errmsg,'Error');
-            $logmsg .= $loghead.'[ERROR] '.$errmsg."<br /> ============================== <br /><br />";
+            $logmsg .= $loghead.'[ERROR] '.$errmsg."\n ============================== \n\n";
             $this->writelog($logmsg);
             return false;
         }
         if (count($files)==0){
             $errmsg .= Xbtext::_('No mp3 files found in',2).$folder;
             Factory::getApplication()->enqueueMessage($errmsg,'Warning');
-            $logmsg .= $loghead.'[WARNING] '.$errmsg."<br /> ============================== <br /><br />";
+            $logmsg .= $loghead.'[WARNING] '.$errmsg."\n ============================== \n\n";
             $this->writelog($logmsg);
             return false;
         }
@@ -104,9 +103,9 @@ class DatamanModel extends AdminModel {
         if ($cattype == "1") {
             //create category with import date
             $daycattitle = date('Y-m-d');
-            $parentcat = XbmusicHelper::checkValueExists('import', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+            $parentcat = XbmusicHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
             if ($parentcat == false) {
-                $catdata = array('title'=>'Import', 'alias'=>'import', 'description'=>'parent for import date categories used on importing items');
+                $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
                 $parentcat = XbmusicHelper::createCategory($catdata, true);
             }
             $this->trackcatid = XbmusicHelper::getCatByAlias($daycattitle)->id;
@@ -120,16 +119,17 @@ class DatamanModel extends AdminModel {
         } //endif cattype=1
         
         // ok we're going to iterate through the files
+        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
         foreach ($files as $file) {
-            $logmsg .= $this->parseID3($file, $cnts);            
+            $logmsg .= $this->parseID3($basemusicfolder.$file, $cnts);            
         }
         //update the log file with counts at the top
-        $loghead .= '[SUM] '.$cnts['newtrk'].' new tracks, '.$cnts['duptrk'].' duplicates'."<br />";
-        $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."<br />";
-        $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."<br />";
-        $loghead .= " -------------------------- <br />";
+        $loghead .= '[SUM] '.$cnts['newtrk'].' new tracks, '.$cnts['duptrk'].' duplicates'."\n";
+        $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."\n";
+        $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
+        $loghead .= " -------------------------- \n";
         $logmsg = $loghead.$logmsg;
-        $logmsg .= '======================================'."<br /><br />";
+        $logmsg .= '======================================'."\n\n";
         $this->writelog($logmsg);
         return true;
     } //end parseFilesMp3()    
@@ -146,42 +146,39 @@ class DatamanModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
 //        $uncatid = XbmusicHelper::getCatByAlias('uncategorised');
         //strat the logging for this file
-        $ilogmsg = '[INFO] '.$filepathname."<br />";
-        $enditem = " -------------------------- <br />";
+        $ilogmsg = '[INFO] '.$filepathname."\n";
+        $enditem = " -------------------------- \n";
         $trackdata = []; //only one track per file
         $albumdata = []; //only one album per file
         $songdata = []; //only one song initially - if medley could be split later
         $artistdata = []; //can be mulitple artists, will attempt to split
-        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
+        $fpathinfo = pathinfo($filepathname);
 
-// 1. make track alias, if it exists already then exit
-        // track alias is the cleaned filepathname 
-        $trackdata['alias'] = OutputFilter::stringURLSafe($filepathname); 
-        if ( $tid = XbmusicHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
-            $ilogmsg .= '[ERROR] Track already in database with track_id='.$tid."<br />";
+// 1. check if filepathname already in database, if it exists already then exit
+        $trackdata['filepathname'] = $filepathname;
+        if ( $tid = XbmusicHelper::checkValueExists($filepathname, '#__xbmusic_tracks', 'filepathname')) {
+            $ilogmsg .= '[ERROR] Track already in database with track_id='.$tid."\n";
             $ilogmsg .= $enditem;
             $cnts['duptrk'] ++;
             return $ilogmsg;
         }
 // 2. set track->pathname and track->filename, if filename exists then warning
-        // path and filename are stored separately in the database
-        $trackdata['pathname'] = rtrim(dirname($filepathname),'/').'/';
-        $trackdata['filename'] = basename($filepathname);
+               // path and filename are stored separately in the database
+//        $trackdata['pathname'] = str_replace(JPATH_ROOT.'/xbmusic/','',$fpathinfo['dirname']);
+        $trackdata['filename'] = $fpathinfo['basename'];
         // check if same filename exists in a different folder - import it anyway and warn 
-        if ( $fid = XbmusicHelper::checkValueExists($trackdata['filename'], '#__xbmusic_tracks', 'filename')) {  
-            $fpath = XbmusicHelper::getItemValue('#__xbmusic_tracks', 'pathname', $fid);
-            if ( $fpath == $trackdata['pathname'] ) {
-                $ilogmsg .= '[WARNING] Track with same filename already in database in '.$fpath.'with track_id='.$fid."<br />";
-                $ilogmsg .= '[WARNING] Importing this one anyway, but check and delete one or other if necessary'."<br />";               
-                $cnts['duptrk'] ++;
-            }
+        if ( $fid = XbmusicHelper::checkValueExists($fpathinfo['basename'], '#__xbmusic_tracks', 'filename')) {  
+            $fpath = XbmusicHelper::getItemValue('#__xbmusic_tracks', 'filepathname', $fid);
+            $ilogmsg .= '[WARNING] Filename already in database at '.$fpath.'with track_id='.$fid."\n";
+            $ilogmsg .= '[WARNING] Importing this one anyway, but check and delete one or other if necessary'."\n";               
+//                $cnts['duptrk'] ++;
         }
         
 //3. okay, now get the id3 data
-        $filedata = XbmusicHelper::getFileId3(($basemusicfolder.$filepathname));
+        $filedata = XbmusicHelper::getFileId3(($filepathname));
         
         if (!isset($filedata['id3tags']['title'])) { //could add any other required elements to the isset() function
-            $ilogmsg .= '[ERROR] No title found in ID3 data. Cannot import'."<br />";
+            $ilogmsg .= '[ERROR] No title found in ID3 data. Cannot import'."\n";
             $ilogmsg .= $enditem;
             $cnts['errtrk'] ++;
             return $ilogmsg;          
@@ -190,11 +187,12 @@ class DatamanModel extends AdminModel {
         
 // 4. get album->title and first artist and make alias for use in image name (use track->title if no album), create/get album id.
         $trackdata['title'] = $filedata['id3tags']['title'];
+        $trackdata['alias'] = XbmusicHelper::makeAliasUnique(OutputFilter::stringURLSafe($trackdata['title']),'#__xbmusic_tracks'); 
         if (isset($filedata['id3tags']['album'])) {
             $albumarr = explode(' || ', $filedata['id3tags']['album']);
             $albumdata['title'] = $albumarr[0];
             if (count($albumarr)>1) {
-                $ilogmsg .= '[WARNING] Multiple album titles listed - first is used - a track can only belong to one album'."<br />";
+                $ilogmsg .= '[WARNING] Multiple album titles listed - first is used - a track can only belong to one album'."\n";
                 $ilogmsg .= 'Album Titles found: ';
                 foreach ($albumarr as $value) {
                     $ilogmsg .= ' '.$value.',';
@@ -219,19 +217,19 @@ class DatamanModel extends AdminModel {
             // if album is set image filename will be "album-title_sortartist.ext"
             // saved in "images/xbmusic/artwork/albums/[initial letter of album title]/"
             // if track has no album then filename "track-title_sortartist.ext" and save in artwork/singles/
-            $imgfilename = '';
+            $imgfilename = '/images/xbmusic/artwork/';
             if (isset($albumdata['alias'])) {
-                $imgfilename = $albumdata['alias'];
+                $imgfilename .= 'albums/'.strtolower($albumdata['alias'][0]).'/'.$albumdata['alias'];
             } else {
-                $imgfilename = $trackdata['title'];
-                if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
+                $imgfilename .= 'singles/'.$trackdata['title'];
             }            
-            $imgurl = $this->createImageFile($filedata, $imgfilename, $ilogmsg);
+            if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];           
+            $imgurl = XbmusicHelper::createImageFile($filedata['imageinfo'], $imgfilename, $ilogmsg);
             if ($imgurl != false) {
                 $trackdata['imgfile'] = $imgurl;
-                $ilogmsg .= Text::_('[INFO] image file created').' '.str_replace(Uri::root(),'',$imgurl)."<br />";
+                $ilogmsg .= Text::_('[INFO] image file created').' '.str_replace(Uri::root(),'',$imgurl)."\n";
             } else {
-                $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgurl."<br />";
+                $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgurl."\n";
             }
             // remove the image data from id3data as it causes problems in later steps
             unset($filedata['imageinfo']['data']);
@@ -253,17 +251,17 @@ class DatamanModel extends AdminModel {
             if (preg_match($datematch,$filedata['id3tags']['recording_time'])==1) {
                 $trackdata['rec_date'] = ($filedata['id3tags']['recording_time']);
             } else {
-                $ilogmsg .= '[WARNING] Recording date '.$filedata['id3tags']['recording_time'].' wrong format. Enter manually for track'."<br />";
+                $ilogmsg .= '[WARNING] Recording date '.$filedata['id3tags']['recording_time'].' wrong format. Enter manually for track'."\n";
             }
         }
         if (isset($filedata['id3tags']['year'])) {
             if (preg_match($datematch,$filedata['id3tags']['year'])==1) {
                 $trackdata['rel_date'] = $filedata['id3tags']['year'];
             } else {
-                $ilogmsg .= '[WARNING] Release date '.$filedata['id3tags']['year'].' wrong format. Enter manually for track and album'."<br />";
+                $ilogmsg .= '[WARNING] Release date '.$filedata['id3tags']['year'].' wrong format. Enter manually for track and album'."\n";
             }
         } else {
-            $ilogmsg .= '[WARNING] No release date found. Enter manually for track and album'."<br />";
+            $ilogmsg .= '[WARNING] No release date found. Enter manually for track and album'."\n";
         }
         
 // 7. Genre Tags - create tags as required and build list to use when saving the track/album/song
@@ -280,20 +278,21 @@ class DatamanModel extends AdminModel {
 // 8. Track Categories
         if (($optcattag & 1) && (!empty($genres))) {
             //first check if we already have a cat for the genre
-            $gid = XbmusicHelper::getCatByAlias(OutputFilter::stringURLSafe($genres[0]->title))->id;
+            $thisgid = XbmusicHelper::getCatByAlias(OutputFilter::stringURLSafe($genres[0]->title))->id;
             if (is_null($gid)) {
                 //get Genre in Tracks category
                 $gcat = XbmusicHelper::getCatByAlias('genres');
                 if ($gcat->id > 0) {
-                    $gpid = $gcat->parent_id;
+                    $gpid = $gcat->id;
                 } else {
                     //we need to create the Tracks/Genres category
-                    $gpcat = XbmusicHelper::getCatByAlias('tracks');
-                    $gpid = ($gpcat->id > 0) ? $gpcat->id : 1; //if the tracks category has been deleted fallback to root
+                    $tcat = XbmusicHelper::getCatByAlias('tracks');
+                    $gpid = ($tcat->id > 0) ? $tcat->id : 1; //if the tracks category has been deleted fallback to root
+                    $gid = XbmusicHelper::getCreateCat(array('title'=>'Genres', 'alias'=>'genres', 'parent_id'=>$gpid),true)->id;
                 }
-                $gid = XbmusicHelper::getCreateCat(array('title'=>$genres[0]->title,                         'alias'=>OutputFilter::stringURLSafe($genres[0]->title), 'parent_id'=>$gpid),true)->id;
+                $thisgid = XbmusicHelper::getCreateCat(array('title'=>$genres[0]->title,                         'alias'=>OutputFilter::stringURLSafe($genres[0]->title), 'parent_id'=>$gid),true)->id;
             }
-            $trackdata['catid'] = $gid;
+            $trackdata['catid'] = $thisgid;
             
         } else {
             $trackdata['catid'] = $this->trackcatid;
@@ -304,7 +303,7 @@ class DatamanModel extends AdminModel {
             $artistarr = explode(' || ', $filedata['id3tags']['artist']);
             $trackdata['sortartist'] = XbmusicHelper::stripThe($artistarr[0]);
             if (count($artistarr) > 1) {
-                $ilogmsg .= '[WARNING] Multiple artists in ID3 - first used as Album Artist if not separately specified, and as Track SortName. Check and adjust manually as required'."<br />";
+                $ilogmsg .= '[WARNING] Multiple artists in ID3 - first used as Album Artist if not separately specified, and as Track SortName. Check and adjust manually as required'."\n";
             }
             $newartistarr = array();
             foreach ($artistarr as $artistname) {
@@ -313,7 +312,7 @@ class DatamanModel extends AdminModel {
                 if ($multi) {
                     $splitarr = explode('&',$artistname);
                     $newartistarr = array_merge($newartistarr, $splitarr);
-                    $ilogmsg .= '[WARNING] '.$artistname.' has been split into separate artists by "&". If this is incorrect edit name and alias of the first artist and delete the others'."<br />";
+                    $ilogmsg .= '[WARNING] '.$artistname.' has been split into separate artists by "&". If this is incorrect edit name and alias of the first artist and delete the others'."\n";
                 } else {
                     $newartistarr[] = $artistname;
                 }
@@ -329,15 +328,15 @@ class DatamanModel extends AdminModel {
                 if (empty($artistdataobj)) { //we need to create the artist
                     $thisartist = array('name'=>$artistname, 'alias'=>$artistalias, 'catid'=>$this->artistcatid, 'created_by_alias'=>'ID3 Import');
                     //could create artist at this point
-                    $artistid = $this->createMusicItem($thisartist,'artist');
+                    $artistid = XbmusicHelper::createMusicItem($thisartist,'artist');
                     if ($artistid > 0) {
                         $artistdata[] = $thisartist;
-                        $trackdata['artistlist'][] = array('artist_id'=>$artistid, 'note' =>Text::_('created by ID3 import'));
+                        $trackdata['artistlist'][] = array('artist_id'=>$artistid, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
                     } else {
-                        $ilogmsg .= '[ERROR] problem attempting to create artist '.$artistname."<br />";
+                        $ilogmsg .= '[ERROR] problem attempting to create artist '.$artistname."\n";
                     }
                 } else {
-                    $trackdata['artistlist'][] = array('artist_id'=>$artistdataobj->id, 'note' =>Text::_('created by ID3 import'));
+                    $trackdata['artistlist'][] = array('artist_id'=>$artistdataobj->id, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
                 }
             } //end foreach artistname
             $albumdata['artistlist'] = $trackdata['artistlist'];
@@ -350,10 +349,18 @@ class DatamanModel extends AdminModel {
             $albumid = XbmusicHelper::checkValueExists($albumalias, '#__xbmusic_albums', 'alias');
             if ($albumid) {
                 $albumexists = true;
+                $trackdata['album_id'] = $albumid;
                 //may need to update tracknumber, rel_date, image, and artist links
             } else {
                 if (isset($albumdata['rel_date'])) $albumdata['rel_date'] = $trackdata['rel_date'];
-                if (isset($filedata['id3tags']['part_of_a_set'])) $albumdata['num_discs'] = $filedata['id3tags']['part_of_a_set'];
+                if (isset($filedata['id3tags']['part_of_a_set'])) {
+                    $setstr = explode('/',$filedata['id3tags']['part_of_a_set']);
+                    if (count($setstr)==2) {
+                        $albumdata['num_discs'] = (int)$setstr[1];
+                    } else {
+                        $ilogmsg .= '[WARNING] failed to parse `num_discs` from "'.$filedata['id3tags']['part_of_a_set'].'"\n';
+                    }                    
+                }
                 $albumdata['imgfile'] = $imgurl;
                 //set artist links
                 
@@ -361,16 +368,20 @@ class DatamanModel extends AdminModel {
                 if ($optalbsong > 1) {
                     if (!empty($genres)) $albumdata['genres'] = array_column($genres,'id');
                 }
-                $albumid = $this->createMusicItem($albumdata, 'album');
+                $albumid = XbmusicHelper::createMusicItem($albumdata, 'album');
+                if ($albumid > 0) {
+                    $trackdata['album_id'] = $albumid;
+                } else {
+                    $ilogmsg .= '[ERROR] failed to create album "'.$albumdata['title'].'"\n';
+                }
             }
-            $trackdata['album_id'] = $albumid;
         }      
         
 // 11. get or create the song(s)
         // if track title contains commas or the word "medley" it may be a medley of songs 
         $medley = preg_match('/,|medley/i', $trackdata['title']);
         if ($medley) {
-            $ilogmsg .= '[WARNING] Track title indicates a possible song medley. Song(s) not created please check and create manually'."<br />";
+            $ilogmsg .= '[WARNING] Track title indicates a possible song medley. Song(s) not created please check and create manually'."\n";
         } else {
             $trackdata['songlist'] = array();
             $songalias = OutputFilter::stringURLSafe(str_replace($this->unwantedaliaschars,"", $trackdata['title']));
@@ -380,25 +391,26 @@ class DatamanModel extends AdminModel {
                 $songdata['title'] = $trackdata['title'];
                 $songdata['alias'] = $songalias;
                 $songdata['catid'] = $this->songcat; 
-                $song = $this->createMusicItem($songdata,'song');
-                if ($song>0) {
-                    $ilogmsg .= '[INFO] Song '.$songdata['title'].' with id '.$song.' created'."<br />";
+                $songid = XbmusicHelper::createMusicItem($songdata,'song');
+                if ($songid>0) {
+                    $ilogmsg .= '[INFO] Song '.$songdata['title'].' with id '.$song.' created'."\n";
                     if (($optalbsong ==1) || ($optalbsong==3)) {
-                        $songdata['tags'] = XbmusicHelper::addTagsToItem('com_xbmusic.song', $song, $genres);
-                        $ilogmsg .= 'Genres added to song'."<br />";
+                        $songdata['tags'] = XbmusicHelper::addTagsToItem('com_xbmusic.song', $songid, $genres);
+                        $ilogmsg .= 'Genres added to song'."\n";
                     }
-                    $trackdata['songlist'][] = array('song_id'=>$song, 'note' =>Text::_('created from ID3 import'));
+                    $trackdata['songlist'][] = array('song_id'=>$songid, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
                 }
             } else {
-                $trackdata['songlist'][] = array('song_id'=>$songdataobj->id, 'note' =>Text::_('created from ID3 import'));
+                $trackdata['songlist'][] = array('song_id'=>$songdataobj->id, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
                 //we need to merge in any new genres here
             }
         }
 
         
 // 12. create track (need to add album id and sortartist once we have them
-        $track = $this->createMusicItem($trackdata,'track');
-        $ilogmsg .= '[INFO] '.'"'.$trackdata['title'].'" with id:'.$track->id.' created ok'."<br />";
+        $trackid = XbmusicHelper::createMusicItem($trackdata,'track');
+        
+        $ilogmsg .= '[INFO] Track '.'"'.$trackdata['title'].'" with id:'.$trackid.' created ok'."\n";
         $ilogmsg .= $enditem;
         return $ilogmsg;
     } //end parseID3()
@@ -417,7 +429,7 @@ class DatamanModel extends AdminModel {
                 $multi = explode(' ',$genre);
                 $newgenrenames = array_merge($tempnames, $multi);
                 if (count($multi) > 1) {
-                    $ilogmsg .= '"'.$genre.Text::sprintf('split into %s genres.<br />',count($multi),2);
+                    $ilogmsg .= '"'.$genre.Text::sprintf("split into %s genres.\n",count($multi),2);
                 }
             }
             $genrenames = $newgenrenames;
@@ -434,7 +446,7 @@ class DatamanModel extends AdminModel {
             } elseif ($optspaces == 2) {
                 $genre = str_replace(' ','/',$genre, $cnt);
             }
-            if ($cnt > 0) $ilogmsg .= $genre.' normalized'."<br />";
+            if ($cnt > 0) $ilogmsg .= $genre.' normalized'."\n";
             $genre = strtolower($genre);
             if ($optcase == 2) {
                 $genre = ucfirst($genre);
@@ -461,7 +473,7 @@ class DatamanModel extends AdminModel {
         //create the folder if it doesn't exist (eg new initial)
         if (file_exists($imgpath)==false) {
             mkdir(JPATH_ROOT.$imgpath,0775,true);
-            $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."<br />";
+            $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."\n";
         }
         $imgext = XbmusicHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
         $imgfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $imgfilename)).'.'.$imgext;
@@ -470,7 +482,7 @@ class DatamanModel extends AdminModel {
         $imgok = false;
         if (file_exists($imgpathfile)) {
             $imgok = true;
-            $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."<br />";
+            $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."\n";
         } else {
             $params = ComponentHelper::getParams('com_xbmusic');
             $maxpx = $params->get('imagesize',500);
@@ -502,6 +514,7 @@ class DatamanModel extends AdminModel {
     }
     
     public function getLastImportLog() {
+        $file = null;
         foreach(new DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {
             if ($item->isFile() && (empty($file) || $item->getMTime() > $file->getMTime())) {
                 $file = clone $item;
@@ -540,7 +553,7 @@ class DatamanModel extends AdminModel {
                 $logstr = fread($f, filesize($pathname));
                 fclose($f);
             } else {
-                Factory::getApplication()->enqueueMessage('Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
+                Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
             }
         }
         return $logstr;
@@ -556,11 +569,10 @@ class DatamanModel extends AdminModel {
      */
     public function createMusicItem(array $data, string $itemtype, $silent = false) {
         if (strpos(' track song playlist artist album ', $itemtype) == false) {
-            Factory::getApplication()->enqueueMessage('Invalid itemtype to create','Error');
+            if (!$silent) Factory::getApplication()->enqueueMessage('Invalid itemtype to create','Error');
             return false;
         }
         $app = Factory::getApplication();
-        $errmsg = '';
         $itemid = false;
         $createmoddate = Factory::getDate()->toSql();
         $user 	=Factory::getApplication()->getIdentity();
@@ -574,11 +586,10 @@ class DatamanModel extends AdminModel {
         // Factory::getApplication()->bootComponent('com_categories')
         //->getMVCFactory()->createModel('Category', 'Administrator', ['ignore_request' => true]);
         if (!$itemmodel->save($data)) {
-            $errmsg = $itemmodel->getError();
-        } else {
-            $itemid = $itemmodel->getState($itemtype.'.id');
+            if (!$silent) Factory::getApplication()->enqueueMessage('createMusicItem() '.$itemtype.' '.$itemmodel->getError(), 'Error');
+            return false;
         }
-        if (($errmsg != '') && (!$silent)) $app->enqueueMessage($errmsg, 'Warning');
+        $itemid = $itemmodel->getState($itemtype.'.id');
         return $itemid;
     }
     

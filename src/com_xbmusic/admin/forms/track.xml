@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Track Form file v0.0.12.1 16th August 2024 -->
+<!-- 
+ * @package xbMusic
+ * @filesource admin/forms/track.xml
+ * @version 0.0.18.6 3rd November 2024
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2021
+ * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
+-->
 
 <form>
 	<config>
@@ -30,17 +37,23 @@
 			size="40" 
 		/>
 		
-		<field name="foldername" type="text"
-			label="Selected Folder"
-			description=""
-			readonly="true"
-			size="80"
-		/>
 		<field name="filepathname" type="text"
-			label="Selected File"
+			label="File pathname"
 			description=""
 			readonly="false"
 			size="80"
+		/>
+		<field name="filename" type="text" 
+			label="File name" description="" 
+		/>
+		<field name="foldername" type="text"
+			label="Selected Folder"
+			description="only used by fileselector"
+			readonly="true"
+			size="80"
+		/>
+		<field name="selectedfiles" type="text" 
+			label="File name" description="only used by fileselector" 
 		/>
 		
 		<field name="sortartist" type="text" 
@@ -50,14 +63,11 @@
 			size="40" 
 		/>
 		
-		 <field name="pathname" type="text" 
+<!--		 <field name="pathname" type="text" 
 			label="File path" 
 			description="path from the music root directory as set in xbMusic Options" 
 		/>
-
-		<field name="filename" type="text" 
-			label="File name" description="Filename" 
-		/>
+-->
 	
 		<field name="getid3onsave" type="radio"
 			label="re-read ID3 on Save"

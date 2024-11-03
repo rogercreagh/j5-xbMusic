@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.18.6 3rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -70,6 +70,7 @@ $input = Factory::getApplication()->getInput();
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
       <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
+      <input type="hidden" id="multi" value="0" />
       <input type="hidden" id="extlist" value="mp3" />
       <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
     	<p class="xbnit">
@@ -87,7 +88,7 @@ $input = Factory::getApplication()->getInput();
             $session->clear('musicfolder');
 		?>
     	</p>
-     	<?php if (($this->item->id == 0) || (!file_exists($this->item->pathname)) ) : ?>
+     	<?php if (($this->item->id == 0) || (!file_exists($this->item->filepathname)) ) : ?>
         	<div class="row form-vertical">
        			<div class="col-md-6">
        				<p><?php echo Text::_('Select music track')?>
@@ -96,15 +97,15 @@ $input = Factory::getApplication()->getInput();
         		<div class="col-md-6">
                 	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
                 	<p> </p>
-        	<?php echo $this->form->renderField('foldername'); ?> 
-                	<?php echo $this->form->renderField('filepathname'); ?> 
+        			<?php echo $this->form->renderField('foldername'); ?> 
+                	<?php echo $this->form->renderField('selectedfiles'); ?> 
                  	<?php // echo $this->form->renderField('getid3onsave'); ?>
                </div>
      		</div>
         	<div class="row">
         	</div>
     	<?php else: ?>
-        	<?php $localpath = str_replace($this->basemusicfolder,'',pathinfo($this->item->pathname, PATHINFO_DIRNAME)).'/'; ?>
+        	<?php $localpath = str_replace($this->basemusicfolder,'',pathinfo($this->item->filepathname, PATHINFO_DIRNAME)).'/'; ?>
         	<div class="row">
         		<div class="col-md-6">
         			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
@@ -124,7 +125,7 @@ $input = Factory::getApplication()->getInput();
             </div>
     	<?php endif; ?>
         <div class="hide">
-        	<?php echo $this->form->renderField('pathname'); ?> 
+        	<?php echo $this->form->renderField('filepathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
         </div>
         <hr />

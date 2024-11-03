@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.10.0 23rd June 2024
+# sql installation file for component xbMusic 0.0.18.6 1st November 2024
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -166,11 +166,12 @@ CREATE UNIQUE INDEX `songaliasindex` ON `#__xbmusic_songs` (`alias`);
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(190) NOT NULL DEFAULT '',
-  `alias` varchar(190) NOT NULL DEFAULT '',
+  `title` varchar(190) NOT NULL,
+  `alias` varchar(190) NOT NULL,
   `description` mediumtext,
   `imgfile` varchar(190) NOT NULL DEFAULT '',
   `id3_data` mediumtext,
+  `filepathname` varchar(190) NOT NULL,
   `filename` varchar(190) NOT NULL,
   `pathname` varchar(190) NOT NULL DEFAULT '',
   `sortartist` varchar(190) NOT NULL DEFAULT '',
@@ -195,7 +196,9 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `ordering` int(10) NOT NULL DEFAULT '0',
   `params` mediumtext NOT NULL DEFAULT '',
   `note` mediumtext,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE (`alias`),
+  UNIQUE (`filepathname`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE UNIQUE INDEX `trackaliasindex` ON `#__xbmusic_tracks` (`alias`);
