@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.18.6 3rd November 2024
+ * @version 0.0.18.7 4th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -288,7 +288,7 @@ $input = Factory::getApplication()->getInput();
 	<?php endif; ?>
 	
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
-			<div class="row">
+			<div class="row form-vertical">
 				<div class="col-12 col-md-6">
 					<?php echo $this->form->renderField('album_id'); ?> 
 				</div>
@@ -299,22 +299,26 @@ $input = Factory::getApplication()->getInput();
 					<?php echo $this->form->renderField('trackno'); ?> 
 				</div>
 			</div>
-			<div class="row">
+			<div class="row form-vertical">
 				<div class="col-12">
 					<?php echo $this->form->renderField('artistlist'); ?> 
 				</div>
 			</div>
-			<div class="row">
+			<div class="row form-vertical">
 				<div class="col-12">
 					<?php echo $this->form->renderField('songlist'); ?> 
 				</div>
 			</div>
-			<div class="row">
+			<div class="row form-vertical">
 				<div class="col-12">
-					Playlists
+					<i>Playlists tba</i>
 				</div>
     		</div>
+			<div class="row form-vertical">
+				<div class="col-12">
             		<?php echo $this->form->renderField('ext_links');?>
+				</div>
+    		</div>
 
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.6 1st November 2024
+ * @version 0.0.18.7 4th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -181,23 +181,23 @@ class XbmusicHelper extends ComponentHelper
 //	    $itemmodel = $this->getMVCFactory()->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
 	    $itemmodel = $app->bootComponent('com_xbmusic')->getMVCFactory()
 	       ->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
-	    if ($itemtype == 'track') {
-	        if (!$itemmodel->simpleSave($data)) {
-	            $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
-	            return false;
-	        }
-	        $itemid = $itemmodel->getState($itemtype.'.id');
-	        return $itemid;
+// 	    if ($itemtype == 'track') {
+// 	        if (!$itemmodel->simpleSave($data)) {
+// 	            $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
+// 	            return false;
+// 	        }
+// 	        $itemid = $itemmodel->getState($itemtype.'.id');
+// 	        return $itemid;
 	        
-	    } else {
+// 	    } else {
     	    if (!$itemmodel->save($data)) {
     	        $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
     	        return false;
     	    }
             $itemid = $itemmodel->getState($itemtype.'.id');
     	    return $itemid;
-	    }
-	    return false;
+//	    }
+//	    return false;
 	}
 	
 	public static function createImageFile(array $imgdata, string $imgfilename, string &$flogmsg) {

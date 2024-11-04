@@ -86,7 +86,7 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             if ($isNew) {
-                $toolbar->standardButton('readid3','XBMUSIC_READ_ID3', 'track.apply')->icon('fas fa-file-arrow-down');                
+                $toolbar->standardButton('readid3save','XBMUSIC_READ_ID3', 'track.readid3save')->icon('fas fa-file-arrow-down');                
             } else {
                 $toolbar->apply('track.apply');
                 $toolbar->save('track.save');
@@ -95,7 +95,8 @@ class HtmlView extends BaseHtmlView {
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');
         if (!$isNew) {
-            $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')->icon('fas fa-file-arrow-up');            
+            $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')
+                ->icon('fas fa-file-arrow-up')->attributes(array('disabled'=>'true'));            
         }
         
         $toolbar->inlinehelp();

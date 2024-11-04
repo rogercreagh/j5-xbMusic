@@ -73,7 +73,7 @@
         	label="ID3 Genre as Album/Song Tag"
         	description="Add genre tags to albums and/or songs"
  			class="btn-group btn-group-yesno"
-			default=""
+			default="2"
         >
 			<option value="0">Ignore</option>
 			<option value="1">Song</option>

@@ -30,7 +30,7 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		/>
 		<field name="impcat" type="radio"
 			label="Joomla Category"
-			description="Default for track will be ID3 Genre if that is specified in global options. "
+			description="Default item categories are specified in global options. Here you can override to create a category based on import date  for all item types created when importing from track file ID3 data"
 			class="btn-group "
  			default="2"
 		>

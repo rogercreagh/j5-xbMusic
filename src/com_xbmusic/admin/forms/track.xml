@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/track.xml
- * @version 0.0.18.6 3rd November 2024
+ * @version 0.0.18.7 4th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -56,6 +56,16 @@
 			label="File name" description="only used by fileselector" 
 		/>
 		
+		<field name="impcat" type="radio"
+			label="Joomla Category"
+			description="Default item categories are specified in global options. Here you can override to create a category based on import date  for all item types created when importing from track file ID3 data"
+			class="btn-group "
+ 			default="2"
+		>
+			<option value="2">Use Item Defaults</option>
+			<option value="1">Create from Date</option>
+		</field>	
+	
 		<field name="sortartist" type="text" 
 			label="Main Performer (sort name)"
 			description="Short name to identify the primary performer or band. Will be used for sorting tracks by artist so 'The ' should usually be removed"
@@ -235,12 +245,12 @@
 			<option value="0">Select Album</option>
 		</field>		
 		<field name="discno" type="text"
-			label="Disc No/subtitle"
+			label="Disc No"
 			description="Disc number of multi-disc set if appropriate. Use format N/M where N is the disc number and M is the number of discs in the album set. Leave blank for singledisc. The number may be followed by a space and a title for the disc in the set that makes the album - eg '1/2 Live Concert, 2/2 Studio Recording"
-			default="" hint="1/2"
+			default="1/1" 
 			size="15" maxlength="20" 
 		>
-			<option value="">No album or 1 disc</option>
+			<option value="1/1">No album or 1 disc</option>
 			<option value="1/2">Disc 1 of 2</option>
 			<option value="1/3">Disc 1 of 3</option>
 			<option value="1/4">Disc 1 of 4</option>

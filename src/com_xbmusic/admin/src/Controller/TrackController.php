@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/TrackController.php
- * @version 0.0.11.4 15 July 2024
+ * @version 0.0.18.7 4th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -54,9 +54,10 @@ class TrackController extends FormController {
         $this->setRedirect((string)Uri::getInstance());
     }
     
-    public function saveid3() {
+    public function readid3save() {
+        
         $model = $this->getModel('track');
-        $wynik = $model->saveId3();
+        $wynik = $model->readId3Save();
         //        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
         $this->setRedirect((string)Uri::getInstance());
     }
