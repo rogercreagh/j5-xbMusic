@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.18.6 1st November 2024
+# sql installation file for component xbMusic 0.0.18.8 7th November 2024
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -86,6 +86,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(190) NOT NULL DEFAULT '',
   `alias` varchar(190) NOT NULL DEFAULT '',
+  `sortname` varchar(190) NOT NULL DEFAULT '',
   `description` mediumtext NOT NULL DEFAULT '',
   `picture` mediumtext NOT NULL DEFAULT '',
   `type` tinyint(3) COMMENT '1:Individual, 2:Group',
@@ -170,7 +171,10 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `alias` varchar(190) NOT NULL,
   `description` mediumtext,
   `imgfile` varchar(190) NOT NULL DEFAULT '',
-  `id3_data` mediumtext,
+  `id3tags` mediumtext,
+  `audioinfo` mediumtext,
+  `fileinfo` mediumtext,
+  `imageinfo` mediumtext,
   `filepathname` varchar(190) NOT NULL,
   `filename` varchar(190) NOT NULL,
   `pathname` varchar(190) NOT NULL DEFAULT '',
@@ -179,9 +183,11 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `rec_date` varchar(31),
   `duration` int(10) NOT NULL DEFAULT '0',
   `album_id` int(10),
-  `discno` varchar(10) NOT NULL DEFAULT '',
+  `discno` varchar(10) NOT NULL DEFAULT '1/1',
+  `disctracks` tinyint(4) NOT NULL DEFAULT '0',
   `trackno` tinyint(4) NOT NULL DEFAULT '0',
   `ext_links` mediumtext,
+  `azuracast_id` varchar(30) NOT NULL DEFAULT '',
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '1',
   `status` tinyint(3) NOT NULL DEFAULT '1',
@@ -203,6 +209,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
 
 CREATE UNIQUE INDEX `trackaliasindex` ON `#__xbmusic_tracks` (`alias`);
 
+# link tables artisttrack, artistalbum, songtrack, songalbum, (artistsong = artisttrack-songtrack),  
+ 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_artisttrack` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -215,19 +223,6 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artisttrack` (
   KEY `idx_track_id` (`track_id`),
   KEY `idx_role` (`role`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
-
--- CREATE TABLE IF NOT EXISTS `#__xbmusic_artistsong` (
---   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
---   `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
---   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
---   `role` varchar(255) NOT NULL DEFAULT '',
---   `note` varchar(255) NOT NULL DEFAULT '',
---   `listorder` int(10) NOT NULL DEFAULT '0',
---   PRIMARY KEY (`id`),
---   KEY `idx_artist_id` (`artist_id`),
---   KEY `idx_track_id` (`song_id`),
---   KEY `idx_role` (`role`)
--- )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_artistalbum` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -265,6 +260,17 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_songtrack` (
   KEY `idx_track_id` (`track_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS `#__xbmusic_songalbum` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `song_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `album_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `note` varchar(255) NOT NULL DEFAULT '',
+  `listorder` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_song_id` (`song_id`),
+  KEY `idx_album_id` (`album_id`)
+)  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS `#__xbmusic_groupmember` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `group_id` int(11) unsigned NOT NULL DEFAULT '0',
@@ -278,5 +284,18 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_groupmember` (
   KEY `idx_group_id` (`group_id`),
   KEY `idx_artist_id` (`artist_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+-- CREATE TABLE IF NOT EXISTS `#__xbmusic_artistsong` (
+--   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+--   `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
+--   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
+--   `role` varchar(255) NOT NULL DEFAULT '',
+--   `note` varchar(255) NOT NULL DEFAULT '',
+--   `listorder` int(10) NOT NULL DEFAULT '0',
+--   PRIMARY KEY (`id`),
+--   KEY `idx_artist_id` (`artist_id`),
+--   KEY `idx_track_id` (`song_id`),
+--   KEY `idx_role` (`role`)
+-- )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 

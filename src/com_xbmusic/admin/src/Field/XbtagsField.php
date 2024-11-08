@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbtagsField.php
- * @version 0.0.11.6 19th July 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -16,10 +16,10 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\Field\ListField;
 use Joomla\CMS\Helper\TagsHelper;
-use Joomla\CMS\Language\Multilanguage;
-use Joomla\Database\ParameterType;
+//use Joomla\CMS\Language\Multilanguage;
+//use Joomla\Database\ParameterType;
 use Joomla\Utilities\ArrayHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 class XbtagsField extends ListField
 {
@@ -98,7 +98,7 @@ class XbtagsField extends ListField
             $maxlevel = $levels;
             if ($parent_id>1) {
                 //get parent level
-                $ptag = XbmusicHelper::getTag($parent_id);
+                $ptag = XbcommonHelper::getTag($parent_id);
                 $maxlevel += $ptag->level;
             }
         }

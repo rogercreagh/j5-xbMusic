@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/TrackTable.php
- * @version 0.0.6.4 20th May 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -12,21 +12,21 @@ namespace Crosborne\Component\Xbmusic\Administrator\Table;
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Application\ApplicationHelper;
+// use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Filter\OutputFilter;
+// use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
+// use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Tag\TaggableTableInterface;
 use Joomla\CMS\Tag\TaggableTableTrait;
 use Joomla\CMS\Versioning\VersionableTableInterface;
 use Joomla\Database\DatabaseDriver;
-use Joomla\Database\ParameterType;
+// use Joomla\Database\ParameterType;
 use Joomla\Event\DispatcherInterface;
 use Joomla\Registry\Registry;
-use Joomla\Utilities\ArrayHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+// use Joomla\Utilities\ArrayHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 
 class TrackTable extends Table implements VersionableTableInterface, TaggableTableInterface {
@@ -84,8 +84,8 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
         
         // Set default value if catid empty.
          if ($this->catid =='') {
-//             $this->catid = ($this->params->get('defcat_track')=='') ? XbmusicHelper::getCatByAlias('uncategorised') : $this->params->get('defcat_track');
-             $this->catid = $this->params->get('defcat_track',XbmusicHelper::getCatByAlias('uncategorised'));
+//             $this->catid = ($this->params->get('defcat_track')=='') ? XbcommonHelper::getCatByAlias('uncategorised') : $this->params->get('defcat_track');
+             $this->catid = $this->params->get('defcat_track',XbcommonHelper::getCatByAlias('uncategorised'));
          }
         
         // Set created date if not set.

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.11.5 16th July 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,8 +14,9 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Layout\LayoutHelper;
+// use Joomla\CMS\Layout\LayoutHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 HTMLHelper::_('behavior.multiselect');
 HTMLHelper::_('formbehavior.chosen', 'select');
@@ -277,7 +278,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						</p>		        		
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
 	        		<?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_REGINFO'), 'reginfo','xbaccordion'); ?>
-                        <?php  if (XbmusicHelper::penPont()) {
+                        <?php  if (XbcommonHelper::penPont()) {
                             echo Text::_('XB_BEER_THANKS'); 
                         } else {
                             echo Text::_('XB_BEER_LINK');
@@ -293,7 +294,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
     
     </form>
     <p>&nbsp;</p>
-    <?php echo XbmusicHelper::credit('xbMusic');?>
+    <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>
     <?php
     echo HTMLHelper::_(

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlisttracks/HtmlView.php
- * @version 0.0.13.2 31st August 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,17 +12,17 @@ namespace Crosborne\Component\Xbmusic\Administrator\View\Playlisttracks;
 
 defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+// use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
-use Joomla\CMS\Installer\Installer;
+// use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\GenericDataException;
+// use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
-use Joomla\CMS\Helper\TagsHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+// use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
@@ -48,7 +48,7 @@ class HtmlView extends BaseHtmlView {
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
 
         $this->id = $this->state->get('id',0);
-        $this->title = ($this->id>0) ? XbmusicHelper::getItemValue('#__xbmusic_playlists', 'title', $this->id) : 'xxx';
+        $this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_playlists', 'title', $this->id) : 'xxx';
                 
         $this->addToolbar();
         

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/CatinfoModel.php
- * @version 0.0.15.1 11th September 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -15,7 +15,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ItemModel;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 class CatinfoModel extends ItemModel {
     
@@ -112,8 +112,8 @@ class CatinfoModel extends ItemModel {
                 } else {
                     $item->tracks = '';
                 }
-                $item->children = XbmusicHelper::getCatChildren($item->path);
-                $item->parent_title = ($item->parent_id > 1) ? XbmusicHelper::getCat($item->parent_id)->title : '';
+                $item->children = XbcommonHelper::getCatChildren($item->path);
+                $item->parent_title = ($item->parent_id > 1) ? XbcommonHelper::getCat($item->parent_id)->title : '';
             }
             
             return $this->item;

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.18.6 31st October 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -21,7 +21,7 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -41,8 +41,8 @@ class HtmlView extends BaseHtmlView {
         } else {
             $defcat_album = $params->get('defrescat_album',0);
         }
-        $this->rootcat_album = ($rootcat_album == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_album)->title.'</span>';
-        $this->defcat_album = ($defcat_album == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_album)->title;
+        $this->rootcat_album = ($rootcat_album == 0) ? $notres : $catbadge.XbcommonHelper::getCat($rootcat_album)->title.'</span>';
+        $this->defcat_album = ($defcat_album == 0) ? 'Uncategorised' : XbcommonHelper::getCat($defcat_album)->title;
 
         $albumtagparents = $params->get('albumtagparents');
         if (is_array($albumtagparents)) {
@@ -94,8 +94,8 @@ class HtmlView extends BaseHtmlView {
         } else {
             $defcat_artist = $params->get('defrescat_artist',0);
         }
-        $this->rootcat_artist = ($rootcat_artist == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_artist)->title.'</span>';
-        $this->defcat_artist = ($defcat_artist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_artist)->title;
+        $this->rootcat_artist = ($rootcat_artist == 0) ? $notres : $catbadge.XbcommonHelper::getCat($rootcat_artist)->title.'</span>';
+        $this->defcat_artist = ($defcat_artist == 0) ? 'Uncategorised' : XbcommonHelper::getCat($defcat_artist)->title;
         
         $artisttagparents = $params->get('artisttagparents');
         if (is_array($artisttagparents)) {
@@ -115,8 +115,8 @@ class HtmlView extends BaseHtmlView {
         } else {
             $defcat_playlist = $params->get('defrescat_plist',0);
         }
-        $this->rootcat_playlist = ($rootcat_playlist == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_playlist)->title.'</span>';
-        $this->defcat_playlist = ($defcat_playlist == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_playlist)->title;
+        $this->rootcat_playlist = ($rootcat_playlist == 0) ? $notres : $catbadge.XbcommonHelper::getCat($rootcat_playlist)->title.'</span>';
+        $this->defcat_playlist = ($defcat_playlist == 0) ? 'Uncategorised' : XbcommonHelper::getCat($defcat_playlist)->title;
         
         $plisttagparents = $params->get('plisttagparents');
         if (is_array($plisttagparents)) {
@@ -136,8 +136,8 @@ class HtmlView extends BaseHtmlView {
         } else {
             $defcat_song = $params->get('defrescat_song',0);
         }
-        $this->rootcat_song = ($rootcat_song == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_song)->title.'</span>';
-        $this->defcat_song = ($defcat_song == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_song)->title;
+        $this->rootcat_song = ($rootcat_song == 0) ? $notres : $catbadge.XbcommonHelper::getCat($rootcat_song)->title.'</span>';
+        $this->defcat_song = ($defcat_song == 0) ? 'Uncategorised' : XbcommonHelper::getCat($defcat_song)->title;
         
         $songtagparents = $params->get('songtagparents');
         if (is_array($songtagparents)) {
@@ -157,8 +157,8 @@ class HtmlView extends BaseHtmlView {
         } else {
             $defcat_track = $params->get('defrescat_track',0);
         }
-        $this->rootcat_track = ($rootcat_track == 0) ? $notres : $catbadge.XbmusicHelper::getCat($rootcat_track)->title.'</span>';
-        $this->defcat_track = ($defcat_track == 0) ? 'Uncategorised' : XbmusicHelper::getCat($defcat_track)->title;
+        $this->rootcat_track = ($rootcat_track == 0) ? $notres : $catbadge.XbcommonHelper::getCat($rootcat_track)->title.'</span>';
+        $this->defcat_track = ($defcat_track == 0) ? 'Uncategorised' : XbcommonHelper::getCat($defcat_track)->title;
         
         $tracktagparents = $params->get('tracktagparents');
         if (is_array($tracktagparents)) {

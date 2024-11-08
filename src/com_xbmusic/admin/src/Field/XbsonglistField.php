@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbsonglistField.php
- * @version 0.0.6.14 10th June 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -13,14 +13,13 @@ namespace Crosborne\Component\Xbmusic\Administrator\Field;
 
 defined('JPATH_BASE') or die;
 
-use Joomla\CMS\Component\ComponentHelper;
+//use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Form\FormHelper;
+//use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Form\Field\ListField;
-use Joomla\CMS\Log\Log;
-use Joomla\Utilities\ArrayHelper;
+//use Joomla\CMS\Log\Log;
+//use Joomla\Utilities\ArrayHelper;
 use \stdClass;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class XbsonglistField extends ListField {
     

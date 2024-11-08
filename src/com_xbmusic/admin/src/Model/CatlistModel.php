@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/CatlistModel.php
- * @version 0.0.14.0 10th September 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,12 +14,12 @@ defined('_JEXEC') or die;
 
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Helper\TagsHelper;
+//use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Table\Table;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+//use Joomla\Utilities\ArrayHelper;
+//use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Table\Table;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 class CatlistModel extends ListModel {
     
@@ -67,7 +67,7 @@ class CatlistModel extends ListModel {
         
         //filter by cat branch
         $branch = (int)$this->getState('filter.branch');
-        $path = XbmusicHelper::getItemValue('#__categories', 'path', $branch);
+        $path = XbcommonHelper::getItemValue('#__categories', 'path', $branch);
         if ($branch != '') {
             $query->where('c.path LIKE '.$db->quote($path.'%'));
         }

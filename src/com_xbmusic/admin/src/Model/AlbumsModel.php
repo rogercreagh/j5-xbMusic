@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.18.5 20th October 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -17,9 +17,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class AlbumsModel extends ListModel {
     

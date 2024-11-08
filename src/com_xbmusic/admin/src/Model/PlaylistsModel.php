@@ -17,9 +17,9 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+//use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class PlaylistsModel extends ListModel {
     

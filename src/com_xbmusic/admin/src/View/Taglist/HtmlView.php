@@ -13,16 +13,16 @@ namespace Crosborne\Component\Xbmusic\Administrator\View\Taglist;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Component\ComponentHelper;
+// use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
-use Joomla\CMS\Installer\Installer;
+// use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\View\GenericDataException;
+// use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
-use Joomla\CMS\Helper\TagsHelper;
+// use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+// use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 

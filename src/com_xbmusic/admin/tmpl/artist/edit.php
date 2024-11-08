@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.12.1 16th August 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -11,14 +11,14 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Helper\TagsHelper;
+// use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
-use Joomla\Registry\Registry;
+// use Joomla\Registry\Registry;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Uri\Uri;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+// use Joomla\CMS\Uri\Uri;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
@@ -85,7 +85,7 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-6">
 					<?php echo $this->form->renderField('type'); ?> 
 				</div>   	
-				<?php if (XbmusicHelper::checkComponent('com_xbpeople',true)) : ?>				
+				<?php if (XbcommonHelper::checkComponent('com_xbpeople',true)) : ?>				
            			<div class="col-12 col-lg-6">
 						<?php echo $this->form->renderField('group_id'); ?> 
 						<?php echo $this->form->renderField('person_id'); ?> 
@@ -248,7 +248,7 @@ $input = Factory::getApplication()->getInput();
     <?php echo HTMLHelper::_('form.token'); ?>
     </form>
     <div class="clearfix"></div>
-    <?php echo XbmusicHelper::credit('xbMusic');?>
+    <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>
 <script>
        updatePvMd();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.18.6 3rd November 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,9 +14,9 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-use Joomla\CMS\Layout\LayoutHelper;
+// use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Uri\Uri;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 //HTMLHelper::_('behavior.multiselect');
 //HTMLHelper::_('formbehavior.chosen', 'select');
@@ -209,5 +209,5 @@ Functionality expected here:</p>
 
 	</form>
     <p>&nbsp;</p>
-    <?php echo XbmusicHelper::credit('xbMusic');?>
+    <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>

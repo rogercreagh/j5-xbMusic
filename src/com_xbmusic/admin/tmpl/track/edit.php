@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.18.7 4th November 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -11,14 +11,14 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Helper\TagsHelper;
+// use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
-use Joomla\Registry\Registry;
+// use Joomla\Registry\Registry;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 HTMLHelper::_('jquery.framework');
 
@@ -362,7 +362,7 @@ $input = Factory::getApplication()->getInput();
     <?php echo HTMLHelper::_('form.token'); ?>
     </form>
     <div class="clearfix"></div>
-    <?php echo XbmusicHelper::credit('xbMusic');?>
+    <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>
 <script>
        updatePvMd();

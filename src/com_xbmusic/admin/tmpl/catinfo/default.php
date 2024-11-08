@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/catinfo/default.php
- * @version 0.0.15.0 12th September 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -11,16 +11,16 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Button\PublishedButton;
-use Joomla\CMS\Helper\TagsHelper;
+// use Joomla\CMS\Button\PublishedButton;
+// use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Layout\LayoutHelper;
+// use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Registry\Registry;
-use Joomla\CMS\Session\Session;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+// use Joomla\Registry\Registry;
+// use Joomla\CMS\Session\Session;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 // HTMLHelper::_('behavior.multiselect');
@@ -316,5 +316,5 @@ $longlist = 4;
       src="<?php echo Uri::root(); ?>media/com_xbmusic/js/setifsrc.js" ></script>
     
     <div class="clearfix"></div>
-    <?php echo XbmusicHelper::credit('xbMusic');?>
+    <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>

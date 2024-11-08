@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,19 +19,19 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\String\PunycodeHelper;
-use Joomla\CMS\Table\Table;
-use Joomla\CMS\Table\TableInterface;
-use Joomla\CMS\UCM\UCMType;
-use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
-use Joomla\Database\ParameterType;
+// use Joomla\CMS\Plugin\PluginHelper;
+// use Joomla\CMS\String\PunycodeHelper;
+// use Joomla\CMS\Table\Table;
+// use Joomla\CMS\Table\TableInterface;
+// use Joomla\CMS\UCM\UCMType;
+// use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
+// use Joomla\Database\ParameterType;
 use Joomla\Filter\OutputFilter;
 use Joomla\Registry\Registry;
-use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+// use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use \SimpleXMLElement;
-use Symfony\Component\Validator\Constraints\IsNull;
+// use Symfony\Component\Validator\Constraints\IsNull;
 
 class SongModel extends AdminModel {
   
@@ -219,7 +219,7 @@ class SongModel extends AdminModel {
        
         //alias is the title so we'll set and check it every time
         $newalias = OutputFilter::stringURLSafe($data['title']);
-        if (($data['id'] == 0) && XbmusicHelper::checkValueExists($newalias, '#__xbmusic_songs', 'alias')) {
+        if (($data['id'] == 0) && XbcommonHelper::checkValueExists($newalias, '#__xbmusic_songs', 'alias')) {
             $warnmsg .= 'Duplicate alias - this song title is already in the database';
             $app->enqueueMessage($warnmsg,'Error');
             return false;

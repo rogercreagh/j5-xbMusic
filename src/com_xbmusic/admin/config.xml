@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.11.5 16th July 2024 -->
+<!-- xbMusic config file v0.0.18.8 5th November 2024 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -73,7 +73,7 @@
         	label="ID3 Genre as Album/Song Tag"
         	description="Add genre tags to albums and/or songs"
  			class="btn-group btn-group-yesno"
-			default="2"
+			default="3"
         >
 			<option value="0">Ignore</option>
 			<option value="1">Song</option>
@@ -113,6 +113,7 @@
  			class="btn-group btn-group-yesno"
 			default="1"
 			>
+				<option value="0">Leave as-is</option>
 				<option value="1">Initial Capital</option>
 				<option value="2">All Lower Case</option>
         </field>        

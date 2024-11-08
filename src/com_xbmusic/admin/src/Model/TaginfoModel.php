@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TaginfoModel.php
- * @version 0.0.17.0 15th September 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -15,7 +15,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ItemModel;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 class TaginfoModel extends ItemModel {
     
@@ -62,8 +62,8 @@ class TaginfoModel extends ItemModel {
                 $item->songs = ($item->songcnt > 0) ? $this->getTagMusicItems($item->id, 'song') : '';
                 $item->tracks = ($item->trackcnt > 0) ? $this->getTagMusicItems($item->id, 'track') : '';
                 $item->others = $this->getTagOtherItems($item->id);
-                $item->children = XbmusicHelper::getTagChildren($item->path);
-                $item->parent_title = ($item->parent_id > 1) ? XbmusicHelper::getTag($item->parent_id)->title : '';
+                $item->children = XbcommonHelper::getTagChildren($item->path);
+                $item->parent_title = ($item->parent_id > 1) ? XbcommonHelper::getTag($item->parent_id)->title : '';
             }
             
             return $this->item;

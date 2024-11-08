@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.10.1 24th June 2024
+ * @version 0.0.18.8 8th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,16 +14,17 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Changelog\Changelog;
-use Joomla\CMS\Component\ComponentHelper;
+//use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\CMS\Toolbar\Toolbar;
-use Joomla\CMS\Toolbar\ToolbarHelper;
+//use Joomla\CMS\Toolbar\Toolbar;
+//use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Layout\FileLayout;
+//use Joomla\CMS\Layout\FileLayout;
 use DOMDocument;
 use ReflectionClass;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
-use CBOR\OtherObject\TrueObject;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+//use CBOR\OtherObject\TrueObject;
 
 class DashboardModel extends ListModel {
     
@@ -129,7 +130,7 @@ class DashboardModel extends ListModel {
     public function getTagCnts() {
         $tagcnts = array('total' =>0, 'used'=>0);
         
-        $tagcnts['total'] = XbmusicHelper::getItemCnt('#__tags');
+        $tagcnts['total'] = XbcommonHelper::getItemCnt('#__tags');
         
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
@@ -150,7 +151,7 @@ class DashboardModel extends ListModel {
         $db->setQuery($query);
         $url = $db->loadResult();
         $array = [];
-        if(XbmusicHelper::check_url($url)) {
+        if(XbcommonHelper::check_url($url)) {
             $xml = simplexml_load_file($url, null , LIBXML_NOCDATA);
             $json = json_encode($xml);
             return json_decode($json,TRUE);
