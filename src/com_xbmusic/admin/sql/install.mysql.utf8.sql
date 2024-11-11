@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_albums` (
   `imgfile` varchar(190) NOT NULL DEFAULT '',
   `rel_date` varchar(31),
   `format` varchar(10) NOT NULL DEFAULT '',
+  `compilation` boolean NOT NULL DEFAULT false,
   `num_discs` int(3) NOT NULL DEFAULT 1,
   `tot_tracks` int(3),
   `ext_links` mediumtext,
@@ -253,6 +254,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_songtrack` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
   `track_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `role` varchar(255) NOT NULL DEFAULT '',
   `note` varchar(255) NOT NULL DEFAULT '',
   `listorder` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -264,6 +266,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_songalbum` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
   `album_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `role` varchar(255) NOT NULL DEFAULT '',
   `note` varchar(255) NOT NULL DEFAULT '',
   `listorder` int(10) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
@@ -285,17 +288,17 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_groupmember` (
   KEY `idx_artist_id` (`artist_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
--- CREATE TABLE IF NOT EXISTS `#__xbmusic_artistsong` (
---   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
---   `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
---   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
---   `role` varchar(255) NOT NULL DEFAULT '',
---   `note` varchar(255) NOT NULL DEFAULT '',
---   `listorder` int(10) NOT NULL DEFAULT '0',
---   PRIMARY KEY (`id`),
---   KEY `idx_artist_id` (`artist_id`),
---   KEY `idx_track_id` (`song_id`),
---   KEY `idx_role` (`role`)
--- )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+ CREATE TABLE IF NOT EXISTS `#__xbmusic_artistsong` (
+   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+   `artist_id` int(10) unsigned NOT NULL DEFAULT '0',
+   `song_id` int(10) unsigned NOT NULL DEFAULT '0',
+   `role` varchar(255) NOT NULL DEFAULT '',
+   `note` varchar(255) NOT NULL DEFAULT '',
+   `listorder` int(10) NOT NULL DEFAULT '0',
+   PRIMARY KEY (`id`),
+   KEY `idx_artist_id` (`artist_id`),
+   KEY `idx_track_id` (`song_id`),
+   KEY `idx_role` (`role`)
+ )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 

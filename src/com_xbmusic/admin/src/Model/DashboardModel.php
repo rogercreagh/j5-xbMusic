@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.18.8 11th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -77,7 +77,7 @@ class DashboardModel extends ListModel {
             'catcnt'=>0, 'tagcnt'=>0
         );
         //get states
-        $cnts = array_merge($cnts,XbmusicHelper::statusCnts($table,'status','com_xbmusic'));
+        $cnts = array_merge($cnts,XbcommonHelper::statusCnts($table,'status','com_xbmusic'));
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         
@@ -123,7 +123,7 @@ class DashboardModel extends ListModel {
     
     public function getCatCnts() {
         $cnts = array('total'=>0, 'published'=>0, 'unpublished'=>0, 'archived'=>0, 'trashed'=>0);
-        $cnts = array_merge($cnts,XbmusicHelper::statusCnts('#__categories','published','com_xbmusic'));        
+        $cnts = array_merge($cnts,XbcommonHelper::statusCnts('#__categories','published','com_xbmusic'));        
         return $cnts;
     }
     

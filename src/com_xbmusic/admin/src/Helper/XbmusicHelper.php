@@ -43,6 +43,8 @@ class XbmusicHelper extends ComponentHelper
 	public static $extension = 'com_xbmusic';
 	
 	public static $musicBase = JPATH_ROOT.'/xbmusic/';
+	
+	public static $linktypes = array('artisttrack', 'artistalbum', 'songtrack', 'songalbum', 'artistsong');
 
 	public static function getActions($categoryid = 0) {
 	    $user 	=Factory::getApplication()->getIdentity();
@@ -208,7 +210,7 @@ class XbmusicHelper extends ComponentHelper
 	        if ($albcnt > 1) {
 	            $ilogmsg .= '[INFO] more than one album name in ID3, only first will be used'."/n";
 	            $ilogmsg .= '[INFO] '.$albumstr."/n";
-	            $albumstr = explode(' || ', $albumstr)[0];
+	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
 	        
 	        $albumdata['title'] = $albumstr;
@@ -240,7 +242,7 @@ class XbmusicHelper extends ComponentHelper
                     $ilogmsg .= '[WARNING] failed to parse `num_discs` from "'.$id3data['part_of_a_set'].'"\n';
                 }
             }
-            $albumdata['compilation'] = (isset($trackdata['part_of_a_compilation']) ? true : false;   
+            $albumdata['compilation'] = (isset($trackdata['part_of_a_compilation'])) ? '1' : '0';   
 	    } //end albuminfo
 	    
 	    
@@ -278,12 +280,76 @@ class XbmusicHelper extends ComponentHelper
 	    
 	} // end id3dataToItems()
 	
-// 	public static function getMusicBase() {
-// 	    return self::$musicBase; 
-// 	}
-	    
+/**
+ * 
+ * @param int $item_id
+ * @param string $itemtype
+ * @param array $linklist (id, role, note, optional:listorder)
+ * @param string $listtype
+ * @param string $action replace|merge
+ * @return boolean
+ */
+	public static function addItemLinks(int $item_id,  array $itemlist, string $itemtype, string $linktype, string $action = 'merge') {
+	       
+//	    if (!in_array($linktype, self::$linktypes)) return '[ERROR] invalid item type';
+	    $table = '#__xbmusic_'.$linktype;
+	    $preserveorder = false;
+	    $errcnt = 0;
+	    $listtype = str_replace($itemtype, '', $linktype);  
+	    $msg = 'adding '.count($itemlist).' '.$listtype.'s to '.$itemtype.'.'.$item_id;
+	    if (($itemtype == 'track') || ($itemtype == 'album')) {
+	        $preserveorder = true;
+	    }
+	    $db = Factory::getDBO();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    if ($action == 'merge') {
+	       //get existing list 
+    	    $query->select('*')->from($db->qn($table))->where($itemtype.'_id = '.$db->q($item_id));
+    	    $db->setQuery($query);
+	       $oldlist = $db->loadAssocList();
+	       if ($oldlist) $itemlist = array_merge($oldlist, $itemlist); //new values will overwrite old if they exist
+	    } else {
+	        $preserveorder = false;
+	    }
+	    $query->clear();
+        //delete existing role list
+        $query->delete($db->qn($table));
+	    $query->where($itemtype.'_id = '.$db->q($item_id));
+	    $db->setQuery($query);
+	    $db->execute();
+	    //restore the new list
+	    $listorder=0;
+	    foreach ($itemlist as $linkitem) {
+	        if ($preserveorder) {
+	            $listorder = (isset($linkitem['listorder'])) ? $linkitem['listorder'] : 0;
+	        } else {
+	            $listorder ++;
+	        }
+//	        if (!isset($link['role'])) $link['role'] = '';
+//	        if (!isset($link['note'])) $link['note'] = '';
+	        
+	        $query->clear();   
+            $query->insert($db->quoteName($table));
+            $query->columns($itemtype.'_id, '.$listtype.'_id, role, note,listorder');
+            $query->values('"'.$item_id.'","'.$linkitem['id'].'","'.$linkitem['role'].'","'.$linkitem['note'].'","'.$listorder.'"');
+            try {
+	            $db->setQuery($query);
+	            $db->execute();
+            } catch (\Exception $e) {
+     	        $dberr = $e->getMessage();
+     	        Factory::getApplication()->enqueueMessage('addItemLinks() '.$dberr.'<br />Query: '.$query->dump(), 'error');
+     	        $errcnt ++;
+            }
+	    }
+	    if ($errcnt>0) $msg .= ' '.$errcnt.' failed';
+	    return $msg;
+	}
+	
+	
 	public static function getArtistAlbums($aid) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    
+	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgfile');
 	    $query->from('#__xbmusic_albums AS a');
@@ -336,6 +402,7 @@ class XbmusicHelper extends ComponentHelper
 	        $app->enqueueMessage('Invalid itemtype to create','Error');
 	        return false;
 	    }
+	    if ($data['id'] ==0) unset($data['id']);
 	    $itemid = false;
 	    $sqldate = Factory::getDate()->toSql();
 	    $user 	= $app->getIdentity();
@@ -468,7 +535,7 @@ class XbmusicHelper extends ComponentHelper
         //get the parent tag for genre tags
         $parentgenre = XbcommonHelper::getCreateTag(array('title'=>'Genres'));
 	    foreach ($genrenames as &$genre) {
-	        $genre = self::normaliseGenrename(trim($genre));
+	        $genre = self::normaliseGenrename(trim($genre), $ilogmsg);
 	        //get or create the genre tag id and title
 	        $newtag = XbcommonHelper::getCreateTag(array('title'=>$genre, 'parent_id'=>$parentgenre['id'],
 	                       'created_by_alias'=>'xbMusicHelper::createGenres()'));

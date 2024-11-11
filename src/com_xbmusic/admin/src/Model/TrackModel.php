@@ -11,7 +11,7 @@
 namespace Crosborne\Component\Xbmusic\Administrator\Model;
 
 defined('_JEXEC') or die;
-``  
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
@@ -124,7 +124,7 @@ class TrackModel extends AdminModel {
     }    
  */
  
- protected function canDelete($record) {
+    protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
             return false;
         }
@@ -480,6 +480,7 @@ class TrackModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $warnmsg = '';
         $infomsg = '';
+        $ilogmsg = '';
         $filepathname = JPATH_ROOT.'/xbmusic/'.rtrim($trackdata['foldername'],'/').'/'.$trackdata['filename'];
         if (file_exists($filepathname)) {
 // 1. check if filepathname already in database, if it exists already then exit
@@ -526,7 +527,7 @@ class TrackModel extends AdminModel {
                     $titlelist .= '</ul>';
                     $warnmsg .= Text::_('More than one album title listed - only the first is used. Check alternate title and if necessary change album title. Track can only belong to one album').$titlelist;
                 }
-                $albumalias = 
+                $albumalias = $albumtitle;
             }
             //get album artist for use in image filename and creating album
             if (isset($filedata['id3tags']['band'])) {
