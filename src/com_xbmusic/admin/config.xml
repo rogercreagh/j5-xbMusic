@@ -81,6 +81,17 @@
 			<option value="3">Both</option>
         </field>
         
+		<field name="impcat" type="radio"
+			label="Import Category"
+			description="This will override the options above for all items to create a category based on import date when importing from track file ID3 data"
+			class="btn-group "
+ 			default="0"
+		>
+			<option value="0">Use Item Defaults</option>
+			<option value="1">Create from Date</option>
+		</field>	
+        
+        
 		<field name ="genrenote" type="note"
 			description="The following options concern the processing of genre names from the ID3 data to create consistency. eg 'Folk Rock', 'Folk/Rock', and 'Folk-Rock' are all found in the wild and should produce the same tag or category name."
 		/>

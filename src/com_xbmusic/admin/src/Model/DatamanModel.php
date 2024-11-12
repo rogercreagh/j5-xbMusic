@@ -43,6 +43,7 @@ class DatamanModel extends AdminModel {
     protected $albumcatid = 0;
     protected $artistcatid = 0;
     protected $songcatid = 0;
+    protected $usedaycat = 0;
     //when creating alias with strURLsafe() punction, apostrophes and quotes get converted into hyphens - we don't want that
     protected $unwantedaliaschars = array("?","!",",",";",".","'","\"");
     
@@ -63,9 +64,10 @@ class DatamanModel extends AdminModel {
      * @param int $cattype
      * @return boolean
      */
-    public function parseFilesMp3($files, int $cattype) {
-
+    public function parseFilesMp3($files, $usedaycat) {
+        //if ($usedaycat == '') $usedaycat = $params->get('usedaycat','0');
         $params = ComponentHelper::getParams('com_xbmusic');
+        $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
         //start log
         $loghead = '[LOGHEAD] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
         $logmsg = '';
@@ -103,23 +105,28 @@ class DatamanModel extends AdminModel {
         $this->albumcatid = $params->get('defcat_album',$uncatid);
         $this->artistcatid = $params->get('defcat_artist',$uncatid);
         $this->songcatid = $params->get('defcat_song',$uncatid);
-        //track category may be the import date (import view option for all), or a genre (per track selection) or global default
-        if ($cattype == "1") {
-            //create category with import date
+        $this->trackcatid = $params->get('defcat_track',$uncatid);
+        //track category may be overriden by genre (tracks-genres-genre) on per item basis
+        if ($this->usedaycat == 1) {
+            //we are going to change the defaults to a day category under \imports 
+            $daycatid = 0;
             $daycattitle = date('Y-m-d');
-            $parentcat = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-            if ($parentcat === false) {
+            $dcparent = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+            if ($dcparent === false) {
                 $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
-                $parentcat = XbcommonHelper::createCategory($catdata, true);
+                $dcparent = XbcommonHelper::createCategory($catdata, true);
             }
-            $this->trackcatid = XbcommonHelper::getCatByAlias($daycattitle)->id;
-            if ($this->trackcatid == false) {
+            $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+            if ($this->trackcatid === false) {
                 $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentcat,'description'=>'items inported on '.date('D jS M Y'));
-                $this->trackcatid = XbcommonHelper::createCategory($catdata, true)->id;
+                $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
             }
-        } else {
-            //this is the default for a track, but may be overridden by a genre based category
-            $this->trackcatid = $params->get('defcat_track',$uncatid);
+            if ($daycatid > 0) {
+                $this->albumcatid = $daycatid;
+                $this->artistcatid = $daycatid;
+                $this->songcatid = $daycatid;
+                $this->trackcatid = $daycatid;
+            }
         } //endif cattype=1
         
         // ok we're going to iterate through the files
@@ -202,7 +209,7 @@ class DatamanModel extends AdminModel {
             $optcattag = $params->get('genrecattag',2);
             if (isset($id3data['genres'])) {
                 $genreids = array_column($id3data['genres'],'id');
-                if ($optcattag & 1) {
+                if (($this->usedaycat == 0) && ($optcattag & 1)) {
                     //first check if we already have a cat for the genre
                     $thisgid = XbcommonHelper::getCatByAlias($id3data['genres'][0]['alias'])->id;
                     if (is_null($thisgid)) {
@@ -321,7 +328,7 @@ class DatamanModel extends AdminModel {
                     if ($optalbsong > 1) $albumdata['tags'] = $genreids;
                     if ($imgurl != false) $albumdata['imgfile'] = $imgurl;
                     $albumdata['id'] = XbmusicHelper::createMusicItem($albumdata, 'album');
-                    if ($albumdata['id']) {
+                    if ($albumdata['id']>0) {
                         $cnts['newalb'] ++;                       
                         $ilogmsg .= INFO.Xbtext::_('new album saved',2).Xbtext::_($albumdata['title'],8);
                     } else {
@@ -351,154 +358,11 @@ class DatamanModel extends AdminModel {
             }
              
         } //end if iset id3data[trackdata]
+        return $ilogmsg;
+    } //end parseID3()
         
         
-        //======================================================================
-/*         
-// 4. get album->title and first artist and make alias for use in image name (use track->title if no album), create/get album id.
-        $trackdata['title'] = $filedata['id3tags']['title'];
-        $trackdata['alias'] = XbcommonHelper::makeUniqueAlias($trackdata['title'],'#__xbmusic_tracks'); 
-        if (isset($filedata['id3tags']['album'])) {
-            $albumarr = explode(' || ', $filedata['id3tags']['album']);
-            $albumdata['title'] = $albumarr[0];
-            if (count($albumarr)>1) {
-                $ilogmsg .= '[WARNING] Multiple album titles listed - first is used - a track can only belong to one album'."\n";
-                $ilogmsg .= 'Album Titles found: ';
-                foreach ($albumarr as $value) {
-                    $ilogmsg .= ' '.$value.',';
-                }
-                $ilogmsg = rtrim($ilogmsg,',')."/n";
-            }
-            if (isset($filedata['id3tags']['band'])) {
-                $albumdata['albumartist'] = $filedata['id3tags']['band'];
-                $albumdata['sortartist'] = XbcommonHelper::stripThe($filedata['id3tags']['band']);
-            } else {
-                if (isset($trackdata['sortartist'])) $albumdata['albumartist'] = $trackdata['sortartist'];
-                if (isset($trackdata['sortartist'])) $albumdata['sortartist'] = $trackdata['sortartist'];
-            }
-            $albumalias = $albumdata['title']; //
-            if (isset($albumdata['sortartist'])) $albumalias.= '-'.$albumdata['sortartist'];
-            $albumdata['alias'] = OutputFilter::stringURLSafe(str_replace($this->unwantedaliaschars,"", $albumalias));
-            // need to get genres, do image and create any artists before we can create album
-        }
-
-// 5. extract image data for later use and unset it in id3data to save clean id3_data with track
-        if (isset($filedata['imageinfo']['data'])){
-            $imgdata = $filedata['imageinfo'];
-            unset($filedata['imageinfo']['data']);
-        }
-        //save json encoded filedata with track for reference
-        $trackdata['imageinfo'] = json_encode($filedata['imageinfo']);
-        $trackdata['id3tags'] = json_encode($filedata['id3tags']);         
-        $trackdata['fileinfo'] = json_encode($filedata['fileinfo']);
-        $trackdata['audioinfo'] = json_encode($filedata['audioinfo']);
-        
-// 6. get track data that doesn't depend on anything else
-        if (isset($filedata['id3tags']['track_number'])) $trackdata['trackno'] = $filedata['id3tags']['track_number'];
-        if (isset($filedata['id3tags']['part_of_a_set'])) $trackdata['discno'] = (int) $filedata['id3tags']['part_of_a_set'];
-        if (isset($filedata['audioinfo']['playtime_seconds'])) $trackdata['duration'] = (int)$filedata['audioinfo']['playtime_seconds'];
-        if (isset($filedata['id3tags']['artist'])) {
-            $artistarr = explode(' || ', $filedata['id3tags']['artist']);
-            $trackdata['sortartist'] = XbcommonHelper::stripThe($artistarr[0]);
-        }
-        // dates in id3 can be any format and may include y m and D or not
-        $datematch = '/(^(\d{4})$)|(^(\d{4})-{1}[0-1][1-9]$)|(^(\d{4})-{1}[0-1][1-9]-{1}[0-3][1-9]$)/';
-        if (isset($filedata['id3tags']['recording_time'])) {
-            if (preg_match($datematch,$filedata['id3tags']['recording_time'])==1) {
-                $trackdata['rec_date'] = ($filedata['id3tags']['recording_time']);
-            } else {
-                $ilogmsg .= '[WARNING] Recording date '.$filedata['id3tags']['recording_time'].' wrong format. Enter manually for track'."\n";
-            }
-        }
-        if (isset($filedata['id3tags']['year'])) {
-            if (preg_match($datematch,$filedata['id3tags']['year'])==1) {
-                $trackdata['rel_date'] = $filedata['id3tags']['year'];
-            } else {
-                $ilogmsg .= '[WARNING] Release date '.$filedata['id3tags']['year'].' wrong format. Enter manually for track and album'."\n";
-            }
-        } else {
-            $ilogmsg .= '[WARNING] No release date found. Enter manually for track and album'."\n";
-        }
-        
-// 7. Genre Tags - create tags as required and build list to use when saving the track/album/song
-        $optcattag = $params->get('genrecattag',2);
-        $optalbsong = $params->get('genrealbsong',0);
-        if (isset($filedata['id3tags']['genre'])) {
-            if (($optcattag >2) || ($optalbsong > 0)) { //we are using the genre
-                $genres = $this->createGenres($filedata['id3tags']['genre'], $ilogmsg);
-                //
-                if (!empty($genres)) $trackdata['genres'] = array_column($genres,'id');
-            } // endif we are using genres
-        } // endif id3 genre is set
-            
-// 8. Track Categories
-        if (($optcattag & 1) && (!empty($genres))) {
-            //first check if we already have a cat for the genre
-            $thisgid = XbcommonHelper::getCatByAlias(OutputFilter::stringURLSafe($genres[0]->title))->id;
-            if (is_null($gid)) {
-                //get Genre in Tracks category
-                $gcat = XbcommonHelper::getCatByAlias('genres');
-                if ($gcat->id > 0) {
-                    $gpid = $gcat->id;
-                } else {
-                    //we need to create the Tracks/Genres category
-                    $tcat = XbcommonHelper::getCatByAlias('tracks');
-                    $gpid = ($tcat->id > 0) ? $tcat->id : 1; //if the tracks category has been deleted fallback to root
-                    $gid = XbcommonHelper::getCreateCat(array('title'=>'Genres', 'alias'=>'genres', 'parent_id'=>$gpid),true)->id;
-                }
-                $thisgid = XbcommonHelper::getCreateCat(array('title'=>$genres[0]->title,                         'alias'=>OutputFilter::stringURLSafe($genres[0]->title), 'parent_id'=>$gid),true)->id;
-            }
-            $trackdata['catid'] = $thisgid;
-            
-        } else {
-            $trackdata['catid'] = $this->trackcatid;
-        }
-        
-// 9. get artist(s) ids creating if don't exist and set in track and album data
-        if (isset($filedata['id3tags']['artist'])) {
-            $artistarr = explode(' || ', $filedata['id3tags']['artist']);
-            $trackdata['sortartist'] = XbcommonHelper::stripThe($artistarr[0]);
-            if (count($artistarr) > 1) {
-                $ilogmsg .= '[WARNING] Multiple artists in ID3 - first used as Album Artist if not separately specified, and as Track SortName. Check and adjust manually as required'."\n";
-            }
-            $newartistarr = array();
-            foreach ($artistarr as $artistname) {
-                // check for possible multiple artists (eg & or and in name)
-                $multi = strpos($artistname,'&'); //preg_match('/&| and /i', $artistname);
-                if ($multi) {
-                    $splitarr = explode('&',$artistname);
-                    $newartistarr = array_merge($newartistarr, $splitarr);
-                    $ilogmsg .= '[WARNING] '.$artistname.' has been split into separate artists by "&". If this is incorrect edit name and alias of the first artist and delete the others'."\n";
-                } else {
-                    $newartistarr[] = $artistname;
-                }
-            }
-            $artistarr = $newartistarr;
-            $trackdata['artistlist'] = array();
-            foreach ($artistarr as $artistname) {
-                $artistname = trim($artistname);
-                //str_replace(array("?","!",",",";"), "", $test);
-                $artistalias = OutputFilter::stringURLSafe(str_replace($this->unwantedaliaschars,"", $artistname));
-                $artistdataobj = XbcommonHelper::getItem("#__xbmusic_artists", $artistalias, "alias");
-                //this will be an object not an array
-                if (empty($artistdataobj)) { //we need to create the artist
-                    $thisartist = array('name'=>$artistname, 'alias'=>$artistalias, 'catid'=>$this->artistcatid, 'created_by_alias'=>'ID3 Import');
-                    //could create artist at this point
-                    $artistid = XbmusicHelper::createMusicItem($thisartist,'artist');
-                    if ($artistid > 0) {
-                        $cnts['newart'] ++;
-                        $artistdata[] = $thisartist;
-                        $trackdata['artistlist'][] = array('artist_id'=>$artistid, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
-                    } else {
-                        $ilogmsg .= '[ERROR] problem attempting to create artist '.$artistname."\n";
-                    }
-                } else {
-                    $trackdata['artistlist'][] = array('artist_id'=>$artistdataobj->id, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
-                }
-            } //end foreach artistname
-            $albumdata['artistlist'] = $trackdata['artistlist'];
-        } //endif track has artist
-
+/*
 // 10. Create image file
         if (isset($filedata['imageinfo']['data'])){
             
@@ -520,80 +384,7 @@ class DatamanModel extends AdminModel {
                 $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgurl."\n";
             }
         } //end ifset image data
-        
-// 10. get album id creating if doesn't exist            
-        if (isset($filedata['id3tags']['album'])) {
-            $albumexists = false;
-            $albumid = XbcommonHelper::checkValueExists($albumalias, '#__xbmusic_albums', 'alias');
-            if ($albumid) {
-                $albumexists = true;
-                $trackdata['album_id'] = $albumid;
-                //may need to update tracknumber, rel_date, image, and artist links
-            } else {
-                if (isset($albumdata['rel_date'])) $albumdata['rel_date'] = $trackdata['rel_date'];
-                if (isset($filedata['id3tags']['part_of_a_set'])) {
-                    $setstr = explode('/',$filedata['id3tags']['part_of_a_set']);
-                    if (count($setstr)==2) {
-                        $albumdata['num_discs'] = (int)$setstr[1];
-                    } else {
-                        $ilogmsg .= '[WARNING] failed to parse `num_discs` from "'.$filedata['id3tags']['part_of_a_set'].'"\n';
-                    }                    
-                }
-                $albumdata['imgfile'] = $imgurl;
-                //set artist links
-                
-                //set genres
-                if ($optalbsong > 1) {
-                    if (!empty($genres)) $albumdata['genres'] = array_column($genres,'id');
-                }
-                $albumid = XbmusicHelper::createMusicItem($albumdata, 'album');
-                if ($albumid > 0) {
-                    $cnts['newalb'] ++;
-                    $trackdata['album_id'] = $albumid;
-                } else {
-                    $ilogmsg .= '[ERROR] failed to create album "'.$albumdata['title'].'"\n';
-                }
-            }
-        }      
-        
-// 11. get or create the song(s)
-        // if track title contains commas or the word "medley" it may be a medley of songs 
-        $medley = preg_match('/,|medley/i', $trackdata['title']);
-        if ($medley) {
-            $ilogmsg .= '[WARNING] Track title indicates a possible song medley. Song(s) not created please check and create manually'."\n";
-        } else {
-            $trackdata['songlist'] = array();
-            $songalias = OutputFilter::stringURLSafe(str_replace($this->unwantedaliaschars,"", $trackdata['title']));
-            $songdataobj = XbcommonHelper::getItem("#__xbmusic_songs", $songalias, "alias");
-            //this will be an object not an array
-            if (empty($songdataobj)) { //we need to create the song
-                $songdata['title'] = $trackdata['title'];
-                $songdata['alias'] = $songalias;
-                $songdata['catid'] = $this->songcat; 
-                $songid = XbmusicHelper::createMusicItem($songdata,'song');
-                if ($songid>0) {
-                    $cnts['newsng'] ++;
-                    $ilogmsg .= '[INFO] Song '.$songdata['title'].' with id '.$song.' created'."\n";
-                    if (($optalbsong ==1) || ($optalbsong==3)) {
-                        $songdata['tags'] = XbcommonHelper::addTagsToItem('com_xbmusic.song', $songid, $genres);
-                        $ilogmsg .= 'Genres added to song'."\n";
-                    }
-                    $trackdata['songlist'][] = array('song_id'=>$songid, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
-                }
-            } else {
-                $trackdata['songlist'][] = array('song_id'=>$songdataobj->id, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
-                //we need to merge in any new genres here
-            }
-        }
-
-        
-// 12. create track (need to add album id and sortartist once we have them
-        $trackid = XbmusicHelper::createMusicItem($trackdata,'track');
-        $ilogmsg .= INFO.'Track'.XbText::_($trackdata['title'],7).'with id:'.$trackid.Xbtext::_('created ok',9);
-        $ilogmsg .= $enditem;
- */        
-        return $ilogmsg;
-    } //end parseID3()
+ */       
 
     private function createGenres($genrenames, &$ilogmsg) {
         $params = ComponentHelper::getParams('com_xbmusic');

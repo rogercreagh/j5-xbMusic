@@ -402,7 +402,7 @@ class XbmusicHelper extends ComponentHelper
 	        $app->enqueueMessage('Invalid itemtype to create','Error');
 	        return false;
 	    }
-	    if ($data['id'] ==0) unset($data['id']);
+	    if ($data['id'] == 0) unset($data['id']);
 	    $itemid = false;
 	    $sqldate = Factory::getDate()->toSql();
 	    $user 	= $app->getIdentity();
@@ -426,12 +426,12 @@ class XbmusicHelper extends ComponentHelper
 // 	        return $itemid;
 	        
 // 	    } else {
-    	    if (!$itemmodel->save($data)) {
-    	        $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
-    	        return false;
-    	    }
-            $itemid = $itemmodel->getState($itemtype.'.id');
-    	    return $itemid;
+	    if ($itemmodel->save($data) == false) {
+	        $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
+	        return false;
+	    }
+        $itemid = $itemmodel->getState($itemtype.'.id');
+	    return $itemid;
 //	    }
 //	    return false;
 	}

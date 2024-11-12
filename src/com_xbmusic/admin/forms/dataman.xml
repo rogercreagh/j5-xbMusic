@@ -32,9 +32,10 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			label="Joomla Category"
 			description="Default item categories are specified in global options. Here you can override to create a category based on import date  for all item types created when importing from track file ID3 data"
 			class="btn-group "
- 			default="2"
+ 			default=""
+ 			useglobal="true"
 		>
-			<option value="2">Use Item Defaults</option>
+			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>
 		</field>	
 	
