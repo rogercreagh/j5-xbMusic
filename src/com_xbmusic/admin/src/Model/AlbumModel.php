@@ -196,7 +196,7 @@ class AlbumModel extends AdminModel {
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
-
+/* 
         if ($input->get('task') == 'save2copy') {
             $origTable = clone $this->getTable();
             $origTable->load($input->getInt('id'));
@@ -215,19 +215,24 @@ class AlbumModel extends AdminModel {
             // standard Joomla practice is to set the new copy record as unpublished
             $data['status'] = 0;
         }
-        
+ */        
        
         //alias is the title so we'll set and check it every time
-        $newalias = OutputFilter::stringURLSafe($data['title']);
-        if (($data['id'] == 0) && XbcommonHelper::checkValueExists($newalias, '#__xbmusic_albums', 'alias')) {
-            $warnmsg .= 'Duplicate alias - this album title is already in the database';
-            $app->enqueueMessage($warnmsg,'Error');
-            return false;
+//        $newalias = OutputFilter::stringURLSafe($data['title']);
+        $albumalias = $data['title'];
+        if (isset($data['sortartist'])) $albumalias.= '-'.$data['sortartist'];
+        $data['alias'] = XbcommonHelper::makeAlias($albumalias);
+        $aid = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
+        if ($aid != false) {
+//            $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
+            $data['id'] = $aid;
+            $this->setState('album.id',$aid);
+            return true;
         }
-        $data['alias'] = $newalias;        
+//        $data['alias'] = $newalias;        
         
         if (isset($data['created_by_alias'])) {
-            $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
+            $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'STRING');
         }
         
         //merge any tag groups back into tags

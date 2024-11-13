@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 1.0.0.0 9th November 2024
+ * @version 1.0.0.0 13th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -460,13 +460,15 @@ class XbcommonHelper extends ComponentHelper {
     
     /**
      * @name getItem()
-     * @desc returns a single item row as an object. If column values are not unique will return the first found
+     * @desc returns a single item row as an object or array. If column values are not unique will return the first found
      * @param string $table - the table name
      * @param string $val - the value to match
      * @param string $col - the column to look in, defaults to 'id'
-     * @return object|NULL
+     * @param string $where - optional additional where condition
+     * $param boolean $retarray - true to return assoc array otherwise returns object
+     * @return object|array|NULL
      */
-    public static function getItem(string $table, string $val, $col ='id', $where = '') {
+    public static function getItem(string $table, string $val, $col ='id', $where = '',$retarray = false) {
         $db = Factory::getDbo();
         //$db = Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
@@ -474,6 +476,7 @@ class XbcommonHelper extends ComponentHelper {
         $query->where($db->qn($col).' = '.$db->q($val));
         if ($where != '') $query->where($where);
         $db->setQuery($query);
+        if ($retarray) return $db->loadAssoc();
         return $db->loadObject();
     }
     

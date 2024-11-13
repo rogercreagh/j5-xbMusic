@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.18.8 13th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -102,6 +102,8 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
+						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
+						</th>
 						<th><?php echo HTMLHelper::_('searchtools.sort', 'Album Artists', 'a.sortartist', $listDirn, $listOrder); ?>
 						</th>
 						<th><?php echo Text::_('Tracks'); ?>
@@ -181,6 +183,10 @@ if (strpos($listOrder, 'modified') !== false) {
         							<?php if ($item->tot_tracks) echo Xbtext::_('with',3).$item->tot_tracks.Text::_('tracks');?>	
    								</p>
 							</div>
+						</td>
+						<td><?php if ($item->imgfile != '') : ?>
+								<img src="<?php echo $item->imgfile; ?>" style="height:100px;" />
+							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">
 							<?php if(count($item->artists)>1) : ?>

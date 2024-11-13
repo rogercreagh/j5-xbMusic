@@ -53,17 +53,14 @@ $wa->useScript('keepalive')
       <input type="hidden" id="extlist" value="mp3" />
       <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
         <h3>xbMusic Data Manager</h3>
-        <p class="xbinfo">
-        <?php echo Text::_('Import tab to import tracks from MP3 file ID3 data by folder or selected files, and to import m3u or pls playlists');?>
-        <br /><?php echo Text::_('Export tab to export track, song, artist, and album data to csv and playlists to m3u/pls') ?>
-        <br /><?php echo Text::_('Report tab to generate reports of possible data problems (eg multi-song or mutli-artist tracks, orphan artists, missing album/playlist tracks etc')?>
-        <br /><?php echo Text::_('Delete tab to clean/delete selected data types')?>
-        </p>
 
 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
     
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'import', Text::_('Import')); ?>
+            <p class="xbinfo">
+            	<?php echo Text::_('Import tab to import tracks from MP3 file ID3 data by folder or selected files, and to import m3u or pls playlists');?>
+            </p>
 <details>
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('Import Tracks using ID3 data from music folder/files'); ?></span>
@@ -72,6 +69,12 @@ $wa->useScript('keepalive')
 		<div class="col-md-6">
 			<p><?php echo Text::_('Select folder or tracks')?>
 	    	<div id="container"> </div>
+        	<p><button id="impmp3" class="btn btn-warning" type="submit" 
+        		onclick="if(confirmImportMp3()) {this.form.submit();}" />
+        		<i class="icon-upload icon-white"></i> 
+        		<?php echo Text::_('Import'); ?>
+        	</button>
+        	</p>
 		</div>
 		<div class="col-md-6">
         	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
@@ -84,11 +87,6 @@ $wa->useScript('keepalive')
          	<?php echo $this->form->renderField('impcat'); ?>
        </div>
 	</div>
-	<button id="impmp3" class="btn btn-warning" type="submit" 
-		onclick="if(confirmImportMp3()) {this.form.submit();}" />
-		<i class="icon-upload icon-white"></i> 
-		<?php echo Text::_('Import'); ?>
-	</button>
 </details>
 <hr />
 <details>
@@ -154,6 +152,9 @@ $wa->useScript('keepalive')
           
    			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'report', Text::_('Report')); ?>
+                <p class="xbinfo">
+                	<?php echo Text::_('Report tab to generate reports of possible data problems (eg multi-song or mutli-artist tracks, orphan artists, missing album/playlist tracks etc')?>
+                </p>
 <p>Functionality expected here:</p>
 <ol>
     <li>Show orphan artists & songs without track</li>
@@ -163,6 +164,9 @@ $wa->useScript('keepalive')
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'export', Text::_('Export')); ?>
+                <p class="xbinfo">
+                	<?php echo Text::_('Export tab to export track, song, artist, and album data to csv and playlists to m3u/pls') ?>
+                </p>
 <p>Functionality expected here:</p>
 <ol>
     <li>Export data type to csv</li>
@@ -173,6 +177,9 @@ $wa->useScript('keepalive')
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'delete', Text::_('Delete')); ?>
+                <p class="xbinfo">
+                	<?php echo Text::_('Delete tab to clean orphans and redundant links and delete selected data')?>
+                </p>
 <p>Functionality expected here:</p>
 <ol>
 	<li>Empty trash (by datatype/all</li>
@@ -187,6 +194,9 @@ $wa->useScript('keepalive')
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', Text::_('Azuracast')); ?>
+                <p class="xbinfo">
+                	<?php echo Text::_('Azuracast functions');?>
+                </p>
 <p>Only show tab if azuracast support set in options<br />
 Functionality expected here:</p>
 <ol>
@@ -194,11 +204,7 @@ Functionality expected here:</p>
 <li>Find tracks listed here but not in azuracast</li>
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
-<p>Functionality expected here:</p>
-<ol>
 
-<li></li>
-</ol>
             <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
         	<hr />
          </div>

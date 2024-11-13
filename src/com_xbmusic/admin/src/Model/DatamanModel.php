@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.18.8 6th November 2024
+ * @version 0.0.18.8 13th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -69,7 +69,7 @@ class DatamanModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
         //start log
-        $loghead = '[LOGHEAD] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
+        $loghead = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
         $logmsg = '';
         
         //are we doing a whole folder, or selected files?
@@ -157,7 +157,7 @@ class DatamanModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
 //        $uncatid = XbmusicHelper::getCatByAlias('uncategorised');
         //strat the logging for this file
-        $ilogmsg = INFO.$filepathname."\n";
+        $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$filepathname)."\n";
         $enditem = " -------------------------- \n";
         $trackdata = []; //only one track per file
 //        $albumdata = []; //only one album per file
@@ -304,9 +304,9 @@ class DatamanModel extends AdminModel {
                 $imgfilename = '/images/xbmusic/artwork/';
                 if (isset($id3data['albumdata']['alias'])) {
                     $imgfilename .= 'albums/'.strtolower($id3data['albumdata']['alias'][0]).'/'.$id3data['albumdata']['alias'];
-                    if (isset($id3data['albumdata']['sortartist'])) {
-                        $imgfilename .= '_'.$id3data['albumdata']['sortartist'];
-                    }
+//                    if (isset($id3data['albumdata']['sortartist'])) {
+//                        $imgfilename .= '_'.$id3data['albumdata']['sortartist'];
+//                    }
                 } else {
                     $imgfilename .= 'singles/'.$trackdata['alias'];
                     if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
@@ -314,9 +314,8 @@ class DatamanModel extends AdminModel {
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg)."\n";
                 if ($imgurl != false) {
                     $trackdata['imgfile'] = $imgurl;
-                    $ilogmsg .= INFO.Text::_('image file created').' '.str_replace(Uri::root(),'',$imgurl)."\n";
                 } else {
-                    $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgfilename."\n";
+                    //$ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgfilename."\n";
                 }
             } //end ifset image data
 
@@ -332,11 +331,16 @@ class DatamanModel extends AdminModel {
                         $cnts['newalb'] ++;                       
                         $ilogmsg .= INFO.Xbtext::_('new album saved',2).Xbtext::_($albumdata['title'],8);
                     } else {
-                        $ilogmsg .= WARN.Xbtext::_('problem saving album',2).Xbtext::_($albumdata['title'],8);
+                        $existing = XbcommonHelper::getItem('#__xbmusic_albums', $albumdata['alias'], 'alias','',true);
+                        if ($existing) {
+                            $existing['tags'] = array_unique(array_merge($existing['tags'],$genreids));
+                            $albumdata = array_merge($existing, $albumdata);
+                            $ilogmsg .= INFO.Xbtext::_('linking to existing album',2).Xbtext::_($albumdata['title'],8);             
+                        }
                     }                    
                 } else {
-                    if ($optalbsong > 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to song',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
+                    if ((is_array($genreids)) && ($optalbsong > 1)) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
+                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
                 }
                 if ($albumdata['id']>0) {
                     $trackdata['album_id'] = $albumdata['id'];

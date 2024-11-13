@@ -50,6 +50,18 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
         >
         	<option value="0">Most Recent</option>
         </field>
+        
+        <field name="logfilter" type="radio"
+        	label="Filter displayed log"
+        	description="Simplify display of log data"
+        	class="btn-group"
+        	default="2"
+        >
+        	<option value="0">All items</option>
+        	<option value="1">Summary only</option>
+        	<option value="2">Errors</option>
+        	<option value="3">Errors &amp; warnings</option>
+        </field>
 <!--        	onchange="this.form.submit();" -->
        	
 	</fieldset>
