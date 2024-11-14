@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.9 13th November 2024
+ * @version 0.0.18.8 14th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -158,7 +158,7 @@ class XbmusicHelper extends ComponentHelper
 	        }
 	    }
 	    if (isset($id3data['year'])) {
-	        $year = trim(substr($id3data['year'], 0, strpos($id3data['year'], '')));
+	        $year = trim(explode('||', $id3data['year'])[0]);
 	        if (preg_match($datematch,$year)==1) {
 	            $trackdata['rel_date'] = $year;
 	        } else {
@@ -167,6 +167,7 @@ class XbmusicHelper extends ComponentHelper
 	    } else {
 	        $ilogmsg .= '[WARNING] No release date found. Enter manually for track and album'."\n";
 	    }
+	    
 	    if (isset($id3data['track_number'])) $trackdata['trackno'] = $id3data['track_number'];
 	    if (isset($id3data['totaltracks'])) $trackdata['disctracks'] = $id3data['totaltracks'];
 	    
@@ -175,7 +176,7 @@ class XbmusicHelper extends ComponentHelper
 	        $artiststr = $id3data['artist'];
 	        $artcnt = substr_count($artiststr,' || ') + 1;
 	        if ($artcnt > 1) {
-	            $ilogmsg .= '[INFO] '.$id3data['artist'].' '.$artcnt.' artist entries found in ID3, only first will be used'."\n";
+	            $ilogmsg .= '[INFO] '.$artiststr.' '.$artcnt.' artist entries found in ID3, only first will be used'."\n";
 	        }
 	        //the first artist in the list will become the track sortartist and album artist 
 	        $origartist = substr($artiststr, 0, strpos($artiststr.' ||', ' ||')+1);
@@ -404,7 +405,7 @@ class XbmusicHelper extends ComponentHelper
 	        return false;
 	    }
 	    $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_'.$itemtype.'s', 'alias');
-	    if (!is_null($id)) return $id;
+	    if ($id !== false) return $id;
 	    if ($data['id'] == 0) unset($data['id']);
 	    $itemid = false;
 	    $sqldate = Factory::getDate()->toSql();
@@ -437,7 +438,7 @@ class XbmusicHelper extends ComponentHelper
 	    return $itemid;
 //	    }
 //	    return false;
-	}
+	}  // end createMusicItem()
 	
 	/**
 	 * @name createImageFile()
@@ -501,7 +502,7 @@ class XbmusicHelper extends ComponentHelper
 	    $flogmsg .= '[ERROR] '.Xbtext::_('failed to create image',2).$imgpathfile."\n";
 	    
 	    return false;
-	}
+	} //end createImageFile()
 	
 	/**
 	 * @name normaliseGenrename()
@@ -576,7 +577,7 @@ class XbmusicHelper extends ComponentHelper
 	    $res['total'] = $tot;
 	    return $res;
 	    
-	}
+	} // end getTagItemCnts()
 
 } //end xbmusicHelper
 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.18.8 14th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -196,29 +196,8 @@ class AlbumModel extends AdminModel {
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
-/* 
-        if ($input->get('task') == 'save2copy') {
-            $origTable = clone $this->getTable();
-            $origTable->load($input->getInt('id'));
-            
-            if ($data['title'] == $origTable->title) {
-                list($title, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['title']);
-                $data['title'] = $title;
-                $data['alias'] = $alias;
-            } else {
-                if ($data['alias'] == $origTable->alias) {
-                    $data['alias'] = '';
-                }
-            }
-            //need to add albumlinks
-            $this->storeAlbumTracks($origTable->id, $data['tracklist']);
-            // standard Joomla practice is to set the new copy record as unpublished
-            $data['status'] = 0;
-        }
- */        
        
         //alias is the title so we'll set and check it every time
-//        $newalias = OutputFilter::stringURLSafe($data['title']);
         $albumalias = $data['title'];
         if (isset($data['sortartist'])) $albumalias.= '-'.$data['sortartist'];
         $data['alias'] = XbcommonHelper::makeAlias($albumalias);

@@ -315,7 +315,7 @@ class DatamanModel extends AdminModel {
                 if ($imgurl != false) {
                     $trackdata['imgfile'] = $imgurl;
                 } else {
-                    //$ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgfilename."\n";
+                    $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgfilename."\n";
                 }
             } //end ifset image data
 
@@ -339,8 +339,10 @@ class DatamanModel extends AdminModel {
                         }
                     }                    
                 } else {
-                    if ((is_array($genreids)) && ($optalbsong > 1)) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
+                    if ($optalbsong > 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
+                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to song',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
+//                    if ((is_array($genreids)) && ($optalbsong > 1)) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
+//                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
                 }
                 if ($albumdata['id']>0) {
                     $trackdata['album_id'] = $albumdata['id'];
