@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.8 14th November 2024
+ * @version 0.0.18.9 16th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -182,7 +182,7 @@ class XbmusicHelper extends ComponentHelper
 	        $origartist = substr($artiststr, 0, strpos($artiststr.' ||', ' ||')+1);
 	        $trackdata['sortartist'] = XbcommonHelper::stripThe($origartist);
 	        //now break any listed artists into separate if the have & or and or with or feat.
-            $splits = array(" & "," and "," with "," feat");
+            $splits = array(" & "," and "," with "," featuring","feat.");
             $splitcnt = 0;
             $artiststr = str_replace($splits," || ",$artiststr,$splitcnt);
             if ($splitcnt > 0) {
@@ -283,39 +283,25 @@ class XbmusicHelper extends ComponentHelper
 	} // end id3dataToItems()
 	
 /**
- * 
- * @param int $item_id
- * @param string $itemtype
+ * @name addItemLinks()
+ * @desc adds cross links between item types for a NEW item used without invoking the model. 
+ * @param int $item_id - the id of a single item having links
+ * @param string $itemtype - the item type - album|artist|playlist|song|track
  * @param array $linklist (id, role, note, optional:listorder)
- * @param string $listtype
- * @param string $action replace|merge
+ * @param string $listtype - the last word in the table name (artistalbum|artistsong|artisttrack|playlisttrack|songalbum|songtrack) 
+ * @param string $action replace|merge (default) - if merging 
  * @return boolean
  */
 	public static function addItemLinks(int $item_id,  array $itemlist, string $itemtype, string $linktype, string $action = 'merge') {
 	       
-//	    if (!in_array($linktype, self::$linktypes)) return '[ERROR] invalid item type';
 	    $table = '#__xbmusic_'.$linktype;
-	    $preserveorder = false;
 	    $errcnt = 0;
 	    $listtype = str_replace($itemtype, '', $linktype);  
 	    $msg = 'adding '.count($itemlist).' '.$listtype.'s to '.$itemtype.'.'.$item_id;
-	    if (($itemtype == 'track') || ($itemtype == 'album')) {
-	        $preserveorder = true;
-	    }
 	    $db = Factory::getDBO();
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $query = $db->getQuery(true);
-	    if ($action == 'merge') {
-	       //get existing list 
-    	    $query->select('*')->from($db->qn($table))->where($itemtype.'_id = '.$db->q($item_id));
-    	    $db->setQuery($query);
-	       $oldlist = $db->loadAssocList();
-	       if ($oldlist) $itemlist = array_merge($oldlist, $itemlist); //new values will overwrite old if they exist
-	    } else {
-	        $preserveorder = false;
-	    }
-	    $query->clear();
-        //delete existing role list
+        //delete existing role list - this is a new item so there really should be any!
         $query->delete($db->qn($table));
 	    $query->where($itemtype.'_id = '.$db->q($item_id));
 	    $db->setQuery($query);
@@ -323,8 +309,8 @@ class XbmusicHelper extends ComponentHelper
 	    //restore the new list
 	    $listorder=0;
 	    foreach ($itemlist as $linkitem) {
-	        if ($preserveorder) {
-	            $listorder = (isset($linkitem['listorder'])) ? $linkitem['listorder'] : 0;
+	        if (isset($linkitem['listorder'])) {
+	            $listorder = $linkitem['listorder'];
 	        } else {
 	            $listorder ++;
 	        }
@@ -333,7 +319,7 @@ class XbmusicHelper extends ComponentHelper
 	        
 	        $query->clear();   
             $query->insert($db->quoteName($table));
-            $query->columns($itemtype.'_id, '.$listtype.'_id, role, note,listorder');
+            $query->columns($itemtype.'_id, '.$listtype.'_id, role, note, listorder');
             $query->values('"'.$item_id.'","'.$linkitem['id'].'","'.$linkitem['role'].'","'.$linkitem['note'].'","'.$listorder.'"');
             try {
 	            $db->setQuery($query);
@@ -341,10 +327,10 @@ class XbmusicHelper extends ComponentHelper
             } catch (\Exception $e) {
      	        $dberr = $e->getMessage();
      	        Factory::getApplication()->enqueueMessage('addItemLinks() '.$dberr.'<br />Query: '.$query->dump(), 'error');
-     	        $errcnt ++;
+     	        $errcnt ++;               
             }
 	    }
-	    if ($errcnt>0) $msg .= ' '.$errcnt.' failed';
+	    if ($errcnt>0) $msg .= ' '.$errcnt.' failed, rest ok';
 	    return $msg;
 	}
 	
@@ -391,12 +377,13 @@ class XbmusicHelper extends ComponentHelper
 	
 	/**
 	 * @name createMusicItem()
-	 * @desc Creates an xbMusic item with supplied data. 
-	 * status, access, created & modified dates will be default values if missing, 
+	 * @desc Creates an xbMusic item with supplied data. Returns id or -id if alias exists. 
+	 * Status, access, created & modified dates will be default values if missing. 
 	 * Created_by will be set to user, alias will be created from title if missing (not if no title)
+	 * Uses item model::save() to create item, so all valid data elements will be created, others will default.
 	 * @param array $data
 	 * @param string $table
-	 * @return int|false - new item id or false on failure
+	 * @return int|false - new item positive id, existing item negative id, or false on failure
 	 */
 	public static function createMusicItem(array $data, string $itemtype) {
 	    $app = Factory::getApplication();
@@ -405,7 +392,7 @@ class XbmusicHelper extends ComponentHelper
 	        return false;
 	    }
 	    $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_'.$itemtype.'s', 'alias');
-	    if ($id !== false) return $id;
+	    if ($id !== false) return $id * -1;
 	    if ($data['id'] == 0) unset($data['id']);
 	    $itemid = false;
 	    $sqldate = Factory::getDate()->toSql();
@@ -421,15 +408,6 @@ class XbmusicHelper extends ComponentHelper
 //	    $itemmodel = $this->getMVCFactory()->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
 	    $itemmodel = $app->bootComponent('com_xbmusic')->getMVCFactory()
 	       ->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
-// 	    if ($itemtype == 'track') {
-// 	        if (!$itemmodel->simpleSave($data)) {
-// 	            $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
-// 	            return false;
-// 	        }
-// 	        $itemid = $itemmodel->getState($itemtype.'.id');
-// 	        return $itemid;
-	        
-// 	    } else {
 	    if ($itemmodel->save($data) == false) {
 	        $app->enqueueMessage('createMusicItem().'.$itemtype.' '.$itemmodel->getError(), 'Error');
 	        return false;
@@ -455,9 +433,9 @@ class XbmusicHelper extends ComponentHelper
 	    //create the folder if it doesn't exist (eg new initial)
 	    if (file_exists($imgpath)==false) {
 	        if (mkdir($imgpath,0775,true)) {
-	            $flogmsg .= '[INFO] '.Xbtext::_('artwork folder created',2).$folder."\n";
+	            $flogmsg .= '[INFO] '.Text::_('artwork folder created',2).Xbtext::_($folder,13);
 	        } else  {
-	            $flogmsg .= '[ERROR] '.Xbtext::_('failed to create artwork folder',2).$imgpath."\n";
+	            $flogmsg .= '[ERROR] '.Text::_('failed to create artwork folder').Xbtext::_($imgpath,13);
 	           return false;
 	        }
 	    }
@@ -469,7 +447,7 @@ class XbmusicHelper extends ComponentHelper
 	    $imgok = false;
 	    if (file_exists($imgpathfile)) {
 	        $imgok = true;
-	        $flogmsg .= '[INFO] '.Text::sprintf('Artwork file %s already exists',$xbfilename)."\n";
+	        $flogmsg .= '[INFO] '.Text::sprintf('Artwork file "%s" already exists',$xbfilename)."\n";
 	    } else {
 	        $params = ComponentHelper::getParams('com_xbmusic');
 	        $maxpx = $params->get('imagesize',500);
@@ -496,10 +474,10 @@ class XbmusicHelper extends ComponentHelper
 	        }
 	    } //endif artfile !exists
 	    if ($imgok) {
-	        $flogmsg .= '[INFO] '.Xbtext::_('image created',2).$xbfilename."\n";
+	        $flogmsg .= '[INFO] '.Text::_('image created').Xbtext::_($xbfilename,13);
 	        return $imgurl;
 	    }
-	    $flogmsg .= '[ERROR] '.Xbtext::_('failed to create image',2).$imgpathfile."\n";
+	    $flogmsg .= '[ERROR] '.Text::_('failed to create image').Xbtext::_($imgpathfile,13);
 	    
 	    return false;
 	} //end createImageFile()

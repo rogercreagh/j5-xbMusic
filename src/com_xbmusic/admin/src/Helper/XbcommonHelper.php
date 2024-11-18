@@ -275,13 +275,15 @@ class XbcommonHelper extends ComponentHelper {
     
     /**
      * @name addTagsToItem()
-     * @desc adds one or more existing tags to an item of a given type
+     * @desc adds one or more existing tags to an item of a given type.
+     * @desc Uses tags model batch function so duplicates will be ignored
      * @param string $compitem - the component item type in dotted lower case eg com_content.article
      * @param int $itemId - the id of the item the tag is being added to
      * @param array $tagIds - the id of the tags being added
      * @return int - count of successful adds
      */
     public static function addTagsToItem(string $compitem, int $itemId, array $tagIds) {
+        // we are using the batch function so any duplicates get handled automatically
         $arr=explode('.',$compitem);
         $app = Factory::getApplication();
         $factory = $app->bootComponent($arr[0])->getMVCFactory();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.18.9 18th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -201,6 +201,9 @@ $input = Factory::getApplication()->getInput();
 					<?php else: ?>
 						<p class="xbit"><?php echo Text::_('No single tracks listed'); ?></p>
 					<?php endif; ?>
+				</div>
+				<div class="col-12">
+            		<?php echo $this->form->renderField('songlist');?>
 				</div>
     		</div>
             		<?php echo $this->form->renderField('ext_links');?>

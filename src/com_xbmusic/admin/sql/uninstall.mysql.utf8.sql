@@ -10,7 +10,10 @@ DROP TABLE IF EXISTS
   `#__xbmusic_medleytrack`,
   `#__xbmusic_playlisttrack`,
   `#__xbmusic_songtrack`,
-  `#__xbmusic_groupmember`;
+  `#__xbmusic_groupmember`,
+  `#__xbmusic_artistalbum`,
+  `#__xbmusic_songalbum`
+;
 
 DELETE FROM `#__ucm_base` WHERE ucm_type_id in 
 	(select type_id from `#__content_types` WHERE type_alias in ('com_xbmusic.album','com_xbmusic.artist','com_xbmusic.playlist','com_xbmusic.song','com_xbmusic.track'));
