@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Album Form file v0.0.12.1 16th August 2024 -->
+<!-- xbMusic Album Form file v0.0.19.0 21st November 2024 -->
 
 <form>
 	<config>
@@ -86,15 +86,6 @@
 			filter="string"   
 		/>
 		
-		<field name="ext_links" type="subform" 
-			label="External Links" description="Links to associated information for the track"
-			min="0" max="10" multiple="true"
-			buttons= "add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			formsource="administrator/components/com_xbmusic/forms/extlinksform.xml"
-		>
-		</field>
-	
 		<field
 			name="note" type="textarea"
 			label="XB_ADMIN_NOTE"
@@ -137,38 +128,45 @@
 			class="xbtags"
 		/>
 	</fieldset>
-	
+
+<!-- Tag Groups, dynamically created at run time -->	
 	<fieldset name="taggroups" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<!-- dynamically created at run time -->
 	</fieldset>
 
-<!-- ID3 iage info -->
+<!-- ID3 image info -->
 	<fieldset name="image-info"
-		label="Artwork Image"
+		label="Album Image"
 	>
-		<field name="artworkfilename" type="text" 
-		label="Image Filename"
-		
-		/>
-		<field name="picturefile" type="accessiblemedia"
-			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
+		<field name="newimage" type="media"
+			label="Select New Image" description="Select a different image for this album. You can choose to upload a new image - the filename should be the album (and optionally artist) filename and should be in a folder under albums with the name of the initial letter of the file (to avoid having 1000s of pictures in one folder)" 
 			directory="xbmusic/artwork/albums"
-			showon="artworkfilename:"
 		/>
+		<field name="newimagetitle" type="text"
+			label="Image Title"
+			description="eg Album Cover, Portrait, Graphic..."
+			size="20" maxlength="50"
+		/>
+		<field name="newimagedesc" type="text"
+			label="Image desciption"
+			description="fuller description of image"
+			size="20" maxlength="50"
+		/>
+		
 	</fieldset>
 
-<!-- Tracks -->	
+<!-- Links -->	
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
 		name="links" 
 	>
-		<field name="notelinks" type="note"
-			label="Links to Albums, Artists, Songs and Playlists"
-			description="Artists, Songs. and Playlists are linked through the tracks, aside fromm Album Artist(s) which is a specific field for Albums and is not connected to the Artists data table"
+		<field name="albumlinksnote" type="note"
+			label="Links to Tracks, Artists, Songs, and External Links"
+			description="Playlists are linked through the tracks, Album Artist(s) is a specific field for Albums and is not connected to the Artists data table (eg it might be 'Various Artists'.)"
 		/>
 		
 		<field name="tracklist" type="subform"
 			label="Track(s)"
-			description="Any album may have several tracks, each track belongs to only one album (or no album in the case of a single). A track might cover several songs (eg a Medley) or several tracks may make a single Song or work (eg the Movements of a Symphony might each be separate tracks)"			
+			description="An album may have several tracks, each track belongs to only one album (or no album in the case of a single). A track might cover several songs (eg a Medley) or several tracks may make a single Song or work (eg the Movements of a Symphony might each be separate tracks)"			
 			multiple="true" min= "0" max= "40"
 			buttons="add,remove,move"
 			layout="joomla.form.field.subform.repeatable-table"
@@ -183,6 +181,55 @@
 			</form>
 		</field>						
 		
+		<field name="artistlist" type="subform"
+			label="Artist(s)"
+			description="The album has a headline Album Artist name, these are the artists as listed with specific tracks"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="artist_id" type="xbartistlist" label="Artist Name">
+					<option value=""> </option>	
+				</field>
+				<field name="role" type="text" label="XB_ROLE" size="50" maxlength="190" />
+				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				/>
+			</form>
+		</field>			
+
+		<field name="songlist" type="subform"
+			label="Song(s)"
+			description="Songs on this album. Song type may be complete track, part of medley, or consists of several tracks"			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="song_id" type="xbsonglist" label="Song Name">
+					<option value=""> </option>	
+				</field>
+				<field name="role" type="combo" label="Type" size="50" maxlength="190" >
+					<option value="Full track">Full track</option>
+					<option value="Part of track">Part of track</option>
+					<option value="Covers several tracks">Covers several tracks</option>
+				</field>
+				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				/>
+			</form>
+		</field>					
+
+		<field name="ext_links" type="subform" 
+			label="External Links" description="Links to associated information for the track"
+			min="0" max="10" multiple="true"
+			buttons= "add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+			formsource="administrator/components/com_xbmusic/forms/extlinksform.xml"
+		>
+		</field>
+	
 	</fieldset>
 	
 <!-- Standard joomla -->

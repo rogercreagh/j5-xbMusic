@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.18.9 18th November 2024
+ * @version 0.0.19.0 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -118,12 +118,12 @@ class DatamanModel extends AdminModel {
                 $dcparent = XbcommonHelper::createCategory($catdata, true);
             }
             $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-            if ($this->trackcatid === false) {
+//            if ($this->trackcatid === false) {
                 $parentcat = XbcommonHelper::getCatByAlias('imports');
                 $parentid = ($parentcat>0) ? $parentcat->id : 1;
                 $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
                 $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
-            }
+//            }
             if ($daycatid > 0) {
                 $this->albumcatid = $daycatid;
                 $this->artistcatid = $daycatid;
@@ -159,8 +159,7 @@ class DatamanModel extends AdminModel {
         //we'll need the params for category allocation and handling genres and image files
         $params = ComponentHelper::getParams('com_xbmusic');
         $app = Factory::getApplication();
-//        $uncatid = XbmusicHelper::getCatByAlias('uncategorised');
-        //strat the logging for this file
+        //start the logging for this file
         $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$filepathname)."\n";
         $enditem = " -------------------------- \n";
         $trackdata = []; //only one track per file
@@ -205,6 +204,7 @@ class DatamanModel extends AdminModel {
 //4. get the basic trackdata from id3
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);
         if (isset($id3data['trackdata'])) {
+            $genreids = [];
             $trackdata = $id3data['trackdata'];
             $trackdata['filepathname'] = $filepathname;
             $trackdata['filename'] = $fpathinfo['basename'];
@@ -248,10 +248,10 @@ class DatamanModel extends AdminModel {
                 unset($filedata['imageinfo']['data']);
             }
             //save json encoded filedata with track for reference
-            $trackdata['imageinfo'] = json_encode($filedata['imageinfo']);
             $trackdata['id3tags'] = json_encode($filedata['id3tags']);
             $trackdata['fileinfo'] = json_encode($filedata['fileinfo']);
             $trackdata['audioinfo'] = json_encode($filedata['audioinfo']);
+            //imageinfo is added to track after the image has been parsed
 
 //4. get the song(s) creating as necessary and make list of song ids to link to track, artist and album
             if (isset($id3data['songdata'])) {
@@ -289,9 +289,10 @@ class DatamanModel extends AdminModel {
                         $link['note'] = '';
                         $listorder ++;
                         $link['listorder'] = 0;
-                        $songlinks[] = $link; //will be linked to album and track once we have ids
+                        $songlinks[] = $link; //will be linked to album and artist once we have ids
                     }
                 }
+                $trackdata['songlist'] = $songlinks;
             }
             
 //5. get the artist(s) and create as necessary. make list of artists to link to track, album and song
@@ -327,9 +328,9 @@ class DatamanModel extends AdminModel {
                         $artistlinks[] = array('id'=>$artist['id'], 'role'=>'', 'note'=>''); 
                         $ilogmsg .= INFO.XbmusicHelper::addItemLinks($artist['id'],$songlinks,'artist','artistsong')."\n";
                     }                   
-                    //will be linked to album and track once we have ids for them
                 }
-                //link artists to songs
+                //will be linked to album once album data loaded
+                $trackdata['artistlist'] = $artistlinks;
             }
             
 //6. Create image file if available
@@ -340,16 +341,31 @@ class DatamanModel extends AdminModel {
                 $imgfilename = '/images/xbmusic/artwork/';
                 if (isset($id3data['albumdata']['alias'])) {
                     $imgfilename .= 'albums/'.strtolower($id3data['albumdata']['alias'][0]).'/'.$id3data['albumdata']['alias'];
-//                    if (isset($id3data['albumdata']['sortartist'])) {
-//                        $imgfilename .= '_'.$id3data['albumdata']['sortartist'];
-//                    }
                 } else {
                     $imgfilename .= 'singles/'.$trackdata['alias'];
                     if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
                 }
-                $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg)."\n";
+                $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                 if ($imgurl !== false) {
+                    unset($imgdata['data']);
+                    $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
+                    if (file_exists($file)){
+                        $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
+                        $imgdata['basename'] = basename($file);
+                        $bytes = filesize($file);
+                        $lbl = Array('bytes','kB','MB','GB');
+                        $factor = floor((strlen($bytes) - 1) / 3);
+                        $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+                        $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
+                        $imagesize = getimagesize($file);
+                        $imgdata['filemime'] = $imagesize['mime'];
+                        $imgdata['filewidth'] = $imagesize[0];
+                        $imgdata['fileht'] = $imagesize[1];
+                        $imgdata['imagetitle'] = $imgdata['picturetype'];
+                        $imgdata['imagedesc'] = $imgdata['description'];
+                    }                    
                     $trackdata['imgfile'] = $imgurl;
+                    $trackdata['imageinfo'] = json_encode($imgdata);
                 } else {
                     $app->enqueueMessage(Text::_('failed to create image file'),'Warning');
                 }
@@ -360,42 +376,38 @@ class DatamanModel extends AdminModel {
                 $albumdata = $id3data['albumdata'];
                 if ($albumdata['id'] == 0) {
                     $albumdata['catid'] = $this->albumcatid;
+                    $albumdata['songlist'] = $songlinks;
+                    if (isset($imgdata)) $albumdata['imageinfo'] = $imgdata;                   
+                    $albumdata['artistlist'] = $artistlinks;
                     if ($optalbsong > 1) $albumdata['tags'] = $genreids;
-                    if ($imgurl != false) $albumdata['imgfile'] = $imgurl;
+                    if ($imgurl != false) $albumdata['imgurl'] = $imgurl;
                     $albumdata['id'] = XbmusicHelper::createMusicItem($albumdata, 'album');
-                    if ($albumdata['id']>0) {
-                        $cnts['newalb'] ++;                       
-                        $msg .= Text::_('new album saved').Xbtext::_($albumdata['title'],13);
-                        $ilogmsg .= INFO.$msg;
-                         $app->enqueueMessage($msg,'Success');
-                    } else {
-                        $existing = XbcommonHelper::getItem('#__xbmusic_albums', $albumdata['alias'], 'alias','',true);
-                        if ($existing) {
-                            $existing['tags'] = array_unique(array_merge($existing['tags'],$genreids));
-                            $albumdata = array_merge($existing, $albumdata);
-                            $ilogmsg .= INFO.Xbtext::_('linking to existing album',2).Xbtext::_($albumdata['title'],8);             
-                        } else {
+                    if ($albumdata['id']===false) {
                             $msg = Text::_('failed to save album').Xbtext::_($albumdata['title'],13);
                             $ilogmsg .= ERROR.$msg;
-                            $app->enqueueMessage($msg,'Error');
-                            
+                            $app->enqueueMessage($msg,'Error');                       
+                    } elseif ($albumdata['id']>0) { 
+                        $cnts['newalb'] ++;                       
+                        $msg = Text::_('new album saved').Xbtext::_($albumdata['title'],13);
+                        $ilogmsg .= INFO.$msg;
+                         $app->enqueueMessage($msg,'Success');
+                    } else { //this implies the album alias already exists
+                        $albumdata['id'] = $albumdata['id'] * -1;
+                        // TODO need to update existing with any new tags, artist and song links                            
                         }
                     }                    
                 } else {
-                    if ($optalbsong > 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
+                    if ($optalbsong > 1) {
+                        $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
                     $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
-//                    if ((is_array($genreids)) && ($optalbsong > 1)) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-//                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
+                    // TODO also might need to add songs and artists
+                    }
                 }
                 if ($albumdata['id']>0) {
                     $trackdata['album_id'] = $albumdata['id'];
-                    //link artists to album
-                    $ilogmsg .= INFO.XbmusicHelper::addItemLinks($albumdata['id'],$songlinks, 'album','songalbum')."\n";
-                    //link songs to album
-                    $ilogmsg .= INFO.XbmusicHelper::addItemLinks($albumdata['id'],$artistlinks, 'album','artistalbum')."\n";
                 }
-            }
-                         
+            
+            
             $trackdata['id'] = XbmusicHelper::createMusicItem($trackdata, 'track');
             if ($trackdata['id']=== false) {
                 $msg = Text::_('failed to save track').Xbtext::_($trackdata['title'],13);
@@ -487,59 +499,60 @@ class DatamanModel extends AdminModel {
         return $genres;
     }
     
-    private function createImageFile($filedata, string $imgfilename, string &$flogmsg) {
-        $albumtitle = '';
-        $imgpath = '/images/xbmusic/artwork/singles/';
-        if (isset($filedata['id3tags']['album'])) {
-            $albumarr = explode(' || ', $filedata['id3tags']['album']);
-            $albumtitle = $albumarr[0];
-            if ($albumtitle != '') {
-                $imgpath = '/images/xbmusic/artwork/albums/'.strtolower($albumtitle[0]).'/';
-            }
-        }
-        //create the folder if it doesn't exist (eg new initial)
-        if (file_exists($imgpath)==false) {
-            mkdir(JPATH_ROOT.$imgpath,0775,true);
-            $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."\n";
-        }
-        $imgext = XbcommonHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
-        $imgfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $imgfilename)).'.'.$imgext;
-        $imgpathfile = JPATH_ROOT.$imgpath.$imgfilename;
-        $imgurl = Uri::root().$imgpath.$imgfilename;
-        $imgok = false;
-        if (file_exists($imgpathfile)) {
-            $imgok = true;
-            $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."\n";
-        } else {
-            $params = ComponentHelper::getParams('com_xbmusic');
-            $maxpx = $params->get('imagesize',500);
-            if ($filedata['imageinfo']['image_height'] > $maxpx) {
-                //need to resize image
-                $image = imagecreatefromstring($filedata['imageinfo']['data']);
-                $newimage = imagescale($image, $maxpx);
-                switch ($imgext) {
-                    case 'jpg':
-                        $imgok = imagejpeg($newimage, $imgpathfile);
-                        break;
-                    case 'png':
-                        $imgok = imagejpeg($newimage, $imgpathfile);
-                        break;
-                    case 'gif':
-                        $imgok = imagejpeg($newimage, $imgpathfile);
-                        break;
-                    default:
-                        $imgok = false;
-                        break;
-                }
-            } else {
-                $imgok = file_put_contents($imgpathfile, $filedata['imageinfo']['data']);
-            }
-        } //endif artfile !exists
-        if ($imgok) return $imgurl;
+/* //     private function createImageFile($filedata, string $imgfilename, string &$flogmsg) {
+//         $albumtitle = '';
+//         $imgpath = '/images/xbmusic/artwork/singles/';
+//         if (isset($filedata['id3tags']['album'])) {
+//             $albumarr = explode(' || ', $filedata['id3tags']['album']);
+//             $albumtitle = $albumarr[0];
+//             if ($albumtitle != '') {
+//                 $imgpath = '/images/xbmusic/artwork/albums/'.strtolower($albumtitle[0]).'/';
+//             }
+//         }
+//         //create the folder if it doesn't exist (eg new initial)
+//         if (file_exists($imgpath)==false) {
+//             mkdir(JPATH_ROOT.$imgpath,0775,true);
+//             $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."\n";
+//         }
+//         $imgext = XbcommonHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
+//         $imgfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $imgfilename)).'.'.$imgext;
+//         $imgpathfile = JPATH_ROOT.$imgpath.$imgfilename;
+//         $imgurl = Uri::root().$imgpath.$imgfilename;
+//         $imgok = false;
+//         if (file_exists($imgpathfile)) {
+//             $imgok = true;
+//             $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."\n";
+//         } else {
+//             $params = ComponentHelper::getParams('com_xbmusic');
+//             $maxpx = $params->get('imagesize',500);
+//             if ($filedata['imageinfo']['image_height'] > $maxpx) {
+//                 //need to resize image
+//                 $image = imagecreatefromstring($filedata['imageinfo']['data']);
+//                 $newimage = imagescale($image, $maxpx);
+//                 switch ($imgext) {
+//                     case 'jpg':
+//                         $imgok = imagejpeg($newimage, $imgpathfile);
+//                         break;
+//                     case 'png':
+//                         $imgok = imagejpeg($newimage, $imgpathfile);
+//                         break;
+//                     case 'gif':
+//                         $imgok = imagejpeg($newimage, $imgpathfile);
+//                         break;
+//                     default:
+//                         $imgok = false;
+//                         break;
+//                 }
+//             } else {
+//                 $imgok = file_put_contents($imgpathfile, $filedata['imageinfo']['data']);
+//             }
+//         } //endif artfile !exists
+//         if ($imgok) return $imgurl;
         
-        return false;
-    }
-    
+//         return false;
+//     }
+ */    
+
     public function getLastImportLog() {
         $file = null;
         foreach(new DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {

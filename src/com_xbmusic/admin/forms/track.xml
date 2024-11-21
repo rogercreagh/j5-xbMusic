@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/track.xml
- * @version 0.0.18.7 4th November 2024
+ * @version 0.0.19.0 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -72,23 +72,7 @@
 			hint="Will default ID3 artist name(s)"
 			size="40" 
 		/>
-		
-<!--		 <field name="pathname" type="text" 
-			label="File path" 
-			description="path from the music root directory as set in xbMusic Options" 
-		/>
--->
 	
-		<field name="getid3onsave" type="radio"
-			label="re-read ID3 on Save"
-			description="Optionally read the ID3 data from musicfile when saving. Will overwrite any existing title and add albums, genres, and artists from ID3 data if available"
- 			class="btn-group btn-group-yesno"
-			default="0"
-			>
-				<option value="0">No</option>
-				<option value="1">Yes</option>
-		</field>
-		
 		<field name="rel_date" type="text"
 			label="Release date" 
 			description="Date the album or track was released. Format YYYY[-MM[-DD]] - day &amp; month optional"
@@ -118,15 +102,6 @@
 			filter="string"   
 		/>
 		
-		<field name="ext_links" type="subform" 
-			label="External Links" description="Links to associated information for the track"
-			min="0" max="10" multiple="true"
-			buttons= "add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			formsource="administrator/components/com_xbmusic/forms/extlinksform.xml"
-		>
-		</field>
-	
 		<field
 			name="note" type="textarea"
 			label="XB_ADMIN_NOTE"
@@ -227,14 +202,14 @@
 			description="fuller description of image"
 			size="20" maxlength="50"
 		/>
-		<field name="picturefile" type="accessiblemedia"
-			label="Track Picture" description="If no ID3 picture available you can upload and select one here" 
+		<field name="picturefile" type="media"
+			label="Track Picture" description="If no ID3 picture available you can upload and select one here. If track ha an album, and album image is not already set this one will be assigned" 
 			directory="xbmusic/artwork"
 			showon="picture_options:3"
 		/>
 	</fieldset>
 
-<!-- Album, artist(s), song, playlists -->	
+<!--Links -->	
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
 		name="links" 
 	>
@@ -283,6 +258,7 @@
 				</field>
 				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
 				/>
+				<field name="role" type="hidden" default="" /> 
 			</form>
 		</field>	
 		
@@ -307,6 +283,35 @@
 			</form>
 		</field>			
 			
+		<field name="playlistlist" type="subform"
+			label="Playlists"
+			description="Track may may appear in several playlists"			
+			multiple="true" min= "0" max= "100"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="playlist_id" type="xbplaylistlist" label="Playlist Title">
+					<option value=""> </option>	
+				</field>
+				<field name="listorder" type="text" label="Order" readonly="true"
+				/>
+				<field name="note" type="text" label="XB_NOTE"
+					size="30" maxlength="190"
+				/> 
+			</form>
+		</field>	
+		
+		<field name="ext_links" type="subform" 
+			label="External Links" description="Links to associated information for the track"
+			min="0" max="10" multiple="true"
+			buttons= "add,remove,move"
+			layout="joomla.form.field.subform.repeatable-table"
+			formsource="administrator/components/com_xbmusic/forms/extlinksform.xml"
+		>
+		</field>
+	
 		
 	</fieldset>
 	

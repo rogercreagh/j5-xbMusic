@@ -95,8 +95,10 @@ class XbcommonHelper extends ComponentHelper {
             $wynik->id = $catid;
             $wynik->title = $catdata['title'];
         }
-        if ($errmsg != '') $app->enqueueMessage('createCategory() '.$errmsg, 'Warning');
-        if ($infomsg != '') $app->enqueueMessage('createCategory() '.$infomsg,'Info');
+        if (!$silent) {
+            if ($errmsg != '') $app->enqueueMessage('createCategory() '.$errmsg, 'Warning');
+            if ($infomsg != '') $app->enqueueMessage('createCategory() '.$infomsg,'Info');           
+        }
         return $wynik;
     }
     

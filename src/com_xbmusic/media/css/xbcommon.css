@@ -506,6 +506,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 }
 
 /* definition list with term and definition on same line (NB overflow will not be indented */
+/* use class="xbdl" in the dl element */
 dl.xbdl dt{
   /*display: inline-block;*/
 	float: left;

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.19.0 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -17,8 +17,9 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 // use Joomla\Registry\Registry;
 use Joomla\CMS\Router\Route;
-// use Joomla\CMS\Uri\Uri;
+ use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
@@ -28,10 +29,10 @@ $wa->useScript('keepalive')
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
-//$params->merge(new Registry($this->item->attribs));
+//$params->merge(new Registry($item->attribs));
 
 $input = Factory::getApplication()->getInput();
-
+$item = $this->item;
 ?>
 <script>
 	function clearmd() {
@@ -66,10 +67,10 @@ $input = Factory::getApplication()->getInput();
 //                 });
 </script>
 <div id="xbcomponent">
-    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=album&layout=edit&id='. (int) $this->item->id); ?>"
+    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=album&layout=edit&id='. (int) $item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<p class="xbnit">
-    	<?php if ($this->item->id == 0 ) : ?>
+    	<?php if ($item->id == 0 ) : ?>
     		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
    			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
     	<?php else : ?>
@@ -134,7 +135,6 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
         			<?php echo $this->form->renderField('catid'); ?> 
-         			<?php echo $this->form->renderField('tags'); ?> 
          			<?php echo $this->form->renderField('access'); ?> 
         			<?php echo $this->form->renderField('ordering'); ?> 
         			<?php echo $this->form->renderField('note'); ?> 
@@ -145,48 +145,72 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<?php echo Text::_('id3 Image'); ?><br/>
-					<img src="<?php echo $this->item->imgfile; ?>" />
-					<br />[LOAD NEW IMAGE] (modal selector)
+           			<h4><?php echo Text::_('Primary Album Image'); ?></h4>
+					<img src="<?php echo $item->imgurl; ?>" />
 				</div>        		
            		<div class="col-12 col-md-7">
-					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
-						<legend>Image details</legend>
-						<dl class="xbdl">
-    						<dt><?php echo Text::_('Type'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_mime;?></dd>
-    						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
-    						<dd><?php echo $this->item->imageinfo->image_width;?>&nbsp;x&nbsp;
-    						<?php echo $this->item->imageinfo->image_height;?> px</dd>
-    						<dt><?php echo Text::_('Size'); ?>:</dt>
-    						<dd><?php echo number_format($this->item->imageinfo->datalength/1024, 2);?> kB</dd>
-						</dl>
-					</fieldset>
+           			<h4><?php echo Text::_('Primary image details'); ?></h4>
+					<div>
+                      <dl class="xbdl">
+                      	<dt>Title</dt><dd><?php echo $item->imageinfo->imagetitle; ?></dd>
+                      	<dt>Description</dt><dd><?php echo $item->imageinfo->imagedesc; ?></dd>
+                      	<dt>Filename</dt><dd><?php echo $item->imageinfo->basename; ?></dd>
+                        <dt>Folder</dt><dd><?php echo $item->imageinfo->folder; ?></dd>
+                        <dt>Filesize</dt><dd><?php echo $item->imageinfo->filesize; ?></dd>
+                        <dt>FileDate</dt><dd><?php echo $item->imageinfo->filedate;?></dd>
+                        <dt>Dimensions</dt><dd><?php echo $item->imageinfo->filewidth.' x '.$item->imageinfo->fileht.' px'; ?></dd>
+                        <dt>Mime type</dt><dd><?php echo $item->imageinfo->filemime; ?></dd>                        
+                      </dl>
+						<p class="xbnote">
+						<?php if(isset($item->imageinfo->datalength)) {
+						    echo Text::_('Album Image has been taken from a track ID3 data');
+						    if ($item->imageinfo->fileht < $item->imageinfo->image_height) {
+						        echo Xbtext::_('and resized from ',3);
+						        echo $item->imageinfo->image_width.' x '.$item->imageinfo->image_height.' px';
+						    }
+						}
+						?></p>
+					</div>
 				</div>
         	</div>
+        	<hr />
 			<div class="row">
-           		<div class="col-12 col-lg-6">
-					<?php echo $this->form->renderField('picturefile'); ?> 
+           		<div class="col-12 col-lg-6 form-vertical">
+           			<h4><?php echo Text::_('Select new image for Album only')?></h4>
+					<?php echo $this->form->renderField('newimage'); ?> 
+					<?php echo $this->form->renderField('newimagetitle'); ?>
+					<?php echo $this->form->renderField('newimagedesc'); ?>
 				</div>
            		<div class="col-12 col-lg-6">
-           			
+           			<p class="xbnote">an option to also save the image to all tracks will appear here 
    				</div>
-			</div>
-        
+			</div>        
+			<div class="row">
+           		<div class="col-12 col-lg-6 form-vertical">
+           			<p class="xbnote">a proposed future enhancement is to allow multiple images for albums. eg to include back and cover and inside sleeve notes</p>
+           		</div>
+           	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-	<?php if (!empty($this->tagparentids)) : ?>
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
-				<?php echo $this->form->renderFieldset('taggroups'); ?>
-    		</div>
+				<div class="col-12 col-md-4">
+         			<?php echo $this->form->renderField('tags'); ?> 
+         		</div>
+				<div class="col-md-8">
+					<?php if (!empty($this->tagparentids)) : ?>
+						<?php echo $this->form->renderFieldset('taggroups'); ?>
+					<?php else: ?>
+						<p class="xbnote"><?php echo Text::_('You can define groups for different types of tags by specifying a group parent tags in the options and they will be listed separately here - eg "genres" and "places" might be useful group parents'); ?></p>
+ 					<?php endif; ?>
+				</div>
+   			</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-	<?php endif; ?>
 	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('Tracks')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
 			<div class="row">
-				<div class="col-12 col-md-6">
-					<?php echo $this->form->renderField('notelinks'); ?> 
+				<div class="col-12">
+					<?php echo $this->form->renderField('albumlinksnote'); ?> 
 				</div>
 			</div>
 			<div class="row">
@@ -194,28 +218,42 @@ $input = Factory::getApplication()->getInput();
 					<?php echo $this->form->renderField('tracklist'); ?> 
 				</div>
 			</div>
-            <?php echo $this->form->renderField('ext_links');?>
+			<div class="row">
+				<div class="col-12">
+					<?php echo $this->form->renderField('songlist'); ?> 
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+					<?php echo $this->form->renderField('artistlist'); ?> 
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-12">
+		            <?php echo $this->form->renderField('ext_links');?>
+		        </div>
+		    </div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
-        <div class="row">
-            <div class="col-12 col-lg-6">
-                <fieldset id="fieldset-publishingdata" class="options-form">
-                    <legend><?php echo Text::_('JGLOBAL_FIELDSET_PUBLISHING'); ?></legend>
-                    <div>
-                    <?php echo LayoutHelper::render('joomla.edit.publishingdata', $this); ?>
-                    </div>
-                </fieldset>
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <fieldset id="fieldset-publishingdata" class="options-form">
+                        <legend><?php echo Text::_('JGLOBAL_FIELDSET_PUBLISHING'); ?></legend>
+                        <div>
+                        <?php echo LayoutHelper::render('joomla.edit.publishingdata', $this); ?>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <fieldset id="fieldset-metadata" class="options-form">
+                        <legend><?php echo Text::_('JGLOBAL_FIELDSET_METADATA_OPTIONS'); ?></legend>
+                        <div>
+                        <?php echo LayoutHelper::render('joomla.edit.metadata', $this); ?>
+                        </div>
+                    </fieldset>
+                </div>
             </div>
-            <div class="col-12 col-lg-6">
-                <fieldset id="fieldset-metadata" class="options-form">
-                    <legend><?php echo Text::_('JGLOBAL_FIELDSET_METADATA_OPTIONS'); ?></legend>
-                    <div>
-                    <?php echo LayoutHelper::render('joomla.edit.metadata', $this); ?>
-                    </div>
-                </fieldset>
-            </div>
-        </div>
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php if ($this->canDo->get('core.admin') ) : ?>

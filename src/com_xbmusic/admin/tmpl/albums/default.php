@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.18.8 13th November 2024
+ * @version 0.0.19.0 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -184,8 +184,8 @@ if (strpos($listOrder, 'modified') !== false) {
    								</p>
 							</div>
 						</td>
-						<td><?php if ($item->imgfile != '') : ?>
-								<img src="<?php echo $item->imgfile; ?>" style="height:100px;" />
+						<td><?php if ($item->imgurl != '') : ?>
+								<img src="<?php echo $item->imgurl; ?>" style="height:100px;" />
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">

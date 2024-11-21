@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.18.8 14th November 2024
+ * @version 0.0.18.9 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,7 @@ use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Uri\Uri;
 //use Joomla\CMS\Plugin\PluginHelper;
 //use Joomla\CMS\String\PunycodeHelper;
 //use Joomla\CMS\Table\Table;
@@ -110,7 +111,33 @@ class AlbumModel extends AdminModel {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
-                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.album');                
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.album');
+                if (isset($item->imageinfo)) {
+                    $item->imageinfo = json_decode($item->imageinfo);
+                    if((isset($item->imageinfo->picturetype)) && (!isset($item->imageinfo->imagetitle))) 
+                        $item->imageinfo->imagetitle = $item->imageinfo->picturetype;
+                    if((isset($item->imageinfo->description)) && (!isset($item->imageinfo->imagedesc)))
+                        $item->imageinfo->imagedesc = $item->imageinfo->description;
+                    if (isset($item->imageinfo->imagetitle)) $item->newimagetitle = $item->imageinfo->imagetitle;
+                    if (isset($item->imageinfo->imagedesc)) $item->newimagetitle = $item->imageinfo->imagedesc;
+                }
+                //                 $item->imginfo = [];
+//                 if ($item->imgfile != '') {
+//                     $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$item->imgfile));
+//                     if (file_exists($file)){
+//                         $item->imginfo['folder'] = dirname(str_replace(Uri::root(),'',$item->imgfile)); 
+//                         $item->imginfo['basename'] = basename($file);
+//                         $bytes = filesize($file);
+//                         $lbl = Array('bytes','kB','MB','GB');
+//                         $factor = floor((strlen($bytes) - 1) / 3);
+//                         $item->imginfo['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+//                         $item->imginfo['date'] = date("d M Y at H:i",filemtime($file));
+//                         $imagesize = getimagesize($file);
+//                         $item->imginfo['mime'] = $imagesize['mime'];
+//                         $item->imginfo['width'] = $imagesize[0];
+//                         $item->imginfo['ht'] = $imagesize[1];
+//                     }
+//                 }
             }
         }        
         return $item;
@@ -156,6 +183,7 @@ class AlbumModel extends AdminModel {
         if (empty($data)) {
             $data = $this->getItem();
             $data->tracklist = $this->getAlbumTrackList($data->id);
+            $data->songlist = $this->getAlbumSongList();
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -196,18 +224,55 @@ class AlbumModel extends AdminModel {
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
-       
+        if (($data['newimage'])) {
+            $imgurl = Uri::root().substr($data['newimage'],0,strpos($data['newimage'], "#"));
+            if ($imgurl != $data['imgurl']) {
+                $data['imgurl'] = $imgurl;
+                unset($data['imageinfo']['datalength']);
+                unset($data['imageinfo']['image_height']);
+                unset($data['imageinfo']['image_width']);
+                unset($data['imageinfo']['picturetype']);
+                unset($data['imageinfo']['description']);
+                unset($data['imageinfo']['image_mime']);
+                $file = str_replace(Uri::root(),'',$imgurl);
+                $data['imageinfo']['folder'] = dirname($file);
+                $file = JPATH_ROOT.'/'.$file;
+                $data['imageinfo']['basename'] = basename($file);
+                $data['imageinfo']['filesize'] = filesize($file);
+                $data['imageinfo']['basename'] = basename($file);
+                $bytes = filesize($file);
+                $lbl = Array('bytes','kB','MB','GB');
+                $factor = floor((strlen($bytes) - 1) / 3);
+                $data['imageinfo']['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+                $data['imageinfo']['filedate'] = date("d M Y at H:i",filemtime($file));
+                $imagesize = getimagesize($file);
+                $data['imageinfo']['filemime'] = $imagesize['mime'];
+                $data['imageinfo']['filewidth'] = $imagesize[0];
+                $data['imageinfo']['fileht'] = $imagesize[1];
+                $data['imageinfo']['imagetitle']='';
+                $data['imageinfo']['imagedesc']='';
+            }
+        }
+        if (isset($data['newimagetitle'])) {
+            $data['imageinfo']['imagetitle'] = $data['newimagetitle'];
+        }
+        if (isset($data['newimagedesc'])) {
+            $data['imageinfo']['imagedesc'] = $data['newimagedesc'];
+        }
+        
+        $data['imageinfo'] = json_encode($data['imageinfo']);
+
         //alias is the title so we'll set and check it every time
         $albumalias = $data['title'];
         if (isset($data['sortartist'])) $albumalias.= '-'.$data['sortartist'];
         $data['alias'] = XbcommonHelper::makeAlias($albumalias);
-        $aid = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
-        if ($aid != false) {
-//            $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
-            $data['id'] = $aid;
-            $this->setState('album.id',$aid);
-            return true;
-        }
+//         $aid = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
+//         if ($aid != false) {
+// //            $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
+//             $data['id'] = $aid;
+//             $this->setState('album.id',$aid);
+//             return true;
+//         }
 //        $data['alias'] = $newalias;        
         
         if (isset($data['created_by_alias'])) {
@@ -229,8 +294,9 @@ class AlbumModel extends AdminModel {
         
         // ok ready to save the album data
         if (parent::save($data)) {
-            $sid = $this->getState('album.id');
-            $this->storeAlbumTracks($sid, $data['tracklist']);
+            $aid = $this->getState('album.id');
+            $this->storeAlbumTracks($aid, $data['tracklist']);
+            $this->storeAlbumSongs($aid, $data['songlist']);
             // Check possible workflow
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
@@ -271,7 +337,7 @@ class AlbumModel extends AdminModel {
 //         return $this->getCurrentUser()->authorise('core.create', 'com_content');
 //     }
     
-    public function getAlbumTrackList($album_id) {
+    private function getAlbumTrackList($album_id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('t.id AS track_id, t.discno AS disc_no, t.trackno AS track_no');
@@ -281,26 +347,63 @@ class AlbumModel extends AdminModel {
         $db->setQuery($query);
         return $db->loadAssocList();
     }
+ 
+    private function getAlbumSongList() {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('song_id, role, a.note AS note');
+        $query->from('#__xbmusic_songalbum AS a');
+        $query->innerjoin('#__xbmusic_songs AS b ON song_id = b.id');
+        $query->where('album_id = '.(int) $this->getItem()->id);
+        $query->order('listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
     
-    function storeAlbumTracks($album_id, $trackList) {
+    
+    private function storeAlbumTracks($album_id, $trackList) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         //restore the new list
         foreach ($trackList as $trk) {
-            if ($trk['track_id'] > 0) {
-                $query->clear();
-                $query->update('#__xbmusic_tracks')
-                    ->set('album_id = '.$db->q($album_id))
-                    ->set('trackno = '.$db->q($trk['track_no']))
-                    ->set('discno = '.$db->q($trk['disc_no']));
-                $query->where('id = '.$db->q($trk['track_id']));
+            $query->clear();
+            $query->update('#__xbmusic_tracks')
+                ->set('album_id = '.$db->q($album_id))
+                ->set('trackno = '.$db->q($trk['track_no']))
+                ->set('discno = '.$db->q($trk['disc_no']));
+            $query->where('id = '.$db->q($trk['track_id']));
+            //try
+            $db->setQuery($query);
+            $db->execute();
+        }
+    }
+    
+    private function storeAlbumSongs($album_id, $songlist) {
+        //delete existing role list
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_songalbum'));
+        $query->where('album_id = '.$album_id);
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        $listorder=0;
+        foreach ($songlist as $song) {
+            if ($song['song_id'] > 0) {
+                $listorder ++;
+                $query = $db->getQuery(true);
+                $query->insert($db->quoteName('#__xbmusic_songalbum'));
+                $query->columns('album_id,song_id,role,note,listorder');
+                $query->values('"'.$album_id.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$listorder.'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
+            } else {
+                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
+                //create person
+                //add filmperson with new id
             }
         }
     }
-
-    
 }
 

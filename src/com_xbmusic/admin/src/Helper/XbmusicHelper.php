@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.18.9 16th November 2024
+ * @version 0.0.19.0 21st November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -339,7 +339,7 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgfile');
+	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
 	    $query->from('#__xbmusic_albums AS a');
 	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
 	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
@@ -443,7 +443,7 @@ class XbmusicHelper extends ComponentHelper
 	    $imgfilename = $imgfilename.'.'.$imgext;
 	    $xbfilename = $folder.'/'.pathinfo($imgfilename, PATHINFO_BASENAME);
 	    $imgpathfile = JPATH_ROOT.$imgfilename;
-	    $imgurl = Uri::root().$imgfilename;
+	    $imgurl = Uri::root().ltrim($imgfilename,'/');
 	    $imgok = false;
 	    if (file_exists($imgpathfile)) {
 	        $imgok = true;
