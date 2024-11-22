@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.19.0 21st November 2024
+ * @version 0.0.19.0 22nd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -147,6 +147,7 @@ $item = $this->item;
            		<div class="col-12 col-md-5">
            			<h4><?php echo Text::_('Primary Album Image'); ?></h4>
 					<img src="<?php echo $item->imgurl; ?>" />
+					<?php echo $this->form->renderField('imgurl'); ?> 
 				</div>        		
            		<div class="col-12 col-md-7">
            			<h4><?php echo Text::_('Primary image details'); ?></h4>

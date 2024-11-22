@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.18.9 21st November 2024
+ * @version 0.0.19.0 22nd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -234,21 +234,6 @@ class AlbumModel extends AdminModel {
                 unset($data['imageinfo']['picturetype']);
                 unset($data['imageinfo']['description']);
                 unset($data['imageinfo']['image_mime']);
-                $file = str_replace(Uri::root(),'',$imgurl);
-                $data['imageinfo']['folder'] = dirname($file);
-                $file = JPATH_ROOT.'/'.$file;
-                $data['imageinfo']['basename'] = basename($file);
-                $data['imageinfo']['filesize'] = filesize($file);
-                $data['imageinfo']['basename'] = basename($file);
-                $bytes = filesize($file);
-                $lbl = Array('bytes','kB','MB','GB');
-                $factor = floor((strlen($bytes) - 1) / 3);
-                $data['imageinfo']['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
-                $data['imageinfo']['filedate'] = date("d M Y at H:i",filemtime($file));
-                $imagesize = getimagesize($file);
-                $data['imageinfo']['filemime'] = $imagesize['mime'];
-                $data['imageinfo']['filewidth'] = $imagesize[0];
-                $data['imageinfo']['fileht'] = $imagesize[1];
                 $data['imageinfo']['imagetitle']='';
                 $data['imageinfo']['imagedesc']='';
             }
@@ -259,6 +244,21 @@ class AlbumModel extends AdminModel {
         if (isset($data['newimagedesc'])) {
             $data['imageinfo']['imagedesc'] = $data['newimagedesc'];
         }
+        $file = str_replace(Uri::root(),'',$data['imgurl']);
+        $data['imageinfo']['folder'] = dirname($file);
+        $file = JPATH_ROOT.'/'.$file;
+        $data['imageinfo']['basename'] = basename($file);
+        $data['imageinfo']['filesize'] = filesize($file);
+        $data['imageinfo']['basename'] = basename($file);
+        $bytes = filesize($file);
+        $lbl = Array('bytes','kB','MB','GB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+        $data['imageinfo']['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+        $data['imageinfo']['filedate'] = date("d M Y at H:i",filemtime($file));
+        $imagesize = getimagesize($file);
+        $data['imageinfo']['filemime'] = $imagesize['mime'];
+        $data['imageinfo']['filewidth'] = $imagesize[0];
+        $data['imageinfo']['fileht'] = $imagesize[1];
         
         $data['imageinfo'] = json_encode($data['imageinfo']);
 
