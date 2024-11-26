@@ -254,44 +254,30 @@ class XbmusicHelper extends ComponentHelper
 	    
 	    //get song info - we assume song has the same title as the track
 	    // we will warn if it could be a medley, but will treat as single song
-// 	    if (substr_count($trackdata['title'],'/')) {
-// 	        // we have a medley of songs
-// 	        $songtitles = explode('/',$trackdata['title']); 
-// 	        $ilogmsg .= '[INFO] Slashes in "'.$trackdata['title'].'" implies '.count($songtitles).' songs. Created as separate songs'."\n"; 
-// 	    } else {
-// 	        if (strpos(strtolower($trackdata['title']),'medley') !== false)  {
-// 	            $ilogmsg .= '[WARNING] "'.$trackdata['title'].'" contains "medley" but can\'t separate titles. Created as single song'."\n";	            
-// 	        }
-// 	        $songtitles = array($trackdata['title']);
-// 	    }
-//	    foreach ($songtitles as $title) {
-	        $title = trim($trackdata['title']);
-	        $splits = array(",","/"," medley"," Medley");
-	        $splitcnt = 0;
-	        $fnd = str_replace($splits," || ", $title, $splitcnt);
-	        if ($splitcnt > 0) {
-	            $msg = Xbtext::_($title,6).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',12);
-	            $ilogmsg .='[WARN] .'.$msg;
-	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
-	        }
-// 	        if (preg_match('\(.*\)|\[.*\]',$title)) {
-// 	            $msg = Xbtext::_($title,6).Xbtext::_('contains brackets - may be same song as title without brackets. Please check song list and replace if necessary',12);
-// 	            $ilogmsg .='[WARN] .'.$msg;
-// 	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
-// 	        }
-	        $rcnt = 0;
-	        $newtitle = preg_replace('\(.*\)|\[.*\]','',$title,4,$rcnt);
-	        if ($newtitle && ($rcnt)) {
-	            $title = $newtitle;
-	            $msg = Xbtext::_($title,6).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',12);
-	            $ilogmsg .='[WARN] .'.$msg;
-	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
-	        }
-	            
-	        $songdata = array('id'=>0, 'title' => $title, 'alias'=>XbcommonHelper::makeAlias($title));
-//	        $song['id'] = XbcommonHelper::checkValueExists($song['alias'], '#__xbmusic_songs', 'alias');
-//	        $songdata[] = $song;
-//	    } //end songinfo
+        $title = trim($trackdata['title']);
+        $splits = array(",","/"," medley"," Medley");
+        $splitcnt = 0;
+        $fnd = str_replace($splits," || ", $title, $splitcnt);
+        if ($splitcnt > 0) {
+            $msg = Xbtext::_($title,6).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',12);
+            $ilogmsg .='[WARN] .'.$msg;
+            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
+        }
+    // 	        if (preg_match('\(.*\)|\[.*\]',$title)) {
+    // 	            $msg = Xbtext::_($title,6).Xbtext::_('contains brackets - may be same song as title without brackets. Please check song list and replace if necessary',12);
+    // 	            $ilogmsg .='[WARN] .'.$msg;
+    // 	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
+    // 	        }
+        $rcnt = 0;
+        $newtitle = preg_replace('\(.*\)|\[.*\]','',$title,4,$rcnt);
+        if ($newtitle && ($rcnt)) {
+            $title = $newtitle;
+            $msg = Xbtext::_($title,6).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',12);
+            $ilogmsg .='[WARN] .'.$msg;
+            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
+        }
+    	            
+        $songdata = array('id'=>0, 'title' => $title, 'alias'=>XbcommonHelper::makeAlias($title));
 	    
 	    //get genres
 	    if (isset($id3data['genre'])) {
@@ -581,59 +567,54 @@ class XbmusicHelper extends ComponentHelper
 	    
 	} // end getTagItemCnts()
 
+	public static function getLastImportLog() {
+	    $file = null;
+	    foreach(new \DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {
+	        if ($item->isFile() && (empty($file) || $item->getMTime() > $file->getMTime())) {
+	            $file = clone $item;
+	        }
+	    }
+	    if (!is_null($file)) {
+	        $logtxt = file_get_contents($file->getPathname());
+	        return $logtxt;
+	    }
+	    return '';
+	}
+	
+	public static function writelog(string $logstr, $filename = '') {
+	    if ($filename == '') {
+	        $filename = 'import_'.date('Y-m-d').'.log';
+	    }
+	    $logstr .= self::readlog($filename);
+	    $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+	    $f = fopen($pathname, 'w');
+	    fwrite($f, $logstr);
+	    fclose($f);
+	}
+	
+	public static function readlog(string $filename, $filter ='') {
+	    $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+	    if ($filter == '') return file_get_contents($pathname);
+	    $logstr = '';
+	    $flags = explode(',',$filter);
+	    if ($lines = file($pathname)) {
+	        foreach ($lines as $line) {
+	            foreach ($flags as $flag) {
+	                if (str_starts_with($line, $flag)) $logstr .= $line;
+	            }
+	        }
+	    }
+// 	    if ((file_exists($pathname)) && (filesize($pathname) > 0)) {
+// 	        $f = fopen($pathname,'r');
+// 	        if ($f) {
+// 	            $logstr = fread($f, filesize($pathname));
+// 	            fclose($f);
+// 	        } else {
+// 	            Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
+// 	        }
+// 	    }
+	    return $logstr;
+	}
+	
+	
 } //end xbmusicHelper
-/**
- * @name addItemLinks()
- * @desc adds cross links between item types for a NEW item used without invoking the model.
- * @param int $item_id - the id of a single item having links
- * @param string $itemtype - the item type - album|artist|playlist|song|track
- * @param array $linklist (id, role, note, optional:listorder)
- * @param string $listtype - the last word in the table name (artistalbum|artistsong|artisttrack|playlisttrack|songalbum|songtrack)
- * @param string $action replace|merge (default) - if merging
- * @return boolean
- */
-/*
- public static function addItemLinks(int $item_id,  array $itemlist, string $itemtype, string $linktype, string $action = 'merge') {
- 
- $table = '#__xbmusic_'.$linktype;
- $errcnt = 0;
- $listtype = str_replace($itemtype, '', $linktype);
- $msg = 'adding '.count($itemlist).' '.$listtype.'s to '.$itemtype.'.'.$item_id;
- $db = Factory::getDBO();
- //$db = Factory::getContainer()->get(DatabaseInterface::class);
- $query = $db->getQuery(true);
- //delete existing role list - this is a new item so there really should be any!
- $query->delete($db->qn($table));
- $query->where($itemtype.'_id = '.$db->q($item_id));
- $db->setQuery($query);
- $db->execute();
- //restore the new list
- $listorder=0;
- foreach ($itemlist as $linkitem) {
- if (isset($linkitem['listorder'])) {
- $listorder = $linkitem['listorder'];
- } else {
- $listorder ++;
- }
- //	        if (!isset($link['role'])) $link['role'] = '';
- //	        if (!isset($link['note'])) $link['note'] = '';
- 
- $query->clear();
- $query->insert($db->quoteName($table));
- $query->columns($itemtype.'_id, '.$listtype.'_id, role, note, listorder');
- $query->values('"'.$item_id.'","'.$linkitem['id'].'","'.$linkitem['role'].'","'.$linkitem['note'].'","'.$listorder.'"');
- try {
- $db->setQuery($query);
- $db->execute();
- } catch (\Exception $e) {
- $dberr = $e->getMessage();
- Factory::getApplication()->enqueueMessage('addItemLinks() '.$dberr.'<br />Query: '.$query->dump(), 'error');
- $errcnt ++;
- }
- }
- if ($errcnt>0) $msg .= ' '.$errcnt.' failed, rest ok';
- return $msg;
- }
- */
-
-

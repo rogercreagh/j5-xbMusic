@@ -45,6 +45,7 @@ class TrackModel extends AdminModel {
     
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
+        'playlist' => 'batchPlaylist',
     );
     
     public function __construct($config = [], $factory = null, $form = null) {

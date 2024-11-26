@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.19.2 26th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,7 +14,6 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
-//use Joomla\CMS\Filter\OutputFilter;
 use Joomla\Filter\OutputFilter;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
@@ -24,15 +23,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use \SimpleXMLElement;
-//use CBOR\OtherObject\TrueObject;
-//use Joomla\CMS\Application\ApplicationHelper;
-//use Joomla\CMS\Changelog\Changelog;
-//use Joomla\CMS\MVC\Model\ListModel;
-//use Joomla\CMS\Toolbar\Toolbar;
-//use Joomla\CMS\Toolbar\ToolbarHelper;
-//use Joomla\CMS\Layout\FileLayout;
-//use DOMDocument;
-//use ReflectionClass;
+
 
 const INFO = '[INFO] ';
 const WARN = '[WARNING] ';
@@ -480,40 +471,6 @@ class DatamanModel extends AdminModel {
         return $logstr;
     }
     
-    /**
-     * @name createMusicItem()
-     * @desc Creates an xbMusic item with supplied data. status, access, created & modified dates will be default values if missing, , Created_by will be set to user, alias will be created from title/name if missing
-     * @param array $data
-     * @param string $table
-     * @param boolean $silent
-     * @return \stdClass
-     */
-    public function createMusicItem(array $data, string $itemtype, $silent = false) {
-        if (strpos(' track song playlist artist album ', $itemtype) == false) {
-            if (!$silent) Factory::getApplication()->enqueueMessage('Invalid itemtype to create','Error');
-            return false;
-        }
-        $app = Factory::getApplication();
-        $itemid = false;
-        $createmoddate = Factory::getDate()->toSql();
-        $user 	=Factory::getApplication()->getIdentity();
-        if (!key_exists('status', $data))  $data['status'] = 1;
-        if (!key_exists('access', $data))  $data['access'] = 1;
-        if (!key_exists('created', $data))  $data['created'] = $createmoddate;
-        if (!key_exists('modified', $data))  $data['modified'] = $createmoddate;
-        if (!key_exists('created_by', $data))  $data['created_by'] = $user;
-        
-        $itemmodel = $this->getMVCFactory()->createModel(ucfirst($itemtype), 'Administrator', ['ignore_request' => true]);
-        // Factory::getApplication()->bootComponent('com_categories')
-        //->getMVCFactory()->createModel('Category', 'Administrator', ['ignore_request' => true]);
-        if (!$itemmodel->save($data)) {
-            if (!$silent) Factory::getApplication()->enqueueMessage('createMusicItem() '.$itemtype.' '.$itemmodel->getError(), 'Error');
-            return false;
-        }
-        $itemid = $itemmodel->getState($itemtype.'.id');
-        return $itemid;
-    }
-    
     private function addArtistSongs($artistid, $songList) {
         $cnt = 0;
         $db = Factory::getDbo();
@@ -608,104 +565,4 @@ class DatamanModel extends AdminModel {
     
     
 }
-/**
- private function createGenres($genrenames, &$ilogmsg) {
- $params = ComponentHelper::getParams('com_xbmusic');
- $opthyphen = $params->get('genrehyphen',1);
- $optspaces = $params->get('genrespaces',1);
- $optcase = $params->get('genrecase',1);
- $genres = [];
- $genrenames = explode(' || ', $genrenames);
- //split name with spaces into two or more genres "Folk Rock" -> "Folk" | "Rock"
- if ($optspaces == 3) {
- $tempnames = array();
- foreach ($tempnames as $genre) {
- $multi = explode(' ',$genre);
- $newgenrenames = array_merge($tempnames, $multi);
- if (count($multi) > 1) {
- $ilogmsg .= '"'.$genre.Text::sprintf("split into %s genres.\n",count($multi),2);
- }
- }
- $genrenames = $newgenrenames;
- }
- foreach ($genrenames as &$genre) {
- $cnt = 0;
- if ($opthyphen == 1) {
- $genre = str_replace('/','-',$genre, $cnt);
- } elseif ($opthyphen==2) {
- $genre = str_replace('-','/',$genre, $cnt);
- }
- if ($optspaces == 1)  {
- $genre = str_replace(' ','-',$genre, $cnt);
- } elseif ($optspaces == 2) {
- $genre = str_replace(' ','/',$genre, $cnt);
- }
- if ($cnt > 0) $ilogmsg .= $genre.' normalized'."\n";
- $genre = strtolower($genre);
- if ($optcase == 2) {
- $genre = ucfirst($genre);
- }
- //get the parent tag for genre tags
- $tpid = XbcommonHelper::getCreateTag(array('title'=>'Genres'));
- //get or create the genre tag id and title
- $newtag = XbcommonHelper::getCreateTag(array('title'=>$genre, 'parent_id'=>$tpid), true);
- if ($newtag) $genres[] = $newtag;
- } //end foreach genre
- return $genres;
- }
- 
- **/
-/* //     private function createImageFile($filedata, string $imgfilename, string &$flogmsg) {
- //         $albumtitle = '';
- //         $imgpath = '/images/xbmusic/artwork/singles/';
- //         if (isset($filedata['id3tags']['album'])) {
- //             $albumarr = explode(' || ', $filedata['id3tags']['album']);
- //             $albumtitle = $albumarr[0];
- //             if ($albumtitle != '') {
- //                 $imgpath = '/images/xbmusic/artwork/albums/'.strtolower($albumtitle[0]).'/';
- //             }
- //         }
- //         //create the folder if it doesn't exist (eg new initial)
- //         if (file_exists($imgpath)==false) {
- //             mkdir(JPATH_ROOT.$imgpath,0775,true);
- //             $flogmsg .= Text::_('[INFO] folder created').' '.$imgpath."\n";
- //         }
- //         $imgext = XbcommonHelper::imageMimeToExt($filedata['imageinfo']['image_mime']);
- //         $imgfilename = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $imgfilename)).'.'.$imgext;
- //         $imgpathfile = JPATH_ROOT.$imgpath.$imgfilename;
- //         $imgurl = Uri::root().$imgpath.$imgfilename;
- //         $imgok = false;
- //         if (file_exists($imgpathfile)) {
- //             $imgok = true;
- //             $flogmsg .= Text::sprintf('[INFO] Artwork file %s already exists',$imgfilename)."\n";
- //         } else {
- //             $params = ComponentHelper::getParams('com_xbmusic');
- //             $maxpx = $params->get('imagesize',500);
- //             if ($filedata['imageinfo']['image_height'] > $maxpx) {
- //                 //need to resize image
- //                 $image = imagecreatefromstring($filedata['imageinfo']['data']);
- //                 $newimage = imagescale($image, $maxpx);
- //                 switch ($imgext) {
- //                     case 'jpg':
- //                         $imgok = imagejpeg($newimage, $imgpathfile);
- //                         break;
- //                     case 'png':
- //                         $imgok = imagejpeg($newimage, $imgpathfile);
- //                         break;
- //                     case 'gif':
- //                         $imgok = imagejpeg($newimage, $imgpathfile);
- //                         break;
- //                     default:
- //                         $imgok = false;
- //                         break;
- //                 }
- //             } else {
- //                 $imgok = file_put_contents($imgpathfile, $filedata['imageinfo']['data']);
- //             }
- //         } //endif artfile !exists
- //         if ($imgok) return $imgurl;
- 
- //         return false;
- //     }
- */
 
