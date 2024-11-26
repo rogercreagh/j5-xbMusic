@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.19.0 21st November 2024
+ * @version 0.0.19.1 25th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -133,14 +133,16 @@ class XbmusicHelper extends ComponentHelper
 	    $items = array();
 	    $trackdata = array(); //only one track
 	    $albumdata = array(); //only one album title allowed, if alternates present reported in log
-	    $songdata = array(); //could be more than one song imploded with ' || '
+	    $songdata = array(); //only one song matching the track, report possible medley but treat as one.
 	    $artistdata = array(); //could be more than one artist imploded with ' || '
 	    $genres = array(); //will will create any genres we find and return them as array of id=>title
-	    $images = array(); //we will create any images found and return as an array of data
+//	    $images = array(); //we will create any images found and return as an array of data
 	    if (isset($id3data['title'])) { 
 	        $trackdata['title'] = $id3data['title'];
 	    } else { //no title found
-	        $ilogmsg .= '[ERROR] No track title found in ID3 data. Cannot import'."\n";
+	        $msg = Xbtext::_('No track title found in ID3 data. Cannot import',8);
+	        $ilogmsg .= '[ERROR] '.$msg;
+	        Factory::getApplication()->enqueueMessage(trim($msg),'Error');
 	        return false;
 	    }
 	    // trackdata['alias'] is title with suffix to make it unique in case of two tracks with same title
@@ -172,36 +174,38 @@ class XbmusicHelper extends ComponentHelper
 	    if (isset($id3data['totaltracks'])) $trackdata['disctracks'] = $id3data['totaltracks'];
 	    
 	    //get artist info
+	    /** id3data artist is a string possibly containing more than one name separated by ' || '
+	     *  This section will generate separate arrays for each name containing the name alias and id
+	     *  If the alias already exists in the xbmusic_artists table then the full data will be loaded 
+	     *  and the id will be a positive integer. 
+	     *  If it is a new artist then the id will be zero and the sortname will be added.
+	     */
 	    if (isset($id3data['artist'])) {
 	        $artiststr = $id3data['artist'];
 	        $artcnt = substr_count($artiststr,' || ') + 1;
 	        if ($artcnt > 1) {
-	            $ilogmsg .= '[INFO] '.$artiststr.' '.$artcnt.' artist entries found in ID3, only first will be used'."\n";
+	            $ilogmsg .= '[INFO] '.$artiststr.' '.$artcnt.' artist entries found in ID3.'."\n";
 	        }
 	        //the first artist in the list will become the track sortartist and album artist 
 	        $origartist = substr($artiststr, 0, strpos($artiststr.' ||', ' ||')+1);
 	        $trackdata['sortartist'] = XbcommonHelper::stripThe($origartist);
 	        //now break any listed artists into separate if the have & or and or with or feat.
-            $splits = array(" & "," and "," with "," featuring","feat.");
-            $splitcnt = 0;
-            $artiststr = str_replace($splits," || ",$artiststr,$splitcnt);
-            if ($splitcnt > 0) {
-                $ilogmsg .= '[INFO] artists have been split into separate names - please check results are correct'."\n";
-            }           
-            $artistarr = explode(' || ', $artiststr);
-            count($artistarr);
-	        foreach ($artistarr as $artistname) {
+            $artistnames = explode(' || ', $artiststr);
+            foreach ($artistnames as $artistname) {
 	            $artistname = trim($artistname);	        
-	            $artist = array('name'=>$artistname, 'alias'=>XbcommonHelper::makeAlias($artistname));
-	            $aid=XbcommonHelper::checkValueExists($artist['alias'], '#__xbmusic_artists', 'alias');
-	            if ($aid>0) {
-	                $artist['id'] = $aid;
-	            } else {
-	                $artist['id'] = 0;
-	                $artist['sortname'] = XbcommonHelper::stripThe($artistname);
-	            }
-	            //we could end up with duplicate artists - need to make artistdata unique by alias
-	            if (!key_exists($artist['alias'], $artistdata)) $artistdata[$artist['alias']] = $artist;
+                 $splits = array(" & "," and "," with "," featuring","feat.");
+                 $splitcnt = 0;
+                 $fnd = str_replace($splits," || ", $artistname, $splitcnt);
+                 if ($splitcnt > 0) {
+                     $msg = Xbtext::_($artistname,6).Xbtext::_('may possibly be more than one artist. Will save as one, use save-copy on artist edit to split',12);
+                     $ilogmsg .='[WARN] .'.$msg;
+                     Factory::getApplication()->enqueueMessage($msg,'Warning');
+                }           
+	            $artist = array('id'=>0, 'name'=>$artistname, 
+	                'alias'=>XbcommonHelper::makeAlias($artistname),
+	                'sortname'=>XbcommonHelper::stripThe($artistname)
+	            );
+	            $artistdata[] = $artist;
 	        }
 	    } //endif set artist
 	    
@@ -210,8 +214,8 @@ class XbmusicHelper extends ComponentHelper
 	        $albumstr = $id3data['album'];
 	        $albcnt = substr_count($albumstr,' || ') + 1;
 	        if ($albcnt > 1) {
-	            $ilogmsg .= '[INFO] more than one album name in ID3, only first will be used'."\n";
-	            $ilogmsg .= '[INFO] '.$albumstr."\n";
+	            $ilogmsg .= '[INFO] '.Xbtext::_('more than one album name in ID3, only first will be used',8);
+	            $ilogmsg .= '[INFO] <ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
 	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
 	        
@@ -228,12 +232,12 @@ class XbmusicHelper extends ComponentHelper
 	        }
 	        if (isset($albumdata['sortartist'])) $albumalias.= '-'.$albumdata['sortartist'];
 	        $albumdata['alias'] = XbcommonHelper::makeAlias($albumalias);
-	        $aid = XbcommonHelper::checkValueExists($albumdata['alias'], '#__xbmusic_albums', 'alias');
-	        if ($aid>0) {
-	            $albumdata['id'] = $aid;
-	        } else {
+//	        $aid = XbcommonHelper::checkValueExists($albumdata['alias'], '#__xbmusic_albums', 'alias');
+//	        if ($aid>0) {
+//	            $albumdata['id'] = $aid;
+//	        } else {
 	            $albumdata['id'] = 0;
-	        }
+//	        }
             $albumdata['rel_date'] = $trackdata['rel_date'];
             if (isset($id3data['part_of_a_set'])) {
                 $trackdata['discno'] = $id3data['part_of_a_set'];
@@ -248,23 +252,46 @@ class XbmusicHelper extends ComponentHelper
 	    } //end albuminfo
 	    
 	    
-	    //get song info
-	    if (substr_count($trackdata['title'],'/')) {
-	        // we have a medley of songs
-	        $songtitles = explode('/',$trackdata['title']); 
-	        $ilogmsg .= '[INFO] Slashes in "'.$trackdata['title'].'" implies '.count($songtitles).' songs. Created as separate songs'."\n"; 
-	    } else {
-	        if (strpos(strtolower($trackdata['title']),'medley') !== false)  {
-	            $ilogmsg .= '[WARNING] "'.$trackdata['title'].'" contains "medley" but can\'t separate titles. Created as single song'."\n";	            
+	    //get song info - we assume song has the same title as the track
+	    // we will warn if it could be a medley, but will treat as single song
+// 	    if (substr_count($trackdata['title'],'/')) {
+// 	        // we have a medley of songs
+// 	        $songtitles = explode('/',$trackdata['title']); 
+// 	        $ilogmsg .= '[INFO] Slashes in "'.$trackdata['title'].'" implies '.count($songtitles).' songs. Created as separate songs'."\n"; 
+// 	    } else {
+// 	        if (strpos(strtolower($trackdata['title']),'medley') !== false)  {
+// 	            $ilogmsg .= '[WARNING] "'.$trackdata['title'].'" contains "medley" but can\'t separate titles. Created as single song'."\n";	            
+// 	        }
+// 	        $songtitles = array($trackdata['title']);
+// 	    }
+//	    foreach ($songtitles as $title) {
+	        $title = trim($trackdata['title']);
+	        $splits = array(",","/"," medley"," Medley");
+	        $splitcnt = 0;
+	        $fnd = str_replace($splits," || ", $title, $splitcnt);
+	        if ($splitcnt > 0) {
+	            $msg = Xbtext::_($title,6).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',12);
+	            $ilogmsg .='[WARN] .'.$msg;
+	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
 	        }
-	        $songtitles = array($trackdata['title']);
-	    }
-	    foreach ($songtitles as $title) {
-	        $title = trim($title);
-	        $song = array('title' => $title, 'alias'=>XbcommonHelper::makeAlias($title));
-	        $song['id'] = XbcommonHelper::checkValueExists($song['alias'], '#__xbmusic_songs', 'alias');
-	        $songdata[] = $song;
-	    } //end songinfo
+// 	        if (preg_match('\(.*\)|\[.*\]',$title)) {
+// 	            $msg = Xbtext::_($title,6).Xbtext::_('contains brackets - may be same song as title without brackets. Please check song list and replace if necessary',12);
+// 	            $ilogmsg .='[WARN] .'.$msg;
+// 	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
+// 	        }
+	        $rcnt = 0;
+	        $newtitle = preg_replace('\(.*\)|\[.*\]','',$title,4,$rcnt);
+	        if ($newtitle && ($rcnt)) {
+	            $title = $newtitle;
+	            $msg = Xbtext::_($title,6).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',12);
+	            $ilogmsg .='[WARN] .'.$msg;
+	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
+	        }
+	            
+	        $songdata = array('id'=>0, 'title' => $title, 'alias'=>XbcommonHelper::makeAlias($title));
+//	        $song['id'] = XbcommonHelper::checkValueExists($song['alias'], '#__xbmusic_songs', 'alias');
+//	        $songdata[] = $song;
+//	    } //end songinfo
 	    
 	    //get genres
 	    if (isset($id3data['genre'])) {
@@ -281,59 +308,6 @@ class XbmusicHelper extends ComponentHelper
 	    return $items;
 	    
 	} // end id3dataToItems()
-	
-/**
- * @name addItemLinks()
- * @desc adds cross links between item types for a NEW item used without invoking the model. 
- * @param int $item_id - the id of a single item having links
- * @param string $itemtype - the item type - album|artist|playlist|song|track
- * @param array $linklist (id, role, note, optional:listorder)
- * @param string $listtype - the last word in the table name (artistalbum|artistsong|artisttrack|playlisttrack|songalbum|songtrack) 
- * @param string $action replace|merge (default) - if merging 
- * @return boolean
- */
-	public static function addItemLinks(int $item_id,  array $itemlist, string $itemtype, string $linktype, string $action = 'merge') {
-	       
-	    $table = '#__xbmusic_'.$linktype;
-	    $errcnt = 0;
-	    $listtype = str_replace($itemtype, '', $linktype);  
-	    $msg = 'adding '.count($itemlist).' '.$listtype.'s to '.$itemtype.'.'.$item_id;
-	    $db = Factory::getDBO();
-	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $query = $db->getQuery(true);
-        //delete existing role list - this is a new item so there really should be any!
-        $query->delete($db->qn($table));
-	    $query->where($itemtype.'_id = '.$db->q($item_id));
-	    $db->setQuery($query);
-	    $db->execute();
-	    //restore the new list
-	    $listorder=0;
-	    foreach ($itemlist as $linkitem) {
-	        if (isset($linkitem['listorder'])) {
-	            $listorder = $linkitem['listorder'];
-	        } else {
-	            $listorder ++;
-	        }
-//	        if (!isset($link['role'])) $link['role'] = '';
-//	        if (!isset($link['note'])) $link['note'] = '';
-	        
-	        $query->clear();   
-            $query->insert($db->quoteName($table));
-            $query->columns($itemtype.'_id, '.$listtype.'_id, role, note, listorder');
-            $query->values('"'.$item_id.'","'.$linkitem['id'].'","'.$linkitem['role'].'","'.$linkitem['note'].'","'.$listorder.'"');
-            try {
-	            $db->setQuery($query);
-	            $db->execute();
-            } catch (\Exception $e) {
-     	        $dberr = $e->getMessage();
-     	        Factory::getApplication()->enqueueMessage('addItemLinks() '.$dberr.'<br />Query: '.$query->dump(), 'error');
-     	        $errcnt ++;               
-            }
-	    }
-	    if ($errcnt>0) $msg .= ' '.$errcnt.' failed, rest ok';
-	    return $msg;
-	}
-	
 	
 	public static function getArtistAlbums($aid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    
@@ -355,7 +329,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query = $db->getQuery(true);
 	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
 	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
-	    $query->from('#__xbmusic_groupmember AS gm');
+	    $query->from('#__xbmusic_artistgroup AS gm');
 	    $query->where('gm.group_id = '.$db->q($gid));
 	    $query->order('gm.listorder ASC');
 	    $db->setQuery($query);
@@ -366,7 +340,7 @@ class XbmusicHelper extends ComponentHelper
 //	    $db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('t.id AS trackid, t.title AS tracktitle, t.imgfile, t.rel_date');
+	    $query->select('t.id AS trackid, t.title AS tracktitle, t.imgurl, t.rel_date');
 	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
@@ -537,8 +511,58 @@ class XbmusicHelper extends ComponentHelper
 	    return $genres;
 	} //end createGenres()
 	
+	public static function getAlbumTracks($aid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('t.id AS trackid, t.title AS trackname, t.filepathname, t.sortartist, t.discno, t.trackno');
+	    $query->from('#__xbmusic_tracks AS t');
+	    $query->where('t.album_id = '.$aid);
+	    $query->order('t.discno, t.trackno ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
 	
-	static function getTagItemCnts($id) {
+	public static function getAlbumArtists($tid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.note as note');
+	    $query->from('#__xbmusic_artists AS a');
+	    $query->join('LEFT','#__xbmusic_artistalbum AS b ON b.artist_id = a.id');
+	    $query->where('b.album_id = '.$tid);
+	    $query->order('a.sortname ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getAlbumSongs($tid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS songid, a.title AS songtitle, a.alias AS alias, b.role AS role, b.note AS note, b.listorder');
+	    $query->from('#__xbmusic_songs AS a');
+	    $query->join('LEFT','#__xbmusic_albumsong AS b ON b.song_id = a.id');
+	    $query->where('b.album_id = '.$tid);
+	    $query->order('b.listorder ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getTrackArtists($tid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
+	    $query->from('#__xbmusic_artists AS a');
+	    $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+	    $query->where('b.track_id = '.$tid);
+	    $query->order('b.listorder ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getTagItemCnts($id) {
 	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
 	    $db = Factory::getDbo();
 	    $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS al WHERE al.type_alias='.$db->quote('com_xbmusic.album').' AND al.tag_id = '.$db->q($id));
@@ -558,4 +582,58 @@ class XbmusicHelper extends ComponentHelper
 	} // end getTagItemCnts()
 
 } //end xbmusicHelper
+/**
+ * @name addItemLinks()
+ * @desc adds cross links between item types for a NEW item used without invoking the model.
+ * @param int $item_id - the id of a single item having links
+ * @param string $itemtype - the item type - album|artist|playlist|song|track
+ * @param array $linklist (id, role, note, optional:listorder)
+ * @param string $listtype - the last word in the table name (artistalbum|artistsong|artisttrack|playlisttrack|songalbum|songtrack)
+ * @param string $action replace|merge (default) - if merging
+ * @return boolean
+ */
+/*
+ public static function addItemLinks(int $item_id,  array $itemlist, string $itemtype, string $linktype, string $action = 'merge') {
+ 
+ $table = '#__xbmusic_'.$linktype;
+ $errcnt = 0;
+ $listtype = str_replace($itemtype, '', $linktype);
+ $msg = 'adding '.count($itemlist).' '.$listtype.'s to '.$itemtype.'.'.$item_id;
+ $db = Factory::getDBO();
+ //$db = Factory::getContainer()->get(DatabaseInterface::class);
+ $query = $db->getQuery(true);
+ //delete existing role list - this is a new item so there really should be any!
+ $query->delete($db->qn($table));
+ $query->where($itemtype.'_id = '.$db->q($item_id));
+ $db->setQuery($query);
+ $db->execute();
+ //restore the new list
+ $listorder=0;
+ foreach ($itemlist as $linkitem) {
+ if (isset($linkitem['listorder'])) {
+ $listorder = $linkitem['listorder'];
+ } else {
+ $listorder ++;
+ }
+ //	        if (!isset($link['role'])) $link['role'] = '';
+ //	        if (!isset($link['note'])) $link['note'] = '';
+ 
+ $query->clear();
+ $query->insert($db->quoteName($table));
+ $query->columns($itemtype.'_id, '.$listtype.'_id, role, note, listorder');
+ $query->values('"'.$item_id.'","'.$linkitem['id'].'","'.$linkitem['role'].'","'.$linkitem['note'].'","'.$listorder.'"');
+ try {
+ $db->setQuery($query);
+ $db->execute();
+ } catch (\Exception $e) {
+ $dberr = $e->getMessage();
+ Factory::getApplication()->enqueueMessage('addItemLinks() '.$dberr.'<br />Query: '.$query->dump(), 'error');
+ $errcnt ++;
+ }
+ }
+ if ($errcnt>0) $msg .= ' '.$errcnt.' failed, rest ok';
+ return $msg;
+ }
+ */
+
 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.18.8 6th November 2024
+ * @version 0.0.19.1 25th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -84,6 +84,25 @@ class TrackModel extends AdminModel {
         }
         return true;
     }
+ 
+    public function delete(&$pks) {
+        //first need to delete links artists, songs
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true);
+        foreach ($pks as $pk) {
+            $query->delete($db->qn('#__xbmusic_artisttrack'));
+            $query->where($db->qn('track_id').' = '.$db->q($pk));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear('delete');
+            $query->delete($db->qn('#__xbmusic_songtrack'));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear();
+        }
+        
+        return parent::delete($pks);
+    }
     
     public function loadId3() {
 //         $app  = Factory::getApplication();
@@ -161,7 +180,11 @@ class TrackModel extends AdminModel {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
-                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');    
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.track');
+                $item->album = $this->getAlbum($item->album_id);               
+                $item->artists = $this->getTrackArtistList($item->id);
+                $item->songs = $this->getTrackSongList($item->id);
+                
                 if ($item->id3tags) $item->id3_tags = json_decode($item->id3tags);
                 if ($item->audioinfo) $item->audioinfo = json_decode($item->audioinfo);
                 if ($item->fileinfo) $item->fileinfo = json_decode($item->fileinfo);
@@ -211,8 +234,8 @@ class TrackModel extends AdminModel {
         
         if (empty($data)) {
             $data = $this->getItem();
-            $data->songlist = $this->getTrackSongList();
-            $data->artistlist = $this->getTrackArtistList();
+            $data->songlist = $this->getTrackSongList($data->id);
+            $data->artistlist = $this->getTrackArtistList($data->id);
 //            $data->playlistlist = $this->getTrackPlayLists();
         }
         
@@ -536,7 +559,7 @@ class TrackModel extends AdminModel {
                 $albumartist = (isset($filedata['id3tags']['artist'])) ? $trackdata['sortartist'] : '';
             }
             // get artwork if not set and if available in ID3
-            if (empty($trackdata['imgfile'])) {
+            if (empty($trackdata['imgurl'])) {
                 if (isset($filedata['imageinfo']['data'])){
                     // 5. extract image data for later use and unset it in id3data to save clean id3_data with track
                     if (isset($filedata['imageinfo']['data'])){
@@ -560,7 +583,7 @@ class TrackModel extends AdminModel {
                     if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
                     $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                     if ($imgurl != false) {
-                        $trackdata['imgfile'] = $imgurl;
+                        $trackdata['imgurl'] = $imgurl;
                         $ilogmsg .= Text::_('[INFO] image file created').' '.str_replace(Uri::root(),'',$imgurl)."\n";
                     } else {
                         $ilogmsg .= Text::_('[WARN] failed to create image file').' '.$imgurl."\n";
@@ -579,10 +602,10 @@ class TrackModel extends AdminModel {
 //                     $artpathfile = JPATH_ROOT.$artpath.$artfilename;
 //                     $arturl = Uri::root().$artpath.$artfilename;
 //                     if (file_exists($artpathfile)) {
-//                         $trackdata['imgfile'] = $arturl;
+//                         $trackdata['imgurl'] = $arturl;
 //                     } else {
 //                         if (file_put_contents($artpathfile, $filedata['imageinfo']['data'])) {
-//                             $trackdata['imgfile'] = $arturl;
+//                             $trackdata['imgurl'] = $arturl;
 //                         }
 //                     }
 //                     unset($filedata['imageinfo']['data']);
@@ -612,7 +635,7 @@ class TrackModel extends AdminModel {
             // create album
             if ($albumtitle != '') {
                 $numdiscs = (isset($filedata['id3tags']['part_of_a_set'])) ? (int) explode('/',$filedata['id3tags']['part_of_a_set'])[1] :1;
-                $albumid = $this->getCreateAlbum($albumtitle, $albumartist, $trackdata['rel_date'], $trackdata['imgfile'],$numdiscs );
+                $albumid = $this->getCreateAlbum($albumtitle, $albumartist, $trackdata['rel_date'], $trackdata['imgurl'],$numdiscs );
                 if ($albumid < 0) {
                     $albumid *= -1;
                     $infomsg .= Text::sprintf('Existing album "%s" added to track',$albumtitle).'<br />';
@@ -829,62 +852,34 @@ class TrackModel extends AdminModel {
         
     } //end function postSaveID3()
     
-    public function getTrackArtistList() {
-        $db = $this->getDatabase();
-        //$db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('ba.artist_id as artist_id, ba.role AS role, ba.note AS note');
-        $query->from('#__xbmusic_artisttrack AS ba');
-//        $query->innerjoin('#__xbmusic_artists AS a ON ba.artist_id = a.id');
-        $query->where('ba.track_id = '.(int) $this->getItem()->id);
-        $query->order('ba.listorder ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-    
-    public function getTrackSongList() {
-        $db = $this->getDatabase();
-        //$db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('ba.song_id as song_id, ba.note AS note');
-        $query->from('#__xbmusic_songtrack AS ba');
-//        $query->innerjoin('#__xbmusic_songs AS a ON ba.song_id = a.id');
-        $query->where('ba.track_id = '.(int) $this->getItem()->id);
-        $query->order('ba.listorder ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-      
-    function storeTrackSongs($track_id, $songlist) {
-        //delete existing role list
-        $db = $this->getDatabase();
-        //$db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_songtrack'));
-        $query->where('track_id = '.$db->q($track_id));
-        $db->setQuery($query);
-        $db->execute();
-        //restore the new list
-        $listorder=0;
-        foreach ($songlist as $song) {
-            if ($song['song_id'] > 0) {
-                $listorder ++;
-                $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_songtrack'));
-                $query->columns('song_id,track_id,note,listorder');
-                $query->values('"'.$song['song_id'].'","'.$track_id.'","'.$song['note'].'","'.$listorder.'"');
-                //try
-                $db->setQuery($query);
-                $db->execute();
-            } else {
-                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
-                //create person
-                //add filmperson with new id
-            }
+    private function getAlbum($albumid) {
+        if ($albumid >0) {
+            $db = $this->getDatabase();
+            $query = $db->getQuery(true);
+            $query->select('id, title, sortartist, rel_date');
+            $query->from('#__xbmusic_albums');
+            $query->where($db->qn('id').' = '.$db->q($albumid));
+            $query->order('title ASC');
+            $db->setQuery($query);
+            $album = $db->loadAssoc();
         }
+        return $album;
+    }
+
+    private function getTrackArtistList($track_id) {
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.artist_id AS artist_id, b.name AS name, a.role AS role, a.note AS note, a.listorder AS listorder');
+        $query->from('#__xbmusic_artisttrack AS a');
+        $query->innerjoin('#__xbmusic_artists AS b ON a.artist_id = b.id');
+        $query->where('a.track_id = '.$db->q($track_id));
+        $query->order('a.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
     }
     
-    function storeTrackArtists($track_id, $artistlist) {
+    private function storeTrackArtists($track_id, $artistlist) {
         //delete existing role list
         $db = $this->getDatabase();
         //$db = $this->getDbo();
@@ -895,20 +890,56 @@ class TrackModel extends AdminModel {
         $db->execute();
         //restore the new list
         $listorder=0;
+        $query->clear();
+        $query->insert($db->quoteName('#__xbmusic_artisttrack'));
+        $query->columns('artist_id,track_id,role, note,listorder');
         foreach ($artistlist as $artist) {
             if ($artist['artist_id'] > 0) {
                 $listorder ++;
-                $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_artisttrack'));
-                $query->columns('artist_id,track_id,role, note,listorder');
                 $query->values('"'.$artist['artist_id'].'","'.$track_id.'","'.$artist['role'].'","'.$artist['note'].'","'.$listorder.'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
-            } else {
-                // Factory::getApplication()->enqueueMessage('<pre>'.print_r($pers,true).'</pre>');
-                //create person
-                //add filmperson with new id
+                $query->clear('values');                
+            }
+        }
+    }
+    
+    private function getTrackSongList($track_id) {
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.title AS title, b.song_id as song_id, b.role AS role, b.note AS note, b.listorder AS listorder');
+        $query->from('#__xbmusic_songtrack AS b');
+        $query->innerjoin('#__xbmusic_songs AS a ON b.song_id = a.id');
+        $query->where('b.track_id = '.$db->q($track_id));
+        $query->order('b.listorder ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+      
+    private function storeTrackSongs($track_id, $songlist) {
+        //delete existing role list
+        $db = $this->getDatabase();
+        //$db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_songtrack'));
+        $query->where('track_id = '.$db->q($track_id));
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        $listorder=0;
+        $query->clear();
+        $query->insert($db->quoteName('#__xbmusic_songtrack'));
+        $query->columns('song_id,track_id,role,note,listorder');
+        foreach ($songlist as $song) {
+            if ($song['song_id'] > 0) {
+                $listorder ++;
+                $query->values('"'.$song['song_id'].'","'.$track_id.'","'.$song['role'].'","'.$song['note'].'","'.$listorder.'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+                $query->clear('values');
             }
         }
     }
@@ -987,7 +1018,7 @@ class TrackModel extends AdminModel {
         return $id;
     }
     
-    public function getCreateAlbum($title, $artist, $reldate, $imgfile, $numdiscs) {
+    public function getCreateAlbum($title, $artist, $reldate, $imgurl, $numdiscs) {
         //what if artist releases two albums with same title?
         $sortartist = XbcommonHelper::stripThe($artist);
         $newalias = OutputFilter::stringURLSafe(str_replace(' & ',' and ', $title).' '.$sortartist);
@@ -1007,8 +1038,8 @@ class TrackModel extends AdminModel {
             $createbyalias = 'created from ID3';
             $query->clear();
             $query->insert('#__xbmusic_albums');
-            $query->columns('title, alias, albumartist, sortartist, rel_date, imgfile, num_discs, catid, status, access, created, modified, created_by_alias');
-            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$imgfile.'","'.$numdiscs.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
+            $query->columns('title, alias, albumartist, sortartist, rel_date, imgurl, num_discs, catid, status, access, created, modified, created_by_alias');
+            $query->values('"'.$title.'","'.$newalias.'","'.$artist.'","'.$sortartist.'","'.$reldate.'","'.$imgurl.'","'.$numdiscs.'","'.$catid.'","1","1","'.$createmod.'","'.$createmod.'","'.$createbyalias.'"');
             //            $query->values($db->quote($title, $newalias, $catid, $createmod, $createmod, $createbyalias));
             $db->setQuery($query);
             try {

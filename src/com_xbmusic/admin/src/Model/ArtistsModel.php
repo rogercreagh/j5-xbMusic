@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistsModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.19.1 23rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -308,7 +308,7 @@ class ArtistsModel extends ListModel {
     public function getArtistSingles($aid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.title AS tracktitle, t.imgfile, t.rel_date');
+        $query->select('t.id AS trackid, t.title AS tracktitle, t.imgurl, t.rel_date');
         $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
         $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
@@ -320,7 +320,7 @@ class ArtistsModel extends ListModel {
     public function getArtistAlbums($aid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgfile');
+        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
         $query->from('#__xbmusic_albums AS a');
         $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
         $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');

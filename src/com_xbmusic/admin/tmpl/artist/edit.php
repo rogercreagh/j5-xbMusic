@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.18.9 18th November 2024
+ * @version 0.0.19.1 25th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,7 +30,12 @@ $wa->useScript('keepalive')
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
 
+$albelink = 'index.php?option=com_xbmusic&task=album.edit&id=';
+$sngelink = 'index.php?option=com_xbmusic&task=song.edit&id=';
+$trkelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
+
 $input = Factory::getApplication()->getInput();
+$item = $this->item;
 
 ?>
 <script>
@@ -59,18 +64,9 @@ $input = Factory::getApplication()->getInput();
  		document.getElementById('task').value='track.setfolder';
  		this.form.submit();
  	}
-//     	var userdata = {'id':mydata,'name':myname};
-//         jQuery.ajax({
-//                 type: "POST",
-//                 url: "YOUR PHP URL HERE",
-//                 data:userdata, 
-//                 success: function(data){
-//                     console.log(data);
-//                 }
-//                 });
 </script>
 <div id="xbcomponent">
-    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=artist&layout=edit&id='. (int) $this->item->id); ?>"
+    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=artist&layout=edit&id='.(int)$item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<div class="row form-vertical">
     		<div class="col-md-10">
@@ -91,11 +87,11 @@ $input = Factory::getApplication()->getInput();
 						<?php echo $this->form->renderField('person_id'); ?> 
 					</div>
 				<?php endif; ?>
-				<?php if (($this->item->type == 2) && ($this->item->groupmembers)) : ?>
+				<?php if (($item->type == 2) && ($item->groupmembers)) : ?>
 					<p class="xbr09"><span class="xbit"><?php echo Text::_('Group Members');?></span>:
 					<?php
                         $list = '';  
-                        foreach ($this->item->groupmembers as $member) {
+                        foreach ($item->groupmembers as $member) {
                             $list .= $member['artistname'];
                             if ($member['role']) $list.= ' ('.$member['role']. ')';
                             $list .=', ';
@@ -129,7 +125,6 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
         			<?php echo $this->form->renderField('catid'); ?> 
-         			<?php echo $this->form->renderField('tags'); ?> 
          			<?php echo $this->form->renderField('access'); ?> 
         			<?php echo $this->form->renderField('ordering'); ?> 
         			<?php echo $this->form->renderField('note'); ?> 
@@ -137,78 +132,66 @@ $input = Factory::getApplication()->getInput();
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-	<?php if (!empty($this->tagparentids)) : ?>
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
-				<?php echo $this->form->renderFieldset('taggroups'); ?>
+				<div class="col-12 col-md-4">
+         			<?php echo $this->form->renderField('tags'); ?> 
+         		</div>
+				<div class="col-md-8">
+					<?php if (!empty($this->tagparentids)) : ?>
+						<?php echo $this->form->renderFieldset('taggroups'); ?>
+					<?php else: ?>
+						<p class="xbnote"><?php echo Text::_('You can define groups for different types of tags by specifying a group parent tags in the options and they will be listed separately here - eg "genres" and "places" might be useful group parents'); ?></p>
+ 					<?php endif; ?>
+				</div>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-	<?php endif; ?>
 	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('tracklist'); ?>	
-				</div>
-				<div class="col-12">
-					<?php echo Text::_('Albums'); ?><br />
-					<?php if (is_array($this->item->albums)) : ?>
-						<?php if (count($this->item->albums) > 1) : ?>
-							<details>
-								<summary>
-									<p class="xbit"><?php echo Text::sprintf('Found on %s albums',count($this->item->albums)); ?></p>
-								</summary>
-								<ul>
-									<?php foreach ($this->item->albums as $album) : ?>
-									    <li>
-									    	<?php echo $album['albumtitle'];
-									    	if ($album['rel_date']) echo ' ('.$album['rel_date'].')'; ?>
-									    </li>
-									<?php endforeach; ?>
-								</ul>
-							</details>
-						<?php elseif (count($this->item->albums)==1) :?>
-							<?php $album = $this->item->albums[0]; ?>
-							<p><?php echo $album['albumtitle'];
-                                if ($album['rel_date']) echo ' ('.$album['rel_date'].')'; ?>							
-						<?php endif; ?>
-					<?php else: ?>
-						<p class="xbit"><?php echo Text::_('Not found on any albums'); ?></p>
-					<?php endif; ?>
-				</div>
-				<div class="col-12">
-					<?php echo Text::_('Single tracks not listed with an album'); ?><br />
-					<?php if (is_array($this->item->singles)) : ?>
-						<?php if (count($this->item->singles) > 1) : ?>
-							<details>
-								<summary>
-									<p class="xbit"><?php echo Text::sprintf('%s single tracks found',count($this->item->singles)); ?></p>
-								</summary>
-								<ul>
-									<?php foreach ($this->item->singles as $single) : ?>
-									    <li>
-									    	<?php echo $single['tracktitle'];
-									    	if ($single['rel_date']) echo ' ('.$single['rel_date'].')'; ?>
-									    </li>
-									<?php endforeach; ?>
-								</ul>
-							</details>
-						<?php elseif (count($this->item->singles)==1) :?>
-							<?php $single = $this->item->singles[0]; ?>
-							<p><?php echo $single['albumtitle'];
-							if ($single['rel_date']) echo ' ('.$single['rel_date'].')'; ?>							
-						<?php endif; ?>
-					<?php else: ?>
-						<p class="xbit"><?php echo Text::_('No single tracks listed'); ?></p>
-					<?php endif; ?>
-				</div>
-				<div class="col-12">
-            		<?php echo $this->form->renderField('songlist');?>
-				</div>
+    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+		<div class="row form-vertical">
+    		<div class="col-12 col-md-3">
+     		<h4><?php echo Text::_('Connections to other items')?></h4>
+   			<b><?php echo Text::_('Albums'); ?></b>
+    		<ul>
+    			<?php foreach ($item->albums as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $albelink.$listitem['album_id'];?>">
+    						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]       			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<hr />
+    		<b><?php echo Text::_('Tracks'); ?></b>
+    		<ul>
+    			<?php foreach ($item->tracks as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $trkelink.$listitem['track_id'];?>">
+    						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]        			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<hr />
+    		<b><?php echo Text::_('Songs'); ?></b>
+    		<ul>
+    			<?php foreach ($item->songs as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
+    						<?php echo $listitem['title']; ?></a>        			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
     		</div>
-            		<?php echo $this->form->renderField('ext_links');?>
-           		
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
+	       	<div class="col-12 col-md-9">
+        		<?php echo $this->form->renderField('albumlist');?>
+				<?php echo $this->form->renderField('tracklist'); ?>	
+        		<?php echo $this->form->renderField('songlist');?>
+			</div>
+		</div>
+		<hr />
+		<?php echo $this->form->renderField('ext_links');?>
+       		
+     <?php echo HTMLHelper::_('uitab.endTab'); ?>
          
 
 

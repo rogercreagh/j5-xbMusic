@@ -10,7 +10,7 @@ DROP TABLE IF EXISTS
   `#__xbmusic_medleytrack`,
   `#__xbmusic_playlisttrack`,
   `#__xbmusic_songtrack`,
-  `#__xbmusic_groupmember`,
+  `#__xbmusic_artistgroup`,
   `#__xbmusic_artistalbum`,
   `#__xbmusic_songalbum`
 ;

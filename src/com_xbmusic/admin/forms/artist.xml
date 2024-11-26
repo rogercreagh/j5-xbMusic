@@ -120,7 +120,9 @@
 				<field name="track_id" type="xbtracklist" label="Track Name">
 					<option value=""> </option>	
 				</field>
-				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				<field name="role" type="text" label="XB_ROLE" maxlength="190"
+				/>
+				<field name="note" type="text" label="Type" maxlength="190"
 				/>
 				<field name="listorder" type="hidden" default="0" />
 			</form>
@@ -137,7 +139,9 @@
 				<field name="album_id" type="xbalbumlist" label="Album Name">
 					<option value=""> </option>	
 				</field>
-				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				<field name="role" type="text" label="Type" maxlength="190"
+				/>
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
 				/>
 				<field name="listorder" type="hidden" default="0" />
 			</form>
@@ -154,8 +158,9 @@
 				<field name="track_id" type="xbtracklist" label="Track Name">
 					<option value=""> </option>	
 				</field>
-				<field name="role" type="hidden" default="" />
-				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				<field name="role" type="text" label="XB_ROLE" maxlength="190"
+				/>
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
 				/>
 			</form>
 		</field>					

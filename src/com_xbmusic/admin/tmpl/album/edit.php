@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.19.0 22nd November 2024
+ * @version 0.0.19.1 24th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -31,6 +31,10 @@ $wa->useScript('keepalive')
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($item->attribs));
 
+$artelink = 'index.php?option=com_xbmusic&task=artist.edit&id=';
+$sngelink = 'index.php?option=com_xbmusic&task=song.edit&id=';
+$trkelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
+
 $input = Factory::getApplication()->getInput();
 $item = $this->item;
 ?>
@@ -56,15 +60,6 @@ $item = $this->item;
 		document.getElementById('pv_desc').innerHTML= descHtml;
     }
 
-//     	var userdata = {'id':mydata,'name':myname};
-//         jQuery.ajax({
-//                 type: "POST",
-//                 url: "YOUR PHP URL HERE",
-//                 data:userdata, 
-//                 success: function(data){
-//                     console.log(data);
-//                 }
-//                 });
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=album&layout=edit&id='. (int) $item->id); ?>"
@@ -179,11 +174,12 @@ $item = $this->item;
            		<div class="col-12 col-lg-6 form-vertical">
            			<h4><?php echo Text::_('Select new image for Album only')?></h4>
 					<?php echo $this->form->renderField('newimage'); ?> 
-					<?php echo $this->form->renderField('newimagetitle'); ?>
-					<?php echo $this->form->renderField('newimagedesc'); ?>
+           			<p class="xbnote">an option to also save the image to all tracks will appear here 
 				</div>
            		<div class="col-12 col-lg-6">
-           			<p class="xbnote">an option to also save the image to all tracks will appear here 
+           			<h4><?php echo Text::_('Edit title and description for album')?></h4>
+					<?php echo $this->form->renderField('newimagetitle'); ?>
+					<?php echo $this->form->renderField('newimagedesc'); ?>
    				</div>
 			</div>        
 			<div class="row">
@@ -209,31 +205,52 @@ $item = $this->item;
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('albumlinksnote'); ?> 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('tracklist'); ?> 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('songlist'); ?> 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('artistlist'); ?> 
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-		            <?php echo $this->form->renderField('ext_links');?>
+        <div class="row">
+        	<div class="col-12 col-md-3">
+        		<h4><?php echo Text::_('Connections to other items')?></h4>
+        		<b><?php echo Text::_('Tracks'); ?></b>
+        		<ol>
+        			<?php foreach ($item->tracks as $track) {
+        			    if($item->num_discs > 1) {
+        			        $track['trackno'] = ((int)$track['discno']*100)+$track['trackno'];
+        			    }
+        			    echo '<li value="'.$track['trackno'].'">';
+        			    echo '<a href="'.$trkelink.$track['track_id'].'">'.$track['title'].'</a></li>';
+        			}?>
+        		</ol>
+        		<hr />
+        		<b><?php echo Text::_('Songs'); ?></b>
+        		<ul>
+        			<?php foreach ($item->songs as $listitem) : ?>
+        				<li>
+        					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
+        						<?php echo $listitem['title']; ?></a>        			
+            			</li>
+        			<?php endforeach; ?>
+        		</ul>
+        		<hr />
+        		<b><?php echo Text::_('Artists'); ?></b>
+        		<ul>
+        			<?php foreach ($item->artists as $listitem) : ?>
+        				<li>
+        					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
+        						<?php echo $listitem['name']; ?></a>        			
+            			</li>
+        			<?php endforeach; ?>
+        		</ul>
+        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+        	</div>
+        	<div class="col-12 col-md-9">
+				<?php echo $this->form->renderField('albumlinksnote'); ?> 
+				<div class="form-vertical">
+    				<?php echo $this->form->renderField('tracklist'); ?> 
+    				<?php echo $this->form->renderField('songlist'); ?> 
+    				<?php echo $this->form->renderField('artistlist'); ?> 
 		        </div>
 		    </div>
+			<hr />
+            <?php echo $this->form->renderField('ext_links');?>
+        </div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>

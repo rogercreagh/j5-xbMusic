@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.19.1 25th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -72,7 +72,30 @@ class SongModel extends AdminModel {
         }
         return true;
     }
-    
+ 
+    public function delete(&$pks) {
+        //first need to delete links to albums, artists, tracks
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true);
+        foreach ($pks as $pk) {
+            $query->delete($db->qn('#__xbmusic_songalbum'));
+            $query->where($db->qn('song_id').' = '.$db->q($pk));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear('delete');
+            $query->delete($db->qn('#__xbmusic_songtrack'));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear('delete');
+            $query->delete($db->qn('#__xbmusic_artistsong'));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear();
+        }
+            
+        return parent::delete($pks);
+    }
+       
     protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
             return false;
@@ -111,6 +134,9 @@ class SongModel extends AdminModel {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.song');                
+                $item->tracks = $this->getSongTrackList($item->id);
+                $item->artists = $this->getSongArtistList($item->id);
+                $item->albums = $this->getSongAlbumList($item->id);
             }
         }        
         return $item;
@@ -155,7 +181,9 @@ class SongModel extends AdminModel {
         
         if (empty($data)) {
             $data = $this->getItem();
-            $data->tracklist = $this->getSongTrackList();
+            $data->tracklist = $this->getSongTrackList($data->id);
+            $data->artistlist = $this->getSongArtistList($data->id);
+            $data->albumlist = $this->getSongAlbumList($data->id);
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -210,8 +238,6 @@ class SongModel extends AdminModel {
                     $data['alias'] = '';
                 }
             }
-            //need to add tracklinks
-            $this->storeSongTracks($origTable->id, $data['tracklist']);
             // standard Joomla practice is to set the new copy record as unpublished
             $data['status'] = 0;
         }
@@ -247,6 +273,8 @@ class SongModel extends AdminModel {
         if (parent::save($data)) {
             $sid = $this->getState('song.id');
             $this->storeSongTracks($sid, $data['tracklist']);
+            $this->storeSongAlbums($sid, $data['albumlist']);
+            $this->storeSongArtists($sid, $data['artistlist']);
             // Check possible workflow
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
@@ -287,40 +315,111 @@ class SongModel extends AdminModel {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
     }
     
-    public function getSongTrackList() {
+    private function getSongTrackList($songid) {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->select('a.id as track_id, ba.note AS note, ba.listorder AS oldorder');
-        $query->from('#__xbmusic_songtrack AS ba');
-        $query->innerjoin('#__xbmusic_tracks AS a ON ba.track_id = a.id');
-        $query->where('ba.song_id = '.(int) $this->getItem()->id);
-        $query->order('a.title ASC');
+        $query->select('a.track_id as track_id, b.title AS title, b.rel_date AS rel_date, a.role AS role, a.note AS note, a.listorder AS listorder');
+        $query->from('#__xbmusic_songtrack AS a');
+        $query->innerjoin('#__xbmusic_tracks AS b ON a.track_id = b.id');
+        $query->where('a.song_id = '.$db->q($songid));
+        $query->order('b.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }
     
-    function storeSongTracks($song_id, $trackList) {
-        //delete existing role list
+    private function storeSongTracks($song_id, $trackList) {
+        //delete existing list
         $db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->delete($db->quoteName('#__xbmusic_songtrack'));
-        $query->where('song_id = '.$song_id);
+        $query->where('song_id = '.$db->q($song_id));
         $db->setQuery($query);
         $db->execute();
         //restore the new list
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
-                $query = $db->getQuery(true);
+                if (!key_exists('listorder', $trk)) $trk['listorder'] = 0;
+                $query->clear();
                 $query->insert($db->quoteName('#__xbmusic_songtrack'));
-                $query->columns('song_id,track_id,note,listorder');
-                $query->values('"'.$song_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$trk['oldorder'].'"');
+                $query->columns('song_id,track_id,role,note,listorder');
+                $query->values('"'.$song_id.'","'.$trk['track_id'].'","'.$trk['role'].'","'.$trk['note'].'","'.$trk['listorder'].'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
             }
         }
     }
-
+    
+    private function getSongAlbumList($songid) {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.album_id as album_id, b.title AS title, b.rel_date AS rel_date, a.role AS role,  a.note AS note, a.listorder AS listorder');
+        $query->from('#__xbmusic_songalbum AS a');
+        $query->innerjoin('#__xbmusic_albums AS b ON a.album_id = b.id');
+        $query->where('a.song_id = '.$db->q($songid));
+        $query->order('b.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+    
+    private function storeSongAlbums($song_id, $albumList) {
+        //delete existing list
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_songalbum'));
+        $query->where('song_id = '.$song_id);
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        foreach ($albumList as $album) {
+            if ($album['album_id'] > 0) {
+                if (!key_exists('listorder', $album)) $album['listorder'] = 0;
+                $query->clear();
+                $query->insert($db->quoteName('#__xbmusic_songalbum'));
+                $query->columns('song_id,album_id,role,note,listorder');
+                $query->values('"'.$song_id.'","'.$album['album_id'].'","'.$album['role'].'","'.$album['note'].'","'.$album['listorder'].'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+            }
+        }
+    }
+    
+    private function getSongArtistList($songid) {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('a.artist_id as artist_id, b.name AS name, a.role AS role, a.note AS note, a.listorder AS listorder');
+        $query->from('#__xbmusic_artistsong AS a');
+        $query->innerjoin('#__xbmusic_artists AS b ON a.artist_id = b.id');
+        $query->where('a.song_id = '.$db->q($songid));
+        $query->order('b.sortname ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+    
+    private function storeSongArtists($song_id, $artistList) {
+        //delete existing list
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_artistsong'));
+        $query->where('song_id = '.$song_id);
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+        foreach ($artistList as $artist) {
+            if ($artist['artist_id'] > 0) {
+                if (!key_exists('listorder', $artist)) $artist['listorder'] = 0;
+                $query = $db->getQuery(true);
+                $query->insert($db->quoteName('#__xbmusic_songalbum'));
+                $query->columns('song_id,album_id,role,note,listorder');
+                $query->values('"'.$song_id.'","'.$artist['album_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+            }
+        }
+    }
+    
     
 }
 

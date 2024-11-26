@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/song/edit.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.19.1 24th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,8 +30,12 @@ $wa->useScript('keepalive')
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
 
-$input = Factory::getApplication()->getInput();
+$artelink = 'index.php?option=com_xbmusic&task=artist.edit&id=';
+$albelink = 'index.php?option=com_xbmusic&task=album.edit&id=';
+$trkelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
 
+$input = Factory::getApplication()->getInput();
+$item = $this->item;
 ?>
 <script>
 	function clearmd() {
@@ -59,18 +63,9 @@ $input = Factory::getApplication()->getInput();
  		document.getElementById('task').value='track.setfolder';
  		this.form.submit();
  	}
-//     	var userdata = {'id':mydata,'name':myname};
-//         jQuery.ajax({
-//                 type: "POST",
-//                 url: "YOUR PHP URL HERE",
-//                 data:userdata, 
-//                 success: function(data){
-//                     console.log(data);
-//                 }
-//                 });
 </script>
 <div id="xbcomponent">
-    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=song&layout=edit&id='. (int) $this->item->id); ?>"
+    <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=song&layout=edit&id='. (int) $item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<div class="row form-vertical">
     		<div class="col-md-10">
@@ -111,7 +106,6 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
         			<?php echo $this->form->renderField('catid'); ?> 
-         			<?php echo $this->form->renderField('tags'); ?> 
          			<?php echo $this->form->renderField('access'); ?> 
         			<?php echo $this->form->renderField('ordering'); ?> 
         			<?php echo $this->form->renderField('note'); ?> 
@@ -119,34 +113,66 @@ $input = Factory::getApplication()->getInput();
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-	<?php if (!empty($this->tagparentids)) : ?>
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
+       <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
-				<?php echo $this->form->renderFieldset('taggroups'); ?>
+				<div class="col-12 col-md-4">
+         			<?php echo $this->form->renderField('tags'); ?> 
+         		</div>
+				<div class="col-md-8">
+					<?php if (!empty($this->tagparentids)) : ?>
+						<?php echo $this->form->renderFieldset('taggroups'); ?>
+					<?php else: ?>
+						<p class="xbnote"><?php echo Text::_('You can define groups for different types of tags by specifying a group parent tags in the options and they will be listed separately here - eg "genres" and "places" might be useful group parents'); ?></p>
+ 					<?php endif; ?>
+				</div>
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
-	<?php endif; ?>
 	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
-			<div class="row">
-				<div class="col-12">
-					<?php echo $this->form->renderField('tracklist'); ?>	
-				</div>
-				<div class="col-12">
-					Album
-				</div>
-				<div class="col-12">
-					Performers
-				</div>
-				<div class="col-12">
-					Playlists
-				</div>
+    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+		<div class="row form-vertical">
+    		<div class="col-12 col-md-3">
+     		<h4><?php echo Text::_('Connections to other items')?></h4>
+   			<b><?php echo Text::_('Albums'); ?></b>
+    		<ul>
+    			<?php foreach ($item->albums as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $albelink.$listitem['album_id'];?>">
+    						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]       			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<hr />
+    		<b><?php echo Text::_('Tracks'); ?></b>
+    		<ul>
+    			<?php foreach ($item->tracks as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $trkelink.$listitem['track_id'];?>">
+    						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]        			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<hr />
+    		<b><?php echo Text::_('Artists'); ?></b>
+    		<ul>
+    			<?php foreach ($item->artists as $listitem) : ?>
+    				<li>
+    					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
+    						<?php echo $listitem['name']; ?></a>        			
+        			</li>
+    			<?php endforeach; ?>
+    		</ul>
+    		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
     		</div>
-            		<?php echo $this->form->renderField('ext_links');?>
-           		
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
-         
-
+	       	<div class="col-12 col-md-9">
+        		<?php echo $this->form->renderField('albumlist');?>
+				<?php echo $this->form->renderField('tracklist'); ?>	
+        		<?php echo $this->form->renderField('artistlist');?>
+			</div>
+		</div>
+		</hr>
+		<?php echo $this->form->renderField('ext_links');?>
+       		
+     <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
         <div class="row">

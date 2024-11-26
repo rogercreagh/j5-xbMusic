@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `title` varchar(190) NOT NULL,
   `alias` varchar(190) NOT NULL,
   `description` mediumtext,
-  `imgfile` varchar(190) NOT NULL DEFAULT '',
+  `imgurl` varchar(190) NOT NULL DEFAULT '',
   `id3tags` mediumtext,
   `audioinfo` mediumtext,
   `fileinfo` mediumtext,

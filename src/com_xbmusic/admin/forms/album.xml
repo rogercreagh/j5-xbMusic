@@ -203,8 +203,8 @@
 				<field name="artist_id" type="xbartistlist" label="Artist Name">
 					<option value=""> </option>	
 				</field>
-				<field name="role" type="text" label="XB_ROLE" size="50" maxlength="190" />
-				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+				<field name="role" type="text" label="XB_ROLE" maxlength="190" />
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
 				/>
 			</form>
 		</field>			
@@ -219,14 +219,16 @@
 		>
 			<form>
 				<field name="song_id" type="xbsonglist" label="Song Name">
-					<option value=""> </option>	
+					<option value=""> </option>	s
 				</field>
-				<field name="role" type="combo" label="Type" size="50" maxlength="190" >
-					<option value="Full track">Full track</option>
-					<option value="Part of track">Part of track</option>
-					<option value="Covers several tracks">Covers several tracks</option>
+				<field name="role" type="list" label="Type" maxlength="190" mutiple="false" >
+					<option value="1">Full track</option>
+					<option value="2">Part of a medley</option>
+					<option value="3">Spread across tracks</option>
+                  <option value="">Other</option>
 				</field>
-				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
+                <field name="other" type="text" label="" showon="role:" />
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
 				/>
 			</form>
 		</field>					

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.19.0 21st November 2024
+ * @version 0.0.19.1 22nd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,7 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Utilities\ArrayHelper;
 //use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class AlbumsModel extends ListModel {
     
@@ -293,12 +294,12 @@ class AlbumsModel extends ListModel {
                         $item->ext_links_list = $item->ext_links_list.'</ul>';                        
                     }
                 } //end if is_object
-                $item->tracks = $this->getAlbumTracks($item->id);
-                $item->artists =[];
-                foreach ($item->tracks as $track) {
-                    $artists = $this->getTrackArtists($track['trackid']);
-                    $item->artists = array_merge($item->artists,$artists);
-                }
+                $item->tracks = XbmusicHelper::getAlbumTracks($item->id);
+                $item->artists = XbmusicHelper::getAlbumArtists($item->id);;
+//                 foreach ($item->tracks as $track) {
+//                     $artists = $this->getTrackArtists($track['trackid']);
+//                     $item->artists = array_merge($item->artists,$artists);
+//                 }
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $item->id);     
                 
@@ -308,27 +309,27 @@ class AlbumsModel extends ListModel {
         
     } // end getItems
     
-    public function getAlbumTracks($aid) {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.title AS trackname, CONCAT(t.pathname,"/",t.filename) AS pathfilename, t.sortartist, t.discno, t.trackno');
-        $query->from('#__xbmusic_tracks AS t');
-        $query->where('t.album_id = '.$aid);
-        $query->order('t.discno, t.trackno ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
+//     public function getAlbumTracks($aid) {
+//         $db = $this->getDatabase();
+//         $query = $db->getQuery(true);
+//         $query->select('t.id AS trackid, t.title AS trackname, t.pathfilename, t.sortartist, t.discno, t.trackno');
+//         $query->from('#__xbmusic_tracks AS t');
+//         $query->where('t.album_id = '.$aid);
+//         $query->order('t.discno, t.trackno ASC');
+//         $db->setQuery($query);
+//         return $db->loadAssocList();
+//     }
 
-    public function getTrackArtists($tid) {
-         $db = $this->getDatabase();
-         $query = $db->getQuery(true);
-         $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
-         $query->from('#__xbmusic_artists AS a');
-         $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
-         $query->where('b.track_id = '.$tid);
-         $query->order('b.listorder ASC');
-         $db->setQuery($query);
-         return $db->loadAssocList('alias');
-        return false;
-    }
+//     public function getTrackArtists($tid) {
+//          $db = $this->getDatabase();
+//          $query = $db->getQuery(true);
+//          $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
+//          $query->from('#__xbmusic_artists AS a');
+//          $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+//          $query->where('b.track_id = '.$tid);
+//          $query->order('b.listorder ASC');
+//          $db->setQuery($query);
+//          return $db->loadAssocList('alias');
+//         return false;
+//     }
 }

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.19.0 21st November 2024
+ * @version 0.0.19.1 22nd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -39,9 +39,12 @@ $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 //$saveOrder = $listOrder == 'a.ordering';
 
-$celink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
-$cvlink = 'index.php?option=com_xbmusic&view=catinfo&id=';
-$tvlink = 'index.php?option=com_xbmusic&view=taginfo&id=';
+$catvlink = 'index.php?option=com_xbmusic&view=catinfo&id=';
+$tagvlink = 'index.php?option=com_xbmusic&view=taginfo&id=';
+$catelink = 'index.php?option=com_categories&extension=com_xbmusic&task=category.edit&id=';
+$trkelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
+$artelink = 'index.php?option=com_xbmusic&task=artist.edit&id=';
+$sngelink = 'index.php?option=com_xbmusic&task=song.edit&id=';
 
 $rowcnt = (empty($this->items)) ? 0 : count($this->items);
 
@@ -104,7 +107,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						</th>
 						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
 						</th>
-						<th><?php echo HTMLHelper::_('searchtools.sort', 'Album Artists', 'a.sortartist', $listDirn, $listOrder); ?>
+						<th><?php echo HTMLHelper::_('searchtools.sort', 'Artists', 'a.sortartist', $listDirn, $listOrder); ?>
 						</th>
 						<th><?php echo Text::_('Tracks'); ?>
 						</th>
@@ -177,10 +180,10 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbr09 xbnit"><?php echo $item->rel_date; ?>
-    								<?php if($item->num_discs > 0) echo $item->num_discs; ?> 
-        							<?php echo ($item->format) ? $item->format : Xbtext::_('discs',1); ?>
-        							<?php if ($item->tot_tracks) echo Xbtext::_('with',3).$item->tot_tracks.Text::_('tracks');?>	
+								<p class="xbr09 xbnit"><?php echo Xbtext::_('Released',2).$item->rel_date; ?><br />
+        							<?php if ($item->format) echo $item->format; ?>
+    								<?php if($item->num_discs > 1) echo Xbtext::_('on',2). $item->num_discs. Xbtext::_('discs',1); ?> 
+        							<?php // if ($item->tot_tracks) echo Xbtext::_('with',3).$item->tot_tracks.Text::_('tracks');?>	
    								</p>
 							</div>
 						</td>
@@ -189,60 +192,58 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">
-							<?php if(count($item->artists)>1) : ?>
+							<p><b>
+    						<?php if($item->albumartist) : ?>   							
+                                <?php echo $item->albumartist; ?>
+    						<?php endif; ?>
+							</b></p>
+                            <?php if (count($item->artists) == 1) : ?>
+								<a href=<?php echo $artelink.$item->artists[0]['artistid']; ?>">
+				                <?php echo $item->artists[0]['artistname']; ?></a> 
+				                <span class="xbnit"><?php echo $item->artists[0]['role']; ?></span>
+							<?php elseif(count($item->artists)>1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('%s Artists on album',count($item->artists)); ?></summary>
 									<ul style="margin:5px;">
 									<?php foreach ($item->artists as $artist) : ?>
 										<li>
-											<a href="index.php?option=com_xbmusic&task=artist.edit&retview=albums&id=<?php echo $artist['artistid']; ?>">
+											<a href=<?php echo $artelink.$artist['artistid']; ?>">
 							                <?php echo $artist['artistname']; ?></a> 
 							                <span class="xbnit"><?php echo $artist['role']; ?></span>
 							            </li>
 									<?php endforeach; ?>
 									</ul>
 								</details>
-							<?php elseif (count($item->artists)==1) : ?>
-								<?php $artist = $item->artists[array_key_first($item->artists)]; ?>
-								<p>
-									<a href="index.php?option=com_xbmusic&task=artist.edit&retview=albums&id=<?php echo $artist['artistid']; ?>">
-				                		<?php echo $artist['artistname']; ?></a>
-									<span class="xbnit"><?php echo $artist['role']; ?></span>
-				                </p>							
 							<?php else : ?>
-								<?php if($item->albumartist) {
-								    echo $item->albumartist;
-								}else { ?>
-								    <p class="xbnit xbr09"><?php echo Text::_('no artists connected'); ?>
-								<?php } ?>
+								<p class="xbnit xbr09"><?php echo Text::_('no artists connected'); ?>
 							<?php endif; ?>
 						</td>
 						<td class="xbr09" onclick="stopProp(event);">
 							<?php if ($item->trkcnt > 1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('%s Tracks from album',$item->trkcnt); ?></summary>
-									<ul style="margin:5px;">
+									<ol style="margin:5px;">
 									<?php foreach ($item->tracks as $track) : ?>
+                                  		<?php if($item->num_discs > 1) {
+                                  		    $track['trackno'] = ((int)$track['discno']*100)+$track['trackno']; 
+                                  		}?>
 										<li value="<?php echo $track['trackno']; ?>">
 											<a href="index.php?option=com_xbmusic&task=track.edit&retview=albums&id=<?php echo $track['trackid']; ?>">
 							                <?php echo $track['trackname']; ?></a> 
 							                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
-							                <br />
-							                <?php echo Xbtext::_('track',2); ?>
-							                <?php if($item->num_discs > 1) echo Xbtext::_('on disc',3).$track['discno']; ?>
 							            </li>
 									<?php endforeach; ?>
-									</ul>
+									</ol>
 								</details>
 							<?php elseif (count($item->tracks)==1) : ?>
 								<?php $track = $item->tracks[0]; ?>
-								<span class="xbpr10"><?php echo Text::sprintf('Track %s', $track['trackno']); ?></span>
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=albums&id=<?php echo $track['trackid']; ?>">
 				                <?php echo $track['trackname']; ?></a> 
 				                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
-				                <br />
-				                <?php echo Xbtext::_('track',2).$track['trackno']; ?>
-				                <?php if($item->num_discs > 1) echo Xbtext::_('on disc',3).$track['discno']; ?>
+				                <br /><span class="xbnote">
+    				                <?php echo Xbtext::_('track',2).$track['trackno'].Xbtext::_('on disc',3); ?>
+    				                <?php if($item->num_discs > 1) echo $track['discno']; ?>
+				                </span>
 							<?php else : ?>
 								<p class="xbnit xbr09"><?php echo Text::_('no tracks connected'); ?>
 							<?php endif; ?>
@@ -250,7 +251,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						<td class="nowrap">
 						<?php if ($item->catid > 0) : ?>
     						<p>
-    							<a class="xblabel label-cat" href="<?php echo $cvlink.$item->catid; ?>" 
+    							<a class="xblabel label-cat" href="<?php echo $catvlink.$item->catid; ?>" 
     								title="<?php echo Text::_( 'XB_VIEW_CATEGORY' );?>::<?php echo $item->category_title; ?>">
     								<?php echo $item->category_title; ?>
     							</a>							

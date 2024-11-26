@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TracksModel.php
- * @version 0.0.18.5 20th October 2024
+ * @version 0.0.19.1 23rd November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -116,7 +116,7 @@ class TracksModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.imgfile,'
+                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.imgurl,'
                     .'a.rec_date, a.rel_date, a.sortartist, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
                     .'a.note, album.title AS albumtitle, a.album_id AS albumid'
@@ -313,7 +313,7 @@ class TracksModel extends ListModel {
     public function getSongs($id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('a.id, a.title, st.note, st.listorder');
+        $query->select('a.id as id, a.title, st.note, st.listorder');
         $query->from('#__xbmusic_songs AS a');
         $query->join('LEFT','#__xbmusic_songtrack AS st ON st.song_id = a.id');
         $query->where('st.track_id = '.$id);
@@ -325,7 +325,7 @@ class TracksModel extends ListModel {
     public function getArtists($id) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select('a.id, a.name, b.role, b.note, b.listorder');
+        $query->select('a.id AS id, a.name, b.role, b.note, b.listorder');
         $query->from('#__xbmusic_artists AS a');
         $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
         $query->where('b.track_id = '.$id);
