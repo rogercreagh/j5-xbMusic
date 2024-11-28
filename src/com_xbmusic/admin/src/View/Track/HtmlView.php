@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.19.2 26th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -84,13 +84,15 @@ class HtmlView extends BaseHtmlView {
         
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         
+        $loadlbl = ($isNew) ? 'Load ID3' : 'Reload ID3' ;
+        $toolbar->standardButton('loadid3',$loadlbl, 'track.loadid3')->icon('fas fa-file-arrow-down');
         if (!$checkedOut && $itemEditable) {
-            if ($isNew) {
-                $toolbar->standardButton('readid3save','XBMUSIC_READ_ID3', 'track.readid3save')->icon('fas fa-file-arrow-down');                
-            } else {
+//             if ($isNew) {
+// //                $toolbar->standardButton('readid3save','XBMUSIC_READ_ID3', 'track.readid3save')->icon('fas fa-file-arrow-down');                
+//             } else {
+//             }
                 $toolbar->apply('track.apply');
                 $toolbar->save('track.save');
-            }
         }
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');

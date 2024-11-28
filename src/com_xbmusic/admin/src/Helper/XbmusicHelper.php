@@ -615,6 +615,46 @@ class XbmusicHelper extends ComponentHelper
 // 	    }
 	    return $logstr;
 	}
-	
+
+	/**
+	 * @name getItemdefCats()
+	 * @desc returns object with properties for default categories as set in global options
+	 * @return \stdClass object with default cat ids for track, artists, album and songs
+	 */
+	public static function getItemDefCats() {
+	    //default categories for albums, artists and songs
+	    $defcats = new \stdClass();
+	    $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $usedaycat = $params->get('impcat','0');
+	    $defcats->albumcatid = $params->get('defcat_album',$uncatid);
+	    $defcats->artistcatid = $params->get('defcat_artist',$uncatid);
+	    $defcats->songcatid = $params->get('defcat_song',$uncatid);
+	    $defcats->trackcatid = $params->get('defcat_track',$uncatid);
+	    //track category may be overriden by genre (tracks-genres-genre) on per item basis
+	    if ($usedaycat == 1) {
+	        //we are going to change the defaults to a day category under \imports
+	        $daycatid = 0;
+	        $daycattitle = date('Y-m-d');
+	        $dcparent = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+	        if ($dcparent === false) {
+	            $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
+	            $dcparent = XbcommonHelper::createCategory($catdata, true);
+	        }
+	        $parentcat = XbcommonHelper::getCatByAlias('imports');
+	        $parentid = ($parentcat>0) ? $parentcat->id : 1;
+	        $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
+	        //            }
+	        $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+	        if  ($daycatid==false) $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
+	        if ($daycatid > 0) {
+	            $defcats->albumcatid = $daycatid;
+	            $defcats->artistcatid = $daycatid;
+	            $defcats->songcatid = $daycatid;
+	            $defcats->trackcatid = $daycatid;
+	        }
+	    } //endif cattype=1
+	    return $defcats;	    
+	}
 	
 } //end xbmusicHelper

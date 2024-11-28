@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default_batch_body.php
- * @version 0.0.3.0 11th April 2023
+ * @version 0.0.19.2 27th November 2023
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2019
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -40,6 +40,9 @@ $catfilt = $this->state->get('filter.category_id','');
 	</div>
 	<div class="row">
 		<div class="col-lg-6">
+			<div class="controls">
+				<?php echo LayoutHelper::render('playlists', array()); ?>
+			</div>
 		</div>
 		<div class="col-lg-6">
 			<div class="controls">
