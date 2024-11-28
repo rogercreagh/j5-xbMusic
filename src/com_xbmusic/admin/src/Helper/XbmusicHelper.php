@@ -386,7 +386,7 @@ class XbmusicHelper extends ComponentHelper
 	 * @param string $flogmsg
 	 * @return string|boolean - img url if exists or created or false on failure
 	 */
-	public static function createImageFile(array $imgdata, string $imgfilename, string &$flogmsg) {
+	public static function createImageFile(array &$imgdata, string $imgfilename, string &$flogmsg) {
 	    $imgpath = pathinfo($imgfilename, PATHINFO_DIRNAME);
 	    $folder = str_replace('/images/xbmusic/artwork/','',$imgpath);
 	    $imgpath = JPATH_ROOT.$imgpath;
@@ -434,6 +434,9 @@ class XbmusicHelper extends ComponentHelper
 	        }
 	    } //endif artfile !exists
 	    if ($imgok) {
+	        unset($imgdata['data']);
+	        $imgdata['imgurl'] = $imgurl;
+	        $imgdata = array_merge($imgdata, self::getImageInfo($imgdata));
 	        $flogmsg .= '[INFO] '.Text::_('image created').Xbtext::_($xbfilename,13);
 	        return $imgurl;
 	    }
@@ -441,6 +444,26 @@ class XbmusicHelper extends ComponentHelper
 	    
 	    return false;
 	} //end createImageFile()
+	
+	public static function getImageInfo(array $imgdata) {
+	    $file = trim(str_replace(Uri::root(), JPATH_ROOT.'/',$imgdata['imgurl']));
+	    if (file_exists($file)){
+	        $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
+	        $imgdata['basename'] = basename($file);
+	        $bytes = filesize($file);
+	        $lbl = Array('bytes','kB','MB','GB');
+	        $factor = floor((strlen($bytes) - 1) / 3);
+	        $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+	        $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
+	        $imagesize = getimagesize($file);
+	        $imgdata['filemime'] = $imagesize['mime'];
+	        $imgdata['filewidth'] = $imagesize[0];
+	        $imgdata['fileht'] = $imagesize[1];
+	        $imgdata['imagetitle'] = $imgdata['picturetype'];
+	        $imgdata['imagedesc'] = $imgdata['description'];
+	    }
+	    
+	}
 	
 	/**
 	 * @name normaliseGenrename()

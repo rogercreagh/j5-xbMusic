@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.2 26th November 2024
+ * @version 0.0.19.2 28th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -281,7 +281,7 @@ class DatamanModel extends AdminModel {
             //we may have multiple artists
             if (isset($id3data['artistdata'])) {
                 $artistlinks =[];
-                foreach ($id3data['artistdata'] as $artist) {
+                foreach ($id3data['artistdata'] as &$artist) {
                     $artist['catid'] = $this->artistcatid;
                     $artist['songlist'] = $songlinks;
                     if (isset($trackdata['url_artist'])) {
@@ -332,25 +332,25 @@ class DatamanModel extends AdminModel {
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                 if ($imgurl !== false) {
                     unset($imgdata['data']);
-                    $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
-                    if (file_exists($file)){
-                        $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),13);
-                        $ilogmsg .= INFO.$msg;
-                        $newmsg .= trim($msg).'<br />';
-                        $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
-                        $imgdata['basename'] = basename($file);
-                        $bytes = filesize($file);
-                        $lbl = Array('bytes','kB','MB','GB');
-                        $factor = floor((strlen($bytes) - 1) / 3);
-                        $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
-                        $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
-                        $imagesize = getimagesize($file);
-                        $imgdata['filemime'] = $imagesize['mime'];
-                        $imgdata['filewidth'] = $imagesize[0];
-                        $imgdata['fileht'] = $imagesize[1];
-                        $imgdata['imagetitle'] = $imgdata['picturetype'];
-                        $imgdata['imagedesc'] = $imgdata['description'];
-                    }                    
+//                     $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
+//                     if (file_exists($file)){
+//                         $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),13);
+//                         $ilogmsg .= INFO.$msg;
+//                         $newmsg .= trim($msg).'<br />';
+//                         $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
+//                         $imgdata['basename'] = basename($file);
+//                         $bytes = filesize($file);
+//                         $lbl = Array('bytes','kB','MB','GB');
+//                         $factor = floor((strlen($bytes) - 1) / 3);
+//                         $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+//                         $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
+//                         $imagesize = getimagesize($file);
+//                         $imgdata['filemime'] = $imagesize['mime'];
+//                         $imgdata['filewidth'] = $imagesize[0];
+//                         $imgdata['fileht'] = $imagesize[1];
+//                   }                    
+                    $imgdata['imagetitle'] = $imgdata['picturetype'];
+                    $imgdata['imagedesc'] = $imgdata['description'];
                     $trackdata['imgurl'] = $imgurl;
                     $trackdata['imageinfo'] = json_encode($imgdata);
                 } else {

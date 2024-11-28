@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.19.2 28th November 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -23,6 +23,7 @@ use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use \SimpleXMLElement;
 //use Joomla\Registry\Registry;
 //use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
@@ -42,6 +43,8 @@ class TrackModel extends AdminModel {
     public $typeAlias = 'com_xbmusic.track';
     
     public $genreParentId = false;
+    
+    private $id3loaded = false;
     
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
@@ -89,7 +92,8 @@ class TrackModel extends AdminModel {
     protected function batchPlaylist($value, $pks, $contexts) {
         Factory::getApplication()->enqueueMessage('Playlist add '.$value.' to '.implode(',',$pks).' contexts '.implode(','.$contexts));
     }
- 
+
+    
     public function delete(&$pks) {
         //first need to delete links artists, songs
         $db = Factory::getDbo();
@@ -110,6 +114,7 @@ class TrackModel extends AdminModel {
     }
     
     public function loadId3() {
+        $this->id3loaded = false;
         $app  = Factory::getApplication();
         $app->enqueueMessage('loadId3()');
         $data = $app->getInput()->get('jform',[],'array');
@@ -136,6 +141,10 @@ class TrackModel extends AdminModel {
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);
         if (isset($id3data['trackdata'])) {
+            if (isset($filedata['imageinfo']['data'])){
+                $imgdata = $filedata['imageinfo'];
+                unset($filedata['imageinfo']['data']);
+            }
             $trackdata = $id3data['trackdata'];
             $trackdata['filepathname'] = $data['filepathname'];
             $trackdata['filename'] = $data['filename'];
@@ -177,25 +186,64 @@ class TrackModel extends AdminModel {
             $trackdata['fileinfo'] = json_encode($filedata['fileinfo']);
             $trackdata['audioinfo'] = json_encode($filedata['audioinfo']);
             
-//4. get the song basic data - if exists
+// get the song data and save in trackdata
             if (isset($id3data['songdata'])) {
                 $trackdata['song'] = $id3data['songdata'];
                 $trackdata['song']['catid'] = $defcats->songcatid;
                 if ($optalbsong & 1) $trackdata['song']['tags'] = $genreids;
-                $trackdata['song']['id'] = XbcommonHelper::checkValueExists($trackdata['song']['alias'], '#__xbmusic_songs', 'alias');
-                if ($trackdata['song']['id'] > 0) {
-                    $songlinks = [];
-                    $link = array('song_id'=>$trackdata['song']['id'],
-                        'role'=>1,'note'=>'','listorder'=>1);
-                    $songlinks[] = $link;
-                    $trackdata['songlist'] = $songlinks;
+            } 
+            //songlinks will bee generating on save and adding to artist album and track
+
+// get artist details and save in trackdata            
+            if (isset($id3data['artistdata'])) {
+                foreach ($id3data['artistdata'] as &$artist) {
+                    $artist['catid'] = $this->artistcatid;
+                    if (isset($trackdata['url_artist'])) {
+                        $artist['ext_links']['ext_links0']= array('link_text'=>'internet',
+                            'link_url'=>$trackdata['url_artist'], 
+                            'link_title'=>basename($trackdata['url_artist']), // TODO actually we want the domain name and maybe path
+              'link_desc'=>Text::sprintf('link found in track "%s" ID3 data', $trackdata['title'])                                        
+                        );
+                    }
                 }
+                $trackdata['artists'] = $id3data['artistdata'];//
+            } 
+            //artistlinks will be created on save and added to album and song
+            
+//6. Create image file if available
+            if (($imgdata['data'])){
+                $imgfilename = '/images/xbmusic/artwork/';
+                if (isset($id3data['albumdata']['alias'])) {
+                    $imgfilename .= 'albums/'.strtolower($id3data['albumdata']['alias'][0]).'/'.$id3data['albumdata']['alias'];
+                } else {
+                    $imgfilename .= 'singles/'.$trackdata['alias'];
+                    if (isset($trackdata['sortartist'])) $imgfilename .= '_'.XbcommonHelper::makeAlias($trackdata['sortartist']);
+                }
+                $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
+                if ($imgurl !== false) {
+                    $imgdata['imagetitle'] = $imgdata['picturetype'];
+                    $imgdata['imagedesc'] = $imgdata['description'];
+                    $trackdata['imgurl'] = $imgurl;
+                    $trackdata['imageinfo'] = $imgdata; // json_encode on save
+                } else {
+                    unset ($imgdata);
+                }
+            } //end ifset image data
+            // img url and info will need adding to album
+            
+            
+// get album details
+            if (isset($id3data['albumdata'])) {
+                $id3data['albumdata'] = $id3data['albumdata'];
+                $id3data['albumdata']['catid'] = $this->albumcatid;
+                if (isset($imgdata)) $id3data['albumdata']['imageinfo'] = $imgdata;
+                if ($optalbsong > 1) $id3data['albumdata']['tags'] = $genreids;
+                if ($imgurl != false) $id3data['albumdata']['imgurl'] = $imgurl;
+                $trackdata['albumdata'] = $id3data['albumdata'];
             }
-            
-            
-        
+            $this->id3loaded = Factory::getApplication()->setUserState('com_xbmusic.edit.track.data', $trackdata);            
         } else {
-            //no trackdata found in id3
+            //no trackdata found in id3 - we've already reported this in id3dataToItems()
         }
         
         //update the log file with counts at the top
@@ -203,248 +251,13 @@ class TrackModel extends AdminModel {
         $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."\n";
         $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
         $loghead .= " -------------------------- \n";
-        $logmsg = $loghead.$logmsg;
+        $logmsg = $loghead.$ilogmsg;
         $logmsg .= '======================================'."\n\n";
         $this->writelog($logmsg);
         
-        $app->enqueueMessage($newmsg,'Success');
-        
-        
-        
-        $app->setUserState('com_xbmusic.edit.track.data', $data);
+//        $app->setUserState('com_xbmusic.edit.track.data', $data);
         return true;
-        
-        /****
-            $trackdata = $id3data['trackdata'];
-            $trackdata['filepathname'] = $data['filepathname'];
-            $trackdata['filename'] = $data['filename']; // TODO this is potentislly redundasnt
-            // get genres list, catids are defined above in parseFilesMp3()
-            $optalbsong = $params->get('genrealbsong',0);
-            $optcattag = $params->get('genrecattag',2);
-            if (isset($id3data['genres'])) {
-                $genreids = array_column($id3data['genres'],'id');
-                //usedaycat will take priority
-                if (($this->usedaycat == 0) && ($optcattag & 1)) {
-                    //first check if we already have a cat for the genre
-                    $thisgid = XbcommonHelper::getCatByAlias($id3data['genres'][0]['alias'])->id;
-                    if (is_null($thisgid)) {
-                        //get Genre in Tracks category
-                        $gcat = XbcommonHelper::getCatByAlias('genres');
-                        if ($gcat->id > 0) {
-                            $gid = $gcat->id;
-                        } else {
-                            //we need to create the Tracks/Genres category
-                            $tcat = XbcommonHelper::getCatByAlias('tracks');
-                            $gpid = ($tcat->id > 0) ? $tcat->id : 1; //if the tracks category has been deleted fallback to root
-                            $gid = XbcommonHelper::getCreateCat(array('title'=>'Genres', 'alias'=>'genres', 'parent_id'=>$gpid),true)->id;
-                        }
-                        $thisgid = XbcommonHelper::getCreateCat(array('title'=>$id3data['genres'][0]['title'], 'alias'=>$id3data['genres'][0]['alias'], 'parent_id'=>$gid),true)->id;
-                    }
-                    $trackdata['catid'] = $thisgid;
-                    
-                } else {
-                    $trackdata['catid'] = $this->trackcatid;
-                }
-            } else {
-                $trackdata['catid'] = $this->trackcatid;
-            }
-            
-            if (isset($filedata['audioinfo']['playtime_seconds'])) $trackdata['duration'] = (int)$filedata['audioinfo']['playtime_seconds'];
-            
-            if (isset($id3data['genres'])) $trackdata['tags'] = $genreids;
-            
-            if (isset($filedata['imageinfo']['data'])){
-                $imgdata = $filedata['imageinfo'];
-                unset($filedata['imageinfo']['data']);
-            }
-            //save json encoded filedata with track for reference
-            $trackdata['id3tags'] = json_encode($filedata['id3tags']);
-            $trackdata['fileinfo'] = json_encode($filedata['fileinfo']);
-            $trackdata['audioinfo'] = json_encode($filedata['audioinfo']);
-            //imageinfo is added to track after the image has been parsed
-            
-            //4. get the song creating as necessary and make array song id to link to track, artist and album
-            if (isset($id3data['songdata'])) {
-                //create songs
-                $songlinks = array(); //will be linked to album and artist once we have ids
-                $song = $id3data['songdata'];
-                $song['catid'] = $this->songcatid;
-                if ($optalbsong & 1) $song['tags'] = $genreids;
-                $song['id'] = XbmusicHelper::createMusicItem($song, 'song');
-                if ($song['id']=== false) {
-                    $msg = Text::_('failed to save song').Xbtext::_($song['title'],13);
-                    $ilogmsg .= ERROR.$msg;
-                    $app->enqueueMessage(trim($msg),'Error');
-                } elseif ($song['id'] >0) {
-                    $cnts['newsng'] ++;
-                    $msg = Xbtext::_('new song saved. Id:',2).$song['id'].Xbtext::_($song['title'],13);
-                    $ilogmsg .= INFO.$msg;
-                    $newmsg .= (trim($msg).'<br />');
-                } else {
-                    $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],7).Xbtext::_('Please check it is not a different song with the same title',4);
-                    $ilogmsg = WARN.$msg;
-                    $app->enqueueMessage(trim($msg),'Warning');
-                    $song['id'] = $song['id'] * -1;
-                    if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
-                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to song',3).$song['id'].': '.Xbtext::_($song['title'],12);
-                }
-                if ($song['id']>0) {
-                    $link = array('song_id'=>$song['id']);
-                    $link['role'] = 1;
-                    $link['note'] = '';
-                    $songlinks[] = $link;
-                }
-                //its a new track so there will be only this song
-                $trackdata['songlist'] = $songlinks;
-            }
-            
-            //5. get the artist(s) and create as necessary. make list of artists to link to track, album and song
-            //we may have multiple artists
-            if (isset($id3data['artistdata'])) {
-                $artistlinks =[];
-                foreach ($id3data['artistdata'] as $artist) {
-                    $artist['catid'] = $this->artistcatid;
-                    $artist['songlist'] = $songlinks;
-                    if (isset($trackdata['url_artist'])) {
-                        $artist['ext_links']['ext_links0']= array('link_text'=>'internet',
-                            'link_url'=>$trackdata['url_artist'],
-                            'link_desc'=>Text::sprintf('link found in track "%s" ID3 data', $trackdata['title'])
                             
-                        );
-                    }
-                    $artist['id'] = XbmusicHelper::createMusicItem($artist, 'artist');
-                    if ($artist['id'] === false) {
-                        $msg = Text::_('failed to save artist').Xbtext::_($artist['title'],13);
-                        $ilogmsg .= ERROR.$msg;
-                        $app->enqueueMessage(trim($msg),'Error');
-                    } elseif ($artist['id'] > 0) {
-                        $cnts['newart'] ++;
-                        $msg = Xbtext::_('new artist saved. Id:',2).$artist['id'].Xbtext::_($artist['name'],13);
-                        $ilogmsg .= INFO.$msg;
-                        $newmsg .= (trim($msg).'<br />');
-                    } else {
-                        $ilogmsg .= INFO.Text::_('Artist already exists').Xbtext::_($artist['name'],13);
-                        $artist['id'] = $artist['id'] * -1;
-                    }
-                    if ($artist['id']>0) {
-                        $artistlinks[] = array('artist_id'=>$artist['id'], 'role'=>'', 'note'=>'');
-                    }
-                }
-                $res = $this->addArtistSongs($artist['id'], $songlinks);
-                if ($res>0)
-                    $ilogmsg .= INFO.$res.Xbtext::_('song links added to',3).Xbtext::_($artist['name'],12);
-                    //will be linked to album once album data loaded
-                    //only one new track so ok to use artist list in model
-                    $trackdata['artistlist'] = $artistlinks;
-            }
-            
-            //6. Create image file if available
-            if (($imgdata['data'])){
-                // filename will be "albums/X/album-alias_sortartist.ext" or "singles/track-alias_sortartist.ext"
-                // saved in "images/xbmusic/artwork/albums/[initial letter of album title]/"
-                // if track has no album then filename "track-title_sortartist.ext" and save in artwork/singles/
-                $imgfilename = '/images/xbmusic/artwork/';
-                if (isset($id3data['albumdata']['alias'])) {
-                    $imgfilename .= 'albums/'.strtolower($id3data['albumdata']['alias'][0]).'/'.$id3data['albumdata']['alias'];
-                } else {
-                    $imgfilename .= 'singles/'.$trackdata['alias'];
-                    if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
-                }
-                $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
-                if ($imgurl !== false) {
-                    unset($imgdata['data']);
-                    $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
-                    if (file_exists($file)){
-                        $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),13);
-                        $ilogmsg .= INFO.$msg;
-                        $newmsg .= trim($msg).'<br />';
-                        $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
-                        $imgdata['basename'] = basename($file);
-                        $bytes = filesize($file);
-                        $lbl = Array('bytes','kB','MB','GB');
-                        $factor = floor((strlen($bytes) - 1) / 3);
-                        $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
-                        $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
-                        $imagesize = getimagesize($file);
-                        $imgdata['filemime'] = $imagesize['mime'];
-                        $imgdata['filewidth'] = $imagesize[0];
-                        $imgdata['fileht'] = $imagesize[1];
-                        $imgdata['imagetitle'] = $imgdata['picturetype'];
-                        $imgdata['imagedesc'] = $imgdata['description'];
-                    }
-                    $trackdata['imgurl'] = $imgurl;
-                    $trackdata['imageinfo'] = json_encode($imgdata);
-                } else {
-                    $msg = Xbtext::_('failed to create image file',12);
-                    $ilogmsg .= WARN.$msg;
-                    $app->enqueueMessage(trim($msg),'Warning');
-                }
-            } //end ifset image data
-            
-            //7. get album data and create album if necessary
-            if (isset($id3data['albumdata'])) {
-                $albumdata = $id3data['albumdata'];
-                $albumdata['catid'] = $this->albumcatid;
-                if (isset($imgdata)) $albumdata['imageinfo'] = $imgdata;
-                if ($optalbsong > 1) $albumdata['tags'] = $genreids;
-                if ($imgurl != false) $albumdata['imgurl'] = $imgurl;
-                $albumdata['id'] = XbmusicHelper::createMusicItem($albumdata, 'album');
-                if ($albumdata['id']===false) {
-                    $msg = Text::_('failed to save album').Xbtext::_($albumdata['title'],13);
-                    $ilogmsg .= ERROR.$msg;
-                    $app->enqueueMessage($msg,'Error');
-                } elseif ($albumdata['id']>0) {
-                    $cnts['newalb'] ++;
-                    $msg = Text::_('new album saved').Xbtext::_($albumdata['title'],13);
-                    $ilogmsg .= INFO.$msg;
-                    $newmsg .= trim($msg).'<br />';
-                } else { //this implies the album alias already exists
-                    $albumdata['id'] = $albumdata['id'] * -1;
-                }
-                
-                //album may have already existed so we need to add to existing artist and song links after creating
-                $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
-                if ($res>0)
-                    $ilogmsg .= INFO.$res.Xbtext::_('song links added to',3).Xbtext::_($albumdata['title'],12);
-                    $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
-                    if ($res>0)
-                        $ilogmsg .= INFO.$res.Xbtext::_('artist links added to',3).Xbtext::_($albumdata['title'],12);
-                        
-                        if ($optalbsong > 1) {
-                            $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                            $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
-                        }
-            }
-            
-            //8. finally we can add links to track and save it
-            if ($albumdata['id']>0) {
-                $trackdata['album_id'] = $albumdata['id'];
-            }
-            $trackdata['songlist'] = $songlinks;
-            $trackdata['artistlist'] = $artistlinks;
-            $trackdata['id'] = XbmusicHelper::createMusicItem($trackdata, 'track');
-            if ($trackdata['id']=== false) {
-                $msg = Text::_('failed to save track').Xbtext::_($trackdata['title'],13);
-                $ilogmsg .= ERROR.$msg;
-                $app->enqueueMessage(trim($msg),'Error');
-            } elseif ($trackdata['id'] >0) {
-                $cnts['newtrk'] ++;
-                $msg = Xbtext::_('new track saved. Id:',2).$trackdata['id'].Xbtext::_($trackdata['title'],13);
-                $ilogmsg .= INFO.$msg;
-                $newmsg .= trim($msg).'<br />';
-                //   $ilogmsg .= INFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
-            } else {
-                $msg = Text::_('Track alias already exists').Xbtext::_($trackdata['alias'],13);
-                $ilogmsg .= WARN.$msg;
-                $trackdata['id'] = $trackdata['id'] * -1;
-                $newmsg .= WARN.trim($msg);
-                //   $ilogmsg .= INFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
-            }
-            
-        } //end if iset id3data[trackdata]
-        
-        ***/
-                    
     } //end loadId3()
     
  
