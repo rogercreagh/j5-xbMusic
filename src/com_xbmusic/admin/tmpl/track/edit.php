@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.19.2 10th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,7 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 HTMLHelper::_('jquery.framework');
 
@@ -66,69 +67,48 @@ $item = $this->item;
 		document.getElementById('pv_desc').innerHTML= descHtml;
     }
 
- 	function postFolder() {
- 		document.getElementById('task').value='track.setfolder';
- 		this.form.submit();
- 	}
 </script>
 <div id="xbcomponent">
+	<?php // if (($this->id3loaded) && ($item->id > 0)) Factory::getApplication()->enqueueMessage('New data loaded from file','Warning'); ?>
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=track&layout=edit&id='. (int) $item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
       <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
       <input type="hidden" id="multi" value="0" />
       <input type="hidden" id="extlist" value="mp3" />
       <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
-    	<p class="xbnit">
-    	<?php if ($item->id == 0 ) : ?>
-   			<?php //$this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
-     		<?php //$this->form->setFieldAttribute('getid3onsave','default','1'); ?>
-     		
-    	<?php else : ?> 
-    	<?php endif; ?>
-		<?php 
-            $session = Factory::getApplication()->getSession();
-            $musicpath = $session->get('musicfolder','');
-			if (is_dir($musicpath)) {
-			}
-            $session->clear('musicfolder');
-		?>
-    	</p>
-     	<?php if (($item->id == 0) || (!file_exists($item->filepathname)) ) : ?>
-        	<div class="row form-vertical">
-       			<div class="col-md-6">
-       				<p><?php echo Text::_('Select music track')?>
-			    	<div id="container"> </div>
-        		</div>
-        		<div class="col-md-6">
-                	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
-                	<p> </p>
-        			<?php echo $this->form->renderField('foldername'); ?> 
-                	<?php echo $this->form->renderField('selectedfiles'); ?> 
-                 	<?php // echo $this->form->renderField('getid3onsave'); ?>
-               </div>
+      	<?php  $fpn = $this->form->getValue('filepathname'); ?>
+    	<div class="row form-vertical" <?php if ((!empty($fpn) ) && (file_exists($fpn) )) echo 'style="display:none;"'; ?>>
+   			<div class="col-md-6">
+   				<p><?php echo Text::_('Select music track')?>
+		    	<div id="container"> </div>
+    		</div>
+    		<div class="col-md-6">
+            	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
+            	<p> </p>
+    			<?php echo $this->form->renderField('foldername'); ?> 
+            	<?php echo $this->form->renderField('selectedfiles'); ?> 
+             	<?php // echo $this->form->renderField('getid3onsave'); ?>
+           </div>
+ 		</div>
+       	<?php $localpath = (empty($fpn)) ? '' : str_replace($this->basemusicfolder,'',pathinfo($fpn, PATHINFO_DIRNAME)).'/'; ?>
+    	<div class="row">
+    		<div class="col-md-6">
+    			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
+    				<?php echo $this->basemusicfolder; ?></p>
+    			<p><i><?php echo Text::_('Track folder'); ?></i> : 
+    				<?php echo $localpath; ?></p>
      		</div>
-        	<div class="row">
-        	</div>
-    	<?php else: ?>
-        	<?php $localpath = str_replace($this->basemusicfolder,'',pathinfo($item->filepathname, PATHINFO_DIRNAME)).'/'; ?>
-        	<div class="row">
-        		<div class="col-md-6">
-        			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
-        				<?php echo $this->basemusicfolder; ?></p>
-        			<p><i><?php echo Text::_('Track folder'); ?></i> : 
-        				<?php echo $localpath; ?></p>
-         		</div>
-        		<div class="col-md-6">
-        			<p><i><?php echo Text::_('Track file'); ?></i> : 
-        				<b><?php echo $item->filename; ?></b></p>
+    		<div class="col-md-6">
+    			<p><i><?php echo Text::_('Track file'); ?></i> : 
+        			<b><?php echo (empty($fpn)) ? '' : basename($fpn); ?></b></p>
+				<?php if (!empty($fpn)) : ?>        			
                     <audio controls>
                     	<source src="<?php echo '/xbmusic/'.$localpath.$item->filename; ?>">
-                    	Your browser does not support the audio tag.
+                    	<i>Your browser does not support the audio tag.</i>
                     </audio>        		
-        			<?php //echo $this->form->renderField('getid3onsave'); ?>
-                </div>
+    			<?php endif; ?>
             </div>
-    	<?php endif; ?>
+        </div>
         <div class="hide">
         	<?php echo $this->form->renderField('filepathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
@@ -137,6 +117,24 @@ $item = $this->item;
     	<div class="row form-vertical">
     		<div class="col-md-10">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
+            	<?php if ((key_exists('title', $this->replaced)) || (key_exists('alias', $this->replaced))) : ?>
+            	    <div class="row" style="margin:-25px;">
+            	    	<div class="col-md-5">
+            	    	<?php if (key_exists('title', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo $this->replaced['title']; ?></dd></dl>
+            	    	<?php endif; ?>
+            	    	</div>
+            	    	<div class="col-md-5">
+            	    	<?php if (key_exists('alias', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo $this->replaced['alias']; ?></dd></dl>
+            	    	<?php endif; ?>
+            	    	</div>
+            	    </div>
+            	<?php endif; ?>
     		</div>
     		<div class="col-md-2">
     			<?php echo $this->form->renderField('id'); ?> 
@@ -145,6 +143,11 @@ $item = $this->item;
     	<div class="row">
     		<div class="col-md-6">
      			<?php echo $this->form->renderField('sortartist'); ?> 
+    	    	<?php if (key_exists('sortartist', $this->replaced)) : ?>
+    	    		<dl class="xbdl xbred">
+    	    			<dt><?php echo Text::_('Old value');?></dt>
+    	    			<dd><?php echo $this->replaced['sortartist']; ?></dd></dl>
+    	    	<?php endif; ?>
      		</div>
      	</div>
     	<hr />
@@ -184,8 +187,23 @@ $item = $this->item;
 						</div>   					
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
+            	    	<?php if (key_exists('rec_date', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo $this->replaced['rec_date']; ?></dd></dl>
+            	    	<?php endif; ?>
         					<?php echo $this->form->renderField('rel_date'); ?> 
+            	    	<?php if (key_exists('rel_date', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo $this->replaced['rel_date']; ?></dd></dl>
+            	    	<?php endif; ?>
         					<?php echo $this->form->renderField('duration'); ?> 
+            	    	<?php if (key_exists('duration', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo $this->replaced['duration']; ?></dd></dl>
+            	    	<?php endif; ?>
     	        			<?php //echo $item->id3_tags->duration; ?>
            				</div>
         			</div>
@@ -206,6 +224,11 @@ $item = $this->item;
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
         			<?php echo $this->form->renderField('catid'); ?> 
+            	    	<?php if (key_exists('catid', $this->replaced)) : ?>
+            	    		<dl class="xbdl xbred">
+            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dd><?php echo XbcommonHelper::getCat($this->replaced['catid'])->title; ?></dd></dl>
+            	    	<?php endif; ?>
          			<?php echo $this->form->renderField('access'); ?> 
         			<?php echo $this->form->renderField('ordering'); ?> 
         			<?php echo $this->form->renderField('note'); ?> 
@@ -221,8 +244,6 @@ $item = $this->item;
            					<p class="xbit"><?php echo Text::_('When you save file artwork will be loaded from ID3 data if available'); ?></p>
            				<?php else: ?>
            					<p class="xbit"><?php echo Text::_('No artowrk specified. You can either save and load from ID3 if the music file has been updated, or save and copy from the album if one is specified and has a picture, or choose a picture below - this will also become the album image if one does not exist when you save the track.'); ?>
-           					<?php $this->form->renderField('picture_options'); ?>
-							<?php $this->form->renderField('picturefile'); ?> 
            				<?php endif; ?>
            				<?php echo Text::_('')?>
            			<?php else : ?>
@@ -233,9 +254,18 @@ $item = $this->item;
            		<div class="col-12 col-md-7">
 					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
 						<legend>Image details</legend>
-    					<?php echo $this->form->renderField('image_type'); ?> 
+						<p><?php 
+						$imgpath = str_replace(Uri::root(),JPATH_ROOT.'/',$item->imgurl);
+						if (!file_exists($imgpath)) : ?>
+						    <?php echo Text::_('Local image file missing.'); ?>
+						<?php else : ?>
+                            <i><?php echo Text::_('Image file'); ?></i> : <?php echo str_replace(Uri::root(), '', $item->imgurl); ?>
+						<?php endif; ?>
+    					<?php echo $this->form->renderField('imgurl');
+    					echo $this->form->renderField('image_type'); ?> 
     					<?php echo $this->form->renderField('image_desc'); ?> 
     					<?php if (!empty($item->imageinfo)) : ?>
+    						<p class="xbbold xbit"><?php echo Text::_('Original ID3 image data');?></p>
     						<dl class="xbdl">
         						<dt><?php echo Text::_('Type'); ?>:</dt>
         						<dd><?php echo $item->imageinfo->image_mime;?></dd>
@@ -248,14 +278,36 @@ $item = $this->item;
     					<?php else : ?>
     						<p class="xbit"><?php echo Text::_('imageinfo not available from id3 data'); ?></p>
     					<?php endif; ?>
+    					<?php 
+    					if (file_exists($imgpath)) : ?>
+    						<p class="xbbold xbit"><?php echo Text::_('Saved local image data'); ?></p>
+    						<?php $imageinfo = getimagesize($imgpath);    						
+    						?>
+    						<dl class="xbdl">
+    						
+        						<dt><?php echo Text::_('Type'); ?>:</dt>
+        						<dd><?php echo $imageinfo['mime'];?></dd>
+        						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
+        						<dd><?php echo $imageinfo[0];?>&nbsp;x&nbsp;
+        						<?php echo $imageinfo[1];?> px</dd>
+        						<dt><?php echo Text::_('Size'); ?>:</dt>
+        						<dd><?php echo number_format(filesize($imgpath)/1024, 2);?> kB</dd>
+    						</dl>
+						<?php else : ?>    
+							<p class="xbit"><?php echo Text::_('local image not available'); ?></p>
+												
+    					<?php endif; ?>
 					</fieldset>
 				</div>
         	</div>
 			<div class="row">
            		<div class="col-12 col-lg-6">
+   					<?php $this->form->renderField('picture_options'); ?>
+					<?php $this->form->renderField('picturefile'); ?> 
 				</div>
            		<div class="col-12 col-lg-6">
-           			
+           			<p>If you load a different image it will be used for the track within xbMusic, but will not be saved back to the file. External applications (eg Azuracast) will still use the original image.</p>
+           			<p>An option to save the image back to ID3 dat ain the music file, and also to replace the Azuracast image file if that has been linked, will appear here in a future version of xbMusic</p>
    				</div>
 			</div>
         

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.18.6 3rd November 2024
+ * @version 0.0.19.2 7th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -86,7 +86,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Tracks","desc"=>"default parent category for xbMusic Tracks")
             );
             $message .= $this->createCategories($cats).'<br />';
-            $message .= $this->createTag('Genres').'<br />';
+            $message .= $this->createTag('MusicGenres').'<br />';
             
             //create a top level tag to be parent for id3genre tags
 //            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));

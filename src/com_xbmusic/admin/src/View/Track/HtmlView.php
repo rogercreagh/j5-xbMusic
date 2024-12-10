@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.19.2 26th November 2024
+ * @version 0.0.19.2 10th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,9 +30,18 @@ class HtmlView extends BaseHtmlView {
     protected $canDo;
     
     public function display($tpl = null) {
+        $app  = Factory::getApplication();
         
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
+        
+        $this->id3loaded = $app->getUserState('com_xbmusic.edit.track.id3loaded', 0);
+        $this->replaced = $app->getUserState('com_xbmusic.edit.track.replaced',[]);
+        if ($this->id3loaded) {
+            $this->id3data = $app->getUserState('com_xbmusic.edit.track.id3data', []);
+            $app->setUserState('com_xbmusic.edit.track.replaced', null);
+            if (empty($this->id3data)) $this->id3loaded = 0;
+        }
 //        $this->state = $this->get('State');
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'track', $this->item->id);
         
@@ -70,7 +79,8 @@ class HtmlView extends BaseHtmlView {
         Factory::getApplication()->getInput()->set('hidemainmenu', true);
         $user       = $this->getCurrentUser();
         $userId     = $user->id;
-        $isNew      = ($this->item->id == 0);
+        $isNew      = (($this->item->id == 0) && ($this->id3loaded));
+        $attrib = ($isNew) ? array('disabled'=>'true') : [];
         $checkedOut = !(\is_null($this->item->checked_out) || $this->item->checked_out == $userId);
         $toolbar    = Toolbar::getInstance();
         
@@ -87,18 +97,15 @@ class HtmlView extends BaseHtmlView {
         $loadlbl = ($isNew) ? 'Load ID3' : 'Reload ID3' ;
         $toolbar->standardButton('loadid3',$loadlbl, 'track.loadid3')->icon('fas fa-file-arrow-down');
         if (!$checkedOut && $itemEditable) {
-//             if ($isNew) {
-// //                $toolbar->standardButton('readid3save','XBMUSIC_READ_ID3', 'track.readid3save')->icon('fas fa-file-arrow-down');                
-//             } else {
-//             }
-                $toolbar->apply('track.apply');
-                $toolbar->save('track.save');
+            $toolbar->apply('track.apply')->attributes($attrib);
+            $toolbar->save('track.save')->attributes($attrib);
         }
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');
         if (!$isNew) {
-            $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')
-                ->icon('fas fa-file-arrow-up')->attributes(array('disabled'=>'true'));            
+            //TODO implement save back to ID3
+//            $toolbar->standardButton('saveid3','XBMUSIC_SAVE_ID3', 'track.saveid3')
+//                ->icon('fas fa-file-arrow-up')->attributes(array('disabled'=>'true'));            
         }
         
         $toolbar->inlinehelp();

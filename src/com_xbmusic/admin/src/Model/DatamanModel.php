@@ -215,7 +215,7 @@ class DatamanModel extends AdminModel {
                             //we need to create the Tracks/Genres category
                             $tcat = XbcommonHelper::getCatByAlias('tracks');
                             $gpid = ($tcat->id > 0) ? $tcat->id : 1; //if the tracks category has been deleted fallback to root
-                            $gid = XbcommonHelper::getCreateCat(array('title'=>'Genres', 'alias'=>'genres', 'parent_id'=>$gpid),true)->id;
+                            $gid = XbcommonHelper::getCreateCat(array('title'=>'MusicGenres', 'alias'=>'musicgenres', 'parent_id'=>$gpid),true)->id;
                         }
                         $thisgid = XbcommonHelper::getCreateCat(array('title'=>$id3data['genres'][0]['title'], 'alias'=>$id3data['genres'][0]['alias'], 'parent_id'=>$gid),true)->id;
                     }

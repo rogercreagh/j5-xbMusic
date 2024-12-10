@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/track.xml
- * @version 0.0.19.1 22nd November 2024
+ * @version 0.0.19.2 10th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -167,6 +167,12 @@
 		<field name="artworkfilename" type="text" 
 		label="Image Filename"
 		
+		/>
+		<field name="imgurl" type="text"
+			label="Image Url"
+			description="URL of image as saved locally"
+			size="40" maxlength="190"
+			readonly="true"
 		/>
 		<field name="image_mime" type="text"
 			label="Mime Type"

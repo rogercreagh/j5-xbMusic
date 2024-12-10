@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/TrackController.php
- * @version 0.0.18.7 4th November 2024
+ * @version 0.0.19.2 7th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -23,6 +23,9 @@ class TrackController extends FormController {
     
     public function __construct($config = array(), MVCFactoryInterface $factory = null, $app = null, $input = null) {
         
+        /**
+         * @desc overridden to return to the correct view we came from
+         */
         parent::__construct($config, $factory, $app, $input);
         
         //article edit view can be called from articles, artlinks, or artimgs.
@@ -33,8 +36,22 @@ class TrackController extends FormController {
             $this->view_item = 'track&retview='.$ret;
         }
        // $this->registerTask('readid3', 'save');
+       
     }
 
+    /**
+     * @desc overridden to clear user state variables if ID3 data has been loaded.
+     * {@inheritDoc}
+     * @see \Joomla\CMS\MVC\Controller\FormController::cancel()
+     */
+    public function cancel($key = null) {
+        $app = Factory::getApplication();
+        $app->setUserState('com_xbmusic.edit.track.id3data', null);
+        $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);                
+        return parent::cancel($key);
+    }
+    
+    
 //     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
         
 //         $task = $this->getTask();
@@ -54,13 +71,13 @@ class TrackController extends FormController {
         $this->setRedirect((string)Uri::getInstance());
     }
     
-    public function readid3save() {
+//     public function readid3save() {
         
-        $model = $this->getModel('track');
-        $wynik = $model->readId3Save();
-        //        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
-        $this->setRedirect((string)Uri::getInstance());
-    }
+//         $model = $this->getModel('track');
+//         $wynik = $model->readId3Save();
+//         //        $redirectTo =('index.php?option=com_xbmusic&task=display&view=tracks');
+//         $this->setRedirect((string)Uri::getInstance());
+//     }
     
     public function publish() {
         $jip =  Factory::getApplication()->input;

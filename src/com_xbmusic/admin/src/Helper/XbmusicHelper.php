@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.19.2 6th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -462,7 +462,7 @@ class XbmusicHelper extends ComponentHelper
 	        $imgdata['imagetitle'] = $imgdata['picturetype'];
 	        $imgdata['imagedesc'] = $imgdata['description'];
 	    }
-	    
+	    return $imgdata;
 	}
 	
 	/**
@@ -509,7 +509,7 @@ class XbmusicHelper extends ComponentHelper
 	    $genres = array();
 	    $genrenames = explode('||', $genrenames);
         //get the parent tag for genre tags
-        $parentgenre = XbcommonHelper::getCreateTag(array('title'=>'Genres'));
+        $parentgenre = XbcommonHelper::getCreateTag(array('title'=>'MusicGenres'));
 	    foreach ($genrenames as &$genre) {
 	        $genre = self::normaliseGenrename(trim($genre), $ilogmsg);
 	        //get or create the genre tag id and title
