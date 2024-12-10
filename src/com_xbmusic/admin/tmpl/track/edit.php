@@ -103,7 +103,7 @@ $item = $this->item;
         			<b><?php echo (empty($fpn)) ? '' : basename($fpn); ?></b></p>
 				<?php if (!empty($fpn)) : ?>        			
                     <audio controls>
-                    	<source src="<?php echo '/xbmusic/'.$localpath.$item->filename; ?>">
+                    	<source src="<?php echo '/xbmusic/'.$localpath.basename($fpn); ?>">
                     	<i>Your browser does not support the audio tag.</i>
                     </audio>        		
     			<?php endif; ?>
