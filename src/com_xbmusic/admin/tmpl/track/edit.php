@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.19.2 10th December 2024
+ * @version 0.0.19.2 11th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -239,17 +239,17 @@ $item = $this->item;
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<?php if (empty($item->imgurl)) : ?>
-           				<?php if ($item->id == 0) : ?>
-           					<p class="xbit"><?php echo Text::_('When you save file artwork will be loaded from ID3 data if available'); ?></p>
-           				<?php else: ?>
-           					<p class="xbit"><?php echo Text::_('No artowrk specified. You can either save and load from ID3 if the music file has been updated, or save and copy from the album if one is specified and has a picture, or choose a picture below - this will also become the album image if one does not exist when you save the track.'); ?>
-           				<?php endif; ?>
-           				<?php echo Text::_('')?>
-           			<?php else : ?>
-	           			<?php echo Text::_('Artwork'); ?><br/>
-						<img src="<?php echo $item->imgurl; ?>" />
-					<?php endif; ?>
+                    <?php $imgurl = $this->form->getValue('imgurl'); ?>
+                    <?php if (empty($imgurl)) : ?>
+                    	<p class="xbnit"><?php echo Text::_('artwork not yet available, either load from music file or selected and existing image');?></p>
+                    <?php else : ?>
+                    	<?php if (key_exists('imgurl', $this->replaced)) {
+                    	    echo Text::_('New image reloaded from music file');
+                    	} else {
+                    	   echo Text::_('Artwork'); 
+                    	} ?><br/>
+                    	<img src="<?php echo $imgurl; ?>" style/>
+                    <?php endif; ?>
 				</div>        		
            		<div class="col-12 col-md-7">
 					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
@@ -301,11 +301,21 @@ $item = $this->item;
 				</div>
         	</div>
 			<div class="row">
-           		<div class="col-12 col-lg-6">
-   					<?php $this->form->renderField('picture_options'); ?>
-					<?php $this->form->renderField('picturefile'); ?> 
+           		<div class="col-12 col-lg-5 form-vertical">
+           			<?php if (key_exists('imgurl', $this->replaced)) : ?>
+           				<p class="xbit xbred"><?php echo Text::_('Previous image'); ?></p>
+           				<img src="<?php echo $this->replaced['imgurl']; ?>" style="max-width:200px; height:auto;" />
+           				<p><span class="xbnote xbred"><?php echo Text::_('to restore before saving copy url below to Image Url field above right'); ?></span>
+           				<br /><b><?php echo $this->replaced['imgurl']; ?></b></p>
+           			<?php endif; ?>
+                    <p><?php echo Text::_('Select an alternative image to be used on save'); ?></p>
+                    <?php echo $this->form->renderField('picture_options'); ?>
+                    <?php echo $this->form->renderField('picturefile'); ?>
+                    <?php echo $this->form->renderField('noalbimgnote'); ?>
+                    <?php echo $this->form->renderField('albumimage'); ?> 
+					
 				</div>
-           		<div class="col-12 col-lg-6">
+           		<div class="col-12 col-lg-7">
            			<p>If you load a different image it will be used for the track within xbMusic, but will not be saved back to the file. External applications (eg Azuracast) will still use the original image.</p>
            			<p>An option to save the image back to ID3 dat ain the music file, and also to replace the Azuracast image file if that has been linked, will appear here in a future version of xbMusic</p>
    				</div>
@@ -315,10 +325,11 @@ $item = $this->item;
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('ID3 data')); ?>
         	<div class="row">
-           		<div class="col-12 col-md-5">
+           		<div class="col-12 col-md-6">
+           			<p><?php echo Text::_('Saved raw data from file'); ?>
 					<?php if (!empty($item->id3_tags)) : ?>
     					<fieldset id="id3dets" class="xbbox xbboxwht ">
-    						<legend>ID3 Comment Tags</legend>
+    						<legend>Saved ID3 Tags</legend>
     						<dl class="xbdl">
                         		<?php foreach ($item->id3_tags as $key=>$value) : ?>
                         			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
@@ -326,11 +337,81 @@ $item = $this->item;
     						</dl>
     					</fieldset>
 					<?php else : ?>
-						<p class="xbit"><?php echo Text::_('id3 data not yet loaded or not available'); ?></p>
+						<p class="xbit"><?php echo Text::_('no id3 tags have been saved yet'); ?></p>
+					<?php endif; ?>
+ 					<?php if (!empty($item->fileinfo)) : ?>
+    					<fieldset id="id3dets" class="xbbox xbboxwht ">
+    						<legend>Fileinfo</legend>
+    						<dl class="xbdl">
+                        		<?php foreach ($item->fileinfo as $key=>$value) : ?>
+                        			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                        		<?php endforeach; ?>        
+    						</dl>
+    					</fieldset>
+					<?php else : ?>
+						<p class="xbit"><?php echo Text::_('file info has not been saved yet'); ?></p>
+					<?php endif; ?>
+					<?php if (!empty($item->audioinfo)) : ?>
+    					<fieldset id="id3dets" class="xbbox xbboxwht ">
+    						<legend>Saved Audio Info</legend>
+    						<dl class="xbdl">
+                        		<?php foreach ($item->audioinfo as $key=>$value) : ?>
+                        			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                        		<?php endforeach; ?>        
+    						</dl>
+    					</fieldset>
+					<?php else : ?>
+						<p class="xbit"><?php echo Text::_('audio info has not been saved yet'); ?></p>
 					<?php endif; ?>
         		</div>
-        		<div class="col-12 col-md-7">
-        			<p>Reload ID3, display new, if diff option to resave with new</p>
+        		
+        		<div class="col-12 col-md-6">
+        			<?php if ($this->id3loaded==1) : ?>
+        				<p><?php echo Text::_('Reloaded file data'); ?></p>
+    					<?php if (!empty($this->id3data['id3tags'])) : ?>
+        					<fieldset id="id3dets" class="xbbox xbboxwht ">
+        						<legend>Reloaded ID3 Tags</legend>
+        						<dl class="xbdl">
+                            		<?php $id3data = json_decode($this->id3data['id3tags']);
+                            		foreach ($id3data as $key=>$value) : ?>
+                            			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                            		<?php endforeach; ?>        
+        						</dl>
+        					</fieldset>
+    					<?php else : ?>
+    						<p class="xbit"><?php echo Text::_('no id3 tags reloaded'); ?></p>
+    					<?php endif; ?>
+     					<?php if (!empty($this->id3data['fileinfo'])) : ?>
+        					<fieldset id="id3dets" class="xbbox xbboxwht ">
+        						<legend>Reloaded Fileinfo</legend>
+        						<dl class="xbdl">
+                            		<?php $fileinfo = json_decode($this->id3data['fileinfo']);
+                            		foreach ($fileinfo as $key=>$value) : ?>
+                            			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                            		<?php endforeach; ?>        
+        						</dl>
+        					</fieldset>
+    					<?php else : ?>
+    						<p class="xbit"><?php echo Text::_('file info has not been saved yet'); ?></p>
+    					<?php endif; ?>
+    					<?php if (!empty($this->id3data['audioinfo'])) : ?>
+        					<fieldset id="id3dets" class="xbbox xbboxwht ">
+        						<legend>Reloaded Audio Info</legend>
+        						<dl class="xbdl">
+                            		<?php $audioinfo = json_decode($this->id3data['audioinfo']);
+                            		foreach ($audioinfo as $key=>$value) : ?>
+                            			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                            		<?php endforeach; ?>        
+        						</dl>
+        					</fieldset>
+    					<?php else : ?>
+    						<p class="xbit"><?php echo Text::_('audio info has not been saved yet'); ?></p>
+    					<?php endif; ?>
+
+
+        			<?php else : ?>
+        				<p class="xbnote"><?php echo Text::_('if file data is reloaded the replacement data will appear here for checking before it is saved'); ?></p>
+        			<?php endif; ?>
         		</div>
         	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>

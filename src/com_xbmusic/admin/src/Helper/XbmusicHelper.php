@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.19.2 6th December 2024
+ * @version 0.0.19.2 11th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -146,7 +146,8 @@ class XbmusicHelper extends ComponentHelper
 	        return false;
 	    }
 	    // trackdata['alias'] is title with suffix to make it unique in case of two tracks with same title
-	    $trackdata['alias'] = XbcommonHelper::makeUniqueAlias($trackdata['title'],'#__xbmusic_tracks');
+	    // we are not making it unique at this stage - do it on save
+	    $trackdata['alias'] = XbcommonHelper::makeAlias($trackdata['title']);
 	    if (isset($id3data['track_number'])) $trackdata['track_number'] = $id3data['track_number'];
 	    if (isset($id3data['part_of_a_set'])) $trackdata['part_of_a_set'] = $id3data['part_of_a_set'];
 //	    if (isset($id3data['audioinfo']['playtime_seconds'])) $trackdata['duration'] = (int)$id3data['audioinfo']['playtime_seconds'];
@@ -212,7 +213,7 @@ class XbmusicHelper extends ComponentHelper
 	    //get album info
 	    if (isset($id3data['album'])) {
 	        $albumstr = $id3data['album'];
-	        $albcnt = substr_count($albumstr,' || ') + 1;
+	        $albcnt = substr_count($albumstr,'||') + 1;
 	        if ($albcnt > 1) {
 	            $ilogmsg .= '[INFO] '.Xbtext::_('more than one album name in ID3, only first will be used',8);
 	            $ilogmsg .= '[INFO] <ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
@@ -294,6 +295,14 @@ class XbmusicHelper extends ComponentHelper
 	    return $items;
 	    
 	} // end id3dataToItems()
+	
+	public static function getItemIdFromAlias(string $table, string $alias){
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true);
+        $query->select($db->qn('id'))->from($db->qn($table))->where('alias = '.$db->q($alias));
+        $db->setQuery($query);
+        return $db->loadResult();
+	}
 	
 	public static function getArtistAlbums($aid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    

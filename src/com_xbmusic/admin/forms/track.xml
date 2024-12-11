@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/track.xml
- * @version 0.0.19.2 10th December 2024
+ * @version 0.0.19.2 11th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -159,20 +159,32 @@
  			class="btn-group btn-group-yesno"
 			default="0"
 			>
-				<option value="0">get from ID3</option>
-				<option value="1">get from Album</option>
-				<option value="3">select new image</option>
+				<option value="0">Reload music file</option>
+				<option shownon="albumimage!:" value="1">Use Album Image</option>
+				<option value="3">Select new image</option>
+		</field>
+      <field name="albimgnote" type="note"
+        description="No album image available"
+        showon="picture_options:1[AND]albumimage:"
+        class="xbit"
+        />
+		<field name="albumimage" type="text"
+			label="Album Image"
+			description=""
+		>
 		</field>
 		
-		<field name="artworkfilename" type="text" 
-		label="Image Filename"
-		
+		<field name="picturefile" type="media"
+			label="Track Picture" description="If no ID3 picture available you can upload and select one here. If track ha an album, and album image is not already set this one will be assigned" 
+			directory="xbmusic/artwork"
+			showon="picture_options:3"
 		/>
+		
 		<field name="imgurl" type="text"
 			label="Image Url"
 			description="URL of image as saved locally"
 			size="40" maxlength="190"
-			readonly="true"
+			readonly="false"
 		/>
 		<field name="image_mime" type="text"
 			label="Mime Type"
@@ -207,11 +219,6 @@
 			label="Picture desciption"
 			description="fuller description of image"
 			size="20" maxlength="50"
-		/>
-		<field name="picturefile" type="media"
-			label="Track Picture" description="If no ID3 picture available you can upload and select one here. If track ha an album, and album image is not already set this one will be assigned" 
-			directory="xbmusic/artwork"
-			showon="picture_options:3"
 		/>
 	</fieldset>
 

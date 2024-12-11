@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 1.0.0.0 13th November 2024
+ * @version 1.0.0.0 11th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -550,17 +550,18 @@ class XbcommonHelper extends ComponentHelper {
      * @name makeUniqueAlias()
      * @desc takes a text string and converts it into a unique alias for the given table
      * calls makeAlias() to remove unwanted chars from text and make url safe
-     * then checks against table and adds 2 digit suffix to make it unique if needed
+     * then checks against table and adds 2 digit suffix to make it unique IRRESPECTIVE OF CATEGORY if needed
      * @param string $text
      * @param string $table
      * @return string
      */
     public static function makeUniqueAlias(string $text, string $table) {
         $alias = self::makeAlias($text);
+        $temp = $alias;
         $i = 0;
         while (self::checkValueExists($alias, $table, 'alias') !== false) {
             $i ++;
-            $alias = $text.'-'.sprintf("%02d",$i);
+            $alias = $temp.'-'.sprintf("%02d",$i);
         }
         return $alias;
     }

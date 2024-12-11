@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.19.2 10th December 2024
+ * @version 0.0.19.2 11th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -131,17 +131,17 @@ class TrackModel extends AdminModel {
             $data['filepathname'] = JPATH_ROOT.'/xbmusic/'.$data['foldername'].$data['selectedfiles'];
             $data['filename'] = $data['selectedfiles'];
         }
-        //TODO check if file exists in case something soilly has been entered manually
+        //TODO check if file exists in case something solly has been entered manually
         
         $warnmsg = '';
         $infomsg = '';
         $ilogmsg = '';
         //start log
-        $loghead = '[LOADID3] Load ID3 Started '.date('H:i:s D jS M Y')."\n";
-        $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
-        $enditem = " -------------------------- \n";
-        $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
-        $starttime = time();
+//         $loghead = '[LOADID3] Load ID3 Started '.date('H:i:s D jS M Y')."\n";
+//         $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
+//         $enditem = " -------------------------- \n";
+//         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
+//         $starttime = time();
         
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);
@@ -197,6 +197,7 @@ class TrackModel extends AdminModel {
             if (isset($id3data['songdata'])) {
                 $trackdata['song'] = $id3data['songdata'];
                 $trackdata['song']['catid'] = $defcats->songcatid;
+                $trackdata['song']['id'] = XbmusicHelper::getItemIdFromAlias('#__xbmusic_songs', $trackdata['song']['alias']);
                 if ($optalbsong & 1) $trackdata['song']['tags'] = $genreids;
             } 
             //songlinks will bee generating on save and adding to artist album and track
@@ -247,6 +248,7 @@ class TrackModel extends AdminModel {
                 if ($optalbsong > 1) $id3data['albumdata']['tags'] = $genreids;
                 if ($imgurl != false) $id3data['albumdata']['imgurl'] = $imgurl;
                 $trackdata['albumdata'] = $id3data['albumdata'];
+                $trackdata['album_id'] = XbmusicHelper::getItemIdFromAlias('#__xbmusic_albums', $trackdata['albumdata']['alias']);
             }
             $app->setUserState('com_xbmusic.edit.track.id3data', $trackdata); 
             $app->setUserState('com_xbmusic.edit.track.id3loaded', 1);
@@ -256,14 +258,14 @@ class TrackModel extends AdminModel {
             //no trackdata found in id3 - we've already reported this in id3dataToItems()
         }
         
-        //update the log file with counts at the top
-        $loghead .= '[SUM] '.$cnts['newtrk'].' new tracks, '.$cnts['duptrk'].' duplicates'."\n";
-        $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."\n";
-        $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
-        $loghead .= " -------------------------- \n";
-        $logmsg = $loghead.$ilogmsg;
-        $logmsg .= '======================================'."\n\n";
-        XbmusicHelper::writelog($logmsg);
+        //we will only write the log when item is saved update the log file with counts at the top
+//         $loghead .= '[SUM] '.$cnts['newtrk'].' new tracks, '.$cnts['duptrk'].' duplicates'."\n";
+//         $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."\n";
+//         $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
+//         $loghead .= " -------------------------- \n";
+//         $logmsg = $loghead.$ilogmsg;
+//         $logmsg .= '======================================'."\n\n";
+//         XbmusicHelper::writelog($logmsg);
         
 //        $app->setUserState('com_xbmusic.edit.track.data', $data);
         return true;
@@ -318,18 +320,19 @@ class TrackModel extends AdminModel {
             if ($item->fileinfo) $item->fileinfo = json_decode($item->fileinfo);
             if ($item->imageinfo) $item->imageinfo = json_decode($item->imageinfo);
             $item->image_type = ($item->imageinfo) ? $item->imageinfo->picturetype : '';
-            $item->image_desc = ($item->imageinfo) ? $item->imageinfo->description : '';                
+            $item->image_desc = ($item->imageinfo) ? $item->imageinfo->description : '';   
+            $item->albumimage = ($item->album_id > 0) ? $item->album['imgurl'] :'';
 
             if ($app->getUserState('com_xbmusic.edit.track.id3loaded', 0) == 1) {
                 $id3data = $app->getUserState('com_xbmusic.edit.track.id3data', []);
                 if (!empty($id3data)) {                   
                     $app->enqueueMessage('New ID3 Data loaded but not yet saved','Warning');
                     //$item->fileinfo = json_decode($id3data['fileinfo']);
-                    $item->fileinfo = json_decode($id3data['fileinfo']);
+                    //$item->fileinfo = json_decode($id3data['fileinfo']);
                     $item->imageinfo = (object)$id3data['imageinfo'];
-                    $item->audioinfo = json_decode($id3data['audioinfo']);
-                    $item->id3tags = json_decode($id3data['id3tags']);
-                    $item->imgurl = $id3data['imgurl'];
+                    //$item->audioinfo = json_decode($id3data['audioinfo']);
+                    //$item->id3tags = json_decode($id3data['id3tags']);
+                    //$item->imgurl = $id3data['imgurl'];
                 }
             }
             } else {
@@ -366,6 +369,7 @@ class TrackModel extends AdminModel {
                 if (!empty($tagsarr)){
                     $groupnametags = $taghelp->getTagTreeArray($pid);
                     $grouptags = array_intersect($groupnametags, $tagsarr);
+                    
                     $form->setValue($groupname,null,$grouptags);
                 }
             }
@@ -389,7 +393,7 @@ class TrackModel extends AdminModel {
             if (!empty($id3data)) {
                 // overwrite these fields even if set
                 $fields = array('title','alias','filepathname','filename','foldername',
-                  'selectedfiles','catid'.'sortartist','rec_date','rel_date','duration',
+                  'selectedfiles','catid','sortartist','rec_date','rel_date','duration',
                     'imgurl','discno','trackno'
                 );
                 $replaced = $this->setFields($fields,$data,$id3data);
@@ -605,7 +609,7 @@ class TrackModel extends AdminModel {
         if ($albumid >0) {
             $db = $this->getDatabase();
             $query = $db->getQuery(true);
-            $query->select('id, title, sortartist, rel_date');
+            $query->select('id, title, sortartist, rel_date, imgurl');
             $query->from('#__xbmusic_albums');
             $query->where($db->qn('id').' = '.$db->q($albumid));
             $db->setQuery($query);
