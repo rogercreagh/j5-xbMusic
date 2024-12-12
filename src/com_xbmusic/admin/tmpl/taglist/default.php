@@ -73,7 +73,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
 		<?php else : ?>
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo Xbtext::_('XB_SORTED_BY',2).$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',XBT_SP_LAST + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="table-scroll">

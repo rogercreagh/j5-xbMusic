@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.2 28th November 2024
+ * @version 0.0.19.3 12th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -25,9 +25,9 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use \SimpleXMLElement;
 
 
-const INFO = '[INFO] ';
-const WARN = '[WARNING] ';
-const ERROR = '[ERROR] ';
+const XBINFO = '[INFO] ';
+const XBWARN = '[WARNING] ';
+const XBERR = '[ERROR] ';
 
 class DatamanModel extends AdminModel {
 
@@ -78,14 +78,14 @@ class DatamanModel extends AdminModel {
         } elseif (!is_array($files)) {
             $errmsg .= Text::_('Invalid files list');
             Factory::getApplication()->enqueueMessage($errmsg,'Error');
-            $logmsg .= $loghead.'[ERROR] '.$errmsg."\n ============================== \n\n";
+            $logmsg .= $loghead.XBERR.$errmsg."\n ============================== \n\n";
             $this->writelog($logmsg);
             return false;
         }
         if (count($files)==0){
             $errmsg .= Xbtext::_('No mp3 files found in',2).$folder;
             Factory::getApplication()->enqueueMessage($errmsg,'Warning');
-            $logmsg .= $loghead.'[WARNING] '.$errmsg."\n ============================== \n\n";
+            $logmsg .= $loghead.XBWARN.$errmsg.XBENDLOG;
             $this->writelog($logmsg);
             return false;
         }
@@ -153,7 +153,7 @@ class DatamanModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $app = Factory::getApplication();
         //start the logging for this file
-        $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$filepathname)."\n";
+        $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$filepathname)."\n";
         $enditem = " -------------------------- \n";
         $newmsg = Text::_('New items created:').'<br />';
         $trackdata = []; //only one track per file
@@ -161,8 +161,8 @@ class DatamanModel extends AdminModel {
 
 // 1. check if filepathname already in database, if it exists already then exit
         if ( $tid = XbcommonHelper::checkValueExists($filepathname, '#__xbmusic_tracks', 'filepathname')) {
-            $msg = Text::_('Track already in database with track_id').Xbtext::_($tid,12);
-            $ilogmsg .= ERROR.$msg.$enditem;
+            $msg = Text::_('Track already in database with track_id').Xbtext::_($tid,XBT_SP_FIRST + XBT_DQ);
+            $ilogmsg .= XBERR.$msg.$enditem;
             $cnts['duptrk'] ++;
             $app->enqueueMessage(trim($msg),'Error');
             return $ilogmsg;
@@ -172,19 +172,19 @@ class DatamanModel extends AdminModel {
         $fpathinfo = pathinfo($filepathname);
         if ( $fid = XbcommonHelper::checkValueExists($fpathinfo['basename'], '#__xbmusic_tracks', 'filename')) {  
             $fpath = XbcommonHelper::getItemValue('#__xbmusic_tracks', 'filepathname', $fid);
-            $msg = Text::_('Filename already in database at different location').Xbtext($fpath,7).Text::_('with track_id').Xbtext::_($fid,12);
-            $ilogmsg .= WARN.$msg;
-            $msg2 = Xbtext::_('Importing this one anyway, but check and delete one or other if necessary',12);
+            $msg = Text::_('Filename already in database at different location').Xbtext($fpath,7).Text::_('with track_id').Xbtext::_($fid,XBT_DQ + XBT_NL);
+            $ilogmsg .= XBWARN.$msg;
+            $msg2 = Xbtext::_('Importing this one anyway, but check and delete one or other if necessary',XBT_NL);
             $app->enqueueMessage(trim($msg).'<br />'.trim($msg2),'Warning');
-            $ilogmsg .= WARN.$msg2;
+            $ilogmsg .= XBWARN.$msg2;
         }
         
 //3. okay, now get the id3 data
         $filedata = XbmusicHelper::getFileId3(($filepathname));
         
         if (!isset($filedata['id3tags']['title'])) { //could add any other required elements to the isset() function
-            $msg = Xbtext::_('No title found in ID3 data. Cannot import',12);
-            $ilogmsg .= ERROR.$msg.$enditem;
+            $msg = Xbtext::_('No title found in ID3 data. Cannot import',XBT_NL);
+            $ilogmsg .= XBERR.$msg.$enditem;
             $cnts['errtrk'] ++;
             $app->enqueueMessage(trim($msg),'Error');
             return $ilogmsg;          
@@ -251,21 +251,21 @@ class DatamanModel extends AdminModel {
                 if ($optalbsong & 1) $song['tags'] = $genreids;
                 $song['id'] = XbmusicHelper::createMusicItem($song, 'song');  
                 if ($song['id']=== false) {
-                    $msg = Text::_('failed to save song').Xbtext::_($song['title'],13);
-                    $ilogmsg .= ERROR.$msg;
+                    $msg = Text::_('failed to save song').Xbtext::_($song['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                    $ilogmsg .= XBERR.$msg;
                     $app->enqueueMessage(trim($msg),'Error');                         
                 } elseif ($song['id'] >0) {
                     $cnts['newsng'] ++;
-                    $msg = Xbtext::_('new song saved. Id:',2).$song['id'].Xbtext::_($song['title'],13);
-                    $ilogmsg .= INFO.$msg;
+                    $msg = Xbtext::_('new song saved. Id:',XBT_SP_LAST).$song['id'].Xbtext::_($song['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                    $ilogmsg .= XBINFO.$msg;
                     $newmsg .= (trim($msg).'<br />');
                 } else {
-                    $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],7).Xbtext::_('Please check it is not a different song with the same title',4);
-                    $ilogmsg = WARN.$msg;
+                    $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],XBT_SP_BOTH + XBT_DQ).Xbtext::_('Please check it is not a different song with the same title',XBT_NL);
+                    $ilogmsg = XBWARN.$msg;
                     $app->enqueueMessage(trim($msg),'Warning');
                     $song['id'] = $song['id'] * -1;
                     if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
-                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to song',3).$song['id'].': '.Xbtext::_($song['title'],12);
+                    $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to song',XBT_BOTH).$song['id'].': '.Xbtext::_($song['title'],XBT_DQ + XBT_NL);
                 }
                 if ($song['id']>0) {
                     $link = array('song_id'=>$song['id']);
@@ -294,15 +294,15 @@ class DatamanModel extends AdminModel {
                     $artist['id'] = XbmusicHelper::createMusicItem($artist, 'artist');
                     if ($artist['id'] === false) {
                         $msg = Text::_('failed to save artist').Xbtext::_($artist['title'],13);
-                        $ilogmsg .= ERROR.$msg;
+                        $ilogmsg .= XBERR.$msg;
                         $app->enqueueMessage(trim($msg),'Error');
                     } elseif ($artist['id'] > 0) {
                         $cnts['newart'] ++;
-                        $msg = Xbtext::_('new artist saved. Id:',2).$artist['id'].Xbtext::_($artist['name'],13);
-                        $ilogmsg .= INFO.$msg;
+                        $msg = Xbtext::_('new artist saved. Id:',XBT_SP_LAST).$artist['id'].Xbtext::_($artist['name'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                        $ilogmsg .= XBINFO.$msg;
                         $newmsg .= (trim($msg).'<br />');
                     } else { 
-                        $ilogmsg .= INFO.Text::_('Artist already exists').Xbtext::_($artist['name'],13);
+                        $ilogmsg .= XBINFO.Text::_('Artist already exists').Xbtext::_($artist['name'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
                         $artist['id'] = $artist['id'] * -1;
                     }
                     if ($artist['id']>0) { 
@@ -311,7 +311,7 @@ class DatamanModel extends AdminModel {
                 }
                 $res = $this->addArtistSongs($artist['id'], $songlinks);
                 if ($res>0)
-                    $ilogmsg .= INFO.$res.Xbtext::_('song links added to',3).Xbtext::_($artist['name'],12);
+                    $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBT_SP_FIRST).Xbtext::_($artist['name'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
                 //will be linked to album once album data loaded
                 //only one new track so ok to use artist list in model 
                 $trackdata['artistlist'] = $artistlinks;
@@ -334,8 +334,8 @@ class DatamanModel extends AdminModel {
                     unset($imgdata['data']);
 //                     $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
 //                     if (file_exists($file)){
-//                         $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),13);
-//                         $ilogmsg .= INFO.$msg;
+//                         $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),XBT_SP_FIRST + XBT_DQ + XBT_NL);
+//                         $ilogmsg .= XBINFO.$msg;
 //                         $newmsg .= trim($msg).'<br />';
 //                         $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
 //                         $imgdata['basename'] = basename($file);
@@ -354,8 +354,8 @@ class DatamanModel extends AdminModel {
                     $trackdata['imgurl'] = $imgurl;
                     $trackdata['imageinfo'] = json_encode($imgdata);
                 } else {
-                    $msg = Xbtext::_('failed to create image file',12);
-                    $ilogmsg .= WARN.$msg;
+                    $msg = Xbtext::_('failed to create image file',XBT_NL);
+                    $ilogmsg .= XBWARN.$msg;
                     $app->enqueueMessage(trim($msg),'Warning');
                 }
             } //end ifset image data
@@ -369,13 +369,13 @@ class DatamanModel extends AdminModel {
                 if ($imgurl != false) $albumdata['imgurl'] = $imgurl;
                 $albumdata['id'] = XbmusicHelper::createMusicItem($albumdata, 'album');
                 if ($albumdata['id']===false) {
-                        $msg = Text::_('failed to save album').Xbtext::_($albumdata['title'],13);
-                        $ilogmsg .= ERROR.$msg;
+                    $msg = Text::_('failed to save album').Xbtext::_($albumdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                        $ilogmsg .= XBERR.$msg;
                         $app->enqueueMessage($msg,'Error');                       
                 } elseif ($albumdata['id']>0) { 
                     $cnts['newalb'] ++;                       
-                    $msg = Text::_('new album saved').Xbtext::_($albumdata['title'],13);
-                    $ilogmsg .= INFO.$msg;
+                    $msg = Text::_('new album saved').Xbtext::_($albumdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                    $ilogmsg .= XBINFO.$msg;
                     $newmsg .= trim($msg).'<br />';
                 } else { //this implies the album alias already exists
                     $albumdata['id'] = $albumdata['id'] * -1;
@@ -384,14 +384,14 @@ class DatamanModel extends AdminModel {
                 //album may have already existed so we need to add to existing artist and song links after creating
                 $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
                 if ($res>0)
-                    $ilogmsg .= INFO.$res.Xbtext::_('song links added to',3).Xbtext::_($albumdata['title'],12);
+                    $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBT_SP_FIRST).Xbtext::_($albumdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
                     $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
                 if ($res>0)
-                    $ilogmsg .= INFO.$res.Xbtext::_('artist links added to',3).Xbtext::_($albumdata['title'],12);
+                    $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBT_SP_FIRST).Xbtext::_($albumdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
                         
                 if ($optalbsong > 1) {
                     $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                    $ilogmsg .= INFO.$gadd.Xbtext::_('genres added to album',3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],12);
+                    $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to album',XBT_SP_BOTH).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBT_DQ + XBT_NL);
                 }
              }
            
@@ -403,21 +403,21 @@ class DatamanModel extends AdminModel {
             $trackdata['artistlist'] = $artistlinks;
             $trackdata['id'] = XbmusicHelper::createMusicItem($trackdata, 'track');
             if ($trackdata['id']=== false) {
-                $msg = Text::_('failed to save track').Xbtext::_($trackdata['title'],13);
-                $ilogmsg .= ERROR.$msg;
+                $msg = Text::_('failed to save track').Xbtext::_($trackdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                $ilogmsg .= XBERR.$msg;
                 $app->enqueueMessage(trim($msg),'Error');
             } elseif ($trackdata['id'] >0) {
                 $cnts['newtrk'] ++;
-                $msg = Xbtext::_('new track saved. Id:',2).$trackdata['id'].Xbtext::_($trackdata['title'],13);
-                $ilogmsg .= INFO.$msg;
+                $msg = Xbtext::_('new track saved. Id:',XBT_SP_LAST).$trackdata['id'].Xbtext::_($trackdata['title'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                $ilogmsg .= XBINFO.$msg;
                 $newmsg .= trim($msg).'<br />';
-             //   $ilogmsg .= INFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
+             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
             } else {
-                $msg = Text::_('Track alias already exists').Xbtext::_($trackdata['alias'],13);
-                $ilogmsg .= WARN.$msg;
+                $msg = Text::_('Track alias already exists').Xbtext::_($trackdata['alias'],XBT_SP_FIRST + XBT_DQ + XBT_NL);
+                $ilogmsg .= XBWARN.$msg;
                 $trackdata['id'] = $trackdata['id'] * -1;
-                $newmsg .= WARN.trim($msg);
-             //   $ilogmsg .= INFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
+                $newmsg .= XBWARN.trim($msg);
+             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
             }
              
         } //end if iset id3data[trackdata]

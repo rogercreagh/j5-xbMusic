@@ -20,41 +20,71 @@ use Joomla\Plugin\Fields\SQL\Extension\SQL;
 class Xbtext extends ComponentHelper {
     
     /**
-     * @name _()
-     * @desc prefixes and/or appends spaces to langauge string and optionally changes case and uses sprintf
-     *  - in en-GB.xbcommon.ini single words are (almost always) with upper case first letter
-     * @param string $text - language string
-     * @param int $opts - 1 to prefix, 2 to append, 3 for both, 4 wrap double quotes, 8 append \n
-     * @param int $case - 1 lcfirst, 2 ucfirst, 3 to lower, 
-     * @param boolean|array $translate - false no translation, true translate, array use sprintf with array[optionss]
-     * @return string
+    * @name _()
+    * @desc processes text with optional translation, case conversion, sprintf,
+    * single or double quotes, spaces before/after, css classes, paragraph wrapper
+    * and line break, horizontal ruler, unix newline appended
+    *  - in en-GB.xbcommon.ini single words are (almost always) with upper case first letter
+    * @desc 
+XBT_SP_FIRST', 1); //add a space before the text
+XBT_SP_LAST add a space after text
+XBT_SP_BOTH add spaces before and after text
+XBT_SQ wrap in single quotes
+XBT_DQ wrap in double quotes
+XBT_P wrap in <p>...</p> with optional class in second param
+// if css class(es) specified in second parameter a <span class="xyz">..</span> will wrap the text
+XBT_BR add <br /> after text
+XBT_HR add <hr /> after text 
+XBT_NL add \n newline after text
+
+XBT_TRANS translate text by passing through Text::_() before processing
+
+// used to adjust case of text.
+//most useful if translate is true (param & 256)
+XBT_LC1  lower case first letter
+XBT_UC1 capitalise first letter
+XBT_LCALL all lower case
+XBT_UCALL all upper case
+
+    * @param string $text - language string
+    * @param int $opts - see defines require by component in comment below
+    * @param string $class -  css classes to be applied to p or span around the text
+    * @param boolean|array $sprintf use Text::sprintf() with options in from array
+    * @return string
      */
-    public static function _(string $text, int $opts = 0, $case = false, $translate = '') {
-        if ($translate === false) {
-            $result = $text;
+    public static function _(string $text, int $opts = 0, $class = '', $sprint = []) {
+        //first do translation and sprintf if required
+        if ($opts & XBT_TRANS) {
+            $result = (!empty($sprint)) ? Text::sprintf($text,$translate) : Text::_($text);                      
         } else {
-            $result = (is_array($translate)) ? Text::sprintf($text,$translate) : Text::_($text);                      
+            $result = $text;
         }
-        switch ($case) {
-            case 1:
-                $result = lcfirst($result);
-                break;
-            case 2:
-                $result = ucfirst($result);
-                break;
-            case 3:
-                $result = strtolower($result);
-                break;
-            case 4:
-                $result = strtoupper($result);
-                break;
-            default:
-                break;
+        //second do any case conversion
+        if ($opts & XBT_LCALL) $result = strtolower($result);
+        if ($opts & XBT_UCALL) $result = strtoupper($result);
+        if ($opts & XBT_LC1) $result = lcfirst($result);
+        if ($opts & XBT_UC1) $result = ucfirst($result);
+        //third add any wrappers
+        if ($opts & XBT_SQ) $result = '\''.$result.'\'';
+        if ($opts & XBT_DQ) $result = '"'.$result.'"';
+        if ($opts & XBT_SP_FIRST) $result = ' '.$result;
+        if ($opts & XBT_SP_LAST) $result .=' ';
+        //now wrap in p or span with any class specified
+        if ($class != '')  {
+            $class = ' class="'.$class.'"';
+            if ($opts & XBT_P) {
+                $result = '<p'.$class.'>'.$result.'</p>';
+            } else {
+                $result = '<span class="'.$class.'">'.$result.'</span>';                
+            }            
+        } else {
+            //no class wrap in paragraph
+            if ($opts & XBT_P) $result = '<p>'.$result.'</p>';           
         }
-        if ($opts & 4) $result = '"'.$result.'"';
-        if ($opts & 1) $result = ' '.$result;
-        if ($opts & 2) $result .=' ';
-        if ($opts & 8) $result = $result."\n";
+        //finally append any br hr and newlie required
+        if ($opts & XBT_BR) $result = $result."<br />";
+        if ($opts & XBT_HR) $result = $result."<hr />";
+        if ($opts & XBT_NL) $result = $result."\n";
         
         return $result;
     }

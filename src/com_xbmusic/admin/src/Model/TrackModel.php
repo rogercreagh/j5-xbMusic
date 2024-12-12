@@ -25,21 +25,6 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use \SimpleXMLElement;
-//use Joomla\Registry\Registry;
-//use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
-//use Symfony\Component\Validator\Constraints\IsNull;
-//use Crosborne\Component\Xbmusic\Administrator\Extension\XbmusicComponent;
-//use Joomla\CMS\Form\Form;
-//use Joomla\CMS\Plugin\PluginHelper;
-//use Joomla\CMS\String\PunycodeHelper;
-//use Joomla\CMS\Table\Table;
-//use Joomla\CMS\Table\TableInterface;
-//use Joomla\CMS\UCM\UCMType;
-//use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
-//use Joomla\Database\ParameterType;
-const INFO = '[INFO] ';
-const WARN = '[WARNING] ';
-const ERROR = '[ERROR] ';
 
 class TrackModel extends AdminModel {
   
@@ -138,7 +123,7 @@ class TrackModel extends AdminModel {
         $ilogmsg = '';
         //start log
 //         $loghead = '[LOADID3] Load ID3 Started '.date('H:i:s D jS M Y')."\n";
-//         $ilogmsg = INFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
+//         $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
 //         $enditem = " -------------------------- \n";
 //         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
 //         $starttime = time();

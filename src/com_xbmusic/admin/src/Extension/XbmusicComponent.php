@@ -22,6 +22,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLRegistryAwareTrait;
 use Psr\Container\ContainerInterface;
 
+require_once('defines.php');
+
 class XbmusicComponent extends MVCComponent implements
 BootableExtensionInterface, RouterServiceInterface
 {
