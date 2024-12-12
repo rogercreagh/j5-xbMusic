@@ -254,13 +254,18 @@ $item = $this->item;
            		<div class="col-12 col-md-7">
 					<fieldset id="pv_desc" class="xbbox xbboxwht xbyscroll">
 						<legend>Image details</legend>
-						<p><?php 
-						$imgpath = str_replace(Uri::root(),JPATH_ROOT.'/',$item->imgurl);
-						if (!file_exists($imgpath)) : ?>
-						    <?php echo Text::_('Local image file missing.'); ?>
+						<p><?php $imgpath = '';
+						if (!empty($item->url)) : ?>
+							<?php $imgpath = str_replace(Uri::root(),JPATH_ROOT.'/',$item->imgurl);
+                            if (file_exists($imgpath)) : ?>
+                            	<i><?php echo Text::_('Image file'); ?></i> : 
+                            		<?php echo str_replace(Uri::root(), '', $item->imgurl); ?>
+                            <?php else : ?>
+                                <?php echo Text::_('Local image file missing.'); ?>
+                            <?php endif; ?>
 						<?php else : ?>
-                            <i><?php echo Text::_('Image file'); ?></i> : <?php echo str_replace(Uri::root(), '', $item->imgurl); ?>
-						<?php endif; ?>
+                            <?php echo Text::_('No image file saved yet.'); ?>
+ 						<?php endif; ?>
     					<?php echo $this->form->renderField('imgurl');
     					echo $this->form->renderField('image_type'); ?> 
     					<?php echo $this->form->renderField('image_desc'); ?> 
@@ -279,7 +284,7 @@ $item = $this->item;
     						<p class="xbit"><?php echo Text::_('imageinfo not available from id3 data'); ?></p>
     					<?php endif; ?>
     					<?php 
-    					if (file_exists($imgpath)) : ?>
+    					if (($imgpath !='') && (file_exists($imgpath))) : ?>
     						<p class="xbbold xbit"><?php echo Text::_('Saved local image data'); ?></p>
     						<?php $imageinfo = getimagesize($imgpath);    						
     						?>
@@ -416,7 +421,7 @@ $item = $this->item;
         	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
         
-       <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
 				<div class="col-12 col-md-4">
          			<?php echo $this->form->renderField('tags'); ?> 
@@ -429,36 +434,64 @@ $item = $this->item;
  					<?php endif; ?>
 				</div>
     		</div>
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
-			<div class="row form-vertical">
+		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
-     		<h4><?php echo Text::_('Connections to other items')?></h4>
-   			<b><?php echo Text::_('Album'); ?></b>
-   				<br /><a href="<?php echo $albelink.$item->album['id'];?>">
-   					<?php echo $item->album['title'];?></a> [<?php echo $item->album['rel_date']; ?>]
-    		<hr />
-    		<b><?php echo Text::_('Songs'); ?></b>
-    		<ul>
-    			<?php foreach ($item->songs as $listitem) : ?>
-    				<li>
-    					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
-    						<?php echo $listitem['title']; ?></a>        			
-        			</li>
-    			<?php endforeach; ?>
-    		</ul>
-    		<hr />
-    		<b><?php echo Text::_('Artists'); ?></b>
-    		<ul>
-    			<?php foreach ($item->artists as $listitem) : ?>
-    				<li>
-    					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
-    						<?php echo $listitem['name']; ?></a>        			
-        			</li>
-    			<?php endforeach; ?>
-    		</ul>
-    		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+         		<h4><?php echo Text::_('Connections to other items')?></h4>
+       			<b><?php echo Text::_('Album'); ?></b>
+       			<br />
+   				<?php if ($item->album_id >0) : ?>   				
+   					<a href="<?php echo $albelink.$item->album['id'];?>">
+   						<?php echo $item->album['title'];?></a> [<?php echo $item->album['rel_date']; ?>]
+   				<?php endif; ?>
+        		<hr />
+        		<b><?php echo Text::_('Songs'); ?></b>
+        		<?php if (!empty($item->songs)) : ?>
+            		<ul>
+            			<?php foreach ($item->songs as $listitem) : ?>
+            				<li>
+            					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
+            						<?php echo $listitem['title']; ?></a>        			
+                			</li>
+            			<?php endforeach; ?>
+            		</ul>
+         		<?php endif; ?>
+       			<hr />
+        		<b><?php echo Text::_('Artists'); ?></b>
+         		<?php if (!empty($item->artists)) : ?>
+            		<ul>
+            			<?php foreach ($item->artists as $listitem) : ?>
+            				<li>
+            					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
+            						<?php echo $listitem['name']; ?></a>        			
+                			</li>
+            			<?php endforeach; ?>
+	        		</ul>
+        		<?php endif; ?>
+        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+        		<?php if ($this->id3loaded==1) : ?>
+        			<hr />
+        			<div class="xbred">
+        			</div>
+        			<h4><?php echo Text::_('Items from ID3 data'); ?></h4>
+        			<?php if (!empty($this->id3data['albumdata']))
+        			    echo '<i>'.Text::_('Album').'</i>: '.$this->id3data['albumdata']['title'].'<hr />';
+    			    if (!empty($this->id3data['song']))
+    			        echo '<i>'.Text::_('Song').'</i>: '.$this->id3data['song']['title'].'<hr />';
+    			    if (!empty($this->id3data['artists'])) {
+    		            echo '<i>'.Text::_('Artists').'</i>:'.'<ul style="list-style:none;">';
+    		            foreach ($this->id3data['artists'] as $artist) {
+    		                echo '<li>'.$artist['name'].'</li>';
+    		            }
+    		            echo '</ul>';
+    			    }
+        			?>
+        			<p class="xbnote">
+        				<?php echo Text::_('Items above will be created if necessary and linked to this track on Save'); ?>
+        			</p>
+        		<?php endif; ?>
     		</div>
 	       	<div class="col-12 col-md-9">
 	       		<div class="row form-vertical">
@@ -475,13 +508,13 @@ $item = $this->item;
 				<?php echo $this->form->renderField('songlist'); ?>	
         		<?php echo $this->form->renderField('artistlist');?>
 			</div>
-    		</hr>
+    		<hr />
     		<?php echo $this->form->renderField('ext_links');?>
-			</div>
+		</div>
 
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
         <div class="row">
             <div class="col-12 col-lg-6">
                 <fieldset id="fieldset-publishingdata" class="options-form">
