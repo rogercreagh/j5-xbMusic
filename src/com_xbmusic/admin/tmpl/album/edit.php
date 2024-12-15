@@ -161,7 +161,7 @@ $item = $this->item;
 						<?php if(isset($item->imageinfo->datalength)) {
 						    echo Text::_('Album Image has been taken from a track ID3 data');
 						    if ($item->imageinfo->fileht < $item->imageinfo->image_height) {
-						        echo Xbtext::_('and resized from ',XBT_SP_BOTH);
+						        echo Xbtext::_('and resized from ',XBSP3);
 						        echo $item->imageinfo->image_width.' x '.$item->imageinfo->image_height.' px';
 						    }
 						}

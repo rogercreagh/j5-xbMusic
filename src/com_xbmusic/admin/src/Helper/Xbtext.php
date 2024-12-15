@@ -26,25 +26,25 @@ class Xbtext extends ComponentHelper {
     * and line break, horizontal ruler, unix newline appended
     *  - in en-GB.xbcommon.ini single words are (almost always) with upper case first letter
     * @desc 
-XBT_SP_FIRST', 1); //add a space before the text
-XBT_SP_LAST add a space after text
-XBT_SP_BOTH add spaces before and after text
-XBT_SQ wrap in single quotes
-XBT_DQ wrap in double quotes
-XBT_P wrap in <p>...</p> with optional class in second param
+XBSP1', 1); //add a space before the text
+XBSP2 add a space after text
+XBSP3 add spaces before and after text
+XBSQ wrap in single quotes
+XBDQ wrap in double quotes
+XBP wrap in <p>...</p> with optional class in second param
 // if css class(es) specified in second parameter a <span class="xyz">..</span> will wrap the text
-XBT_BR add <br /> after text
-XBT_HR add <hr /> after text 
-XBT_NL add \n newline after text
+XBBR add <br /> after text
+XBHR add <hr /> after text 
+XBNL add \n newline after text
 
-XBT_TRANS translate text by passing through Text::_() before processing
+XBTRL translate text by passing through Text::_() before processing
 
 // used to adjust case of text.
 //most useful if translate is true (param & 256)
-XBT_LC1  lower case first letter
-XBT_UC1 capitalise first letter
-XBT_LCALL all lower case
-XBT_UCALL all upper case
+XBLC1  lower case first letter
+XBUC1 capitalise first letter
+XBLCALL all lower case
+XBUCALL all upper case
 
     * @param string $text - language string
     * @param int $opts - see defines require by component in comment below
@@ -54,37 +54,37 @@ XBT_UCALL all upper case
      */
     public static function _(string $text, int $opts = 0, $class = '', $sprint = []) {
         //first do translation and sprintf if required
-        if ($opts & XBT_TRANS) {
+        if ($opts & XBTRL) {
             $result = (!empty($sprint)) ? Text::sprintf($text,$translate) : Text::_($text);                      
         } else {
             $result = $text;
         }
         //second do any case conversion
-        if ($opts & XBT_LCALL) $result = strtolower($result);
-        if ($opts & XBT_UCALL) $result = strtoupper($result);
-        if ($opts & XBT_LC1) $result = lcfirst($result);
-        if ($opts & XBT_UC1) $result = ucfirst($result);
+        if ($opts & XBLCALL) $result = strtolower($result);
+        if ($opts & XBUCALL) $result = strtoupper($result);
+        if ($opts & XBLC1) $result = lcfirst($result);
+        if ($opts & XBUC1) $result = ucfirst($result);
         //third add any wrappers
-        if ($opts & XBT_SQ) $result = '\''.$result.'\'';
-        if ($opts & XBT_DQ) $result = '"'.$result.'"';
-        if ($opts & XBT_SP_FIRST) $result = ' '.$result;
-        if ($opts & XBT_SP_LAST) $result .=' ';
+        if ($opts & XBSQ) $result = '\''.$result.'\'';
+        if ($opts & XBDQ) $result = '"'.$result.'"';
+        if ($opts & XBSP1) $result = ' '.$result;
+        if ($opts & XBSP2) $result .=' ';
         //now wrap in p or span with any class specified
         if ($class != '')  {
             $class = ' class="'.$class.'"';
-            if ($opts & XBT_P) {
+            if ($opts & XBP) {
                 $result = '<p'.$class.'>'.$result.'</p>';
             } else {
                 $result = '<span class="'.$class.'">'.$result.'</span>';                
             }            
         } else {
             //no class wrap in paragraph
-            if ($opts & XBT_P) $result = '<p>'.$result.'</p>';           
+            if ($opts & XBP) $result = '<p>'.$result.'</p>';           
         }
         //finally append any br hr and newlie required
-        if ($opts & XBT_BR) $result = $result."<br />";
-        if ($opts & XBT_HR) $result = $result."<hr />";
-        if ($opts & XBT_NL) $result = $result."\n";
+        if ($opts & XBBR) $result = $result."<br />";
+        if ($opts & XBHR) $result = $result."<hr />";
+        if ($opts & XBNL) $result = $result."\n";
         
         return $result;
     }

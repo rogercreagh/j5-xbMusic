@@ -84,7 +84,7 @@ if (strpos($listOrder, 'modified') !== false) {
 		<?php else : ?>
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo Xbtext::_('XB_SORTED_BY',XBT_SP_LAST + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
@@ -180,10 +180,10 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbr09 xbnit"><?php echo Xbtext::_('Released',XBT_SP_LAST).$item->rel_date; ?><br />
+								<p class="xbr09 xbnit"><?php echo Xbtext::_('Released',XBSP2).$item->rel_date; ?><br />
         							<?php if ($item->format) echo $item->format; ?>
-    								<?php if($item->num_discs > 1) echo Xbtext::_('on',XBT_SP_LAST). $item->num_discs. Xbtext::_('discs',XBT_SP_FIRST); ?> 
-        							<?php // if ($item->tot_tracks) echo Xbtext::_('with',XBT_SP_BOTH).$item->tot_tracks.Text::_('tracks');?>	
+    								<?php if($item->num_discs > 1) echo Xbtext::_('on',XBSP2). $item->num_discs. Xbtext::_('discs',XBSP1); ?> 
+        							<?php // if ($item->tot_tracks) echo Xbtext::_('with',XBSP3).$item->tot_tracks.Text::_('tracks');?>	
    								</p>
 							</div>
 						</td>
@@ -241,7 +241,7 @@ if (strpos($listOrder, 'modified') !== false) {
 				                <?php echo $track['trackname']; ?></a> 
 				                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
 				                <br /><span class="xbnote">
-    				                <?php echo Xbtext::_('track',XBT_SP_LAST).$track['trackno'].Xbtext::_('on disc',XBT_SP_BOTH); ?>
+    				                <?php echo Xbtext::_('track',XBSP2).$track['trackno'].Xbtext::_('on disc',XBSP3); ?>
     				                <?php if($item->num_discs > 1) echo $track['discno']; ?>
 				                </span>
 							<?php else : ?>

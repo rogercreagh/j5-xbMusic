@@ -11,25 +11,25 @@
  * second paramter is an optional class
  **/
 //bitwise flags to modify or wrap text, default  is 0 = transform
-define('XBT_SP_FIRST', 1); //add a space before the text
-define('XBT_SP_LAST', 2); //add a space after text
-define('XBT_SP_BOTH', 3); //add spaces before and after text
-define('XBT_SQ', 4); //wrap in single quotes
-define('XBT_DQ', 8); //wrap in double quotes
-define('XBT_P', 16); //wrap in <p>...</p> with optional class in second param
+define('XBSP1', 1); //add a space before the text
+define('XBSP2', 2); //add a space after text
+define('XBSP3', 3); //add spaces before and after text
+define('XBSQ', 4); //wrap in single quotes
+define('XBDQ', 8); //wrap in double quotes
+define('XBP', 16); //wrap in <p>...</p> with optional class in second param
 // if css class(es) specified in second parameter a <span class="xyz">..</span> will wrap the text
-define('XBT_BR', 32); //add <br /> after text
-define('XBT_HR', 64); //add <hr /> after text 
-define('XBT_NL', 128); //add \n newline after text
+define('XBBR', 32); //add <br /> after text
+define('XBHR', 64); //add <hr /> after text 
+define('XBNL', 128); //add \n newline after text
 
-define('XBT_TRANS',512); //translate text by passing through Text::_() before processing
+define('XBTRL',512); //translate text by passing through Text::_() before processing
 
 // used to adjust case of text.
 //most useful if translate is true (param & 256)
-define('XBT_LC1', 1024); // lower case first letter
-define('XBT_UC1', 2048); //capitalise first letter
-define('XBT_LCALL', 4096); // all lower case
-define('XBT_UCALL', 8192); // all upper case
+define('XBLC1', 1024); // lower case first letter
+define('XBUC1', 2048); //capitalise first letter
+define('XBLCALL', 4096); // all lower case
+define('XBUCALL', 8192); // all upper case
 
 /** log messages 
  * 

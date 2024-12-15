@@ -81,7 +81,7 @@ if (strpos($listOrder, 'modified') !== false) {
 		<?php else : ?>
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo Xbtext::_('XB_SORTED_BY',XBT_SP_LAST + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
@@ -176,10 +176,10 @@ if (strpos($listOrder, 'modified') !== false) {
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
 								<?php if($item->trkcnt > 0): ?>
-    								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',XBT_SP_LAST).$item->trkcnt; 
-    								echo ($item->trkcnt==1)? Xbtext::_('track',XBT_SP_FIRST + XBT_TRANS) : Xbtext::_('tracks',XBT_SP_FIRST,  + XBT_TRANS).'. ';     								    
-    								echo (count($item->albums) == 1) ? Xbtext::_('album',XBT_SP_FIRST + XBT_TRANS) : Xbtext::_('albums',XBT_SP_FIRST + XBT_TRANS);
-    								if (count($item->singles) > 0) echo count($item->singles) . Xbtext::_('single tracks',XBT_SP_FIRST + XBT_TRANS);?>
+    								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',XBSP2).$item->trkcnt; 
+    								echo ($item->trkcnt==1)? Xbtext::_('track',XBSP1 + XBT_TRANS) : Xbtext::_('tracks',XBSP1,  + XBT_TRANS).'. ';     								    
+    								echo (count($item->albums) == 1) ? Xbtext::_('album',XBSP1 + XBT_TRANS) : Xbtext::_('albums',XBSP1 + XBT_TRANS);
+    								if (count($item->singles) > 0) echo count($item->singles) . Xbtext::_('single tracks',XBSP1 + XBT_TRANS);?>
     								</p>
 								<?php endif; ?>
 							</div>

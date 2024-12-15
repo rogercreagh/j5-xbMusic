@@ -131,7 +131,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->albumcnt>0) ? 'gradyellow' : 'xbbggy'; ?>">
 					<p><?php echo ($item->albumcnt==0) ? Text::_('JNO') : $item->albumcnt==0;
-					echo Xbtext::_('XBMUSIC_ALBUMS',XBT_SP_BOTH + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XBMUSIC_ALBUMS',XBSP3 + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->albumcnt > 0) : ?>
     					<?php if ($item->albumcnt < $longlist+1) : ?>
@@ -163,7 +163,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->artistcnt > 0) ? 'gradblue' : 'xbbggy'; ?>">
 					<p><?php echo ($item->artistcnt > 0) ? $item->artistcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_ARTISTS',XBT_SP_BOTH + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XBMUSIC_ARTISTS',XBSP3 + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->artistcnt > 0) : ?>
     					<?php if ($item->artistcnt < $longlist+1) : ?>
@@ -195,7 +195,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->playlistcnt > 0) ? 'gradpink' : 'xbbggy'; ?>">
 					<p><?php echo ($item->playlistcnt > 0) ? $item->playlistcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_PLAYLISTS',XBT_SP_BOTH + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XBMUSIC_PLAYLISTS',XBSP3 + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->playlistcnt > 0) : ?>
     					<?php if ($item->playlistcnt < $longlist+1) : ?>
@@ -229,7 +229,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->songcnt>0) ? 'gradcyan' : 'xbbggy'; ?>">
 					<p><?php echo ($item->songcnt>0) ? $item->songcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_SONGS',XBT_SP_BOTH + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XBMUSIC_SONGS',XBSP3 + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->songcnt > 0) : ?>
     					<?php if ($item->songcnt < $longlist+1) : ?>
@@ -261,7 +261,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->trackcnt > 0) ? 'gradgreen' : 'xbbggy'; ?>">
 					<p><?php echo ($item->trackcnt > 0) ? $item->trackcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_TRACKS',XBT_SP_BOTH + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XBMUSIC_TRACKS',XBSP3 + XBT_TRANS).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->trackcnt > 0) : ?>
     					<?php if ($item->trackcnt < $longlist+1) : ?>
