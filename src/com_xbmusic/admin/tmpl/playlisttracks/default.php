@@ -70,7 +70,7 @@ if ($saveOrder && !empty($this->items)) {
 		<?php else : ?>
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBTRL).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">

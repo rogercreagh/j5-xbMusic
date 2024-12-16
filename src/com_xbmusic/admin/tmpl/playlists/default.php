@@ -81,7 +81,7 @@ if (strpos($listOrder, 'modified') !== false) {
 		<?php else : ?>
 			<div class="pull-left">
         		<p class="xbmb5">              
-                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBT_TRANS).$listOrder.' '.$listDirn ; ?>
+                    <?php echo Xbtext::_('XB_SORTED_BY',XBSP2 + XBTRL).$listOrder.' '.$listDirn ; ?>
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
@@ -179,7 +179,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if($item->trkcnt > 0): ?>
 								<details>
 									<summary class="xbnit"><?php echo $item->trkcnt; 
-									echo ($item->trkcnt==1)? Xbtext::_('track',XBSP1 + XBT_TRANS) : Xbtext::_('tracks',XBSP1 + XBT_TRANS); ?>
+									echo ($item->trkcnt==1)? Xbtext::_('track',XBSP1 + XBTRL) : Xbtext::_('tracks',XBSP1 + XBTRL); ?>
 								    </summary>
 								    <div class="xbmh400 xbyscroll">
     									<ul style="margin:5px;list-style: none;">

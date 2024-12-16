@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.19.2 11th December 2024
+ * @version 0.0.19.3 16th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -210,8 +210,8 @@ class TrackModel extends AdminModel {
                     $imgfilename .= 'albums/'.strtolower($id3data['albumdata']['alias'][0]).'/'.$id3data['albumdata']['alias'];
                 } else {
                     $imgfilename .= 'singles/'.$trackdata['alias'];
-                    if (isset($trackdata['sortartist'])) $imgfilename .= '_'.XbcommonHelper::makeAlias($trackdata['sortartist']);
                 }
+                if (isset($trackdata['sortartist'])) $imgfilename .= '_'.XbcommonHelper::makeAlias($trackdata['sortartist']);
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                 if ($imgurl !== false) {
                     $imgdata['imagetitle'] = $imgdata['picturetype'];
@@ -470,7 +470,15 @@ class TrackModel extends AdminModel {
                 }
             }
         } // endforeach parenttag
-        
+        // check if track alias already exists and if it does append [basename(imagename)]
+        if (XbcommonHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
+            $append = '';
+            if (key_exists('sortartist',$trackdata)) $append = $trackdata['sortartist'];
+            if ($trackdata['album_id'] > 0) $append .= ' '.$id3data['albumdata']['alias'];
+            if ($append != '') $append = ' ['.$append.']';
+            $trackdata['alias'] = XbcommonHelper::makeUniqueAlias($trackdata['alias'].$append, '#__xbmusic_tracks');
+            //$msg .= ' - '.Text::sprintf('Trying save with alias %s',$trackdata['alias']);
+        }
         if (parent::save($trackdata)) {
             $app->setUserState('com_xbmusic.edit.track.id3data', null);
             $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);

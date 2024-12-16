@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.3 12th December 2024
+ * @version 0.0.19.3 16th December 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -401,6 +401,14 @@ class DatamanModel extends AdminModel {
             }
             $trackdata['songlist'] = $songlinks;
             $trackdata['artistlist'] = $artistlinks;
+            if (XbcommonHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
+                $append = '';
+                if (key_exists('sortartist',$trackdata)) $append = $trackdata['sortartist'];
+                if ($trackdata['album_id'] > 0) $append .= ' '.$albumdata['alias'];
+                if ($append != '') $append = ' ['.$append.']';
+                $trackdata['alias'] = XbcommonHelper::makeUniqueAlias($trackdata['alias'].$append, '#__xbmusic_tracks');
+                //$msg .= ' - '.Text::sprintf('Trying save with alias %s',$trackdata['alias']);               
+            }
             $trackdata['id'] = XbmusicHelper::createMusicItem($trackdata, 'track');
             if ($trackdata['id']=== false) {
                 $msg = Text::_('failed to save track').Xbtext::_($trackdata['title'],XBSP1 + XBDQ + XBNL);
@@ -411,17 +419,18 @@ class DatamanModel extends AdminModel {
                 $msg = Xbtext::_('new track saved. Id:',XBSP2).$trackdata['id'].Xbtext::_($trackdata['title'],XBSP1 + XBDQ + XBNL);
                 $ilogmsg .= XBINFO.$msg;
                 $newmsg .= trim($msg).'<br />';
+                $app->enqueueMessage($newmsg,'Success');
              //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
             } else {
-                $msg = Text::_('Track alias already exists').Xbtext::_($trackdata['alias'],XBSP1 + XBDQ + XBNL);
-                $ilogmsg .= XBWARN.$msg;
-                $trackdata['id'] = $trackdata['id'] * -1;
-                $newmsg .= XBWARN.trim($msg);
+                $msg .= ' : '.Text::_('FAILED to save track').Xbtext::_($trackdata['title'], XBSP1 + XBDQ + XBNL);
+                $ilogmsg .= XBERR.$msg;
+                $newmsg .= trim($msg).'<br />';
+                $app->enqueueMessage(trim($msg),'Error');
+                
              //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
             }
              
         } //end if iset id3data[trackdata]
-        $app->enqueueMessage($newmsg,'Success');
         return $ilogmsg;
     } //end parseID3()
         
