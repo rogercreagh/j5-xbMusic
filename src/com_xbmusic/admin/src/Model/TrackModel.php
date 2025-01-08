@@ -118,15 +118,11 @@ class TrackModel extends AdminModel {
         }
         //TODO check if file exists in case something solly has been entered manually
         
-        $warnmsg = '';
-        $infomsg = '';
-        $ilogmsg = '';
+//        $warnmsg = '';
+//        $infomsg = '';
+//        $ilogmsg = '';
         //start log
-//         $loghead = '[LOADID3] Load ID3 Started '.date('H:i:s D jS M Y')."\n";
-//         $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
-//         $enditem = " -------------------------- \n";
-//         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
-//         $starttime = time();
+        $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
         
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);
@@ -152,7 +148,7 @@ class TrackModel extends AdminModel {
                 $usedaycat = $params->get('impcat','0');
                 if (!$usedaycat && ($optcattag & 1)) {
                     //need to create a genre category and assign it to defcat->albumcatid
-                    $thisgid = XbcommonHelper::getCatByAlias($id3data['genres'][0]['alias'])->id;
+                    $thisgid = XbcommonHelper::getCatByAlias($id3data['genrs'][0]['alias'])->id;
                     if (is_null($thisgid)) {
                         //get Genre in Tracks category
                         $gcat = XbcommonHelper::getCatByAlias('musicgenres');
@@ -235,6 +231,7 @@ class TrackModel extends AdminModel {
                 $trackdata['albumdata'] = $id3data['albumdata'];
                 $trackdata['albumdata']['id'] = XbmusicHelper::getItemIdFromAlias('#__xbmusic_albums', $trackdata['albumdata']['alias']);
             }
+            $trackdata['logmsg'] = $ilogmsg;
             $app->setUserState('com_xbmusic.edit.track.id3data', $trackdata); 
             $app->setUserState('com_xbmusic.edit.track.id3loaded', 1);
             
@@ -425,10 +422,22 @@ class TrackModel extends AdminModel {
         if ($app->getUserState('com_xbmusic.edit.track.id3loaded', 0) == 1) {
             $id3data = $app->getUserState('com_xbmusic.edit.track.id3data', []);
             if (!empty($id3data)) {
+                $loglevel = $params->get('loglevel',3);
+                if ($loglevel>0) {
+                    $loghead = '[LOADID3] Load ID3 Started '.date('H:i:s D jS M Y')."\n";
+                    $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
+                    $ilogmsg = $id3data['logmsg'];
+                }
                 if (!empty($id3data['song'])) {
                     $id = XbmusicHelper::createMusicItem($id3data['song'], 'song');
-                    if ($id < 0) $id = $id * -1;
-                    if ($id > 0) $trackdata['songlist'][] = array('song_id'=>$id,'role'=>'','note'=>'');;
+                    if ($id < 0) {
+                        $id = $id * -1;
+                        if ($loglevel >3) $ilogmsg .= XBINFO.''; //********************
+                    } elseif ($id > 0) {
+                        $trackdata['songlist'][] = array('song_id'=>$id,'role'=>'','note'=>'');;
+                    } else {
+                        
+                    }
                 }
                 if (!empty($id3data['artists'])) {
                     foreach ($id3data['artists'] as $artist) {

@@ -1,4 +1,12 @@
 <?php
+/*******
+ * @package xbMusic
+ * @filesource admin/vendor/getID3...
+ * @version 0.0.0.1 31st March 2024
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ ******/
 
 /////////////////////////////////////////////////////////////////
 /// getID3() by James Heinrich <info@getid3.org>               //

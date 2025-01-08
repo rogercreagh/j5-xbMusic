@@ -17,6 +17,7 @@ use Joomla\CMS\Router\Route;
 // use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 //HTMLHelper::_('behavior.multiselect');
 //HTMLHelper::_('formbehavior.chosen', 'select');
@@ -203,6 +204,25 @@ Functionality expected here:</p>
 <li>Display azuracast and station infos</li>
 <li>Find tracks listed here but not in azuracast</li>
 </ol>
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+			
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'filemanager', Text::_('Files')); ?>
+        	<?php echo $this->form->renderField('fmnote1'); ?> 
+			<?php if (empty($this->symlinks)) : ?>
+				<?php echo Text::_('No symlinks currently defined in xbmusic/'); ?>
+			<?php else : ?>
+				<p><?php echo count($this->symlinks).Xbtext::_('existing SymLinks found',XBSP1);?></p>
+                  <table><tr><th>Local Name</th><th></th><th>Target Path</th>
+				<?php foreach ($this->symlinks as $link) {
+				    echo '<tr><td>'.$link['name'].'</td><td> -> </td><td>'.$link['target'].'</td></tr>';
+				}?>
+				</table>
+				<p>&nbsp;</p>
+			<?php endif; ?>
+        	<?php echo $this->form->renderField('link_target'); ?> 
+        	<?php echo $this->form->renderField('link_name'); ?> 
+        	<?php echo $this->form->renderField('fmnote2'); ?> 
+			
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
             <?php echo HTMLHelper::_('uitab.endTabSet'); ?>

@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.18.6 3rd November 2024
+ * @version 0.0.19.4 7th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -53,6 +53,17 @@ class DatamanController extends FormController
         $wynick = $model->saveErrors($post['errlist'],true);
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
+    }
+    
+    function makeSymlink() {
+        $jip =  Factory::getApplication()->input;
+        $targ =  $jip->get('link_target');
+        $name = $jip->get('linkname');
+        $model = $this->getModel('dataman');
+        if (($targ!='') && ($name!='')) $wynik = $model->newsymlink($targ, $name);
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $this->setRedirect($redirectTo );
+        
     }
     
 }

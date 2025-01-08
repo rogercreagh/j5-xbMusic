@@ -2,11 +2,15 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/extension/defines.php
- * @version 0.0.19.3 12th December 2024
+ * @version 0.0.19.4 7th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+
  ******/
+
+defined('_JEXEC') or die;
+
 /** constants used by class Xbtext first parameter to flag text modifiers
  * second paramter is an optional class
  **/

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.3 16th December 2024
+ * @version 0.0.19.4 7th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -572,6 +572,22 @@ class DatamanModel extends AdminModel {
         return $cnt;
     }
     
+    private function newsymlink($targ, $name) {
+        
+        return false;
+    }
     
+    public function getSymlinks() {
+        $result = [];
+        $folders = glob(JPATH_ROOT . '/xbmusic/*' , GLOB_ONLYDIR);
+        if (!empty($folders)) {
+            foreach ($folders AS $folder) {
+                if (is_link($folder)) {                    
+                    $result[] = array('target' => readlink($folder), 'name'=>$folder) ;
+                }
+            }
+        }
+        return $result;
+    }
 }
 
