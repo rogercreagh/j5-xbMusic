@@ -46,6 +46,24 @@ $wa->useScript('keepalive')
 			return false;
 		}
 	}
+	function confirmMksym(){
+		if ((document.getElementById('jform_link_target').value!='') && document.getElementById('jform_link_name').value!=''){
+		    if (confirm('Make Link?') ) {
+				document.getElementById('task').value='dataman.makesymlink';
+		        return true;
+		    } else { return false; }
+		} else {
+			alert('Please enter target path and link name');
+			return false;
+		}
+	}
+	function confirmRemsym(link,targ,name) {
+		if (confirm('This will remove the link '+name+' to '+targ) ) {
+			document.getElementById('rem_name').value=link;
+			document.getElementById('task').value='dataman.remsymlink';
+		    return true;
+		} else { return false; }
+	}
 </script>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
@@ -68,19 +86,19 @@ $wa->useScript('keepalive')
 	</summary>	
 	<div class="row form-vertical">
 		<div class="col-md-6">
-			<p><?php echo Text::_('Select folder or tracks')?>
+			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
 	    	<div id="container"> </div>
         	<p><button id="impmp3" class="btn btn-warning" type="submit" 
         		onclick="if(confirmImportMp3()) {this.form.submit();}" />
         		<i class="icon-upload icon-white"></i> 
-        		<?php echo Text::_('Import'); ?>
+        		<?php echo Text::_('XB_IMPORT'); ?>
         	</button>
         	</p>
 		</div>
 		<div class="col-md-6">
         	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
-			<p class="xbinfo"><?php  echo Text::_('If you select a folder then all MP3 files in that folder (not sub-folders) will be imported.')?>
-				<br /><?php echo Text::_('If you select one or more files then only those files will be imported')?></p>	
+			<p class="xbinfo"><?php  echo Text::_('XBMUSIC_IMPORT_NOTE1')?>
+				<br /><?php echo Text::_('XBMUSIC_IMPORT_NOTE2')?></p>	
         	<?php echo $this->form->renderField('foldername'); ?> 
         	<?php echo $this->form->renderField('selectedfiles'); ?> 
         	<?php echo $this->form->renderField('filepathname'); ?> 
@@ -108,7 +126,7 @@ $wa->useScript('keepalive')
 	<h4>Import Logs</h4>
 		<div class="row">
 			<div class="col-md-6">
-				<h4><?php echo Text::_('Log File')?></h4>
+				<h4><?php echo Text::_('XB_LOG_FILE')?></h4>
 				<div class="xbbox gradyellow xbyscroll xbmh300">
 					<?php if ($this->log == '') : ?>
 						<p><i>no log loaded</i></p>
@@ -118,7 +136,7 @@ $wa->useScript('keepalive')
 				</div>
 			</div>
 			<div class="col-md-6">
-				<h4><?php echo Text::_('Select Log File')?></h4>
+				<h4><?php echo Text::_('XB_SELECT_LOG_FILE')?></h4>
 				<?php echo $this->form->renderField('logfile'); ?>
 			</div>
 		</div>
@@ -209,19 +227,40 @@ Functionality expected here:</p>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'filemanager', Text::_('Files')); ?>
         	<?php echo $this->form->renderField('fmnote1'); ?> 
 			<?php if (empty($this->symlinks)) : ?>
-				<?php echo Text::_('No symlinks currently defined in xbmusic/'); ?>
+				<?php echo Text::_('XBMUSIC_NO_SYMLINKS'); ?>
 			<?php else : ?>
-				<p><?php echo count($this->symlinks).Xbtext::_('existing SymLinks found',XBSP1);?></p>
-                  <table><tr><th>Local Name</th><th></th><th>Target Path</th>
-				<?php foreach ($this->symlinks as $link) {
-				    echo '<tr><td>'.$link['name'].'</td><td> -> </td><td>'.$link['target'].'</td></tr>';
-				}?>
+				<h4><?php echo count($this->symlinks).' '.Text::_('XBMUSIC_EXISTING_SYMLINKS');?></h4>
+                <table class="table-striped xbml50">
+                  	<tr><th style="text-align:right;">Name in <code>/xbmusic</code></th>
+                  		<th style="width:50px;text-align:center;">-></th>
+                  		<th>Target Path</th>
+                  		<th></th></tr>
+				<?php $n=0; 
+				foreach ($this->symlinks as $link) : ?>
+					<tr><td style="text-align:right;">
+				    	<?php $n++; 
+				    	   $name = str_replace(JPATH_ROOT.'/xbmusic/', '', $link['name']); 
+				    	   echo '<b>'.$name.'</b>'; ?>
+				    	</td><td style="text-align:center">-></td><td><?php echo $link['target']; ?></td>
+				    	<td style="padding:5px;">
+				    		<button id="remsym<?php echo $n;?>" class="btn btn-danger btn-sm" type="submit"
+        						onclick="if(confirmRemsym('<?php echo $link['name']; ?>','<?php echo $link['target']; ?>','<?php echo $name; ?>') == true) { this.form.submit();}" >
+        						<i class="icon-link icon-white"></i> <?php echo Text::_('XBMUSIC_REMOVE_LINK'); ?>
+        					</button>
+        				</td>
+				    </tr>
+				<?php endforeach; ?>
 				</table>
 				<p>&nbsp;</p>
 			<?php endif; ?>
         	<?php echo $this->form->renderField('link_target'); ?> 
         	<?php echo $this->form->renderField('link_name'); ?> 
         	<?php echo $this->form->renderField('fmnote2'); ?> 
+        	<p><button id="mksym" class="btn btn-warning" type="submit" 
+        		onclick="if(confirmMksym() == true) {this.form.submit();}" >
+        		<i class="icon-link icon-red"></i> 
+        		<?php echo Text::_('XBMUSIC_CREATE_LINK'); ?>
+        	</button></p>
 			
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
@@ -229,6 +268,7 @@ Functionality expected here:</p>
         	<hr />
          </div>
 
+		<input type="hidden" id="rem_name" name="rem_name" value="" />
 		<input type="hidden" id="task" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<?php echo HTMLHelper::_('form.token'); ?>

@@ -2,11 +2,11 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.10.1</version>
-		<date>27th June 2024</date>
+		<version>0.0.19.4</version>
+		<date>9th January 2025</date>
 		<title>First Alpha Release</title>
 		<addition>
-			<item><![CDATA[<h3>First Alpha Release v0.0.10.1</h3> Updated 27th June 2024]]></item>
+			<item><![CDATA[<h3>First Alpha Release v0.0.19.4</h3> Updated 9th January 2025]]></item>
 		</addition>
 		<remove>
 		</remove>
@@ -14,7 +14,8 @@
 		</change>
 		<other>
 			<item>Playlist functions missing</item>
-			<item>Data Management functions not yet implemented</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
 		</other>
 		<language>
 			<item>en-GB only</item>

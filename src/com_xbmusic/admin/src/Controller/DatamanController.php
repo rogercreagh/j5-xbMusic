@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.19.4 7th January 2025
+ * @version 0.0.19.4 9th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -55,12 +55,22 @@ class DatamanController extends FormController
         $this->setRedirect($redirectTo );
     }
     
-    function makeSymlink() {
+    function makesymlink() {
         $jip =  Factory::getApplication()->input;
-        $targ =  $jip->get('link_target');
-        $name = $jip->get('linkname');
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $targ =  $post['link_target'];
+        $name = $post['link_name'];
         $model = $this->getModel('dataman');
-        if (($targ!='') && ($name!='')) $wynik = $model->newsymlink($targ, $name);
+        $wynik = $model->newsymlink($targ, $name);            
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $this->setRedirect($redirectTo );       
+    }
+    
+    function remsymlink() {
+        $jip =  Factory::getApplication()->input;
+        $link = $jip->get('rem_name','','string');
+        $model = $this->getModel('dataman');
+        if (($link!='')) $wynik = $model->remsymlink($link);
         $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
         

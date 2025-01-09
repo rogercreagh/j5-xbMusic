@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.4 7th January 2025
+ * @version 0.0.19.4 9th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -572,9 +572,54 @@ class DatamanModel extends AdminModel {
         return $cnt;
     }
     
-    private function newsymlink($targ, $name) {
+    public function newsymlink($targ, $name) {
+        $res = false;
+        $mtype = 'Warning';
+        $linkname = JPATH_ROOT.'/xbmusic/'.$name;
+        $msg = '/xbmusic/<b>'.$name.'</b> -> '.$targ.'<br />';
+        if (file_exists($targ)) {;
+            if (is_readable($targ)) {
+                if (!file_exists($linkname)) {
+                    $res = symlink($targ,$linkname);
+                    if ($res) {
+                        $msg .= Text::_('XBMUSIC_LINK_CREATED');
+                        $mtype = 'Success';
+                    } else {
+                        $msg .= Text::_('XBMUSIC_ERROR_LINKING');                   
+                    }
+                } else {
+                    $msg .= Text::_('XBMUSIC_LINK_EXISTS');
+                }
+            } else {
+                $msg .= Text::_('XBMUSIC_TARGET_NOT_READABLE');
+            }
+        } else {
+            $msg .= Text::_('XBMUSIC_TARGET_NOT_EXIST');
+        }
+        Factory::getApplication()->enqueueMessage($msg,$mtype);
+        return $res;        
+    }
+    
+    public function remsymlink( $link) {
+        $msg = Text::_('Link').' <b>'.str_replace(JPATH_ROOT,'',$link).'</b> ';
+        $res = false;
+        $mtype = 'Warning';
+        $name = str_replace(JPATH_ROOT,'',$link);
+        if (is_link($link)) {
+            $res = unlink($link);
+            if ($res) {
+                $msg .= Text::_('XBMUSIC_REMOVED_OK');
+                $mtype = 'Success';
+            } else {
+                $msg .= Text::_('XBMUSIC_ERROR_UNLINKING');
+                $mtype = 'Error';
+            }
+        } else {
+            $msg .= Text::_('XBMUSIC_NOT_LINK');
+        }
+        Factory::getApplication()->enqueueMessage($msg,$mtype);
+        return $res;
         
-        return false;
     }
     
     public function getSymlinks() {

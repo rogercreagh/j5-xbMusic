@@ -77,9 +77,9 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			hint="enter absolute path to folder"
 			default=""
 		/>
-		<field name="link name" type="text"
+		<field name="link_name" type="text"
 			label="Link name in /xbmusic"
-			descrtiption="Enter the name for the new sysmlink. Must not be an existing folder or file in xbmusic/ or a Ideally no spaces or funny characters!"
+			description="Enter the name for the new sysmlink. Must not be an existing folder or file in xbmusic/ or a Ideally no spaces or funny characters!"
 			default=""
 			showon="link_target!:"
 		/> 
