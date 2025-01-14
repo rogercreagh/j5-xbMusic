@@ -42,9 +42,7 @@ $input = Factory::getApplication()->getInput();
 $item = $this->item;
 
 ?>
-<link rel="stylesheet" href="/test/media/com_xbmusic/css/foldertree.css">
-<script type="text/javascript" >
-</script>
+<link rel="stylesheet" href="<?php echo Uri::root(true);?>/media/com_xbmusic/css/foldertree.css">
 <script>
 	function clearmd() {
     	var descMd = document.getElementById('jform_description').value;

@@ -122,7 +122,7 @@ class TrackModel extends AdminModel {
 //        $infomsg = '';
 //        $ilogmsg = '';
         //start log
-        $ilogmsg = '[IMPORT TRACK] '.str_replace(JPATH_ROOT.'/xbmusic/','',$data[filepathname])."\n";
+        $ilogmsg = '[IMPORT TRACK] '.str_replace(JPATH_ROOT.'/xbmusic/','',$data['filepathname'])."\n";
         
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);

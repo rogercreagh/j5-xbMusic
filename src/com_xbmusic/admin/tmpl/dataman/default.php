@@ -37,7 +37,7 @@ $wa->useScript('joomla.dialog')
 //$input = Factory::getApplication()->getInput();
 
 ?>
-<link rel="stylesheet" href="/test/media/com_xbmusic/css/foldertree.css">
+<link rel="stylesheet" href="<?php echo Uri::root(true);?>/media/com_xbmusic/css/foldertree.css">
 <script type="module" >
     import JoomlaDialog from 'joomla.dialog';
 
@@ -48,34 +48,6 @@ $wa->useScript('joomla.dialog')
           };
        });
     }
-</script>
-<script type="text/javascript" >
-	function confirmImportMp3(){
-		if (confirm('This will import from MP3 data\n Are you really sure?')==true){
-			document.getElementById('task').value='dataman.importmp3';
-			return true;
-		} else {
-			return false;
-		}
-	}
-	function confirmMksym(){
-		if ((document.getElementById('jform_link_target').value!='') && document.getElementById('jform_link_name').value!=''){
-		    if (confirm('Make Link?')==true ) {
-				document.getElementById('task').value='dataman.makesymlink';
-		        return true;
-		    } else { return false; }
-		} else {
-			alert('Please enter target path and link name');
-			return false;
-		}
-	}
-	function confirmRemsym(link,targ,name) {
-		if (confirm('This will remove the link '+name+' to '+targ)==true ) {
-			document.getElementById('rem_name').value=link;
-			document.getElementById('task').value='dataman.remsymlink';
-		    return true;
-		} else { return false; }
-	}
 </script>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
@@ -100,8 +72,11 @@ $wa->useScript('joomla.dialog')
 		<div class="col-md-6">
 			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
 	    	<div id="container"> </div>
-        	<p><button id="impmp3" class="btn btn-warning" type="submit" 
-        		onclick="if(confirmImportMp3()==true) {this.form.submit();}" />
+	    	<?php $popbody = '<br />Are you really sure?'; 
+	    	  $pophead = 'Confirm Import from MP3'; ?>
+        	<p><button id="impmp3" class="btn btn-warning" type="button" 
+        		onclick="doConfirm('<i>Import from </i>'+document.getElementById('jform_foldername').value+
+        			'<?php echo $popbody; ?>','<?php echo $pophead; ?>','importmp3');" >
         		<i class="icon-upload icon-white"></i> 
         		<?php echo Text::_('XB_IMPORT'); ?>
         	</button>

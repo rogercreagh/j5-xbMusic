@@ -127,7 +127,7 @@
 			label="Import Category"
 			description="This will override the options above for all items to create a category based on import date when importing from track file ID3 data"
 			class="btn-group "
- 			default="0"
+ 			default="2"
 		>
 			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>

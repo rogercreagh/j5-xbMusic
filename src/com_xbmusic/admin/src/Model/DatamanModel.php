@@ -109,12 +109,12 @@ class DatamanModel extends AdminModel {
                 $dcparent = XbcommonHelper::createCategory($catdata, true);
             }
             $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-//            if ($this->trackcatid === false) {
+            if ($daycatid === false) {
                 $parentcat = XbcommonHelper::getCatByAlias('imports');
                 $parentid = ($parentcat>0) ? $parentcat->id : 1;
                 $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
                 $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
-//            }
+            }
             if ($daycatid > 0) {
                 $this->albumcatid = $daycatid;
                 $this->artistcatid = $daycatid;
