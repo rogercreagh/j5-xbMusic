@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.19.3 16th December 2024
+ * @version 0.0.19.7 14th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -122,7 +122,7 @@ class TrackModel extends AdminModel {
 //        $infomsg = '';
 //        $ilogmsg = '';
         //start log
-        $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$data['filepathname'])."\n";
+        $ilogmsg = '[IMPORT TRACK] '.str_replace(JPATH_ROOT.'/xbmusic/','',$data[filepathname])."\n";
         
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);

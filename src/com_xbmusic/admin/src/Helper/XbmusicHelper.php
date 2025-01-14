@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.19.2 11th December 2024
+ * @version 0.0.19.7 14th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -130,6 +130,8 @@ class XbmusicHelper extends ComponentHelper
 	 * @return array | false
 	 */
 	public static function id3dataToItems(array $id3data, string &$ilogmsg) {
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $loglevel = $params->get('loglevel',3);
 	    $items = array();
 	    $trackdata = array(); //only one track
 	    $albumdata = array(); //only one album title allowed, if alternates present reported in log
@@ -185,7 +187,7 @@ class XbmusicHelper extends ComponentHelper
 	        $artiststr = $id3data['artist'];
 	        $artcnt = substr_count($artiststr,' || ') + 1;
 	        if ($artcnt > 1) {
-	            $ilogmsg .= '[INFO] '.$artiststr.' '.$artcnt.' artist entries found in ID3.'."\n";
+	            if ($loglevel==4) $ilogmsg .= '[INFO] '.$artiststr.' '.$artcnt.' artist entries found in ID3.'."\n";
 	        }
 	        //the first artist in the list will become the track sortartist and album artist 
 	        $origartist = substr($artiststr, 0, strpos($artiststr.' ||', ' ||')+1);
@@ -215,8 +217,8 @@ class XbmusicHelper extends ComponentHelper
 	        $albumstr = $id3data['album'];
 	        $albcnt = substr_count($albumstr,'||') + 1;
 	        if ($albcnt > 1) {
-	            $ilogmsg .= XBINFO.Xbtext::_('more than one album name in ID3, only first will be used',XBNL);
-	            $ilogmsg .= XBINFO.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
+	            $ilogmsg .= XBWARN.Xbtext::_('more than one album name in ID3, only first will be used',XBNL);
+	            $ilogmsg .= XBWARN.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
 	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
 	        
@@ -396,13 +398,15 @@ class XbmusicHelper extends ComponentHelper
 	 * @return string|boolean - img url if exists or created or false on failure
 	 */
 	public static function createImageFile(array &$imgdata, string $imgfilename, string &$flogmsg) {
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $loglevel = $params->get('loglevel',3);
 	    $imgpath = pathinfo($imgfilename, PATHINFO_DIRNAME);
 	    $folder = str_replace('/images/xbmusic/artwork/','',$imgpath);
 	    $imgpath = JPATH_ROOT.$imgpath;
 	    //create the folder if it doesn't exist (eg new initial)
 	    if (file_exists($imgpath)==false) {
 	        if (mkdir($imgpath,0775,true)) {
-	            $flogmsg .= XBINFO.Text::_('artwork folder created',2).Xbtext::_($folder,XBSP1 + XBDQ + XBNL);
+	            if ($loglevel==4) $flogmsg .= XBINFO.Text::_('artwork folder created',2).Xbtext::_($folder,XBSP1 + XBDQ + XBNL);
 	        } else  {
 	            $flogmsg .= XBERR.Text::_('failed to create artwork folder').Xbtext::_($imgpath,XBSP1 + XBDQ + XBNL);
 	           return false;
@@ -416,7 +420,7 @@ class XbmusicHelper extends ComponentHelper
 	    $imgok = false;
 	    if (file_exists($imgpathfile)) {
 	        $imgok = true;
-	        $flogmsg .= '[INFO] '.Text::sprintf('Artwork file "%s" already exists',$xbfilename)."\n";
+	        if ($loglevel==4) $flogmsg .= '[INFO] '.Text::sprintf('Artwork file "%s" already exists',$xbfilename)."\n";
 	    } else {
 	        $params = ComponentHelper::getParams('com_xbmusic');
 	        $maxpx = $params->get('imagesize',500);
@@ -446,7 +450,7 @@ class XbmusicHelper extends ComponentHelper
 	        unset($imgdata['data']);
 	        $imgdata['imgurl'] = $imgurl;
 	        $imgdata = array_merge($imgdata, self::getImageInfo($imgdata));
-	        $flogmsg .= XBINFO.Text::_('image created').Xbtext::_($xbfilename,XBSP1 + XBDQ + XBNL);
+	        if ($loglevel==4) $flogmsg .= XBINFO.Text::_('image created').Xbtext::_($xbfilename,XBSP1 + XBDQ + XBNL);
 	        return $imgurl;
 	    }
 	    $flogmsg .= XBERR.Text::_('failed to create image').Xbtext::_($imgpathfile,XBSP1 + XBDQ + XBNL);

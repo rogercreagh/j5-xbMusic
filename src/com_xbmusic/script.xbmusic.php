@@ -119,8 +119,8 @@ class Com_xbmusicInstallerScript extends InstallerScript
 //             } else {
 //                 //create
 //                 //$query->clear();
-//                 $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
-//                 $app->enqueueMessage($mess,'warning');                
+                $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
+                $app->enqueueMessage($mess,'warning');                
 //             }
 //             $query->clear();
             $query->update('#__categories')
@@ -173,35 +173,35 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             $message .= $cnt.' existing xbMusic categories restored. ';
             //if we've got a params category then restore params and delete the category
-//             $query->clear();
-//             $paramwhere = $db->qn('extension').'='.$db->q('com_xbmusic').' AND '. $db->qn('title').'='.$db->q('params');
-//             $query->select('description')->from($db->qn('#__categories'));
-//             $query->where($paramwhere);
-//             $db->setQuery($query);
-//             $recparams = $db->loadResult();
-//             if ($recparams != '') {
-//                 $query->clear();
-//                 $query->update('#__extensions');
-//                 $query->set('params='.$db->q($recparams))
-//                     ->where('name='.$db->q('com_xbmusic'));
-//                 $db->setQuery($query);
-//                 try {
-//                     $db->execute();
-//                     $cnt = $db->getAffectedRows();
-//                 } catch (Exception $e) {
-//                     $app->enqueueMessage($e->getMessage(),'Error');
-//                 }
-//                 $query->clear();
-//                 $query->delete('#__categories')->where($paramwhere);
-//                 $db->setQuery($query);
-//                 try {
-//                     $db->execute();
-//                     $cnt = $db->getAffectedRows();
-//                 } catch (Exception $e) {
-//                     $app->enqueueMessage($e->getMessage(),'Error');
-//                 }
-//                 if ($cnt>0) $message.= 'com_xbmusic options recovered. Check values before proceeding.';
-//             }
+            $query->clear();
+            $paramwhere = $db->qn('extension').'='.$db->q('com_xbmusic').' AND '. $db->qn('title').'='.$db->q('params');
+            $query->select('description')->from($db->qn('#__categories'));
+            $query->where($paramwhere);
+            $db->setQuery($query);
+            $recparams = $db->loadResult();
+            if ($recparams != '') {
+                $query->clear();
+                $query->update('#__extensions');
+                $query->set('params='.$db->q($recparams))
+                    ->where('name='.$db->q('com_xbmusic'));
+                $db->setQuery($query);
+                try {
+                    $db->execute();
+                    $cnt = $db->getAffectedRows();
+                } catch (Exception $e) {
+                    $app->enqueueMessage($e->getMessage(),'Error');
+                }
+                $query->clear();
+                $query->delete('#__categories')->where($paramwhere);
+                $db->setQuery($query);
+                try {
+                    $db->execute();
+                    $cnt = $db->getAffectedRows();
+                } catch (Exception $e) {
+                    $app->enqueueMessage($e->getMessage(),'Error');
+                }
+                if ($cnt>0) $message.= 'com_xbmusic options recovered. Check values before proceeding.';
+            }
             // create default categories using category table if they haven't been recovered
             $cats = array(
                 array("title"=>"Uncategorised","desc"=>"default fallback category for all xbMusic items"),

@@ -151,9 +151,10 @@ class DatamanModel extends AdminModel {
         // The track is new so can use model with song and artist lists
         // album, song and artist may not be new in which case need to append links not in model
         $params = ComponentHelper::getParams('com_xbmusic');
+        $loglevel = $params->get('loglevel',3);
         $app = Factory::getApplication();
         //start the logging for this file
-        $ilogmsg = XBINFO.str_replace(JPATH_ROOT,'',$filepathname)."\n";
+        $ilogmsg = '[IMPORT BULK] '.str_replace(JPATH_ROOT.'/xbmusic/','',$filepathname)."\n";
         $enditem = " -------------------------- \n";
         $newmsg = Text::_('New items created:').'<br />';
         $trackdata = []; //only one track per file
@@ -257,7 +258,7 @@ class DatamanModel extends AdminModel {
                 } elseif ($song['id'] >0) {
                     $cnts['newsng'] ++;
                     $msg = Xbtext::_('new song saved. Id:',XBSP2).$song['id'].Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
-                    $ilogmsg .= XBINFO.$msg;
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                     $newmsg .= (trim($msg).'<br />');
                 } else {
                     $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],XBSP3 + XBDQ).Xbtext::_('Please check it is not a different song with the same title',XBNL);
@@ -265,7 +266,7 @@ class DatamanModel extends AdminModel {
                     $app->enqueueMessage(trim($msg),'Warning');
                     $song['id'] = $song['id'] * -1;
                     if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
-                    $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to song',XBSP3).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to song',XBSP3).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
                 }
                 if ($song['id']>0) {
                     $link = array('song_id'=>$song['id']);
@@ -299,10 +300,10 @@ class DatamanModel extends AdminModel {
                     } elseif ($artist['id'] > 0) {
                         $cnts['newart'] ++;
                         $msg = Xbtext::_('new artist saved. Id:',XBSP2).$artist['id'].Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
-                        $ilogmsg .= XBINFO.$msg;
+                        if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                         $newmsg .= (trim($msg).'<br />');
                     } else { 
-                        $ilogmsg .= XBINFO.Text::_('Artist already exists').Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
+                        if ($loglevel==4) $ilogmsg .= XBINFO.Text::_('Artist already exists').Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
                         $artist['id'] = $artist['id'] * -1;
                     }
                     if ($artist['id']>0) { 
@@ -311,7 +312,7 @@ class DatamanModel extends AdminModel {
                 }
                 $res = $this->addArtistSongs($artist['id'], $songlinks);
                 if ($res>0)
-                    $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
                 //will be linked to album once album data loaded
                 //only one new track so ok to use artist list in model 
                 $trackdata['artistlist'] = $artistlinks;
@@ -375,7 +376,7 @@ class DatamanModel extends AdminModel {
                 } elseif ($albumdata['id']>0) { 
                     $cnts['newalb'] ++;                       
                     $msg = Text::_('new album saved').Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
-                    $ilogmsg .= XBINFO.$msg;
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                     $newmsg .= trim($msg).'<br />';
                 } else { //this implies the album alias already exists
                     $albumdata['id'] = $albumdata['id'] * -1;
@@ -384,14 +385,14 @@ class DatamanModel extends AdminModel {
                 //album may have already existed so we need to add to existing artist and song links after creating
                 $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
                 if ($res>0)
-                    $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
                     $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
                 if ($res>0)
-                    $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
                         
                 if ($optalbsong > 1) {
                     $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                    $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to album',XBSP3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBDQ + XBNL);
+                    if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to album',XBSP3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBDQ + XBNL);
                 }
              }
            
@@ -417,7 +418,7 @@ class DatamanModel extends AdminModel {
             } elseif ($trackdata['id'] >0) {
                 $cnts['newtrk'] ++;
                 $msg = Xbtext::_('new track saved. Id:',XBSP2).$trackdata['id'].Xbtext::_($trackdata['title'],XBSP1 + XBDQ + XBNL);
-                $ilogmsg .= XBINFO.$msg;
+                if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                 $newmsg .= trim($msg).'<br />';
                 $app->enqueueMessage($newmsg,'Success');
              //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";

@@ -37,7 +37,7 @@ $wa->useScript('joomla.dialog')
 //$input = Factory::getApplication()->getInput();
 
 ?>
-<link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
+<link rel="stylesheet" href="/test/media/com_xbmusic/css/foldertree.css">
 <script type="module" >
     import JoomlaDialog from 'joomla.dialog';
 
@@ -273,8 +273,7 @@ Functionality expected here:</p>
         	<?php echo $this->form->renderField('link_target'); ?> 
         	<?php echo $this->form->renderField('link_name'); ?> 
         	<?php echo $this->form->renderField('fmnote2'); ?> 
-        	<p><?php $popbody = 'Link '.$link_target.'<br /> as /xbmusic/<b>'.$link_name.'</b>';
-        	   $pophead = 'Confirm Create SymLink in /xbmusic/'; ?>
+        	<p><?php $pophead = 'Confirm Create SymLink in /xbmusic/'; ?>
         	<button id="mksym" class="btn btn-warning" type="button" 
         		onclick="doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value + 
         			' <i>as</i>i> <b>'+document.getElementById('jform_link_name').value+'</b>',

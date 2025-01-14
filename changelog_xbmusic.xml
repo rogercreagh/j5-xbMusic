@@ -2,6 +2,43 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.19.7</version>
+		<date>14th January 2025</date>
+		<title>Improvements and Bugfixes</title>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.19.7</h3> Updated 14th January 2025]]></item>
+			<item>Option:Save data on uninstall</item>
+			<item>Option:Delete data files on uninstall</item>
+			<item>Create and remove music symlinks</item>
+			
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Option:Set log level working</item>
+		</change>
+		<other>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
+		</other>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item>dB update: filepathname field not long enough, extented to varchar 500</item>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.19.4</version>
 		<date>9th January 2025</date>
 		<title>First Alpha Release</title>

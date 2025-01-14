@@ -42,7 +42,7 @@ $input = Factory::getApplication()->getInput();
 $item = $this->item;
 
 ?>
-<link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
+<link rel="stylesheet" href="/test/media/com_xbmusic/css/foldertree.css">
 <script type="text/javascript" >
 </script>
 <script>

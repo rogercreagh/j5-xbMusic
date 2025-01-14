@@ -45,7 +45,7 @@
 				<option value="0" >DELETE</option>
 				<option value="1">KEEP</option>
 		</field>			
-  		<field name="savefile" type="radio"
+  		<field name="savefiles" type="radio"
 			label="Keep xbMusic files"
 			description="Option to keep the image, music and log files intact when uninstalling the xbMusic component. The external contents of symlinked music folders are not deleted in any event, only files actually stored in the xbMusic folders are affected."
  			class="btn-group btn-group-yesno"
