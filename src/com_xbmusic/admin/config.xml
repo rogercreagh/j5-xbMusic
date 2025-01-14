@@ -26,6 +26,36 @@
 			description="XBCONFIG_MUSICNOTE_DESC"
 			class="info"
 		/>
+		
+        <field name="space1" type="spacer" hr="true" />
+        
+		<field name="devmode" type="hidden" default="1" />
+		
+		<field name="devnote" type="note"
+			label="Development Options"
+			showon="devmode:1"
+		/>
+  		<field name="savedata" type="radio"
+			label="Keep Data on Uninstall"
+			description="This option allows you to uninstall without deleteing the database tables, categories or options. The categories and global options will be saved as a hidden category. When reinstalling xbMusic categories will be restored with their original IDs so will be correctly linked."
+ 			class="btn-group btn-group-yesno"
+			default="0"
+			showon="devmode:1"
+			>
+				<option value="0" >DELETE</option>
+				<option value="1">KEEP</option>
+		</field>			
+  		<field name="savefile" type="radio"
+			label="Keep xbMusic files"
+			description="Option to keep the image, music and log files intact when uninstalling the xbMusic component. The external contents of symlinked music folders are not deleted in any event, only files actually stored in the xbMusic folders are affected."
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			showon="devmode:1[AND]savedata:0"
+			>
+				<option value="1">KEEP</option>
+				<option value="0" >DELETE</option>
+		</field>			
+
 <!-- 
   		<field name="use_xbmusic" type="radio"
 			label="Folder for Music files"

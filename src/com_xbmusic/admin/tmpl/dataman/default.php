@@ -28,6 +28,7 @@ $wa->useScript('keepalive')
 ->useScript('form.validate')
 ->useScript('xbmusic.foldertree')
 ->useScript('xbmusic.showdown');
+$wa->useScript('joomla.dialog')
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -37,9 +38,20 @@ $wa->useScript('keepalive')
 
 ?>
 <link rel="stylesheet" href="/media/com_xbmusic/css/foldertree.css">
+<script type="module" >
+    import JoomlaDialog from 'joomla.dialog';
+
+    window.doConfirm = function(poptext,pophead,task) {
+        JoomlaDialog.confirm(poptext,pophead).then((result) => { 
+        if(result) {
+            Joomla.submitbutton('dataman.'+task);
+          };
+       });
+    }
+</script>
 <script type="text/javascript" >
 	function confirmImportMp3(){
-		if (confirm('This will import from MP3 data\n Are you really sure?')){
+		if (confirm('This will import from MP3 data\n Are you really sure?')==true){
 			document.getElementById('task').value='dataman.importmp3';
 			return true;
 		} else {
@@ -48,7 +60,7 @@ $wa->useScript('keepalive')
 	}
 	function confirmMksym(){
 		if ((document.getElementById('jform_link_target').value!='') && document.getElementById('jform_link_name').value!=''){
-		    if (confirm('Make Link?') ) {
+		    if (confirm('Make Link?')==true ) {
 				document.getElementById('task').value='dataman.makesymlink';
 		        return true;
 		    } else { return false; }
@@ -58,7 +70,7 @@ $wa->useScript('keepalive')
 		}
 	}
 	function confirmRemsym(link,targ,name) {
-		if (confirm('This will remove the link '+name+' to '+targ) ) {
+		if (confirm('This will remove the link '+name+' to '+targ)==true ) {
 			document.getElementById('rem_name').value=link;
 			document.getElementById('task').value='dataman.remsymlink';
 		    return true;
@@ -89,7 +101,7 @@ $wa->useScript('keepalive')
 			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
 	    	<div id="container"> </div>
         	<p><button id="impmp3" class="btn btn-warning" type="submit" 
-        		onclick="if(confirmImportMp3()) {this.form.submit();}" />
+        		onclick="if(confirmImportMp3()==true) {this.form.submit();}" />
         		<i class="icon-upload icon-white"></i> 
         		<?php echo Text::_('XB_IMPORT'); ?>
         	</button>
@@ -240,11 +252,16 @@ Functionality expected here:</p>
 					<tr><td style="text-align:right;">
 				    	<?php $n++; 
 				    	   $name = str_replace(JPATH_ROOT.'/xbmusic/', '', $link['name']); 
+				    	   $popbody = '<b>'.$name.'</b> linked to '.$link['target'];
+				    	   $pophead = 'Confirm OK to Remove Symlink';
 				    	   echo '<b>'.$name.'</b>'; ?>
 				    	</td><td style="text-align:center">-></td><td><?php echo $link['target']; ?></td>
 				    	<td style="padding:5px;">
-				    		<button id="remsym<?php echo $n;?>" class="btn btn-danger btn-sm" type="submit"
-        						onclick="if(confirmRemsym('<?php echo $link['name']; ?>','<?php echo $link['target']; ?>','<?php echo $name; ?>') == true) { this.form.submit();}" >
+				    		<button id="remsym<?php echo $n;?>" class="btn btn-danger btn-sm" type="button"
+                   				onclick="document.getElementById('rem_name').value='<?php echo $link['name']; ?>';
+                   					doConfirm('<?php echo $popbody; ?>',
+                   					'<?php echo $pophead; ?>',
+                   					'remsymlink');" >
         						<i class="icon-link icon-white"></i> <?php echo Text::_('XBMUSIC_REMOVE_LINK'); ?>
         					</button>
         				</td>
@@ -256,9 +273,13 @@ Functionality expected here:</p>
         	<?php echo $this->form->renderField('link_target'); ?> 
         	<?php echo $this->form->renderField('link_name'); ?> 
         	<?php echo $this->form->renderField('fmnote2'); ?> 
-        	<p><button id="mksym" class="btn btn-warning" type="submit" 
-        		onclick="if(confirmMksym() == true) {this.form.submit();}" >
-        		<i class="icon-link icon-red"></i> 
+        	<p><?php $popbody = 'Link '.$link_target.'<br /> as /xbmusic/<b>'.$link_name.'</b>';
+        	   $pophead = 'Confirm Create SymLink in /xbmusic/'; ?>
+        	<button id="mksym" class="btn btn-warning" type="button" 
+        		onclick="doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value + 
+        			' <i>as</i>i> <b>'+document.getElementById('jform_link_name').value+'</b>',
+                    '<?php echo $pophead; ?>','makesymlink');" >
+        		<i class="icon-link"></i> 
         		<?php echo Text::_('XBMUSIC_CREATE_LINK'); ?>
         	</button></p>
 			

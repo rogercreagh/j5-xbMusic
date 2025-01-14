@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_albums` (
   PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE UNIQUE INDEX `albumaliasindex` ON `#__xbmusic_albums` (`alias`);
+#CREATE UNIQUE INDEX `albumaliasindex` ON `#__xbmusic_albums` (`alias`);
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_artists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artists` (
   PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE UNIQUE INDEX `artistaliasindex` ON `#__xbmusic_artists` (`alias`);
+#CREATE UNIQUE INDEX `artistaliasindex` ON `#__xbmusic_artists` (`alias`);
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE UNIQUE INDEX `playlistaliasindex` ON `#__xbmusic_playlists` (`alias`);
+#CREATE UNIQUE INDEX `playlistaliasindex` ON `#__xbmusic_playlists` (`alias`);
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_songs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -165,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_songs` (
   PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE UNIQUE INDEX `songaliasindex` ON `#__xbmusic_songs` (`alias`);
+#CREATE UNIQUE INDEX `songaliasindex` ON `#__xbmusic_songs` (`alias`);
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   UNIQUE (`filepathname`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-CREATE UNIQUE INDEX `trackaliasindex` ON `#__xbmusic_tracks` (`alias`);
+#CREATE UNIQUE INDEX `trackaliasindex` ON `#__xbmusic_tracks` (`alias`);
 
 # link tables artisttrack, artistalbum, songtrack, songalbum, (artistsong = artisttrack-songtrack),  
  

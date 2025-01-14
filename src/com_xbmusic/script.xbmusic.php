@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.19.2 7th December 2024
+ * @version 0.0.19.5 10th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,11 +12,13 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Filesystem\Folder;
+use Joomla\CMS\Filesystem\Path;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Installer\InstallerScript;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Version;
-use Joomla\Filesystem\Path;
 use Joomla\CMS\Uri\Uri;
 
 class Com_xbmusicInstallerScript extends InstallerScript
@@ -48,10 +50,91 @@ class Com_xbmusicInstallerScript extends InstallerScript
     
     function install($parent) {
     }
+  
     
     function uninstall($parent) {
-        $message = 'Uninstalling '.$this->extname.' component v.'.$parent->getManifest()->version.' '.$parent->getManifest()->creationDate;
-        Factory::getApplication()->enqueueMessage($message,'Info');
+        $app = Factory::getApplication();
+        $message = 'Uninstalling '.$this->extname.' component v.'.$parent->getManifest()->version.' '.$parent->getManifest()->creationDate.'<br />';
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $savedata = $params->get('savedata',0);
+        if ($savedata == 0) {  //we are deleting data and images          
+            if ($this->uninstallData()) {
+                $message .= ' ...xbMusic data tables deleted';
+            }
+            if ($params->get('savefiles',1)==0) { //also deleting music
+                //need to first unlink any symlinked external folders or folder::delete fails
+                $folders = glob(JPATH_ROOT . '/xbmusic/*' , GLOB_ONLYDIR);
+                if (!empty($folders)) {
+                    foreach ($folders AS $folder) {
+                        if (is_link($folder)) {
+                            unlink($folder) ;
+                        }
+                    }
+                }                
+                if (Folder::delete(JPATH_ROOT.'/xbmusic')){
+                    $message .= ' .../xbmusic folder and files deleted. NB SymLink targets have not been deleted';
+                } else {
+                    $err = 'Problem deleting /xbmusic - please check';
+                    $app->enqueueMessage($err,'Error');
+                }
+                $dest='/images/xbmusic';
+                if (Folder::exists(JPATH_ROOT.$dest)) {
+                    if (Folder::delete(JPATH_ROOT.$dest)){
+                        $message .= ' ...images/xbmusic folder deleted';
+                    } else {
+                        $err = 'Problem deleting xbMusic images folder "/images/music" - please check in Media manager';
+                        $app->enqueueMessage($err,'Error');
+                    }
+                }
+                $dest='/xbmusic-logs';
+                if (Folder::exists(JPATH_ROOT.$dest)) {
+                    if (Folder::delete(JPATH_ROOT.$dest)){
+                        $message .= ' .../xbmusic-logs folder deleted';
+                    } else {
+                        $err = 'Problem deleting xbMusic Logs folder "/xbmusic-logs" - please check';
+                        $app->enqueueMessage($err,'Error');
+                    }
+                }
+            } else {
+                $message .= '<br /><b>/xbMusic files (images, music and logs) have NOT been deleted.';
+            }
+            
+        } else {
+            $message .= ' xbMusic data tables and files have <b>NOT</b> been deleted. CATEGORIES may be recovered on re-install, but TAG links will be lost although tags themselves have not been deleted.';
+            $db = Factory::getDbo();
+            $query = $db->getQuery(true);
+//             //check if !xbmusic! params cat still exists - if it does update
+//             $query->select('id')->from($db->qn('#__categories'))
+//                 ->where($db->qn('extension').'='.$db->q('!com_xbmusic!').' AND '. $db->qn('title').'='.$db->q('params'));
+//             $db->setQuery($query);
+//             if ($db->loadResult()>0) {
+//                 //update
+//                 $query->clear();
+//                 $query->update('#__categories')
+//                 ->set('description='.$db->q(json_encode($params)))
+//                 ->where($db->qn('extension').'='.$db->q('!com_xbmusic!').' AND '. $db->qn('title').'='.$db->q('params')
+//                 );
+//                 $db->setQuery($query);
+//                 $db->execute();
+//             } else {
+//                 //create
+//                 //$query->clear();
+//                 $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
+//                 $app->enqueueMessage($mess,'warning');                
+//             }
+//             $query->clear();
+            $query->update('#__categories')
+                ->set('extension='.$db->q('Xcom_xbmusicX'))
+                ->where('extension='.$db->q('com_xbmusic'));
+            $db->setQuery($query);
+            $db->execute();
+            $cnt = $db->getAffectedRows();
+            
+            if ($cnt>0) {
+                $message .= $cnt.' xbMusic categories.extension renamed as "<b>X</b>com_xbmusic<b>X</b>". They will be recovered on reinstall with original ids.';
+            }
+        }
+        $app->enqueueMessage($message,'Info');
     }
     
     function update($parent) {
@@ -74,7 +157,51 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $ext_mess .= '<p>version '.$manifest->version.' dated '.$manifest->creationDate.'</p>';
             $ext_mess .= '<p><b>Important</b> Before starting review &amp; set the component options&nbsp;&nbsp;';
             $ext_mess .=  '<a href="index.php?option=com_config&view=component&component='.$this->extension.'" class="btn btn-small btn-info" style="color:#fff;">'.$this->extname.' Options</a>';
-            //$res = $this->createCssFromTmpl();
+            $db = Factory::getDbo(); 
+            $query = $db->getQuery();
+            // Recover categories if they exist assigned to extension !com_xbmusic!
+            $query->clear();
+            $query->update('#__categories')
+                ->set('extension='.$db->q('com_xbmusic'))
+                ->where('extension='.$db->q('Xcom_xbmusicX'));
+            $db->setQuery($query);
+            try {
+                $db->execute();
+                $cnt = $db->getAffectedRows();
+            } catch (Exception $e) {
+                $app->enqueueMessage($e->getMessage(),'Error');
+            }
+            $message .= $cnt.' existing xbMusic categories restored. ';
+            //if we've got a params category then restore params and delete the category
+//             $query->clear();
+//             $paramwhere = $db->qn('extension').'='.$db->q('com_xbmusic').' AND '. $db->qn('title').'='.$db->q('params');
+//             $query->select('description')->from($db->qn('#__categories'));
+//             $query->where($paramwhere);
+//             $db->setQuery($query);
+//             $recparams = $db->loadResult();
+//             if ($recparams != '') {
+//                 $query->clear();
+//                 $query->update('#__extensions');
+//                 $query->set('params='.$db->q($recparams))
+//                     ->where('name='.$db->q('com_xbmusic'));
+//                 $db->setQuery($query);
+//                 try {
+//                     $db->execute();
+//                     $cnt = $db->getAffectedRows();
+//                 } catch (Exception $e) {
+//                     $app->enqueueMessage($e->getMessage(),'Error');
+//                 }
+//                 $query->clear();
+//                 $query->delete('#__categories')->where($paramwhere);
+//                 $db->setQuery($query);
+//                 try {
+//                     $db->execute();
+//                     $cnt = $db->getAffectedRows();
+//                 } catch (Exception $e) {
+//                     $app->enqueueMessage($e->getMessage(),'Error');
+//                 }
+//                 if ($cnt>0) $message.= 'com_xbmusic options recovered. Check values before proceeding.';
+//             }
             // create default categories using category table if they haven't been recovered
             $cats = array(
                 array("title"=>"Uncategorised","desc"=>"default fallback category for all xbMusic items"),
@@ -86,6 +213,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 array("title"=>"Tracks","desc"=>"default parent category for xbMusic Tracks")
             );
             $message .= $this->createCategories($cats).'<br />';
+            
             $message .= $this->createTag('MusicGenres').'<br />';
             
             //create a top level tag to be parent for id3genre tags
@@ -128,8 +256,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
      * @param array $cats
      * @return string message
      */
-    public function createCategories(array $cats) {
-        $message = 'Creating '.$this->extension.' categories. ';
+    public function createCategories(array $cats, $ext = '') {
+        if ($ext == '') $ext = 'com_xbmusic';
+        $message = 'Creating '.$ext.' categories. ';
         $db = Factory::getDBO();
         foreach ($cats as $cat) {
             if (key_exists('title',$cat)) {
@@ -137,13 +266,13 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 //first check if category already exists
                 $query->select('id')->from($db->quoteName('#__categories'))
                 ->where($db->quoteName('title')." = ".$db->quote($cat['title']))
-                ->where($db->quoteName('extension')." = ".$db->quote('com_xbmusic'));
+                ->where($db->quoteName('extension')." = ".$db->quote($ext));
                 $db->setQuery($query);
                 if ($db->loadResult()>0) {
                     $message .= '"'.$cat['title'].' already exists<br /> ';
                 } else {
                     $category = Table::getInstance('Category');
-                    $category->extension = $this->extension;
+                    $category->extension = $ext;
                     $category->title = $cat['title'];
                     $category->alias = $cat['title'];
                     $category->description = $cat['desc'];
@@ -204,6 +333,34 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             return '';
         }
+        
+        protected function uninstallData() {
+            $message = '';
+            $db = Factory::getDBO();
+            $db->setQuery('DROP TABLE IF EXISTS   
+              `#__xbmusic_albums`,
+              `#__xbmusic_artists`,
+              `#__xbmusic_playlists`,
+              `#__xbmusic_songs`,
+              `#__xbmusic_tracks`,
+              `#__xbmusic_artisttrack`,
+              `#__xbmusic_artistsong`,
+              `#__xbmusic_medleytrack`,
+              `#__xbmusic_playlisttrack`,
+              `#__xbmusic_songtrack`,
+              `#__xbmusic_artistgroup`,
+              `#__xbmusic_artistalbum`,
+              `#__xbmusic_songalbum`
+            ');
+            $res = $db->execute();
+            if ($res === false) {
+                $message = 'Error deleting xbMusic tables, please check manually';
+                Factory::getApplication()->enqueueMessage($message,'Error');
+                return false;
+            }
+            return true;
+        }
+        
         
 /*         
         Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
