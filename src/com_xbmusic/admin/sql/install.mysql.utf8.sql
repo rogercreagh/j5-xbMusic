@@ -1,5 +1,6 @@
-# sql installation file for component xbMusic 0.0.19.0 21st November 2024
+# sql installation file for component xbMusic 0.0.19.7 15th January 2025
 # NB no data is installed with this file, default categories are created by the installation script
+# NB additional indicies for alias fields not created here as conflicts with re-install if data saved
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
 VALUES
@@ -177,9 +178,9 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `audioinfo` mediumtext,
   `fileinfo` mediumtext,
   `imageinfo` mediumtext,
-  `filepathname` varchar(190) NOT NULL,
+  `filepathname` varchar(500) NOT NULL,
   `filename` varchar(190) NOT NULL,
-  `pathname` varchar(190) NOT NULL DEFAULT '',
+  `pathname` varchar(500) NOT NULL DEFAULT '',
   `sortartist` varchar(190) NOT NULL DEFAULT '',
   `rel_date` varchar(31),
   `rec_date` varchar(31),

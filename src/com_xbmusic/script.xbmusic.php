@@ -239,8 +239,10 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
             }
             
+            $message .= '<br />Checking indicies... ';
+            $this->createAliasIndex(array('album','artist','playlist','song','track'));
+            
             Factory::getApplication()->enqueueMessage($message,'Info');
-                       
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
             $ext_mess .= '<p>For help and information see <a href="https://crosborne.co.uk/'.$this->extslug.'/doc" target="_blank" style="font-weight:bold; color:black;">www.crosborne.co.uk/'.$this->extslug.'/doc</a> ';
@@ -360,6 +362,28 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             return true;
         }
+        
+        protected function createAliasIndex(array $types) {
+            $db = Factory::getDbo();
+//            $prefix = Factory::getApplication()->get('dbprefix');
+//            $querystr = 'ALTER TABLE '.$prefix.'xbfilms ADD INDEX filmaliasindex (alias)';
+            $errmsg = '';
+            foreach ($types as $type) {
+                $querystr = 'ALTER TABLE `#__xbmusic_'.$type.'s` ADD INDEX `'.$type.'aliasindex` (`alias`)';
+                try {
+                    $db->setQuery($querystr);
+                    $db->execute();
+                } catch (Exception $e) {
+                    if($e->getCode() == 1061) {
+                        $errmsg = $type.' alias index already exists. ';
+                        Factory::getApplication()->enqueueMessage($errmsg, 'Warning');
+                    } else {
+                        $errmsg .= '[ERROR creating '.$type.'.aliasindex: '.$e->getCode().' '.$e->getMessage().']<br />';
+                    }
+                }          
+            }
+            if ($errmsg !='') Factory::getApplication()->enqueueMessage($errmsg, 'Error');
+       }
         
         
 /*         

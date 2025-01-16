@@ -3,10 +3,10 @@
 		<element>com_xbmusic</element>
 		<type>component</type>
 		<version>0.0.19.7</version>
-		<date>14th January 2025</date>
+		<date>15th January 2025</date>
 		<title>Improvements and Bugfixes</title>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.19.7</h3> Updated 14th January 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.19.7</h3> Updated 15th January 2025]]></item>
 			<item>Option:Save data on uninstall</item>
 			<item>Option:Delete data files on uninstall</item>
 			<item>Create and remove music symlinks</item>
