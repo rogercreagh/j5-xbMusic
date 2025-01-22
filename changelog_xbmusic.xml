@@ -2,6 +2,40 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.20.0</version>
+		<date>22nd January 2025</date>
+		<title>Improvements and Bugfixes</title>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.20.0</h3> Updated 22nd January 2025]]></item>
+			
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item></item>
+		</change>
+		<other>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
+		</other>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item>error saving song</item>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.19.7</version>
 		<date>15th January 2025</date>
 		<title>Improvements and Bugfixes</title>

@@ -1,13 +1,34 @@
-### xbMusic-J5 Development Roadmap
+### xbMusic Package Roadmap
 
-#### Component com_xbarticleman Joomla5 version
+#### Component com_xbmusic
 
-- v0.0.1.0 Install and database creation
-- v0.0.2.0 Edit and list Tracks
-- v0.0.3.0 Edit and list Artists (individual and groups)
-- v0.0.4.0
-- v0.1.0 - 1st March 2024 - **Beta** to CrOsborne.uk - bugs fixed
+- v0.1.x Admin alpha releases
+
+- v0.2.x Admin beta releases
+
+- v0.3.x Admin Release Candidates
+
+- v0.5.x Site alpha releases
+
+- v0.6.x Site beta releases
+
+- v0.7.x Site Release Candidates
+
+- v1.0.x Complete Component Release
+
 - 
+
+Module mod_
+
+
+
+Plugin plg_
+
+
+
+Package Versions
+
+
 
 ##### Other ideas to be scheduled
 
@@ -19,13 +40,3 @@
 
 (tba)
 
-```
-Array
-(
-    [changelog] => Array
-        (
-            [0] => Array
-                (
-                    [element] => com_xbarticleman
-                    [type] => component
-```

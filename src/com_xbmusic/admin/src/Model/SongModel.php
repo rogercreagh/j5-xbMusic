@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.20.0 22nd January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -410,9 +410,9 @@ class SongModel extends AdminModel {
             if ($artist['artist_id'] > 0) {
                 if (!key_exists('listorder', $artist)) $artist['listorder'] = 0;
                 $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_songalbum'));
-                $query->columns('song_id,album_id,role,note,listorder');
-                $query->values('"'.$song_id.'","'.$artist['album_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
+                $query->insert($db->quoteName('#__xbmusic_artistsong'));
+                $query->columns('song_id,artist_id,role,note,listorder');
+                $query->values('"'.$song_id.'","'.$artist['artist_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
