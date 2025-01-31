@@ -253,7 +253,7 @@ function stopProp(event) {
     								</details>
     							<?php elseif (count($item->artists)==1) : ?>
     								<i><?php echo Text::_('Artists'); ?></i>: 
-    								<a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $artist['id']; ?>">
+    								<a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $item->artists[0]['id']; ?>">
     									<?php echo $item->artists[0]['name']; ?>
     								</a>
     							<?php endif; ?>

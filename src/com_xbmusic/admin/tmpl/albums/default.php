@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.19.1 22nd November 2024
+ * @version 0.0.20.1 27th January 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -259,7 +259,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						<?php endif; ?>
 						<ul class="inline">
 						<?php foreach ($item->tags as $t) : ?>
-							<li><a href="<?php echo $tvlink.$t->id; ?>" class="xblabel label-tag">
+							<li><a href="<?php echo $tagvlink.$t->id; ?>" class="xblabel label-tag">
 								<?php echo $t->title; ?></a>
 							</li>												
 						<?php endforeach; ?>
