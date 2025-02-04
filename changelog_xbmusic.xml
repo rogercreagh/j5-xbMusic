@@ -2,6 +2,43 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.20.2</version>
+		<date>4th February 2025</date>
+		<title>Improvements and Bugfixes</title>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.20.2</h3> Updated 4th February 2025]]></item>
+			<item>xbComboBox control implemented</item>
+			<item>Mouseover image popup in tracks and albums lists</item>
+		</addition>
+		<remove>
+			<item>Further redundant modules removed from getId3</item>
+		</remove>
+		<change>
+			<item>Symlinks be in a subfolder of /xbmusic</item>
+			<item>Tags tab in edit views layout improved</item>
+		</change>
+		<other>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
+		</other>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item></item>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.20.1</version>
 		<date>31st January 2025</date>
 		<title>Improvements and Bugfixes</title>
