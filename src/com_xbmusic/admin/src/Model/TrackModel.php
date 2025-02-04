@@ -30,6 +30,8 @@ class TrackModel extends AdminModel {
   
     public $typeAlias = 'com_xbmusic.track';
     
+    protected $ilogmsg;
+    
 //    public $genreParentId = false;
     
 //    private $id3loaded = false;

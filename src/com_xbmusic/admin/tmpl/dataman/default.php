@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.20.2 1st February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -251,7 +251,7 @@ Functionality expected here:</p>
         	<p><?php $pophead = 'Confirm Create SymLink in /xbmusic/'; ?>
         	<button id="mksym" class="btn btn-warning" type="button" 
         		onclick="doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value + 
-        			' <i>as</i>i> <b>'+document.getElementById('jform_link_name').value+'</b>',
+        			'<br /><i>as</i> <b>'+document.getElementById('jform_link_name').value+'</b>',
                     '<?php echo $pophead; ?>','makesymlink');" >
         		<i class="icon-link"></i> 
         		<?php echo Text::_('XBMUSIC_CREATE_LINK'); ?>

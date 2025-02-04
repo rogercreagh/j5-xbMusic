@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.20.1 27th January 2025
+ * @version 0.0.20.2 2nd February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 // HTMLHelper::_('behavior.multiselect');
 // HTMLHelper::_('formbehavior.chosen', 'select');
 HTMLHelper::_('bootstrap.tooltip');
-HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
+HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('table.columns');
@@ -188,7 +188,15 @@ if (strpos($listOrder, 'modified') !== false) {
 							</div>
 						</td>
 						<td><?php if ($item->imgurl != '') : ?>
-								<img src="<?php echo $item->imgurl; ?>" style="height:100px;" />
+        						<?php  $src = trim($item->imgurl);
+        						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+       								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+        						?>
+    							<img class="hasPopover" title="" 
+    								data-bs-content="<?php echo $tip; ?>"
+    								src="<?php echo $src; ?>"  style="height:100px;"
+    								border="0" alt="" />							                          
+    	                    	<?php  endif; ?>	                    
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">

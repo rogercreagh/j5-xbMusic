@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.19.5 10th January 2025
+ * @version 0.0.20.2 2nd February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -171,7 +171,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             } catch (Exception $e) {
                 $app->enqueueMessage($e->getMessage(),'Error');
             }
-            $message .= $cnt.' existing xbMusic categories restored. ';
+            if ($cnt > 0) $message .= $cnt.' existing xbMusic categories restored. ';
             //if we've got a params category then restore params and delete the category
             $query->clear();
             $paramwhere = $db->qn('extension').'='.$db->q('com_xbmusic').' AND '. $db->qn('title').'='.$db->q('params');

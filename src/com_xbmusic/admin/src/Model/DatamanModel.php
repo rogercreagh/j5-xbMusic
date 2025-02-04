@@ -623,13 +623,16 @@ class DatamanModel extends AdminModel {
         
     }
     
-    public function getSymlinks() {
+    public function getSymlinks($path = '') {
+        if ($path=='') $path = JPATH_ROOT . '/xbmusic/*';
         $result = [];
-        $folders = glob(JPATH_ROOT . '/xbmusic/*' , GLOB_ONLYDIR);
+        $folders = glob($path, GLOB_ONLYDIR);
         if (!empty($folders)) {
             foreach ($folders AS $folder) {
                 if (is_link($folder)) {                    
                     $result[] = array('target' => readlink($folder), 'name'=>$folder) ;
+                } else {
+                    $result =  array_merge($result,$this->getSymlinks($folder.'/*'));
                 }
             }
         }

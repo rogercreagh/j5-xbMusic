@@ -14,6 +14,7 @@
 		<change>
 			<item>Song Edit error when saving fixed</item>
 			<item>Tracks and Songs list error if only one item fixed</item>
+			<item>Using Joomla Dialog popup for prompts</item>
 		</change>
 		<other>
 			<item>Playlist functions missing</item>
@@ -117,6 +118,7 @@
 		<remove>
 		</remove>
 		<change>
+			<item>Removed unwanted files and added GPL to GetID3 vendor code</item>
 		</change>
 		<other>
 			<item>Playlist functions missing</item>

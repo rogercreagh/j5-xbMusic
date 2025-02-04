@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.19.2 11th December 2024
+ * @version 0.0.20.2 4th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -234,6 +234,104 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+			<div class="row">
+				<div class="col-12">
+                  <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
+         			<?php echo $this->form->renderField('tags'); ?> 
+         		</div>
+         	</div>
+         	<hr />
+         	<div class="row">
+				<div class="col-12">
+					<?php if (!empty($this->tagparentids)) : ?>
+						<p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE2'); ?></p>
+						<?php echo $this->form->renderFieldset('taggroups'); ?>
+					<?php else: ?>
+						<p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE3'); ?></p>
+ 					<?php endif; ?>
+				</div>
+    		</div>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
+	
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
+		<div class="row form-vertical">
+    		<div class="col-12 col-md-3">
+         		<h4><?php echo Text::_('Connections to other items')?></h4>
+       			<b><?php echo Text::_('Album'); ?></b>
+       			<br />
+   				<?php if ($item->album_id >0) : ?>   				
+   					<a href="<?php echo $albelink.$item->album['id'];?>">
+   						<?php echo $item->album['title'];?></a> [<?php echo $item->album['rel_date']; ?>]
+   				<?php endif; ?>
+        		<hr />
+        		<b><?php echo Text::_('Songs'); ?></b>
+        		<?php if (!empty($item->songs)) : ?>
+            		<ul>
+            			<?php foreach ($item->songs as $listitem) : ?>
+            				<li>
+            					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
+            						<?php echo $listitem['title']; ?></a>        			
+                			</li>
+            			<?php endforeach; ?>
+            		</ul>
+         		<?php endif; ?>
+       			<hr />
+        		<b><?php echo Text::_('Artists'); ?></b>
+         		<?php if (!empty($item->artists)) : ?>
+            		<ul>
+            			<?php foreach ($item->artists as $listitem) : ?>
+            				<li>
+            					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
+            						<?php echo $listitem['name']; ?></a>        			
+                			</li>
+            			<?php endforeach; ?>
+	        		</ul>
+        		<?php endif; ?>
+        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+        		<?php if ($this->id3loaded==1) : ?>
+        			<hr />
+        			<div class="xbred">
+        			</div>
+        			<h4><?php echo Text::_('Items from ID3 data'); ?></h4>
+        			<?php if (!empty($this->id3data['albumdata']))
+        			    echo '<i>'.Text::_('Album').'</i>: '.$this->id3data['albumdata']['title'].'<hr />';
+    			    if (!empty($this->id3data['song']))
+    			        echo '<i>'.Text::_('Song').'</i>: '.$this->id3data['song']['title'].'<hr />';
+    			    if (!empty($this->id3data['artists'])) {
+    		            echo '<i>'.Text::_('Artists').'</i>:'.'<ul style="list-style:none;">';
+    		            foreach ($this->id3data['artists'] as $artist) {
+    		                echo '<li>'.$artist['name'].'</li>';
+    		            }
+    		            echo '</ul>';
+    			    }
+        			?>
+        			<p class="xbnote">
+        				<?php echo Text::_('Items above will be created if necessary and linked to this track on Save'); ?>
+        			</p>
+        		<?php endif; ?>
+    		</div>
+	       	<div class="col-12 col-md-9">
+	       		<div class="row form-vertical">
+    				<div class="col-12 col-md-6">
+    					<?php echo $this->form->renderField('album_id'); ?> 
+    				</div>
+    				<div class="col-12 col-md-3 xbctl150">
+    					<?php echo $this->form->renderField('discno'); ?> 
+    				</div>
+    				<div class="col-12 col-md-3 xbctl150">
+    					<?php echo $this->form->renderField('trackno'); ?> 
+    				</div>
+	       		</div>
+				<?php echo $this->form->renderField('songlist'); ?>	
+        		<?php echo $this->form->renderField('artistlist');?>
+			</div>
+    		<hr />
+    		<?php echo $this->form->renderField('ext_links');?>
+		</div>
+
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
@@ -419,99 +517,6 @@ $item = $this->item;
         	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
         
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
-			<div class="row">
-				<div class="col-12 col-md-4">
-         			<?php echo $this->form->renderField('tags'); ?> 
-         		</div>
-				<div class="col-md-8">
-					<?php if (!empty($this->tagparentids)) : ?>
-						<?php echo $this->form->renderFieldset('taggroups'); ?>
-					<?php else: ?>
-						<p class="xbnote"><?php echo Text::_('You can define groups for different types of tags by specifying a group parent tags in the options and they will be listed separately here - eg "genres" and "places" might be useful group parents'); ?></p>
- 					<?php endif; ?>
-				</div>
-    		</div>
-		<?php echo HTMLHelper::_('uitab.endTab'); ?>
-	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
-		<div class="row form-vertical">
-    		<div class="col-12 col-md-3">
-         		<h4><?php echo Text::_('Connections to other items')?></h4>
-       			<b><?php echo Text::_('Album'); ?></b>
-       			<br />
-   				<?php if ($item->album_id >0) : ?>   				
-   					<a href="<?php echo $albelink.$item->album['id'];?>">
-   						<?php echo $item->album['title'];?></a> [<?php echo $item->album['rel_date']; ?>]
-   				<?php endif; ?>
-        		<hr />
-        		<b><?php echo Text::_('Songs'); ?></b>
-        		<?php if (!empty($item->songs)) : ?>
-            		<ul>
-            			<?php foreach ($item->songs as $listitem) : ?>
-            				<li>
-            					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
-            						<?php echo $listitem['title']; ?></a>        			
-                			</li>
-            			<?php endforeach; ?>
-            		</ul>
-         		<?php endif; ?>
-       			<hr />
-        		<b><?php echo Text::_('Artists'); ?></b>
-         		<?php if (!empty($item->artists)) : ?>
-            		<ul>
-            			<?php foreach ($item->artists as $listitem) : ?>
-            				<li>
-            					<a href="<?php echo $artelink.$listitem['artist_id'];?>">
-            						<?php echo $listitem['name']; ?></a>        			
-                			</li>
-            			<?php endforeach; ?>
-	        		</ul>
-        		<?php endif; ?>
-        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
-        		<?php if ($this->id3loaded==1) : ?>
-        			<hr />
-        			<div class="xbred">
-        			</div>
-        			<h4><?php echo Text::_('Items from ID3 data'); ?></h4>
-        			<?php if (!empty($this->id3data['albumdata']))
-        			    echo '<i>'.Text::_('Album').'</i>: '.$this->id3data['albumdata']['title'].'<hr />';
-    			    if (!empty($this->id3data['song']))
-    			        echo '<i>'.Text::_('Song').'</i>: '.$this->id3data['song']['title'].'<hr />';
-    			    if (!empty($this->id3data['artists'])) {
-    		            echo '<i>'.Text::_('Artists').'</i>:'.'<ul style="list-style:none;">';
-    		            foreach ($this->id3data['artists'] as $artist) {
-    		                echo '<li>'.$artist['name'].'</li>';
-    		            }
-    		            echo '</ul>';
-    			    }
-        			?>
-        			<p class="xbnote">
-        				<?php echo Text::_('Items above will be created if necessary and linked to this track on Save'); ?>
-        			</p>
-        		<?php endif; ?>
-    		</div>
-	       	<div class="col-12 col-md-9">
-	       		<div class="row form-vertical">
-    				<div class="col-12 col-md-6">
-    					<?php echo $this->form->renderField('album_id'); ?> 
-    				</div>
-    				<div class="col-12 col-md-3 xbctl150">
-    					<?php echo $this->form->renderField('discno'); ?> 
-    				</div>
-    				<div class="col-12 col-md-3 xbctl150">
-    					<?php echo $this->form->renderField('trackno'); ?> 
-    				</div>
-	       		</div>
-				<?php echo $this->form->renderField('songlist'); ?>	
-        		<?php echo $this->form->renderField('artistlist');?>
-			</div>
-    		<hr />
-    		<?php echo $this->form->renderField('ext_links');?>
-		</div>
-
-		<?php echo HTMLHelper::_('uitab.endTab'); ?>
-
 		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
         <div class="row">
             <div class="col-12 col-lg-6">

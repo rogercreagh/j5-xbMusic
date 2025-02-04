@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/song/edit.php
- * @version 0.0.19.1 24th November 2024
+ * @version 0.0.20.2 4th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -115,14 +115,19 @@ $item = $this->item;
 
        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
-				<div class="col-12 col-md-4">
+				<div class="col-12">
+                  <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
          			<?php echo $this->form->renderField('tags'); ?> 
          		</div>
-				<div class="col-md-8">
+         	</div>
+         	<hr />
+         	<div class="row">
+				<div class="col-12">
 					<?php if (!empty($this->tagparentids)) : ?>
+						<p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE2'); ?></p>
 						<?php echo $this->form->renderFieldset('taggroups'); ?>
 					<?php else: ?>
-						<p class="xbnote"><?php echo Text::_('You can define groups for different types of tags by specifying a group parent tags in the options and they will be listed separately here - eg "genres" and "places" might be useful group parents'); ?></p>
+						<p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE3'); ?></p>
  					<?php endif; ?>
 				</div>
     		</div>
