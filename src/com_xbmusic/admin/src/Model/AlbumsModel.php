@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.19.1 22nd November 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -325,7 +325,7 @@ class AlbumsModel extends ListModel {
 //          $query = $db->getQuery(true);
 //          $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
 //          $query->from('#__xbmusic_artists AS a');
-//          $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+//          $query->join('LEFT','#__xbmusic_trackartist AS b ON b.artist_id = a.id');
 //          $query->where('b.track_id = '.$tid);
 //          $query->order('b.listorder ASC');
 //          $db->setQuery($query);

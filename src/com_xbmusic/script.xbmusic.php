@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.20.2 2nd February 2025
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -44,7 +44,6 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $componentXML = Installer::parseXMLInstallFile(Path::clean(JPATH_ADMINISTRATOR . '/components/'.$this->extension.'/'.$this->extslug.'.xml'));
             $this->oldver = $componentXML['version'];
             $this->olddate = $componentXML['creationDate'];
-            //            Factory::getApplication()->enqueueMessage('Updating '.$this->extname.' from '.$this->oldver.' '.$this->olddate.' to '.$parent->getManifest()->version);
         }
     }
     
@@ -61,37 +60,35 @@ class Com_xbmusicInstallerScript extends InstallerScript
             if ($this->uninstallData()) {
                 $message .= ' ...xbMusic data tables deleted';
             }
-            if ($params->get('savefiles',1)==0) { //also deleting music
+            if ($params->get('savemusic',1)==0) { 
                 //need to first unlink any symlinked external folders or folder::delete fails
-                $folders = glob(JPATH_ROOT . '/xbmusic/*' , GLOB_ONLYDIR);
-                if (!empty($folders)) {
-                    foreach ($folders AS $folder) {
-                        if (is_link($folder)) {
-                            unlink($folder) ;
-                        }
-                    }
-                }                
+                $res = $this->remSymlinks('');
+                if (!empty($res)) $message .= 'Symlinks removed: '.implode(', ', $res).',br />';
                 if (Folder::delete(JPATH_ROOT.'/xbmusic')){
-                    $message .= ' .../xbmusic folder and files deleted. NB SymLink targets have not been deleted';
+                    $message .= ' ...<code>/xbmusic</code> folder and files deleted. NB SymLink targets have not been deleted';
                 } else {
-                    $err = 'Problem deleting /xbmusic - please check';
+                    $err = 'Problem deleting <code>/xbmusic</code> - please check';
                     $app->enqueueMessage($err,'Error');
                 }
+            }
+            if ($params->get('saveimages',1)==0) {
                 $dest='/images/xbmusic';
                 if (Folder::exists(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
-                        $message .= ' ...images/xbmusic folder deleted';
+                        $message .= ' ...images <code>/images/xbmusic</code> folder deleted';
                     } else {
-                        $err = 'Problem deleting xbMusic images folder "/images/music" - please check in Media manager';
+                        $err = 'Problem deleting xbMusic images folder <code>/images/music</code> - please check in Media manager';
                         $app->enqueueMessage($err,'Error');
                     }
                 }
+            }
+            if ($params->get('savelogs',1)==0) {
                 $dest='/xbmusic-logs';
                 if (Folder::exists(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
-                        $message .= ' .../xbmusic-logs folder deleted';
+                        $message .= ' ...<code>/xbmusic-logs</code> folder deleted';
                     } else {
-                        $err = 'Problem deleting xbMusic Logs folder "/xbmusic-logs" - please check';
+                        $err = 'Problem deleting xbMusic Logs folder <code>/xbmusic-logs</code> - please check';
                         $app->enqueueMessage($err,'Error');
                     }
                 }
@@ -101,28 +98,10 @@ class Com_xbmusicInstallerScript extends InstallerScript
             
         } else {
             $message .= ' xbMusic data tables and files have <b>NOT</b> been deleted. CATEGORIES may be recovered on re-install, but TAG links will be lost although tags themselves have not been deleted.';
+            $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
+            $app->enqueueMessage($mess,'warning');                
             $db = Factory::getDbo();
             $query = $db->getQuery(true);
-//             //check if !xbmusic! params cat still exists - if it does update
-//             $query->select('id')->from($db->qn('#__categories'))
-//                 ->where($db->qn('extension').'='.$db->q('!com_xbmusic!').' AND '. $db->qn('title').'='.$db->q('params'));
-//             $db->setQuery($query);
-//             if ($db->loadResult()>0) {
-//                 //update
-//                 $query->clear();
-//                 $query->update('#__categories')
-//                 ->set('description='.$db->q(json_encode($params)))
-//                 ->where($db->qn('extension').'='.$db->q('!com_xbmusic!').' AND '. $db->qn('title').'='.$db->q('params')
-//                 );
-//                 $db->setQuery($query);
-//                 $db->execute();
-//             } else {
-//                 //create
-//                 //$query->clear();
-                $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
-                $app->enqueueMessage($mess,'warning');                
-//             }
-//             $query->clear();
             $query->update('#__categories')
                 ->set('extension='.$db->q('Xcom_xbmusicX'))
                 ->where('extension='.$db->q('com_xbmusic'));
@@ -215,9 +194,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $message .= $this->createCategories($cats).'<br />';
             
             $message .= $this->createTag('MusicGenres').'<br />';
-            
-            //create a top level tag to be parent for id3genre tags
-//            $this->createTag(array('title'=>'Id3Genres', 'parent_id'=>1, 'published'=>1, 'description'=>'Parent tag for ID3 genres. Do not remove, genres will be added automatically from track files.'));
+            $message .= $this->createTag('Locations').'<br />';
             
             //create xbmusic image folder. Check in case left after previous uninstall
             $imgroot = JPATH_ROOT.'/images/xbmusic/';
@@ -345,14 +322,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
               `#__xbmusic_playlists`,
               `#__xbmusic_songs`,
               `#__xbmusic_tracks`,
-              `#__xbmusic_artisttrack`,
-              `#__xbmusic_artistsong`,
-              `#__xbmusic_medleytrack`,
-              `#__xbmusic_playlisttrack`,
-              `#__xbmusic_songtrack`,
-              `#__xbmusic_artistgroup`,
-              `#__xbmusic_artistalbum`,
-              `#__xbmusic_songalbum`
+              `#__xbmusic_trackartist`,
+              `#__xbmusic_trackplaylist`,
+              `#__xbmusic_tracksong`
             ');
             $res = $db->execute();
             if ($res === false) {
@@ -362,11 +334,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             return true;
         }
-        
-        protected function createAliasIndex(array $types) {
+
+protected function createAliasIndex(array $types) {
             $db = Factory::getDbo();
-//            $prefix = Factory::getApplication()->get('dbprefix');
-//            $querystr = 'ALTER TABLE '.$prefix.'xbfilms ADD INDEX filmaliasindex (alias)';
             $errmsg = '';
             foreach ($types as $type) {
                 $querystr = 'ALTER TABLE `#__xbmusic_'.$type.'s` ADD INDEX `'.$type.'aliasindex` (`alias`)';
@@ -384,52 +354,21 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             if ($errmsg !='') Factory::getApplication()->enqueueMessage($errmsg, 'Error');
        }
-        
-        
-/*         
-        Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_tags/tables');
-        $app = Factory::getApplication();
-        //check if alias already exists (dupe id)
-        $alias = $tagdata['title'];
-        $alias = ApplicationHelper::stringURLSafe($alias);
-        if (trim(str_replace('-', '', $alias)) == '') {
-            $alias = Factory::getDate()->format('Y-m-d-H-i-s');
-        }
-        $db = Factory::getDBO();
-        $query = $db->getQuery(true);
-        $query->select('id')->from($db->quoteName('#__tags'))->where($db->quoteName('alias').' = '.$db->quote($alias));
-        $db->setQuery($query);
-        $id = $db->loadResult();
-        if ($id>0) {
-            $app->enqueueMessage('Tag with alias '.$alias.' already exists with id '.$id, 'Warning');
-            return $id;
-        }
-        
-        $table = Table::getInstance('Tag', 'TagsTable', array());
-        // Bind data
-        if (!$table->bind($tagdata)) {
-            $app->enqueueMessage($table->getError(),'Error');
-            return false;
-        }
-        // Check the data.
-        if (!$table->check()) {
-            $app->enqueueMessage($table->getError(),'Error');
-            return false;
-        }
-        // set the parent details
-        $table->setLocation($tagdata['parent_id'], 'last-child'); //no error reporting from this one
-        // Store the data.
-        if (!$table->store()){
-            $app->enqueueMessage($table->getError(),'Error');
-            return false;
-        }
-        if (!$table->rebuildPath($table->id)) {
-            $app->enqueueMessage($table->getError(),'Error');
-            return false;
-        }
-        $app->enqueueMessage('New tag '.$tagdata['title'].' created with id '.$table->id);
-        return $table->id;
-    }
-    
- */
+ 
+       public function remSymlinks($path = '') {
+           if ($path=='') $path = JPATH_ROOT . '/xbmusic/*';
+           $result = [];
+           $folders = glob($path, GLOB_ONLYDIR);
+           if (!empty($folders)) {
+               foreach ($folders AS $folder) {
+                   if (is_link($folder)) {
+                       if (unlink($folder)) $result[] = $folder;
+                   } else {
+                       $result =  array_merge($result,$this->remSymlinks($folder.'/*'));
+                   }
+               }
+           }
+           return $result;
+       }
+       
 }

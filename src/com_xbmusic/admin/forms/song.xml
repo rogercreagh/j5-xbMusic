@@ -99,6 +99,12 @@
 <!-- Links -->	
 	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		name="links">
+		
+		<field name="songlinksnote" type="note"
+			label="Links to Tracks, Albums, Artists, and External Links"
+			description="A song may be connected to one or more tracks and you can add, edit or remove these links here. A track may conatin more than one song (eg a medley). A song (or movement) may also be part of a larger work like a musical or concerto encompassing several tracks. Links to Albums, and Artists are through a track link, so if those need changing you need to edit the track which is linked to the artist"
+		/>
+		
 		<field name="tracklist" type="subform"
 			label="Track(s)"
 			description="Song may be used in one or more tracks"			
@@ -126,51 +132,6 @@
 			</form>
 		</field>			
 			
-		<field name="albumlist" type="subform"
-			label="Album(s)"
-			description="Song may be found on one or more albums"			
-			multiple="true" min= "0" max= "10"
-			buttons="add,remove"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="album_id" type="xbalbumlist" label="Album Name">
-					<option value=""> </option>	
-				</field>
-				<field name="role" type="combo" label="Track type" 
-				>
-                  	<option value="1">Full</option>
-					<option value="2">Part</option>
-					<option value="3">Multiple</option>
-
-                  </field>
-				<field name="note" type="text" label="XB_NOTE" maxlength="190"
-				/>
-				<field name="listorder" type="hidden" default="0" />
-			</form>
-		</field>			
-
-		<field name="artistlist" type="subform"
-			label="Artist(s)"
-			description="The album has a headline Album Artist name, these are the artists as listed with specific tracks"			
-			multiple="true" min= "0" max= "10"
-			buttons="add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="artist_id" type="xbartistlist" label="Artist Name">
-					<option value=""> </option>	
-				</field>
-				<field name="role" type="text" label="XB_ROLE" maxlength="190"
-				/>
-				<field name="note" type="text" label="XB_NOTE" maxlength="190"
-				/>
-				<field name="oldorder" type="hidden" default="0" />
-			</form>
-		</field>			
-
 		<field name="ext_links" type="subform" 
 			label="External Links" description="Links to associated information for the track"
 			min="0" max="10" multiple="true"

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/PlaylisttrackTable.php
- * @version 0.0.13.3 6th September 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -38,7 +38,7 @@ class PlaylisttrackTable extends Table implements VersionableTableInterface, Tag
     {
         $this->typeAlias = 'com_xbmusic.playlisttrack';
         
-        parent::__construct('#__xbmusic_playlisttrack', 'id', $db, $dispatcher);
+        parent::__construct('#__xbmusic_trackplaylist', 'id', $db, $dispatcher);
         
         $this->setColumnAlias('ordering', 'listorder');
     }

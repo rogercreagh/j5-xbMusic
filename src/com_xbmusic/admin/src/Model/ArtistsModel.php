@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistsModel.php
- * @version 0.0.19.1 23rd November 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -112,7 +112,7 @@ class ArtistsModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.name, a.alias, a.description, a.picture, '
+                'DISTINCT a.id, a.name, a.alias, a.description, a.imgurl, '
                     .'a.type, '
                     .'a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
@@ -120,7 +120,7 @@ class ArtistsModel extends ListModel {
                     .'a.note'
                 )
             );
-        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_artisttrack AS tk WHERE tk.artist_id = a.id) AS trkcnt');
+        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackartist AS tk WHERE tk.artist_id = a.id) AS trkcnt');
         $query->from('#__xbmusic_artists AS a');
                         
         // Join over the users for the checked out user.
@@ -309,7 +309,7 @@ class ArtistsModel extends ListModel {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('t.id AS trackid, t.title AS tracktitle, t.imgurl, t.rel_date');
-        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
         $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
         $query->order('t.rel_date, t.title ASC');
@@ -323,7 +323,7 @@ class ArtistsModel extends ListModel {
         $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
         $query->from('#__xbmusic_albums AS a');
         $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
-        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
         $query->where('at.artist_id = '.$aid.' AND t.album_id > 0');
         $query->order('a.title ASC');
         $db->setQuery($query);
@@ -335,8 +335,8 @@ class ArtistsModel extends ListModel {
         $query = $db->getQuery(true);
         $query->select('s.id AS songid, s.title AS songtitle, s.composer');
         $query->from('#__xbmusic_songs AS s');
-        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.song_id = s.id');
-        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = st.track_id');
+        $query->join('LEFT','#__xbmusic_tracksong AS st ON st.song_id = s.id');
+        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = st.track_id');
         $query->where('at.artist_id = '.$aid);
         $query->order('s.title ASC');
         $db->setQuery($query);

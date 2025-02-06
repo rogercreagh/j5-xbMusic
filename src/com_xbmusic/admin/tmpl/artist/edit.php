@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.20.2 4th February 2025
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,9 +30,9 @@ $wa->useScript('keepalive')
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
 
-$albelink = 'index.php?option=com_xbmusic&task=album.edit&id=';
-$sngelink = 'index.php?option=com_xbmusic&task=song.edit&id=';
-$trkelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
+$albumelink = 'index.php?option=com_xbmusic&task=album.edit&id=';
+$songelink = 'index.php?option=com_xbmusic&task=song.edit&id=';
+$trackelink = 'index.php?option=com_xbmusic&task=track.edit&id=';
 
 $input = Factory::getApplication()->getInput();
 $item = $this->item;
@@ -153,44 +153,47 @@ $item = $this->item;
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
     <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+		<?php echo $this->form->renderField('artistlinksnote'); ?>	    
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
      		<h4><?php echo Text::_('Connections to other items')?></h4>
-   			<b><?php echo Text::_('Albums'); ?></b>
+     		<hr />
+   			<b><?php echo count(item->albums).' '.Text::_('Albums'); ?></b>
     		<ul>
     			<?php foreach ($item->albums as $listitem) : ?>
     				<li>
-    					<a href="<?php echo $albelink.$listitem['album_id'];?>">
-    						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]       			
+    					<a href="<?php echo $albumelink.$listitem['albumid'];?>">
+    						<?php echo $listitem['albumtitle']; ?></a> [<?php echo $listitem['rel_date']; ?>]       			
         			</li>
     			<?php endforeach; ?>
     		</ul>
     		<hr />
-    		<b><?php echo Text::_('Tracks'); ?></b>
+    		<b><?php echo count(item->tracks).' '.Text::_('Tracks'); ?></b>
     		<ul>
     			<?php foreach ($item->tracks as $listitem) : ?>
     				<li>
-    					<a href="<?php echo $trkelink.$listitem['track_id'];?>">
+    					<a href="<?php echo $trackelink.$listitem['track_id'];?>">
     						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['rel_date']; ?>]        			
         			</li>
     			<?php endforeach; ?>
     		</ul>
     		<hr />
-    		<b><?php echo Text::_('Songs'); ?></b>
+    		<b><?php echo count(item->songs).' '.Text::_('Songs'); ?></b>
     		<ul>
     			<?php foreach ($item->songs as $listitem) : ?>
     				<li>
-    					<a href="<?php echo $sngelink.$listitem['song_id'];?>">
-    						<?php echo $listitem['title']; ?></a>        			
+    					<a href="<?php echo $songelink.$listitem['songid'];?>">
+    						<?php echo $listitem['songtitle']; ?></a>        			
         			</li>
     			<?php endforeach; ?>
     		</ul>
+    		<hr />
     		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
     		</div>
 	       	<div class="col-12 col-md-9">
-        		<?php echo $this->form->renderField('albumlist');?>
-				<?php echo $this->form->renderField('tracklist'); ?>	
-        		<?php echo $this->form->renderField('songlist');?>
+	       		<div class="xbmh800 xbyscroll">
+					<?php echo $this->form->renderField('tracklist'); ?>	
+	       		</div>
 			</div>
 		</div>
 		<hr />

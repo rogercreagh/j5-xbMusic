@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.19.7 14th January 2025
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -44,7 +44,8 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static $musicBase = JPATH_ROOT.'/xbmusic/';
 	
-	public static $linktypes = array('artisttrack', 'artistalbum', 'songtrack', 'songalbum', 'artistsong');
+//	public static $linktypes = array('trackartist', 'tracksong');
+//, 'artistalbum', 'songalbum', 'artistsong'
 
 	public static function getActions($categoryid = 0) {
 	    $user 	=Factory::getApplication()->getIdentity();
@@ -306,31 +307,17 @@ class XbmusicHelper extends ComponentHelper
         return $db->loadResult();
 	}
 	
-	public static function getArtistAlbums($aid) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl    
-	    $db = Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
-	    $query->from('#__xbmusic_albums AS a');
-	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
-	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
-	    $query->where('at.artist_id = '.$aid.' AND t.album_id > 0');
-	    $query->order('a.title ASC');
-	    $db->setQuery($query);
-	    return $db->loadAssocList();
-	}
-	
 	public static function getGroupMembers($gid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-	    $db = Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
-	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
-	    $query->from('#__xbmusic_artistgroup AS gm');
-	    $query->where('gm.group_id = '.$db->q($gid));
-	    $query->order('gm.listorder ASC');
-	    $db->setQuery($query);
-	    return $db->loadAssocList();
+// 	    $db = Factory::getDbo();
+// 	    $query = $db->getQuery(true);
+// 	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
+// 	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
+// 	    $query->from('#__xbmusic_artistgroup AS gm');
+// 	    $query->where('gm.group_id = '.$db->q($gid));
+// 	    $query->order('gm.listorder ASC');
+// 	    $db->setQuery($query);
+	    return array(); //$db->loadAssocList();
 	}
 	
 	public static function getArtistSingles($aid) {
@@ -338,7 +325,7 @@ class XbmusicHelper extends ComponentHelper
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('t.id AS trackid, t.title AS tracktitle, t.imgurl, t.rel_date');
-	    $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
+	    $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->where('t.album_id = 0 AND at.artist_id = '.$aid);
 	    $query->order('t.rel_date, t.title ASC');
@@ -533,56 +520,132 @@ class XbmusicHelper extends ComponentHelper
 	    return $genres;
 	} //end createGenres()
 	
-	public static function getAlbumTracks($aid) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
-	    $db = Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('t.id AS trackid, t.title AS trackname, t.filepathname, t.sortartist, t.discno, t.trackno');
-	    $query->from('#__xbmusic_tracks AS t');
-	    $query->where('t.album_id = '.$aid);
-	    $query->order('t.discno, t.trackno ASC');
-	    $db->setQuery($query);
-	    return $db->loadAssocList();
-	}
-	
-	public static function getAlbumArtists($tid) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
-	    $db = Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.note as note');
-	    $query->from('#__xbmusic_artists AS a');
-	    $query->join('LEFT','#__xbmusic_artistalbum AS b ON b.artist_id = a.id');
-	    $query->where('b.album_id = '.$tid);
-	    $query->order('a.sortname ASC');
-	    $db->setQuery($query);
-	    return $db->loadAssocList();
-	}
-	
-	public static function getAlbumSongs($tid) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
-	    $db = Factory::getDbo();
-	    $query = $db->getQuery(true);
-	    $query->select('a.id AS songid, a.title AS songtitle, a.alias AS alias, b.role AS role, b.note AS note, b.listorder');
-	    $query->from('#__xbmusic_songs AS a');
-	    $query->join('LEFT','#__xbmusic_albumsong AS b ON b.song_id = a.id');
-	    $query->where('b.album_id = '.$tid);
-	    $query->order('b.listorder ASC');
-	    $db->setQuery($query);
-	    return $db->loadAssocList();
-	}
-	
 	public static function getTrackArtists($tid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, b.role AS role, b.listorder');
+	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, ta.role AS role, ta.listorder');
 	    $query->from('#__xbmusic_artists AS a');
-	    $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
-	    $query->where('b.track_id = '.$tid);
-	    $query->order('b.listorder ASC');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.artist_id = a.id');
+	    $query->where('ta.track_id = '.$tid);
+	    $query->order('ta.listorder ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();
 	}
+	
+	public static function getTrackSongs($tid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('s.id AS songid, s.title AS songtitle, s.alias AS songalias, ts.role AS songrole, ts.listorder AS songorder');
+	    $query->from('#__xbmusic_songs AS s');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
+	    $query->where('ts.track_id = '.$tid);
+	    $query->order('ts.listorder ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+
+	public static function getAlbumTracks($aid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('t.id AS trackid, t.title AS tracktitle, t.filepathname, t.sortartist, t.discno, t.trackno');
+	    $query->from('#__xbmusic_tracks AS t');
+	    $query->where('t.album_id = '.$db->q($aid));
+	    $query->order('t.discno, t.trackno, t.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getAlbumArtists($albumid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.name AS artistname, a.id AS artistid, a.alias AS artistalias, b.role AS artistrole, b.note as artistnote');
+	    $query->from('#__xbmusic_tracks AS t');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
+	    $query->leftjoin('#__xbmusic_artists AS a ON a.id = ta.artist_id');
+	    $query->where('t.album_id = '.$albumid);
+	    $query->group('a.name');
+	    $query->order('a.sortname ASC');
+	    return $db->loadAssocList();
+	}
+	
+	public static function getAlbumSongs($albumid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('s.title AS songtitle, s.id AS songid, s.alias AS songalias, ts.role AS songrole, ts.note AS songnote, ts.listorder AS songorder');
+	    $query->from('#__xbmusic_tracks AS t');
+	    $query->leftjoin('#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
+	    $query->leftjoin('#__xbmusic_songs AS s ON s.id = ts.song_id');
+	    $query->where('t.album_id = '.$albumid);
+	    $query->order('s.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getSongArtists($songid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT a.id AS artistid, a.name AS artistname, a.imgurl, a.sortname AS artistsort');
+	    $query->from('#__xbmusic_artists AS a');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.artist_id = a.id');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.track_id = ta.track_id');
+	    $query->where('ts.song_id = '.$songid);
+	    $query->group('a.id');
+	    $query->order('a.sortname ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();	    
+	}
+	
+	public static function getSongAlbums($songid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
+	    $query->from('#__xbmusic_albums AS a');
+	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
+	    $query->where('ts.song_id = '.$songid.' AND t.album_id > 0');
+	    $query->order('a.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();	    
+	}
+	
+	public static function getArtistSongs($artistid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT s.id AS songid, s.title AS songtitle');
+	    $query->from('#__xbmusic_songs AS s');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = ts.track_id');
+	    $query->where('ta.artist_id = '.$artistid);
+	    $query->group('s.id');
+	    $query->order('s.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getArtistAlbums($artistid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
+	    $query->from('#__xbmusic_albums AS a');
+	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
+	    $query->where('ta.artist_id = '.$artistid.' AND t.album_id > 0');
+	    $query->order('a.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	
 	
 	public static function getTagItemCnts($id) {
 	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -291,7 +291,7 @@ class PlaylistModel extends AdminModel {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('a.id as track_id, ba.note AS note, ba.listorder AS ordering, ba.listorder AS oldorder');
-        $query->from('#__xbmusic_playlisttrack AS ba');
+        $query->from('#__xbmusic_trackplaylist AS ba');
         $query->innerjoin('#__xbmusic_tracks AS a ON ba.track_id = a.id');
         $query->where('ba.playlist_id = '.(int) $this->getItem()->id);
         $query->order('ba.listorder ASC', 'a.title ASC');
@@ -303,7 +303,7 @@ class PlaylistModel extends AdminModel {
         //delete existing role list
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_playlisttrack'));
+        $query->delete($db->quoteName('#__xbmusic_trackplaylist'));
         $query->where('playlist_id = '.$playlist_id);
         $db->setQuery($query);
         $db->execute();
@@ -311,7 +311,7 @@ class PlaylistModel extends AdminModel {
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
                 $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_playlisttrack'));
+                $query->insert($db->quoteName('#__xbmusic_trackplaylist'));
                 $query->columns('playlist_id,track_id,note,listorder');
                 $query->values('"'.$playlist_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$trk['oldorder'].'"');
                 //try

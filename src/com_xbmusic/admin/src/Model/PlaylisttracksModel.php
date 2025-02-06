@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylisttracksModel.php
- * @version 0.0.13.5 8th September 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -100,8 +100,8 @@ class PlaylisttracksModel extends ListModel {
         /*
          SELECT pt.id AS id, pt.track_id, pt.listorder AS ordering,t.title AS track_title, t.sortartist AS artist, b.title AS album_title
 , GROUP_CONCAT(at.artist_id SEPARATOR ',') AS artists
-FROM j5_xbmusic_playlisttrack AS pt
-LEFT JOIN `j5_xbmusic_artisttrack` AS at ON pt.track_id = at.track_id
+FROM j5_xbmusic_trackplaylist AS pt
+LEFT JOIN `j5_xbmusic_trackartist` AS at ON pt.track_id = at.track_id
 INNER JOIN `j5_xbmusic_tracks` AS t ON t.id = pt.track_id
 LEFT JOIN `j5_xbmusic_albums` AS b ON b.id = t.album_id
 WHERE pt.playlist_id = 1 
@@ -120,8 +120,8 @@ ORDER BY ordering ASC
                 )
             );
         $query->select('GROUP_CONCAT(at.artist_id SEPARATOR '.$db->q(',').') AS artists');
-        $query->from('#__xbmusic_playlisttrack AS pt');
-        $query->join('LEFT',$db->qn('#__xbmusic_artisttrack').' AS at ON pt.track_id = at.track_id');
+        $query->from('#__xbmusic_trackplaylist AS pt');
+        $query->join('LEFT',$db->qn('#__xbmusic_trackartist').' AS at ON pt.track_id = at.track_id');
         $query->join('INNER', $db->qn('#__xbmusic_tracks'). ' AS t ON t.id = pt.track_id');
         $query->join('LEFT', $db->qn('#__xbmusic_albums'). ' AS b ON b.id = t.album_id');
         $query->where('pt.playlist_id = '.$this->id); 
@@ -187,7 +187,7 @@ ORDER BY ordering ASC
                          
         foreach ($pks as $i => $pk) {
             $query->clear();
-            $query->update('#__xbmusic_playlisttrack');
+            $query->update('#__xbmusic_trackplaylist');
             $query->set('listorder = '.$db->q($order[$i]))
                 ->where('id = '.$db->q($pk));
             $db->setQuery($query);
@@ -220,7 +220,7 @@ ORDER BY ordering ASC
         
         foreach ($pks as $pk) {
             $query->clear();
-            $query->delete('#__xbmusic_playlisttrack')
+            $query->delete('#__xbmusic_trackplaylist')
                 ->where($db->qn('id').' = '.$db->q($pk));
             $db->setQuery($query);
             try {
@@ -247,7 +247,7 @@ ORDER BY ordering ASC
         $query = $db->getQuery(true);
         foreach ($ids as $id) {
             $query->clear();
-            $query->update('#__xbmusic_playlisttrack');
+            $query->update('#__xbmusic_trackplaylist');
             $query->set('listorder = '.$db->q('0'))
             ->where('id = '.$db->q($id));
             $db->setQuery($query);
@@ -271,7 +271,7 @@ ORDER BY ordering ASC
      */
     public function toend($ids) {
         $db = $this->getDatabase();
-        $db->setQuery('SELECT MAX(listorder) FROM '.$db->qn('#__xbmusic_playlisttrack').' WHERE '.$db->qn('playlist_id').' = 1');
+        $db->setQuery('SELECT MAX(listorder) FROM '.$db->qn('#__xbmusic_trackplaylist').' WHERE '.$db->qn('playlist_id').' = 1');
         $end = $db->loadResult();
         
         $query = $db->getQuery(true);
@@ -279,7 +279,7 @@ ORDER BY ordering ASC
         foreach ($ids as $id) {
             $end ++;
             $query->clear();
-            $query->update('#__xbmusic_playlisttrack');
+            $query->update('#__xbmusic_trackplaylist');
             $query->set('listorder = '.$db->q($end))
             ->where('id = '.$db->q($id));
             $db->setQuery($query);
@@ -302,7 +302,7 @@ ORDER BY ordering ASC
     public function resetorder($plid) {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
-        $query->select($db->qn('id'))->from('#__xbmusic_playlisttrack');
+        $query->select($db->qn('id'))->from('#__xbmusic_trackplaylist');
         $query->where($db->qn('playlist_id').' = '.$db->q($plid));
         $query->order($db->qn('listorder'));
         $db->setQuery($query);
@@ -311,7 +311,7 @@ ORDER BY ordering ASC
         foreach ($ids as $id) {
             $n ++;
             $query->clear();
-            $query->update('#__xbmusic_playlisttrack');
+            $query->update('#__xbmusic_trackplaylist');
             $query->set('listorder = '.$db->q($n))
                 ->where('id = '.$db->q($id));
             $db->setQuery($query);

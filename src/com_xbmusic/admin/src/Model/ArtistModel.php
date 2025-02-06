@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistModel.php
- * @version 0.0.19.1 25th November 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -79,19 +79,10 @@ class ArtistModel extends AdminModel {
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         foreach ($pks as $pk) {
-            $query->delete($db->qn('#__xbmusic_artistalbum'));
+            $query->delete($db->qn('#__xbmusic_trackartist'));
             $query->where($db->qn('artist_id').' = '.$db->q($pk));
             $db->setQuery($query);
             $db->execute();
-            $query->clear('delete');
-            $query->delete($db->qn('#__xbmusic_artisttrack'));
-            $db->setQuery($query);
-            $db->execute();
-            $query->clear('delete');
-            $query->delete($db->qn('#__xbmusic_artistsong'));
-            $db->setQuery($query);
-            $db->execute();
-            $query->clear();
         }
         
         return parent::delete($pks);
@@ -136,12 +127,11 @@ class ArtistModel extends AdminModel {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.artist'); 
                 $item->tracks = $this->getArtistTrackList($item->id);
-                $item->albums = $this->getArtistAlbumList($item->id);
-                $item->songs = $this->getArtistSongList($item->id);
-                
-                
+                $item->albums = XbmusicHelper::getArtistAlbums($item->id);
+                $item->songs = XbmusicHelper::getArtistSongs($item->id);
+                                
                 if ($item->type == 2) {
-                    $item->groupmembers = XbmusicHelper::getGroupMembers($item->id);
+ //                   $item->groupmembers = XbmusicHelper::getGroupMembers($item->id);
                 }
 //                $item->albums = XbmusicHelper::getArtistAlbums($item->id);
                 $item->singles = XbmusicHelper::getArtistSingles($item->id);
@@ -190,8 +180,8 @@ class ArtistModel extends AdminModel {
         if (empty($data)) {
             $data = $this->getItem();
             $data->tracklist = $this->getArtistTrackList($data->id);
-            $data->albumlist = $this->getArtistAlbumList($data->id);
-            $data->songlist = $this->getArtistSongList($data->id);
+            $data->albumlist = XbmusicHelper::getArtistAlbums($data->id);
+            $data->songlist = XbmusicHelper::getArtistSongs($data->id);
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -283,8 +273,8 @@ class ArtistModel extends AdminModel {
         if (parent::save($data)) {
             $sid = $this->getState('artist.id');
             $this->storeArtistTracks($sid, $data['tracklist']);
-            $this->storeArtistAlbums($sid, $data['albumlist']);
-            $this->storeArtistSongs($sid, $data['songlist']);
+//            $this->storeArtistAlbums($sid, $data['albumlist']);
+//            $this->storeArtistSongs($sid, $data['songlist']);
             // Check possible workflow
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
@@ -329,7 +319,7 @@ class ArtistModel extends AdminModel {
         $db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('b.title AS title, b.rel_date, a.track_id AS track_id, a.role AS role, a.note AS note, a.listorder AS listorder');
-        $query->from('#__xbmusic_artisttrack AS a');
+        $query->from('#__xbmusic_trackartist AS a');
         $query->innerjoin('#__xbmusic_tracks AS b ON a.track_id = b.id');
         $query->where('a.artist_id = '.$db->q($artistid));
         $query->order('b.title ASC');
@@ -341,7 +331,7 @@ class ArtistModel extends AdminModel {
         //delete existing role list
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_artisttrack'));
+        $query->delete($db->quoteName('#__xbmusic_trackartist'));
         $query->where('artist_id = '.$artistid);
         $db->setQuery($query);
         $db->execute();
@@ -350,79 +340,9 @@ class ArtistModel extends AdminModel {
             if ($trk['track_id'] > 0) {
                 if (!key_exists('listorder', $trk)) $trk['listorder'] = 0;
                 $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_artisttrack'));
+                $query->insert($db->quoteName('#__xbmusic_trackartist'));
                 $query->columns('artist_id,track_id,role,note,listorder');
                 $query->values('"'.$artistid.'","'.$trk['track_id'].'","'.$trk['role'].'","'.$trk['note'].'","'.$trk['listorder'].'"');
-                //try
-                $db->setQuery($query);
-                $db->execute();
-            }
-        }
-    }
-
-    private function getArtistAlbumList($artistid) {
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('a.album_id AS album_id, b.title AS title, b.rel_date AS rel_date, a.role AS role, a.note AS note, a.listorder AS listorder');
-        $query->from('#__xbmusic_artistalbum AS a');
-        $query->innerjoin('#__xbmusic_albums AS b ON a.album_id = b.id');
-        $query->where('a.artist_id = '.$db->q($artistid));
-        $query->order('b.title ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-    
-    private function storeArtistAlbums($artistid, $albumList) {
-        //delete existing list
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_artistalbum'));
-        $query->where('artist_id = '.$artistid);
-        $db->setQuery($query);
-        $db->execute();
-        //restore the new list
-        foreach ($albumList as $album) {
-            if ($album['album_id'] > 0) {
-                if (!key_exists('listorder', $album)) $album['listorder'] = 0;
-                $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_artistalbum'));
-                $query->columns('artist_id,album_id,role,note,listorder');
-                $query->values('"'.$artistid.'","'.$album['album_id'].'","'.$album['role'].'","'.$album['note'].'","'.$album['listorder'].'"');
-                //try
-                $db->setQuery($query);
-                $db->execute();
-            }
-        }
-    }
-    
-    private function getArtistSongList($artistid) {
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->select('a.id AS song_id, a.title AS title, b.role AS role, b.note AS note, b.listorder AS listorder');
-        $query->from('#__xbmusic_artistsong AS b');
-        $query->innerjoin('#__xbmusic_songs AS a ON b.song_id = a.id');
-        $query->where('b.artist_id = '.$db->q($artistid));
-        $query->order('a.title ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-    
-    private function storeArtistSongs($artistid, $songList) {
-        //delete existing list
-        $db = $this->getDbo();
-        $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_artistsong'));
-        $query->where('artist_id = '.$artistid);
-        $db->setQuery($query);
-        $db->execute();
-        //restore the new list
-        foreach ($songList as $song) {
-            if ($song['song_id'] > 0) {
-                if (!key_exists('listorder', $song)) $song['listorder'] = 0;
-                $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_artistsong'));
-                $query->columns('artist_id,song_id,role,note,listorder');
-                $query->values('"'.$artistid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();

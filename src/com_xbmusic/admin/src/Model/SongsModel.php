@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongsModel.php
- * @version 0.0.18.6 31st October 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -119,7 +119,7 @@ class SongsModel extends ListModel {
                     .'a.note'
                 )
             );
-        $query->select('(SELECT COUNT(DISTINCT(tk.track_id)) FROM #__xbmusic_songtrack AS tk WHERE tk.song_id = a.id) AS trkcnt');
+        $query->select('(SELECT COUNT(DISTINCT(tk.track_id)) FROM #__xbmusic_tracksong AS tk WHERE tk.song_id = a.id) AS trkcnt');
         $query->from('#__xbmusic_songs AS a');
                         
         // Join over the users for the checked out user.
@@ -314,9 +314,9 @@ class SongsModel extends ListModel {
             .' GROUP_CONCAT(CONCAT(p.id,'|'.p.name) SEPARATOR '.$db->q(' | ').') AS performers, '
             .' st.note AS note, al.id AS albumid, al.title AS albumtitle');
         $query->from('#__xbmusic_tracks AS t');
-        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_tracksong AS st ON st.track_id = t.id');
         $query->join('LEFT','#__xbmusic_albums AS al ON al.id = t.album_id');
-        $query->join('LEFT','#__xbmusic_artisttrack AS at ON at.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
         $query->join('LEFT','#__xbmusic_artists AS p ON p.id = at.artist_id');
         $query->where('st.song_id = '.$id);
         $query->order('t.rec_date DESC, t.title ASC');
@@ -331,7 +331,7 @@ class SongsModel extends ListModel {
         $query->select('t.id AS trackid, t.filename AS trackname, t.rel_date AS rel_date, '
             .' st.note AS note, al.id AS albumid, al.title AS albumtitle');
         $query->from('#__xbmusic_tracks AS t');
-        $query->join('LEFT','#__xbmusic_songtrack AS st ON st.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_tracksong AS st ON st.track_id = t.id');
         $query->join('LEFT','#__xbmusic_albums AS al ON al.id = t.album_id');
         $query->where('st.song_id = '.$sid);
         $query->order('t.rel_date DESC, t.title ASC');
@@ -344,7 +344,7 @@ class SongsModel extends ListModel {
         $query = $db->getQuery(true);
         $query->select('a.id AS artistid, a.name AS name, b.role AS role, b.note AS stnote, b.listorder');
         $query->from('#__xbmusic_artists AS a');
-        $query->join('LEFT','#__xbmusic_artisttrack AS b ON b.artist_id = a.id');
+        $query->join('LEFT','#__xbmusic_trackartist AS b ON b.artist_id = a.id');
         $query->where('b.track_id = '.$tid);
         $query->order('b.listorder ASC');
         $db->setQuery($query);

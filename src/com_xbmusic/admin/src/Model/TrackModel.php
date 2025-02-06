@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.19.7 14th January 2025
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -89,12 +89,12 @@ class TrackModel extends AdminModel {
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         foreach ($pks as $pk) {
-            $query->delete($db->qn('#__xbmusic_artisttrack'));
+            $query->delete($db->qn('#__xbmusic_trackartist'));
             $query->where($db->qn('track_id').' = '.$db->q($pk));
             $db->setQuery($query);
             $db->execute();
             $query->clear('delete');
-            $query->delete($db->qn('#__xbmusic_songtrack'));
+            $query->delete($db->qn('#__xbmusic_tracksong'));
             $db->setQuery($query);
             $db->execute();
             $query->clear();
@@ -542,7 +542,7 @@ class TrackModel extends AdminModel {
             } else {
                 if ($songid > 0) $data['newsongs'][] = [$songid => $songtitle];
             }
-            if (empty(XbcommonHelper::getItems('#__xbmusic_songtrack', 'song_id', $songid, 'track_id = '.$db->q($tid)))) {
+            if (empty(XbcommonHelper::getItems('#__xbmusic_tracksong', 'song_id', $songid, 'track_id = '.$db->q($tid)))) {
                 $n = (isset($data['songlist'])) ? count($data['songlist']) : 0;
                 $data['songlist']['songlist'.$n] = array('song_id' => $songid, 'note' =>Text::_('XBMUSIC_CREATED_IMPORT'));
                 $infomsg .= Text::sprintf('Song "%s" added to track',$songtitle ).'<br />';
@@ -568,7 +568,7 @@ class TrackModel extends AdminModel {
                     $artistid *= -1; //(faster than abs()
                 }
                 // add artist to artist list
-                if (empty(XbcommonHelper::getItems('#__xbmusic_artisttrack', 'artist_id', $artistid, 'track_id = '.$db->q($tid)))) {
+                if (empty(XbcommonHelper::getItems('#__xbmusic_trackartist', 'artist_id', $artistid, 'track_id = '.$db->q($tid)))) {
                     $data['artistlist']['artistlist'.$n] = array('artist_id' => $artistid, 'role'=>'', 'note' =>Text::_('auto created from ID3'));
                     $infomsg .= Text::sprintf('Artist %s added to %s %s','"'.$name.'"', 'track','' ).'<br />';
                     $n ++;
@@ -640,7 +640,7 @@ class TrackModel extends AdminModel {
         //$db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('a.artist_id AS artist_id, b.name AS name, a.role AS role, a.note AS note, a.listorder AS listorder');
-        $query->from('#__xbmusic_artisttrack AS a');
+        $query->from('#__xbmusic_trackartist AS a');
         $query->innerjoin('#__xbmusic_artists AS b ON a.artist_id = b.id');
         $query->where('a.track_id = '.$db->q($track_id));
         $query->order('a.listorder ASC');
@@ -653,14 +653,14 @@ class TrackModel extends AdminModel {
         $db = $this->getDatabase();
         //$db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_artisttrack'));
+        $query->delete($db->quoteName('#__xbmusic_trackartist'));
         $query->where('track_id = '.$db->q($track_id));
         $db->setQuery($query);
         $db->execute();
         //restore the new list
         $listorder=0;
         $query->clear();
-        $query->insert($db->quoteName('#__xbmusic_artisttrack'));
+        $query->insert($db->quoteName('#__xbmusic_trackartist'));
         $query->columns('artist_id,track_id,role, note,listorder');
         foreach ($artistlist as $artist) {
             if ($artist['artist_id'] > 0) {
@@ -679,7 +679,7 @@ class TrackModel extends AdminModel {
         //$db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('a.title AS title, b.song_id as song_id, b.role AS role, b.note AS note, b.listorder AS listorder');
-        $query->from('#__xbmusic_songtrack AS b');
+        $query->from('#__xbmusic_tracksong AS b');
         $query->innerjoin('#__xbmusic_songs AS a ON b.song_id = a.id');
         $query->where('b.track_id = '.$db->q($track_id));
         $query->order('b.listorder ASC');
@@ -692,14 +692,14 @@ class TrackModel extends AdminModel {
         $db = $this->getDatabase();
         //$db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->delete($db->quoteName('#__xbmusic_songtrack'));
+        $query->delete($db->quoteName('#__xbmusic_tracksong'));
         $query->where('track_id = '.$db->q($track_id));
         $db->setQuery($query);
         $db->execute();
         //restore the new list
         $listorder=0;
         $query->clear();
-        $query->insert($db->quoteName('#__xbmusic_songtrack'));
+        $query->insert($db->quoteName('#__xbmusic_tracksong'));
         $query->columns('song_id,track_id,role,note,listorder');
         foreach ($songlist as $song) {
             if ($song['song_id'] > 0) {

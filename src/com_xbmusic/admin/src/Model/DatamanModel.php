@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.19.4 9th January 2025
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -383,12 +383,12 @@ class DatamanModel extends AdminModel {
                 }
 
                 //album may have already existed so we need to add to existing artist and song links after creating
-                $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
-                if ($res>0)
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
-                    $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
-                if ($res>0)
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
+//                 $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
+//                 if ($res>0)
+//                     if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
+//                     $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
+//                 if ($res>0)
+//                     if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
                         
                 if ($optalbsong > 1) {
                     $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
@@ -421,14 +421,14 @@ class DatamanModel extends AdminModel {
                 if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                 $newmsg .= trim($msg).'<br />';
                 $app->enqueueMessage($newmsg,'Success');
-             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
+             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','tracksong')."\n";
             } else {
                 $msg .= ' : '.Text::_('FAILED to save track').Xbtext::_($trackdata['title'], XBSP1 + XBDQ + XBNL);
                 $ilogmsg .= XBERR.$msg;
                 $newmsg .= trim($msg).'<br />';
                 $app->enqueueMessage(trim($msg),'Error');
                 
-             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','songtrack')."\n";
+             //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','tracksong')."\n";
             }
              
         } //end if iset id3data[trackdata]
@@ -483,93 +483,93 @@ class DatamanModel extends AdminModel {
     
     private function addArtistSongs($artistid, $songList) {
         $cnt = 0;
-        $db = Factory::getDbo();
-        $query = $db->getQuery(true);
-        foreach ($songList as $song) {
-           //check if this link alreasdy exists
-            $query->where($db->qn('artist_id').' = '.$db->q($artistid));
-            $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
-            $query->select('id')->from('#__xbmusic_artistsong');
-            $db->setQuery($query);
-            if ($db->loadResult()>0) {
-                //skipping this one already exists, could update role note and listorder
-            } else {
-                if (!key_exists('listorder', $song)) $song['listorder'] = 0;
-                $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_artistsong'));
-                $query->columns('artist_id,song_id,role,note,listorder');
-                $query->values('"'.$artistid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
-                try {
-                    if ($db->setQuery($query)) $cnt++;
-                    $db->execute();                                    
-                } catch (\Exception $e) {
-                    $dberr = $e->getMessage();
-                    Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-                }
-            }
-        }
+//         $db = Factory::getDbo();
+//         $query = $db->getQuery(true);
+//         foreach ($songList as $song) {
+//            //check if this link alreasdy exists
+//             $query->where($db->qn('artist_id').' = '.$db->q($artistid));
+//             $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
+//             $query->select('id')->from('#__xbmusic_artistsong');
+//             $db->setQuery($query);
+//             if ($db->loadResult()>0) {
+//                 //skipping this one already exists, could update role note and listorder
+//             } else {
+//                 if (!key_exists('listorder', $song)) $song['listorder'] = 0;
+//                 $query->clear();
+//                 $query->insert($db->quoteName('#__xbmusic_artistsong'));
+//                 $query->columns('artist_id,song_id,role,note,listorder');
+//                 $query->values('"'.$artistid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
+//                 try {
+//                     if ($db->setQuery($query)) $cnt++;
+//                     $db->execute();                                    
+//                 } catch (\Exception $e) {
+//                     $dberr = $e->getMessage();
+//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
+//                 }
+//             }
+//         }
         return $cnt;
     }
     
     private function addAlbumArtists($albumid, $artistList) {
         $cnt = 0;
-        $db = Factory::getDbo();
-        $query = $db->getQuery(true);
-        foreach ($artistList as $artist) {
-            //check if this link alreasdy exists
-            $query->clear();
-            $query->where($db->qn('album_id').' = '.$db->q($albumid));
-            $query->where($db->qn('artist_id').' = '.$db->q($artist['artist_id']));
-            $query->select('id')->from('#__xbmusic_artistalbum');
-            $db->setQuery($query);
-            if ($db->loadResult()>0) {
-                //skipping this one already exists, could update role note and listorder
-            } else {
-                if (!key_exists('listorder', $artist)) $artist['listorder'] = 0;
-                $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_artistalbum'));
-                $query->columns('album_id,artist_id,role,note,listorder');
-                $query->values('"'.$albumid.'","'.$artist['artist_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
-                try {
-                    if ($db->setQuery($query)) $cnt++;
-                    $db->execute();
-                } catch (\Exception $e) {
-                    $dberr = $e->getMessage();
-                    Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-                }
-            }
-        }
+//         $db = Factory::getDbo();
+//         $query = $db->getQuery(true);
+//         foreach ($artistList as $artist) {
+//             //check if this link alreasdy exists
+//             $query->clear();
+//             $query->where($db->qn('album_id').' = '.$db->q($albumid));
+//             $query->where($db->qn('artist_id').' = '.$db->q($artist['artist_id']));
+//             $query->select('id')->from('#__xbmusic_artistalbum');
+//             $db->setQuery($query);
+//             if ($db->loadResult()>0) {
+//                 //skipping this one already exists, could update role note and listorder
+//             } else {
+//                 if (!key_exists('listorder', $artist)) $artist['listorder'] = 0;
+//                 $query->clear();
+//                 $query->insert($db->quoteName('#__xbmusic_artistalbum'));
+//                 $query->columns('album_id,artist_id,role,note,listorder');
+//                 $query->values('"'.$albumid.'","'.$artist['artist_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
+//                 try {
+//                     if ($db->setQuery($query)) $cnt++;
+//                     $db->execute();
+//                 } catch (\Exception $e) {
+//                     $dberr = $e->getMessage();
+//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
+//                 }
+//             }
+//         }
         return $cnt;
     }
     
     private function addAlbumSongs($albumid, $songList) {
         $cnt = 0;
-        $db = Factory::getDbo();
-        $query = $db->getQuery(true);
-        foreach ($songList as $song) {
-            //check if this link alreasdy exists
-            $query->clear();
-            $query->where($db->qn('album_id').' = '.$db->q($albumid));
-            $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
-            $query->select('id')->from('#__xbmusic_songalbum');
-            $db->setQuery($query);
-            if ($db->loadResult()>0) {
-                //skipping this one already exists, could update role note and listorder
-            } else {
-                if (!key_exists('listorder', $song)) $song['listorder'] = 0;
-                $query->clear();
-                $query->insert($db->quoteName('#__xbmusic_songalbum'));
-                $query->columns('album_id,song_id,role,note,listorder');
-                $query->values('"'.$albumid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
-                try {
-                    if ($db->setQuery($query)) $cnt++;
-                    $db->execute();
-                } catch (\Exception $e) {
-                    $dberr = $e->getMessage();
-                    Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-                }
-            }
-        }
+//         $db = Factory::getDbo();
+//         $query = $db->getQuery(true);
+//         foreach ($songList as $song) {
+//             //check if this link alreasdy exists
+//             $query->clear();
+//             $query->where($db->qn('album_id').' = '.$db->q($albumid));
+//             $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
+//             $query->select('id')->from('#__xbmusic_songalbum');
+//             $db->setQuery($query);
+//             if ($db->loadResult()>0) {
+//                 //skipping this one already exists, could update role note and listorder
+//             } else {
+//                 if (!key_exists('listorder', $song)) $song['listorder'] = 0;
+//                 $query->clear();
+//                 $query->insert($db->quoteName('#__xbmusic_songalbum'));
+//                 $query->columns('album_id,song_id,role,note,listorder');
+//                 $query->values('"'.$albumid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
+//                 try {
+//                     if ($db->setQuery($query)) $cnt++;
+//                     $db->execute();
+//                 } catch (\Exception $e) {
+//                     $dberr = $e->getMessage();
+//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
+//                 }
+//             }
+//         }
         return $cnt;
     }
     

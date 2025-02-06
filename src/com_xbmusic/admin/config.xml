@@ -29,7 +29,15 @@
 		
         <field name="space1" type="spacer" hr="true" />
         
-		<field name="devmode" type="hidden" default="1" />
+		<field name="devmode" type="radio" 
+			label="Developer Mode"
+			description="Turn on to enable save data on uninstall options and some features used during development"
+ 			class="btn-group btn-group-yesno"
+			default="0" 
+		>
+				<option value="0" >Off</option>
+				<option value="1">On</option>
+		</field>
 		
 		<field name="devnote" type="note"
 			label="Development Options"
@@ -45,9 +53,31 @@
 				<option value="0" >DELETE</option>
 				<option value="1">KEEP</option>
 		</field>			
-  		<field name="savefiles" type="radio"
-			label="Keep xbMusic files"
-			description="Option to keep the image, music and log files intact when uninstalling the xbMusic component. The external contents of symlinked music folders are not deleted in any event, only files actually stored in the xbMusic folders are affected."
+  		<field name="savemusic" type="radio"
+			label="Keep Music files"
+			description="Option to keep the music file in /xbmusic when uninstalling the xbMusic component. If there are symlinks to external folders in /xbmusic then the delete will fail. In this case you will need to delete local files manually, or remove the symlink(s) before uninstalling"
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			showon="devmode:1[AND]savedata:0"
+			>
+				<option value="1">KEEP</option>
+				<option value="0" >DELETE</option>
+		</field>			
+
+  		<field name="saveimages" type="radio"
+			label="Keep Image files"
+			description="Option to keep the image files in /images/xbmusic when uninstalling the xbMusic component."
+ 			class="btn-group btn-group-yesno"
+			default="1"
+			showon="devmode:1[AND]savedata:0"
+			>
+				<option value="1">KEEP</option>
+				<option value="0" >DELETE</option>
+		</field>			
+
+  		<field name="savelogs" type="radio"
+			label="Keep Log files"
+			description="Option to keep the log files in /xbmusic_logs when uninstalling the xbMusic component."
  			class="btn-group btn-group-yesno"
 			default="1"
 			showon="devmode:1[AND]savedata:0"
@@ -127,7 +157,7 @@
 			label="Import Category"
 			description="This will override the options above for all items to create a category based on import date when importing from track file ID3 data"
 			class="btn-group "
- 			default="2"
+ 			default="1"
 		>
 			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>

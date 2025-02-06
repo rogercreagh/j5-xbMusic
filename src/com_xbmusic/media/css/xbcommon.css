@@ -1,7 +1,7 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.6.14 11th June 2024
+ * @version xbmusic-J5 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -442,6 +442,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbmh200 {max-height:200px; }
 .xbmh300 {max-height:300px; }
 .xbmh400 {max-height:400px; }
+.xbmh800 {max-height:800px; }
 
 /* widths */
 .xbw18 {width: 18px; }

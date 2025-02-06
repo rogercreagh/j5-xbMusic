@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.12.0 7th August 2024
+ * @version 0.0.30.0 5th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -113,14 +113,14 @@ class PlaylistsModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.picture, '
+                'DISTINCT a.id, a.title, a.alias, a.description, '
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
                     .'a.note'
                 )
             );
-        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_playlisttrack AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
+        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
         $query->from('#__xbmusic_playlists AS a');
                         
         // Join over the users for the checked out user.
@@ -294,7 +294,7 @@ class PlaylistsModel extends ListModel {
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select('t.id AS trackid, t.title AS tracktitle, t.sortartist AS artistname, pt.listorder AS ordering');
-        $query->join('LEFT','#__xbmusic_playlisttrack AS pt ON pt.track_id = t.id');
+        $query->join('LEFT','#__xbmusic_trackplaylist AS pt ON pt.track_id = t.id');
         $query->from('#__xbmusic_tracks AS t');
         $query->where('pt.playlist_id = '.$pid);
         $query->order('pt.listorder, t.title ASC');

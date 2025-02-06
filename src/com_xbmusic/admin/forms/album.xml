@@ -171,67 +171,8 @@
 	>
 		<field name="albumlinksnote" type="note"
 			label="Links to Tracks, Artists, Songs, and External Links"
-			description="Playlists are linked through the tracks, Album Artist(s) is a specific field for Albums and is not connected to the Artists data table (eg it might be 'Various Artists'.)"
+			description="The album is linked from one or more tracks - if tracks are missing in the list then you need to add the link from the missing track if it is available. Artists and Songs are linked from the tracks, so will only appear for linked tracks. Album Artist(s) is a specific field for this Album and is not connected to the Artists data table (eg it might be 'Various Artists')."
 		/>
-		
-		<field name="tracklist" type="subform"
-			label="Track(s)"
-			description="An album may have several tracks, each track belongs to only one album (or no album in the case of a single). A track might cover several songs (eg a Medley) or several tracks may make a single Song or work (eg the Movements of a Symphony might each be separate tracks)"			
-			multiple="true" min= "0" max= "40"
-			buttons="add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="track_id" type="xbtracklist" label="Track Name">
-					<option value=""> </option>	
-				</field>
-				<field name="disc_no" type="text" label="Disc No." default="1" />
-				<field name="track_no" type="text" label="Track No." default="0" />
-			</form>
-		</field>						
-		
-		<field name="artistlist" type="subform"
-			label="Artist(s)"
-			description="The album has a headline Album Artist name, these are the artists as listed with specific tracks"			
-			multiple="true" min= "0" max= "10"
-			buttons="add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="artist_id" type="xbartistlist" label="Artist Name">
-					<option value=""> </option>	
-				</field>
-				<field name="role" type="text" label="XB_ROLE" maxlength="190" />
-				<field name="note" type="text" label="XB_NOTE" maxlength="190"
-				/>
-			</form>
-		</field>			
-
-		<field name="songlist" type="subform"
-			label="Song(s)"
-			description="Songs on this album. Song type may be complete track, part of medley, or consists of several tracks"			
-			multiple="true" min= "0" max= "10"
-			buttons="add,remove,move"
-			layout="joomla.form.field.subform.repeatable-table"
-			groupByFieldset="false" 
-		>
-			<form>
-				<field name="song_id" type="xbsonglist" label="Song Name">
-					<option value=""> </option>	s
-				</field>
-				<field name="role" type="list" label="Type" maxlength="190" mutiple="false" >
-					<option value="1">Full track</option>
-					<option value="2">Part of a medley</option>
-					<option value="3">Spread across tracks</option>
-                  <option value="">Other</option>
-				</field>
-                <field name="other" type="text" label="" showon="role:" />
-				<field name="note" type="text" label="XB_NOTE" maxlength="190"
-				/>
-			</form>
-		</field>					
 
 		<field name="ext_links" type="subform" 
 			label="External Links" description="Links to associated information for the track"
