@@ -105,11 +105,11 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
+						<th style="width:105px;"><?php echo Text::_('XBMUSIC_ARTWORK'); ?>
 						</th>
 						<th><?php echo HTMLHelper::_('searchtools.sort', 'Artists', 'a.sortartist', $listDirn, $listOrder); ?>
 						</th>
-						<th><?php echo Text::_('Tracks'); ?>
+						<th><?php echo Text::_('XBMUSIC_TRACKS'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -180,9 +180,9 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbr09 xbnit"><?php echo Xbtext::_('Released',XBSP2).$item->rel_date; ?><br />
+								<p class="xbr09 xbnit"><?php echo Xbtext::_('XBMUSIC_RELEASED',XBSP2).$item->rel_date; ?><br />
         							<?php if ($item->format) echo $item->format; ?>
-    								<?php if($item->num_discs > 1) echo Xbtext::_('on',XBSP2). $item->num_discs. Xbtext::_('discs',XBSP1); ?> 
+    								<?php if($item->num_discs > 1) echo Xbtext::_('XB_ON',XBSP2). $item->num_discs. Xbtext::_('XBMUSIC_DISCS',XBSP1); ?> 
         							<?php // if ($item->tot_tracks) echo Xbtext::_('with',XBSP3).$item->tot_tracks.Text::_('tracks');?>	
    								</p>
 							</div>
@@ -200,36 +200,37 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">
-							<p><b>
     						<?php if($item->albumartist) : ?>   							
-                                <?php echo $item->albumartist; ?>
-    						<?php endif; ?>
+							<p><span class="xbit"><?php echo Text::_('XBMUSIC_ALBUM_ARTIST'); ?></span>: <b>
+                               <?php echo $item->albumartist; ?>
 							</b></p>
+    						<?php endif; ?>
+    						<span class="xbit"><?php echo Text::_('XBMUSIC_TRACK_ARTISTS');?></span>
                             <?php if (count($item->artists) == 1) : ?>
 								<a href=<?php echo $artelink.$item->artists[0]['artistid']; ?>">
 				                <?php echo $item->artists[0]['artistname']; ?></a> 
-				                <span class="xbnit"><?php echo $item->artists[0]['role']; ?></span>
+				                <span class="xbnit"><?php echo $item->artists[0]['artistrole']; ?></span>
 							<?php elseif(count($item->artists)>1) : ?>
 								<details>
-									<summary><?php echo Text::sprintf('%s Artists on album',count($item->artists)); ?></summary>
+									<summary><?php echo Text::sprintf('%s XBMUSIC_ARTISTS_ALBUM',count($item->artists)); ?></summary>
 									<ul style="margin:5px;">
 									<?php foreach ($item->artists as $artist) : ?>
 										<li>
 											<a href=<?php echo $artelink.$artist['artistid']; ?>">
 							                <?php echo $artist['artistname']; ?></a> 
-							                <span class="xbnit"><?php echo $artist['role']; ?></span>
+							                <span class="xbnit"><?php echo $artist['artistrole']; ?></span>
 							            </li>
 									<?php endforeach; ?>
 									</ul>
 								</details>
 							<?php else : ?>
-								<p class="xbnit xbr09"><?php echo Text::_('no artists connected'); ?>
+								<p class="xbnit xbr09"><?php echo Text::_('XBMUSIC_NO_ARTISTS_LISTED'); ?>
 							<?php endif; ?>
 						</td>
 						<td class="xbr09" onclick="stopProp(event);">
 							<?php if ($item->trkcnt > 1) : ?>
 								<details>
-									<summary><?php echo Text::sprintf('%s Tracks from album',$item->trkcnt); ?></summary>
+									<summary><?php echo Text::sprintf('%s XBMUSIC_TRACKS_ALBUM',$item->trkcnt); ?></summary>
 									<ol style="margin:5px;">
 									<?php foreach ($item->tracks as $track) : ?>
                                   		<?php if($item->num_discs > 1) {
@@ -237,7 +238,7 @@ if (strpos($listOrder, 'modified') !== false) {
                                   		}?>
 										<li value="<?php echo $track['trackno']; ?>">
 											<a href="index.php?option=com_xbmusic&task=track.edit&retview=albums&id=<?php echo $track['trackid']; ?>">
-							                <?php echo $track['trackname']; ?></a> 
+							                <?php echo $track['tracktitle']; ?></a> 
 							                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
 							            </li>
 									<?php endforeach; ?>
@@ -249,11 +250,11 @@ if (strpos($listOrder, 'modified') !== false) {
 				                <?php echo $track['trackname']; ?></a> 
 				                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
 				                <br /><span class="xbnote">
-    				                <?php echo Xbtext::_('track',XBSP2).$track['trackno'].Xbtext::_('on disc',XBSP3); ?>
+    				                <?php echo Xbtext::_('XBMUSIC_TRACK',XBSP2).$track['trackno'].Xbtext::_('XBMUSIC_ON_DISC',XBSP3); ?>
     				                <?php if($item->num_discs > 1) echo $track['discno']; ?>
 				                </span>
 							<?php else : ?>
-								<p class="xbnit xbr09"><?php echo Text::_('no tracks connected'); ?>
+								<p class="xbnit xbr09"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?>
 							<?php endif; ?>
 						</td>
 						<td class="nowrap">

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.1 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -563,15 +563,17 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('a.name AS artistname, a.id AS artistid, a.alias AS artistalias, b.role AS artistrole, b.note as artistnote');
+	    $query->select('DISTINCT a.name AS artistname, a.id AS artistid, ta.role AS artistrole');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
 	    $query->leftjoin('#__xbmusic_artists AS a ON a.id = ta.artist_id');
-	    $query->where('t.album_id = '.$albumid);
-	    $query->group('a.name');
+	    $query->where('t.album_id = '.$albumid.' AND a.name <> \'\'');
+	    //$query->group('a.name');
 	    $query->order('a.sortname ASC');
+	    $db->setQuery($query);
 	    return $db->loadAssocList();
 	}
+	
 	
 	public static function getAlbumSongs($albumid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl

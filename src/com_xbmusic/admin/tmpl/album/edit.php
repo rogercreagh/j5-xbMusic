@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.1 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -66,7 +66,7 @@ $item = $this->item;
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<p class="xbnit">
     	<?php if ($item->id == 0 ) : ?>
-    		Default base folder to find music files from <code><?php echo $this->basemusicfolder; ?></code> This is set in xbMusic Options.
+    		<?php echo Text::sprintf('XBMUSIC_MUSIC_LOCATION',$this->basemusicfolder); ?>
    			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
     	<?php else : ?>
     	<?php endif; ?>
@@ -102,7 +102,7 @@ $item = $this->item;
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('XB_GENERAL')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
    					<div class="row xb09">
@@ -118,7 +118,7 @@ $item = $this->item;
         				</div>
 		           		<div class="col-12 col-lg-6">
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
-		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
+		           					<?php echo Text::_('XB_PREVIEW_MARKDOWN'); ?>
 		           				</div>
 								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
@@ -137,7 +137,7 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('XB_TAGS')); ?>
 			<div class="row">
 				<div class="col-12">
                   <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
@@ -157,18 +157,18 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKS')); ?>
         <div class="row">
         	<div class="col-12">
 				<?php echo $this->form->renderField('albumlinksnote'); ?> 
-        		<h4><?php echo Text::_('Connections to other items')?></h4>
-        		<b><?php echo Text::_('Tracks'); ?></b>
-        		<table>
+        		<h4><?php echo Text::_('XB_LINKS_OTHER_ITEMS')?></h4>
+        		<b><?php echo Text::_('XBMUSIC_TRACKS'); ?></b>
+        		<table class="xbtablehgrid">
         			<thead>
         				<tr>
-        					<th>Track</th>
-        					<th>Artist(s) for track</th>
-        					<th>Songs in track</th>
+        					<th><?php echo Text::_('XBMUSIC_TRACK'); ?></th>
+        					<th><?php echo Text::_('XBMUSIC_ARTISTS_TRACK'); ?></th>
+        					<th><?php echo Text::_('XBMUSIC_SONGS_TRACK'); ?></th>
         				</tr>
         			</thead>
         			<tbody>
@@ -200,38 +200,38 @@ $item = $this->item;
         			    <?php endforeach; ?>
         			</tbody>
         		</table>
-        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item, the eyecon previews the site view'); ?></p>
+        		<p class="xbnote"><?php echo Text::_('XB_LINKS_NOTE_ITEM_EYCON'); ?></p>
         	</div>
 			<hr />
             <?php echo $this->form->renderField('ext_links');?>
         </div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('XB_IMAGES')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
-           			<h4><?php echo Text::_('Primary Album Image'); ?></h4>
+           			<h4><?php echo Text::_('XBMUSIC_PRIME_ALBUM_IMG'); ?></h4>
 					<img src="<?php echo $item->imgurl; ?>" />
 					<?php echo $this->form->renderField('imgurl'); ?> 
 				</div>        		
            		<div class="col-12 col-md-7">
-           			<h4><?php echo Text::_('Primary image details'); ?></h4>
+           			<h4><?php echo Text::_('XBMUSIC_PRIME_IMG_DETAILS'); ?></h4>
 					<div>
                       <dl class="xbdl">
-                      	<dt>Title</dt><dd><?php echo $item->imageinfo->imagetitle; ?></dd>
-                      	<dt>Description</dt><dd><?php echo $item->imageinfo->imagedesc; ?></dd>
-                      	<dt>Filename</dt><dd><?php echo $item->imageinfo->basename; ?></dd>
-                        <dt>Folder</dt><dd><?php echo $item->imageinfo->folder; ?></dd>
-                        <dt>Filesize</dt><dd><?php echo $item->imageinfo->filesize; ?></dd>
-                        <dt>FileDate</dt><dd><?php echo $item->imageinfo->filedate;?></dd>
-                        <dt>Dimensions</dt><dd><?php echo $item->imageinfo->filewidth.' x '.$item->imageinfo->fileht.' px'; ?></dd>
-                        <dt>Mime type</dt><dd><?php echo $item->imageinfo->filemime; ?></dd>                        
+                      	<dt><?php echo Text::_('XB_TITLE'); ?></dt><dd><?php echo $item->imageinfo->imagetitle; ?></dd>
+                      	<dt><?php echo Text::_('XB_DESCRIPTION'); ?></dt><dd><?php echo $item->imageinfo->imagedesc; ?></dd>
+                      	<dt><?php echo Text::_('XB_FILENAME'); ?></dt><dd><?php echo $item->imageinfo->basename; ?></dd>
+                        <dt><?php echo Text::_('XB_FOLDER'); ?></dt><dd><?php echo $item->imageinfo->folder; ?></dd>
+                        <dt><?php echo Text::_('XB_FILESIZE'); ?></dt><dd><?php echo $item->imageinfo->filesize; ?></dd>
+                        <dt><?php echo Text::_('XB_FILEDATE'); ?></dt><dd><?php echo $item->imageinfo->filedate;?></dd>
+                        <dt><?php echo Text::_('XB_DIMENSIONS'); ?></dt><dd><?php echo $item->imageinfo->filewidth.' x '.$item->imageinfo->fileht.' px'; ?></dd>
+                        <dt><?php echo Text::_('XB_MIME_TYPE'); ?></dt><dd><?php echo $item->imageinfo->filemime; ?></dd>                        
                       </dl>
 						<p class="xbnote">
 						<?php if(isset($item->imageinfo->datalength)) {
-						    echo Text::_('Album Image has been taken from a track ID3 data');
+						    echo Text::_('XBMUSIC_ALBUM_IMAGE_FROM');
 						    if ($item->imageinfo->fileht < $item->imageinfo->image_height) {
-						        echo Xbtext::_('and resized from ',XBSP3);
+						        echo Xbtext::_('XBMUSIC_AND_RESIZED_FROM',XBSP3);
 						        echo $item->imageinfo->image_width.' x '.$item->imageinfo->image_height.' px';
 						    }
 						}
@@ -242,12 +242,12 @@ $item = $this->item;
         	<hr />
 			<div class="row">
            		<div class="col-12 col-lg-6 form-vertical">
-           			<h4><?php echo Text::_('Select new image for Album only')?></h4>
+           			<h4><?php echo Text::_('XBMUSIC_ALBUM_IMAGE_SELECT')?></h4>
 					<?php echo $this->form->renderField('newimage'); ?> 
            			<p class="xbnote">an option to also save the image to all tracks will appear here 
 				</div>
            		<div class="col-12 col-lg-6">
-           			<h4><?php echo Text::_('Edit title and description for album')?></h4>
+           			<h4><?php echo Text::_('XBMUSIC_EDIT_IMG_TITLEDESC')?></h4>
 					<?php echo $this->form->renderField('newimagetitle'); ?>
 					<?php echo $this->form->renderField('newimagedesc'); ?>
    				</div>
@@ -259,7 +259,7 @@ $item = $this->item;
            	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('XB_PUBLISHING')); ?>
             <div class="row">
                 <div class="col-12 col-lg-6">
                     <fieldset id="fieldset-publishingdata" class="options-form">
@@ -281,9 +281,9 @@ $item = $this->item;
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php if ($this->canDo->get('core.admin') ) : ?>
-            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('Permissions')); ?>
+            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('XB_PERMISSIONS')); ?>
             <fieldset id="fieldset-rules" class="options-form">
-                <legend><?php echo Text::_('User Group Permissions'); ?></legend>
+                <legend><?php echo Text::_('XB_USER_GROUP_PERMISSIONS'); ?></legend>
                 <div>
                 	<?php echo $this->form->getInput('rules'); ?>
                 </div>

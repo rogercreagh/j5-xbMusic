@@ -1,7 +1,7 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.30.0 5th February 2025
+ * @version xbmusic-J5 0.0.30.1 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -587,3 +587,40 @@ dl.xbdl dd {
 	border:1px solid #888;
 	background-color:#f7f7f7;
 } 
+
+/** simple table with row and cell h padding and horizontal separator lines**/
+.xbtablehgrid tbody tr {
+	border-bottom: 1px solid #888;
+	padding: 10px 0;
+}
+.xbtablehgrid td {
+	padding-right: 10px;
+}
+
+/** table header background and border **/
+#xbcomponent th {
+  background-color: #e0ffff;
+  border-top: 1px solid #7dbfbf;
+  border-bottom: 1px solid #7dbfbf;
+}
+
+/** subform compact **/
+.xbsubformcompact table tbody td {
+  padding:1px;
+}
+.xbsubformcompact table tbody td .btn-group { 
+	margin: 4px 0;
+}
+.xbsubformcompact table tbody td .control-group {
+  margin-bottom:2px;
+}
+
+/** subform text fields width **/
+joomla-field-subform .table td input[type="text"],
+joomla-field-subform .table td input[type="url"] 
+joomla-field-subform .table td input[type="search"] 
+joomla-field-subform .table td input[type="tel"] {
+	width:100%;
+}
+
+

@@ -120,10 +120,10 @@
 				<field name="role" type="xbcombobox" 
 					label="Track type"
 					hint="Type or click for list" 
+					table="xbmusic_tracksong"
 				>
-                  	<option value="1">Full track</option>
-					<option value="2">Part of a medley</option>
-					<option value="3">Combination of tracks</option>
+                  	<option value="1. Full track"></option>
+					<option value="2. In a medley"></option>
 
                   </field>
 				<field name="note" type="text" label="XB_NOTE" maxlength="190"
