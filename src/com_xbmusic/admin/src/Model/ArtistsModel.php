@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistsModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.2 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,7 @@ use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Utilities\ArrayHelper;
 //use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Table\Table;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class ArtistsModel extends ListModel {
     
@@ -294,8 +295,8 @@ class ArtistsModel extends ListModel {
                     }
                 } //end if is_object
                 $item->singles = $this->getArtistSingles($item->id);
-                $item->albums = $this->getArtistAlbums($item->id);
-                $item->songs = $this->getArtistSongs($item->id);
+                $item->albums = XbmusicHelper::getArtistAlbums($item->id);
+                $item->songs = XbmusicHelper::getArtistSongs($item->id);
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $item->id);     
                 
@@ -317,29 +318,5 @@ class ArtistsModel extends ListModel {
         return $db->loadAssocList();
     }
 
-    public function getArtistAlbums($aid) {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select('DISTINCT a.id AS albumid, a.title AS albumtitle, a.rel_date, a.imgurl');
-        $query->from('#__xbmusic_albums AS a');
-        $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
-        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
-        $query->where('at.artist_id = '.$aid.' AND t.album_id > 0');
-        $query->order('a.title ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-    
-    public function getArtistSongs($aid) {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select('s.id AS songid, s.title AS songtitle, s.composer');
-        $query->from('#__xbmusic_songs AS s');
-        $query->join('LEFT','#__xbmusic_tracksong AS st ON st.song_id = s.id');
-        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = st.track_id');
-        $query->where('at.artist_id = '.$aid);
-        $query->order('s.title ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
+
 }

@@ -2,6 +2,44 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.30.2</version>
+		<date>10th February 2025</date>
+		<title>Improvements and Bugfixes</title>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.30.2</h3> Updated 10th February 2025]]></item>
+			<item>Artist image working</item>
+			<item>ArtistGroups table added</item>
+			<item>Language strings for album and artist list and edit views</item>
+		</addition>
+		<remove>
+			<item></item>
+		</remove>
+		<change>
+			<item>On import any bracketed text at end of track title will be removed for song title</item>
+			<item>Tweaks to album and edit views</item>
+		</change>
+		<other>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
+		</other>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item>Batch cancel button now working all list views</item>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.20.2</version>
 		<date>4th February 2025</date>
 		<title>Improvements and Bugfixes</title>
@@ -14,7 +52,7 @@
 			<item>Further redundant modules removed from getId3</item>
 		</remove>
 		<change>
-			<item>Symlinks be in a subfolder of /xbmusic</item>
+			<item>Symlinks allowed in a subfolder of /xbmusic</item>
 			<item>Tags tab in edit views layout improved</item>
 		</change>
 		<other>

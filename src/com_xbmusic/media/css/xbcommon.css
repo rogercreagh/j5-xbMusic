@@ -130,15 +130,6 @@ ul.nav-tabs {
 	font-size:1.1em;
 }
 	
-/*shade background of subform headings */
-.subform-repeatable thead { 
-	background-color:aliceblue;
-}
-.subform-repeatable .table th {
-  font-weight:normal;
-  font-style:italic;
-}
-
 /* style accordions */
 .xbaccordion .accordion-heading {
 	background-color:#eee;	
@@ -604,7 +595,17 @@ dl.xbdl dd {
   border-bottom: 1px solid #7dbfbf;
 }
 
-/** subform compact **/
+/*****subforms *****/
+/*shade background of subform headings */
+.subform-repeatable thead { 
+	background-color:aliceblue;
+}
+.subform-repeatable .table th {
+  font-weight:normal;
+  font-style:italic;
+}
+
+/** subform compact apply to control **/
 .xbsubformcompact table tbody td {
   padding:1px;
 }

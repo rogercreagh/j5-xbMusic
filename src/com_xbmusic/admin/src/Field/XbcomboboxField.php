@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbcomboboxField.php
- * @version 0.0.30.1 6th February 2025
+ * @version 0.0.30.2 9th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,9 +32,9 @@ class XbcomboboxField extends ListField {
 
     public function getOptions() {
         //if attribute saveopts is set get values from table.column
-        $table = $this->element['table'];
+        $table = (string) $this->element['table'];
         if (!empty($table)) {
-            $column = $this->element['name'];
+            $column = (string) $this->element['name'];
             $db    = $this->getDatabase();
             $query = $db->getQuery(true);
             $query->select('DISTINCT '.$db->qn($column).' AS value, '.$db->qn($column).' AS text');

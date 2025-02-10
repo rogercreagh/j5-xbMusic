@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.2 10th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -130,8 +130,6 @@ class AlbumModel extends AdminModel {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.album');
                 $item->tracks = $this->getAlbumTrackList($item->id);
- //               $item->artists = $this->getAlbumArtistList($item->id);
-//                $item->songs = $this->getAlbumSongList($item->id);
                 if (isset($item->imageinfo)) {
                     $item->imageinfo = json_decode($item->imageinfo);
                     if((isset($item->imageinfo->picturetype)) && (!isset($item->imageinfo->imagetitle))) 
@@ -184,8 +182,6 @@ class AlbumModel extends AdminModel {
         if (empty($data)) {
             $data = $this->getItem();
             $data->tracklist = $this->getAlbumTrackList($data->id);
-//            $data->songlist = $this->getAlbumSongList($data->id);
-//            $data->artistlist = $this->getAlbumArtistList($data->id);
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
             if (($this->getState('album.id') == 0) && ($retview != '')) {
@@ -244,6 +240,7 @@ class AlbumModel extends AdminModel {
         if (isset($data['newimagetitle'])) {
             $data['imageinfo']['imagetitle'] = $data['newimagetitle'];
         }
+        if (trim($data['imageinfo']['imagetitle'])=='') $data['imageinfo']['imagetitle'] = $data['title'];
         if (isset($data['newimagedesc'])) {
             $data['imageinfo']['imagedesc'] = $data['newimagedesc'];
         }
@@ -269,14 +266,6 @@ class AlbumModel extends AdminModel {
         $albumalias = $data['title'];
         if (isset($data['sortartist'])) $albumalias.= '-'.$data['sortartist'];
         $data['alias'] = XbcommonHelper::makeAlias($albumalias);
-//         $aid = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
-//         if ($aid != false) {
-// //            $id = XbcommonHelper::checkValueExists($data['alias'], '#__xbmusic_albums', 'alias');
-//             $data['id'] = $aid;
-//             $this->setState('album.id',$aid);
-//             return true;
-//         }
-//        $data['alias'] = $newalias;        
         
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'STRING');
@@ -298,10 +287,7 @@ class AlbumModel extends AdminModel {
         // ok ready to save the album data
         if (parent::save($data)) {
             $aid = $this->getState('album.id');
- //           $this->storeAlbumTracks($aid, $data['tracklist']);
-//            $this->storeAlbumArtists($aid, $data['artistlist']);
-//            $this->storeAlbumSongs($aid, $data['songlist']);
-            // Check possible workflow
+
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
         }
@@ -314,7 +300,7 @@ class AlbumModel extends AdminModel {
      * @name getAlbumTracklist()
      * @desc includes song and artist lists for each track
      * @param int $album_id
-     * @return assoc array
+     * @return array assoc
      */
     private function getAlbumTrackList(int $albumid) {
         $tracklist = XbmusicHelper::getAlbumTracks($albumid);
@@ -324,37 +310,6 @@ class AlbumModel extends AdminModel {
         }
         return $tracklist;
     }
-     
-//     private function getAlbumSongList($albumid) {
-// //TODO also check tracksong type
-// // if medley simply group by track and order by listorder
-// // if if partwork ??
-//         $db = $this->getDbo();
-//         $query = $db->getQuery(true);
-//         $query->select('s.title AS title, ts.song_id');
-//         $query->from('#__xbmusic_tracks AS t');
-//         $query->leftjoin('#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
-//         $query->leftjoin('#__xbmusic_songs AS s ON s.id = ts.song_id');
-//         $query->where('t.album_id = '.$albumid);
-//         $query->order('a.titlename ASC');
-//         $db->setQuery($query);
-//         $songlist = $db->loadAssocList();
-//         return $songlist;
-//     }
-    
-//     private function getAlbumArtistList($albumid) {
-//          $db = $this->getDbo();
-//          $query = $db->getQuery(true);
-//          $query->select('a.name AS name, ta.artist_id');
-//          $query->from('#__xbmusic_tracks AS t');
-//          $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
-//          $query->leftjoin('#__xbmusic_artists AS a ON a.id = ta.artist_id');
-//          $query->where('t.album_id = '.$albumid);
-//          $query->order('a.sortname ASC');
-//          $db->setQuery($query);
-//          $artistlist = $db->loadAssocList();
-//         return $artistlist;
-//     }
-    
+         
 }
 

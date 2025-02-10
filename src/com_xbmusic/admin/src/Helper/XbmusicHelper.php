@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.1 7th February 2025
+ * @version 0.0.30.2 9th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -195,7 +195,9 @@ class XbmusicHelper extends ComponentHelper
 	        $trackdata['sortartist'] = XbcommonHelper::stripThe($origartist);
 	        //now break any listed artists into separate if the have & or and or with or feat.
             $artistnames = explode(' || ', $artiststr);
-            foreach ($artistnames as $artistname) {
+            $artistname = $artistnames[0];
+            //only take the first name - ideally check to see if first is same as second with The
+//            foreach ($artistnames as $artistname) {
 	            $artistname = trim($artistname);	        
                  $splits = array(" & "," and "," with "," featuring","feat.");
                  $splitcnt = 0;
@@ -210,7 +212,7 @@ class XbmusicHelper extends ComponentHelper
 	                'sortname'=>XbcommonHelper::stripThe($artistname)
 	            );
 	            $artistdata[] = $artist;
-	        }
+//	        }
 	    } //endif set artist
 	    
 	    //get album info
@@ -259,11 +261,17 @@ class XbmusicHelper extends ComponentHelper
 	    //get song info - we assume song has the same title as the track
 	    // we will warn if it could be a medley, but will treat as single song
         $title = trim($trackdata['title']);
+        // we are going to discard anything in brackets at the end of the title
+        $songtitle = $title;
+        if (strrpos($songtitle,')')+1 == strlen($songtitle)) {
+            $open = strrpos($songtitle,'(');
+            $songtitle = substr($songtitle,0,$open);
+        }
         $splits = array(",","/"," medley"," Medley");
         $splitcnt = 0;
-        $fnd = str_replace($splits," || ", $title, $splitcnt);
+        $fnd = str_replace($splits," || ", $songtitle, $splitcnt);
         if ($splitcnt > 0) {
-            $msg = Xbtext::_($title,XBSP2 + XBDQ).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',XBNL);
+            $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',XBNL);
             $ilogmsg .=XBWARN.$msg;
             Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
         }
@@ -273,15 +281,15 @@ class XbmusicHelper extends ComponentHelper
     // 	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
     // 	        }
         $rcnt = 0;
-        $newtitle = preg_replace('\(.*\)|\[.*\]','',$title,4,$rcnt);
+        $newtitle = preg_replace('\(.*\)|\[.*\]','',$songtitle,4,$rcnt);
         if ($newtitle && ($rcnt)) {
-            $title = $newtitle;
-            $msg = Xbtext::_($title,XBSP2 + XBDQ).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',XBNL);
+            $songtitle = $newtitle;
+            $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',XBNL);
             $ilogmsg .= XBWARN.$msg;
             Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
         }
     	            
-        $songdata = array('id'=>0, 'title' => $title, 'alias'=>XbcommonHelper::makeAlias($title));
+        $songdata = array('id'=>0, 'title' => $songtitle, 'alias'=>XbcommonHelper::makeAlias($songtitle));
 	    
 	    //get genres
 	    if (isset($id3data['genre'])) {
@@ -309,15 +317,28 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static function getGroupMembers($gid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
-// 	    $db = Factory::getDbo();
-// 	    $query = $db->getQuery(true);
-// 	    $query->select('a.id AS artistid, a.name AS artistname, gm.role, gm.from, gm.until, gm.note');
-// 	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.artist_id');
-// 	    $query->from('#__xbmusic_artistgroup AS gm');
-// 	    $query->where('gm.group_id = '.$db->q($gid));
-// 	    $query->order('gm.listorder ASC');
-// 	    $db->setQuery($query);
-	    return array(); //$db->loadAssocList();
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS member_id, a.name AS membername, gm.role, gm.since, gm.until, gm.note');
+	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.member_id');
+	    $query->from('#__xbmusic_artistgroup AS gm');
+	    $query->where('gm.group_id = '.$db->q($gid));
+	    $query->order('gm.listorder ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getMemberGroups($aid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS group_id, a.name AS groupname, gm.role, gm.since, gm.until, gm.note');
+	    $query->join('LEFT','#__xbmusic_artists AS a ON a.id = gm.group_id');
+	    $query->from('#__xbmusic_artistgroup AS gm');
+	    $query->where('gm.member_id = '.$db->q($aid));
+	    $query->order('gm.listorder ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
 	}
 	
 	public static function getArtistSingles($aid) {
@@ -622,7 +643,7 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT s.id AS songid, s.title AS songtitle');
+	    $query->select('s.id AS songid, s.title AS songtitle, s.composer AS composer');
 	    $query->from('#__xbmusic_songs AS s');
 	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = ts.track_id');
@@ -646,8 +667,6 @@ class XbmusicHelper extends ComponentHelper
 	    $db->setQuery($query);
 	    return $db->loadAssocList();
 	}
-	
-	
 	
 	public static function getTagItemCnts($id) {
 	    $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
@@ -756,6 +775,41 @@ class XbmusicHelper extends ComponentHelper
 	        }
 	    } //endif cattype=1
 	    return $defcats;	    
+	}
+	
+	public static function getAlbumImgInfo($albumid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('DISTINCT a.imgurl, a.imginfo');
+	    $query->from('#__xbmusic_albums AS a');
+	    $db->setQuery($query);
+	    return $db->loadAssoc();	    
+	}
+	
+	public static function getID3image($trackfilename,$imgfilename) {
+	    $ThisFileInfo = getIdData($trackfilename);
+	    $imgdata = $ThisFileInfo['comments']['picture'][0]; //we're only getting the first image
+	    unset($ThisFileInfo['comments']['picture']);
+	    if (isset($imgdata['description'])) { //fix for an album with odd encoding on picture description
+	        $desc = $imgdata['description'];
+	        $res = htmlentities($desc, ENT_QUOTES | ENT_IGNORE, 'UTF-8');
+	        $res =  preg_replace('/[\x00-\x1F\x7F-\x9F]/u', '', $res);
+	        $imgdata['description'] = $res;
+	    }
+	    if (($imgdata['data'])){
+	        $log ='';
+	        $imgurl = self::createImageFile($imgdata, $imgdata, $log);
+	        if ($imgurl !== false) {
+	            $imgdata['imagetitle'] = $imgdata['picturetype'];
+	            $imgdata['imagedesc'] = $imgdata['description'];
+	        }
+	    }
+	    return $imgdata;
+	}
+	
+	public static function setID3image($imgfilename, $trackfilename) {
+	    
 	}
 	
 } //end xbmusicHelper

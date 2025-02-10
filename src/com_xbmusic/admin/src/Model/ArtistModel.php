@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.2 10th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,8 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Uri\Uri;
+
 //use Joomla\CMS\Plugin\PluginHelper;
 //use Joomla\CMS\String\PunycodeHelper;
 //use Joomla\CMS\Table\Table;
@@ -40,6 +42,7 @@ class ArtistModel extends AdminModel {
     
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
+        'indgrp' => 'batchIndgrp'
     );
     
     public function batch($commands, $pks, $contexts) {
@@ -73,14 +76,45 @@ class ArtistModel extends AdminModel {
         }
         return true;
     }
+    
+    protected function batchIndgrp($value, $pks, $contexts) {
+        if ($value > 0) {
+            $cnt = 0;
+            $db = Factory::getDbo();
+            $query = $db->getQuery(true);
+            $query->update($db->qn('#__xbmusic_artists'));
+            $query->set($db->qn('type').' = '. $db->q($value));
+            foreach ($pks as $pk) {
+                if ($this->user->authorise('core.edit', $contexts[$pk])) {
+                    $query->where($db->qn('id').' = '.$db->q($pk));
+                    $db->setQuery($query);
+                    $db->execute();
+                    $cnt ++;
+                    $query->clear('where');
+                } else {
+                    $this->setError(Text::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
+                    return false;
+                }
+                Factory::getApplication()->enqueueMessage($cnt.' '.'item types set to '.$value);
+            }
+            return true;            
+        }
+        return false;
+    }
 
     public function delete(&$pks) {
-        //first need to delete links to albums, artists, tracks
+        //first need to delete links to tracks, artistgroups
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         foreach ($pks as $pk) {
             $query->delete($db->qn('#__xbmusic_trackartist'));
             $query->where($db->qn('artist_id').' = '.$db->q($pk));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear();
+            $query->delete($db->qn('#__xbmusic_artistgroup'));
+            $query->where($db->qn('artist_id').' = '.$db->q($pk));
+            $query->orWhere($db->qn('group_id').' = '.$db->q($pk));
             $db->setQuery($query);
             $db->execute();
         }
@@ -129,12 +163,20 @@ class ArtistModel extends AdminModel {
                 $item->tracks = $this->getArtistTrackList($item->id);
                 $item->albums = XbmusicHelper::getArtistAlbums($item->id);
                 $item->songs = XbmusicHelper::getArtistSongs($item->id);
-                                
+                $item->members = []; $item->groups = [];                
                 if ($item->type == 2) {
- //                   $item->groupmembers = XbmusicHelper::getGroupMembers($item->id);
+                    $item->members = XbmusicHelper::getGroupMembers($item->id);
+                } elseif ($item->type == 1) {
+                    $item->groups = XbmusicHelper::getMemberGroups($item->id);
                 }
-//                $item->albums = XbmusicHelper::getArtistAlbums($item->id);
                 $item->singles = XbmusicHelper::getArtistSingles($item->id);
+                if (!empty(($item->imageinfo))) {
+                    $item->imageinfo = json_decode($item->imageinfo);
+                    if((isset($item->imageinfo->picturetype)) && (!isset($item->imageinfo->imagetitle)))
+                        $item->imageinfo->imagetitle = $item->imageinfo->picturetype;
+                    if((isset($item->imageinfo->description)) && (!isset($item->imageinfo->imagedesc)))
+                        $item->imageinfo->imagedesc = $item->imageinfo->description;
+                }
             }
         }        
         return $item;
@@ -179,9 +221,12 @@ class ArtistModel extends AdminModel {
         
         if (empty($data)) {
             $data = $this->getItem();
+//            $data->imageinfo = json_decode($data->imageinfo);
             $data->tracklist = $this->getArtistTrackList($data->id);
             $data->albumlist = XbmusicHelper::getArtistAlbums($data->id);
             $data->songlist = XbmusicHelper::getArtistSongs($data->id);
+            $data->grouplist = XbmusicHelper::getMemberGroups($data->id);
+            $data->memberlist = XbmusicHelper::getGroupMembers($data->id);
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -206,6 +251,8 @@ class ArtistModel extends AdminModel {
                         );
                 }
             }
+//            if (isset($data->imageinfo->imagetitle)) $data->newimagetitle = $data->imageinfo->imagetitle;
+//            if (isset($data->imageinfo->imagedesc)) $data->newimagedesc = $data->imageinfo->imagedesc;
             
             // If there are params fieldsets in the form it will fail with a registry object
             if (isset($data->params) && $data->params instanceof Registry) {
@@ -223,6 +270,57 @@ class ArtistModel extends AdminModel {
         $infomsg = '';
         $warnmsg = '';
 
+        if (!empty($data['newimage'])) {
+            $imgurl = Uri::root().substr($data['newimage'],0,strpos($data['newimage'], "#"));
+            if ($imgurl != $data['imgurl']) {
+                $data['imgurl'] = $imgurl;
+                $data['imageinfo']['datalength']='';
+                $data['imageinfo']['image_height']='';
+                $data['imageinfo']['image_width']='';
+                $data['imageinfo']['picturetype']='';
+                $data['imageinfo']['description']='';
+                $data['imageinfo']['image_mime']='';
+                $data['imageinfo']['imagetitle']='';
+                $data['imageinfo']['imagedesc']='';
+            }
+ //       } elseif (empty($data['imgurl'])) {
+ //           $data['imageinfo'] = [];
+//            $data['imgurl'] = '';            
+        } if ($data['imgurl'] != '') {
+            $file = str_replace(Uri::root(),'',$data['imgurl']);
+            $data['imageinfo']['folder'] = dirname($file);
+            $file = JPATH_ROOT.'/'.$file;
+            if (file_exists($file)) {
+                $data['imageinfo']['basename'] = basename($file);
+                $data['imageinfo']['filesize'] = filesize($file);
+                $data['imageinfo']['basename'] = basename($file);
+                $bytes = filesize($file);
+                $lbl = Array('bytes','kB','MB','GB');
+                $factor = floor((strlen($bytes) - 1) / 3);
+                $data['imageinfo']['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
+                $data['imageinfo']['filedate'] = date("d M Y at H:i",filemtime($file));
+                $imagesize = getimagesize($file);
+                $data['imageinfo']['filemime'] = $imagesize['mime'];
+                $data['imageinfo']['filewidth'] = $imagesize[0];
+                $data['imageinfo']['fileht'] = $imagesize[1];
+                if (isset($data['newimagetitle'])) {
+                    $data['imageinfo']['imagetitle'] = $data['newimagetitle'];
+                }
+                if (trim($data['imageinfo']['imagetitle'])=='') $data['imageinfo']['imagetitle'] = $data['name'];
+                if (isset($data['newimagedesc'])) {
+                    $data['imageinfo']['imagedesc'] = $data['newimagedesc'];
+                }      
+                       
+            } else {
+                $data['imageinfo'] = [];
+                $data['imgurl'] = '';
+            }
+        } else {
+            $data['imageinfo'] = [];
+        }            
+        
+        $data['imageinfo'] = json_encode($data['imageinfo']);
+        
         if ($input->get('task') == 'save2copy') {
             $origTable = clone $this->getTable();
             $origTable->load($input->getInt('id'));
@@ -273,6 +371,9 @@ class ArtistModel extends AdminModel {
         if (parent::save($data)) {
             $sid = $this->getState('artist.id');
             $this->storeArtistTracks($sid, $data['tracklist']);
+            if ($data['type'] > 0) {
+                $this->storeArtistGroup($sid, $data['memberlist'], $data['grouplist'], $data['type']);                
+            }
 //            $this->storeArtistAlbums($sid, $data['albumlist']);
 //            $this->storeArtistSongs($sid, $data['songlist']);
             // Check possible workflow
@@ -346,6 +447,41 @@ class ArtistModel extends AdminModel {
                 //try
                 $db->setQuery($query);
                 $db->execute();
+            }
+        }
+    }
+    
+    private function storeArtistGroup($itemid, $members, $groups, $type) {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        //start by clearing all references to this artist
+        $query->delete($db->quoteName('#__xbmusic_artistgroup'));
+        $query->where('member_id = '.$itemid);
+        $query->orWhere('group_id = '.$itemid);
+        $db->setQuery($query);
+        $db->execute();       
+        if ($type == 1) {
+            foreach ($groups AS $group) {
+                $query->clear();
+                $query->insert($db->quoteName('#__xbmusic_artistgroup'));
+                $query->columns('member_id,group_id,role,since,until,note');
+                $query->values('"'.$itemid.'","'.$group['group_id'].'","'.$group['role'].'","'.$group['since'].'","'.$group['until'].'","'.$group['note'].'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+                
+            }
+        } elseif ($type == 2 ) {
+            // we have a group so members are valid and clear groups
+            foreach ($members AS $member) {
+                $query->clear();
+                $query->insert($db->quoteName('#__xbmusic_artistgroup'));
+                $query->columns('group_id,member_id,role,since,until,note');
+                $query->values('"'.$itemid.'","'.$member['member_id'].'","'.$member['role'].'","'.$member['since'].'","'.$member['until'].'","'.$member['note'].'"');
+                //try
+                $db->setQuery($query);
+                $db->execute();
+                
             }
         }
     }

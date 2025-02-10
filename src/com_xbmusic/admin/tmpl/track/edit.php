@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.20.2 4th February 2025
+ * @version 0.0.30.2 9th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -96,7 +96,7 @@ $item = $this->item;
     			<p><i><?php echo Text::_('Track folder'); ?></i> : 
     				<?php echo $localpath; ?></p>
      		</div>
-    		<div class="col-md-6">
+    		<div class="col-md-3">
     			<p><i><?php echo Text::_('Track file'); ?></i> : 
         			<b><?php echo (empty($fpn)) ? '' : basename($fpn); ?></b></p>
 				<?php if (!empty($fpn)) : ?>        			
@@ -106,6 +106,17 @@ $item = $this->item;
                     </audio>        		
     			<?php endif; ?>
             </div>
+    		<div class="col-md-3">
+    		<?php if(!empty($item->imgurl)) : ?>
+    			<div class="control-group">
+    				<img class="img-polaroid hidden-phone" style="height:150px;object-fit:contain;" 
+        				src="<?php echo $item->imgurl; ?>" />
+    			</div>
+    		<?php else : ?>
+    			<div class="xbbox xbboxwht xbnit" style="width:100%;"><?php echo Text::_('XBMUSIC_NO_TRACK_IMAGE'); ?></div>
+    		<?php endif; ?>
+    			 
+    		</div>
         </div>
         <div class="hide">
         	<?php echo $this->form->renderField('filepathname'); ?> 

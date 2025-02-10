@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.30.1 7th February 2025
+ * @version 0.0.30.2 9th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -64,10 +64,11 @@ $item = $this->item;
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=album&layout=edit&id='. (int) $item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
-    	<p class="xbnit">
-    	<?php if ($item->id == 0 ) : ?>
-    		<?php echo Text::sprintf('XBMUSIC_MUSIC_LOCATION',$this->basemusicfolder); ?>
-   			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
+        <?php if ($item->id == 0 ) : ?>
+        	<p class="xbnit">
+        		<?php echo Text::sprintf('XBMUSIC_MUSIC_LOCATION',$this->basemusicfolder); ?>
+       			<?php $this->form->setFieldAttribute('pathname','directory',$this->basemusicfolder); ?>
+        	</p><hr />
     	<?php else : ?>
     	<?php endif; ?>
 		<?php 
@@ -77,27 +78,28 @@ $item = $this->item;
 			}
             $session->clear('musicfolder');
 		?>
-    	</p>
     	<div class="row form-vertical">
-        </div>
-    	<hr />
-    	<div class="row form-vertical">
-    		<div class="col-md-10">
-            	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
-    		</div>
-    		<div class="col-md-2">
-    			<?php echo $this->form->renderField('id'); ?> 
-    		</div>
-    	</div>
-    	<div class="row">
-    		<div class="col-md-6">
+    		<div class="col-md-9">
+        		<?php echo $this->form->renderField('title'); ?> 
+        		<?php echo $this->form->renderField('alias'); ?> 
       			<?php echo $this->form->renderField('subtitle'); ?> 
-     		</div>
-    		<div class="col-md-6">
      			<?php echo $this->form->renderField('albumartist'); ?> 
      			<?php echo $this->form->renderField('sortartist'); ?> 
-     		</div>
-     	</div>
+        	</div>
+    		<div class="col-md-3">
+    			<?php echo $this->form->renderField('id'); ?> 
+    		    <?php if(!empty($item->imgurl)) : ?>
+    				<div class="control-group">
+    					<img class="img-polaroid hidden-phone" style="height:200px;object-fit:contain;" 
+        					src="<?php echo $item->imgurl; ?>" />
+    				</div>
+    			<?php else : ?>
+    				<div class="xbbox xbboxwht xbnit" style="width:100%;">
+    					<?php echo Text::_('XBMUSIC_NO_ARTIST_IMAGE'); ?>
+    				</div>
+    			<?php endif; ?>
+    		</div>
+    	</div>
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
@@ -161,14 +163,12 @@ $item = $this->item;
         <div class="row">
         	<div class="col-12">
 				<?php echo $this->form->renderField('albumlinksnote'); ?> 
-        		<h4><?php echo Text::_('XB_LINKS_OTHER_ITEMS')?></h4>
-        		<b><?php echo Text::_('XBMUSIC_TRACKS'); ?></b>
-        		<table class="xbtablehgrid">
+        		<table class="xbtablehgrid xbml100 xbmt20"">
         			<thead>
         				<tr>
-        					<th><?php echo Text::_('XBMUSIC_TRACK'); ?></th>
-        					<th><?php echo Text::_('XBMUSIC_ARTISTS_TRACK'); ?></th>
-        					<th><?php echo Text::_('XBMUSIC_SONGS_TRACK'); ?></th>
+        					<th style="padding:5px 0;"><?php echo Text::_('XBMUSIC_TRACK'); ?></th>
+        					<th class="xbpr50" style="width:200px;"><?php echo Text::_('XBMUSIC_ARTISTS_TRACK'); ?></th>
+        					<th class="xbpl50"><?php echo Text::_('XBMUSIC_SONGS_TRACK'); ?></th>
         				</tr>
         			</thead>
         			<tbody>
@@ -177,24 +177,27 @@ $item = $this->item;
         			        $track['trackno'] = ((int)$track['discno']*100)+$track['trackno'];
         			    } ?>
         			    <tr>
-        			    	<td>
+        			    	<td style="padding:5px 50px 5px 0;">
         			    		<?php if ($track['trackno'] >0 ) echo $track['trackno'].'&nbsp '; 
                     			    echo '<a href="'.$trackelink.$track['trackid'].'">'.$track['tracktitle'].'</a>';
            			    		?>
+                              <a href="#"><span class="icon-eye xbpl10 xbpr20"></span></a>
         			    	</td>
-        			    	<td>
+        			    	<td class="xbpr50">
         			    		<?php if (!empty($track['artistlist'])) {
         			    		    foreach ($track['artistlist'] as $artist) {
-        			    		        echo '<a href="'.$artistelink.$artist['artistid'].'">'.$artist['artistname'].'</a><br />';
-        			    		    }
+        			    		        echo '<a href="'.$artistelink.$artist['artistid'].'">'.$artist['artistname'].'</a>'; ?>
+                                        <a href="#"><span class="icon-eye xbpl10 xbpr20"></span></a><br />
+       			    		       <?php }
         			    		} ?>
         			    	</td>
-        			    	<td>
+        			    	<td class="xbpr50">
         			    		<?php if (!empty($track['songlist'])) {
         			    		    foreach ($track['songlist'] as $song) {
-        			    		        echo '<a href="'.$songelink.$song['songid'].'">'.$song['songtitle'].'</a><br />';
-        			    		    }
-        			    		} ?>
+        			    		        echo '<a href="'.$songelink.$song['songid'].'">'.$song['songtitle'].'</a>'; ?>
+                              <span class="icon-eye xbpl10 xbpr20"></span><br />
+        			    		<?php    }
+        			    		 } ?> 
         			    	</td>
         			    </tr>
         			    <?php endforeach; ?>

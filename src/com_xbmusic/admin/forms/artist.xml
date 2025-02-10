@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Artist Form file v0.0.30.0 5th February 2025 -->
+<!-- xbMusic Artist Form file v0.0.30.2 9th February 2025 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
@@ -36,7 +36,7 @@
 			<option value="1" >Individual</option>
 			<option value="2">Group</option>
 		</field>
-		
+<!-- for use if xbpeople is installed
 		<field name ="person_id" type="text"
 			label="xbPeople Person" 
 			description="If component xbPeople is available link to Person table for more details"
@@ -51,6 +51,7 @@
 			showon="type:2"
 		/>		
 			
+ -->		
 		<field name="description" type="textarea"
 			label="Edit Description" description="Plain text or Markdown code. " 
 			class="inputbox" rows="15" cols="60"
@@ -99,6 +100,34 @@
 			class="xbtags"
 		/>
 	</fieldset>
+
+	<fieldset name="image-info"
+		label="Artist Picture"
+	>
+	
+		<field name="imgurl" type="hidden"
+			label="Image URL"
+			maxlength="190"
+		/>
+			
+		<field name="newimage" type="media"
+			label="Select Image" description="Select a image for this artist" 
+			directory="xbmusic/artwork/artists"
+		/>
+		<field name="newimagetitle" type="text"
+			label="Image Title"
+			description=""
+			hint="defaults to artist name"
+			size="50" maxlength="190"
+		/>
+		<field name="newimagedesc" type="text"
+			label="Image desciption"
+			description="fuller description of image"
+			size="50" maxlength="190"
+		/>
+		<field name="imageinfo" type="hidden" />
+		
+	</fieldset>
 	
 	<fieldset name="taggroups" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<!-- dynamically created at run time -->
@@ -113,12 +142,61 @@
 			description="An artist may be connected to one or more tracks and you can add, edit or remove these links here. Links to Albums, and Songs are through a track link so if those need changing you need to edit the track which is linked to the artist"
 		/>
 		
-		<field name="tracklist" type="subform"
-			label="Track(s)"
-			description="Song may be used in one or more tracks"			
+		<field name="grouplist" type="subform"
+			label="Artist member of Groups"
+			description=""			
 			multiple="true" min= "0" max= "10"
 			buttons="add,remove"
 			layout="joomla.form.field.subform.repeatable-table"
+			class="xbsubformcompact"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="group_id" type="xbgrouplist" label="Group Name">
+					<option value=""> </option>	
+				</field>
+				<field name="role" type="text" label="XB_ROLE" maxlength="190"
+				/>
+				<field name="since" type="number" label="From" min="1900" max="2052"
+				/>
+				<field name="until" type="number" label="Until" min="1900" max="2052"
+				/>
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
+				/>
+			</form>
+		</field>	
+				
+		<field name="memberlist" type="subform"
+			label="Artists in Group"
+			description=""			
+			multiple="true" min= "0" max= "10"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			class="xbsubformcompact"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="member_id" type="xbmemberlist" label="Artist Name">
+					<option value=""> </option>	
+				</field>
+				<field name="role" type="text" label="XB_ROLE" maxlength="190"
+				/>
+				<field name="since" type="number" label="From" min="1900" max="2052"
+				/>
+				<field name="until" type="number" label="Until" min="1900" max="2052"
+				/>
+				<field name="note" type="text" label="XB_NOTE" maxlength="190"
+				/>
+			</form>
+		</field>	
+				
+		<field name="tracklist" type="subform"
+			label="Track(s)"
+			description="Song may be used in one or more tracks"			
+			multiple="true" min= "0" max= "999"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			class="xbsubformcompact"
 			groupByFieldset="false" 
 		>
 			<form>

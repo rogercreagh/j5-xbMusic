@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artists/default.php
- * @version 0.0.19.1 22nd November 2024
+ * @version 0.0.30.2 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 // HTMLHelper::_('behavior.multiselect');
 // HTMLHelper::_('formbehavior.chosen', 'select');
 HTMLHelper::_('bootstrap.tooltip');
-HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
+HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('table.columns');
@@ -99,12 +99,13 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th class="nowrap center" style="width:95px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.status', $listDirn, $listOrder); ?>
 						</th>
+						<th style="width75px;"><!-- image --></th>
 						<th >
-							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
+							<?php echo HTMLHelper::_('searchtools.sort', 'XB_NAME', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th><?php echo Text::_('Albums & Singles'); ?>
+						<th><?php echo Text::_('XBMUSIC_ALBUMS'); ?>
 						</th>
-						<th><?php echo Text::_('Songs'); ?>
+						<th><?php echo Text::_('XBMUSIC_SONGS'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -153,6 +154,19 @@ if (strpos($listOrder, 'modified') !== false) {
 								<?php endif; ?>
                              </div>
 						</td>
+						<td>
+							<?php if (!empty($item->imgurl)) : ?>
+								<?php  $src = trim($item->imgurl);
+        						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+       								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+        						?>
+								<img src="<?php echo $src; ?>" alt="<?php echo $item->name; ?>" 
+									style="width:75px;"
+									class="hasPopover" title="" 
+									data-bs-content="<?php echo $tip; ?>" />
+								<?php endif; ?>
+							<?php endif; ?>
+						</td>
 						<td class="has-context">
 							<div class="pull-left">
 								<p class="xbm0">
@@ -175,12 +189,35 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
+								<?php if(!empty($item->type)) : ?>
+									<span class="xbnit xbpl20">
+								    	<?php echo ($item->type == 2)? Text::_('XB_GROUP') : Text::_('XB_PERSON'); ?>
+									</span><br />
+									<?php else : ?>
+									<span class="xbnit xbred xbpl20"><?php echo Text::_('XBMUSIC_SET_TYPE'); ?></span><br />
+								<?php endif; ?>
+							
 								<?php if($item->trkcnt > 0): ?>
-    								<p class="xbr09 xbnit"><?php echo Xbtext::_('Found on',XBSP2).$item->trkcnt; 
-    								echo ($item->trkcnt==1)? Xbtext::_('track',XBSP1 + XBTRL) : Xbtext::_('tracks',XBSP1,  + XBTRL).'. ';     								    
-    								echo (count($item->albums) == 1) ? Xbtext::_('album',XBSP1 + XBTRL) : Xbtext::_('albums',XBSP1 + XBTRL);
-    								if (count($item->singles) > 0) echo count($item->singles) . Xbtext::_('single tracks',XBSP1 + XBTRL);?>
-    								</p>
+    								<span class="xbr09 xbnit"><?php echo Xbtext::_('XBMUSIC_FOUND_ON',XBSP2 + XBTRL); 
+    								if ($item->trkcnt == 1) {
+    								    echo '1 '.Xbtext::_('XBMUSIC_TRACK',XBSP1 + XBTRL);
+    								} else {
+    								    echo $item->trkcnt.' '.Xbtext::_('XBMUSIC_TRACKS',XBSP1 + XBTRL); 
+    								} ?>
+    								</span><br />
+    							<?php endif; ?> 
+    							<?php if(count($item->albums) > 0) : ?>    								    
+    								<span class="xbr09 xbnit"><?php echo Xbtext::_('XB_ON', XBSP2 + XBTRL); ?>
+    									<?php if (count($item->albums) == 1) {
+    									    echo '1 '.Xbtext::_('XBMUSIC_ALBUM',XBSP1 + XBTRL);
+    									} else {
+    									   echo count($item->albums).' '.Xbtext::_('XBMUSIC_ALBUMS',XBSP1 + XBTRL);
+    									} ?>
+    								</span><br />
+    							<?php endif; ?>
+    							<?php if (count($item->singles) > 0) : ?>
+    								<span class="xbr09 xbnit"> <?php echo count($item->singles) . Xbtext::_('XBMUSIC_SINGLES',XBSP1 + XBTRL);?>
+    								</span><br />
 								<?php endif; ?>
 							</div>
 						</td>
@@ -188,13 +225,21 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if (count($item->albums) > 1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('XBMUSIC_N_ALBUMS',count($item->albums)); ?></summary>
-									<ul style="margin:5px;">
+									<ul style="margin:5px;list-style: none;">
 									<?php foreach ($item->albums as $album) : ?>
-										<li>
+										<li>							
 											<?php if($album['imgurl']!='') :?>
-												<img src="<?php echo $album['imgurl']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
+                								<?php  $src = trim($album['imgurl']);
+                        						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+                       								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+                        						?>
+												<img src="<?php echo $src; ?>" alt="<?php echo $album['albumtitle']; ?>" 
+													style="height:50px;margin: 2px 5px 8px 0;"
+													class="hasPopover" title="" 
+    												data-bs-content="<?php echo $tip; ?>" />
+												<?php endif; ?>
 											<?php endif; ?>
-										`	<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
+											<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
 							                <?php echo $album['albumtitle']; ?></a> 
 							                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
 							            </li>
@@ -203,16 +248,24 @@ if (strpos($listOrder, 'modified') !== false) {
 								</details>
 							<?php elseif (count($item->albums)==1) : ?>
 								<?php $album = $item->albums[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Album'); ?></span><br />
+								<p><span class="xbit"><?php echo Text::_('XBMUSIC_ALBUM'); ?></span><br />
 								<?php if($album['imgurl']!='') :?>
-									<img src="<?php echo $album['imgurl']; ?>" alt="<?php echo $album['albumtitle']; ?>" width="50" height="50" class="xbml10" />
+    								<?php  $src = trim($album['imgurl']);
+            						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+           								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+            						?>
+									<img src="<?php echo $src; ?>" alt="<?php echo $album['albumtitle']; ?>" 
+										style="height:50px;margin: 2px 5px 8px 0;"
+										class="hasPopover" title="" 
+										data-bs-content="<?php echo $tip; ?>" />
+									<?php endif; ?>
 								<?php endif; ?>
 								<a href="index.php?option=com_xbmusic&task=album.edit&retview=artists&id=<?php echo $album['albumid']; ?>">
 					                <?php echo $album['albumtitle']; ?></a> 
 					                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
 					            </p>
 							<?php else : ?>
-								<p class="xbnit"><?php echo Text::_('no albums listed'); ?>
+								<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_ALBUMS_LISTED'); ?>
 							<?php endif; ?>
 							<?php if (count($item->singles) > 1) : ?>
 								<details>
@@ -221,8 +274,16 @@ if (strpos($listOrder, 'modified') !== false) {
 									<?php foreach ($item->singles as $single) : ?>
 										<li>
 											<?php if($single['imgurl']!='') :?>
-												<img src="<?php echo $single['imgurl']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="50" height="50" class="xbml10" />
-											<?php endif; ?>
+    								<?php  $src = trim($single['imgurl']);
+            						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+           								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+            						?>
+									<img src="<?php echo $src; ?>" alt="<?php echo $album['albumtitle']; ?>" 
+										style="height:50px;margin: 2px 5px 8px 0;"
+										class="hasPopover" title="" 
+										data-bs-content="<?php echo $tip; ?>" />
+									<?php endif; ?>
+								<?php endif; ?>
 											<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
 							                <?php echo $single['albumtitle']; ?></a> 
 							                <?php if($single['rel_date']) echo ' ('.$single['rel_date'].') '; ?>
@@ -232,9 +293,17 @@ if (strpos($listOrder, 'modified') !== false) {
 								</details>
 							<?php elseif (count($item->singles)==1) : ?>
 								<?php $single = $item->singles[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Single Track'); ?></span><br />
+								<p><span class="xbit"><?php echo Text::_('XBMUSIC_SINGLE'); ?></span><br />
 								<?php if($single['imgurl']!='') :?>
-									<img src="<?php echo $single['imgurl']; ?>" alt="<?php echo $single['tracktitle']; ?>" width="100" height="100" class="xbml10" />
+    								<?php  $src = trim($single['imgurl']);
+            						  if ((!$src=='') && (file_exists(JPATH_ROOT.'/'.str_replace(Uri::root(),'',$src)))) :
+           								$tip = '<img src=\''.$src.'\' style=\'width:400px;\' />';
+            						?>
+									<img src="<?php echo $src; ?>" alt="<?php echo $single['tracktitle']; ?>" 
+										style="height:50px;margin: 2px 5px 8px 0;"
+										class="hasPopover" title="" 
+										data-bs-content="<?php echo $tip; ?>" />
+									<?php endif; ?>
 								<?php endif; ?>
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=artists&id=<?php echo $single['trackid']; ?>">
 					                <?php echo $single['tracktitle']; ?></a> 
@@ -258,13 +327,13 @@ if (strpos($listOrder, 'modified') !== false) {
 								</details>
 							<?php elseif (count($item->songs)==1) : ?>
 								<?php $song = $item->songs[0]; ?>
-								<p><span class="xbit"><?php echo Text::_('Single Songs'); ?></span><br />
+								<p><span class="xbit"><?php echo Text::_('XBMUSIC_SONGS'); ?></span><br />
 									<a href="index.php?option=com_xbmusic&task=song.edit&retview=artists&id=<?php echo $song['songid']; ?>">
 					                <?php echo $song['songtitle']; ?></a> 
 					                <?php if($song['composer']) echo ' ('.$song['composer'].') '; ?>
 					            </p>
 							<?php else : ?>
-								<p class="xbnit"><?php echo Text::_('no songs listed'); ?>
+								<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_SONGS_LISTED'); ?>
 							<?php endif; ?>
 						</td>
 						<td class="nowrap">

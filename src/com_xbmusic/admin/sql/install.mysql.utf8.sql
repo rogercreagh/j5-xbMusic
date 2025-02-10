@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artists` (
   `sortname` varchar(190) NOT NULL DEFAULT '',
   `description` mediumtext NOT NULL DEFAULT '',
   `imgurl` varchar(190) NOT NULL DEFAULT '',
+  `imageinfo` mediumtext,
   `type` tinyint(3) COMMENT '1:Individual, 2:Group',
   `person_id` int(10) unsigned COMMENT 'link to xbPeople',
   `group_id` int(10) unsigned COMMENT 'link to xbGroups',
@@ -251,6 +252,20 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracksong` (
   PRIMARY KEY (`id`),
   KEY `idx_song_id` (`song_id`),
   KEY `idx_track_id` (`track_id`)
+)  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `#__xbmusic_artistgroup` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `member_id` varchar(4) NOT NULL DEFAULT '0',
+  `group_id` varchar(4) NOT NULL DEFAULT '0',
+  `role` varchar(255) NOT NULL DEFAULT '',
+  `since` varchar(4) NOT NULL DEFAULT '',
+  `until` varchar(4) NOT NULL DEFAULT '',
+  `note` varchar(255) NOT NULL DEFAULT '',
+  `listorder` int(10) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `idx_artist_id` (`member_id`),
+  KEY `idx_group_id` (`group_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 

@@ -19,10 +19,13 @@ audio {
 
 /* the preview eye button */
 #xbcomponent .icon-eye {
-	color:#448; 
+	color:#888; 
 }
-#xbcomponent .icon-eye:hover {
-	color:#185ba1;
+#xbcomponent a .icon-eye {
+	color:#458; 
+}
+#xbcomponent a .icon-eye:hover {
+	color:#185;
 	cursor:pointer;
 }
 /* preview modal iframe margin */

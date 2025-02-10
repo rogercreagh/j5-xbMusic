@@ -31,7 +31,7 @@ $catfilt = $this->state->get('filter.category_id','');
 		<?php endif; ?>
 		</div>
 		<div class="col-lg-6">
-    		<div class="control-group span6">
+    		<div class="control-group xbmt20" >
     			<div class="controls">
                     <?php echo LayoutHelper::render('joomla.html.batch.tag', array()); ?>
     			</div>
@@ -40,6 +40,10 @@ $catfilt = $this->state->get('filter.category_id','');
 	</div>
 	<div class="row">
 		<div class="col-lg-6">
+			<div class="controls">
+				<?php echo LayoutHelper::render('indgrp', array()); ?>
+			</div>
+		
 		</div>
 		<div class="col-lg-6">
 			<div class="controls">

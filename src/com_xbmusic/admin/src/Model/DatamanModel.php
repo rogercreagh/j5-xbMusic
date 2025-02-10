@@ -173,7 +173,7 @@ class DatamanModel extends AdminModel {
         $fpathinfo = pathinfo($filepathname);
         if ( $fid = XbcommonHelper::checkValueExists($fpathinfo['basename'], '#__xbmusic_tracks', 'filename')) {  
             $fpath = XbcommonHelper::getItemValue('#__xbmusic_tracks', 'filepathname', $fid);
-            $msg = Text::_('Filename already in database at different location').Xbtext($fpath,7).Text::_('with track_id').Xbtext::_($fid,XBDQ + XBNL);
+            $msg = Text::_('Filename already in database at different location').Xbtext::_($fpath,7).Text::_('with track_id').Xbtext::_($fid,XBDQ + XBNL);
             $ilogmsg .= XBWARN.$msg;
             $msg2 = Xbtext::_('Importing this one anyway, but check and delete one or other if necessary',XBNL);
             $app->enqueueMessage(trim($msg).'<br />'.trim($msg2),'Warning');
@@ -270,7 +270,7 @@ class DatamanModel extends AdminModel {
                 }
                 if ($song['id']>0) {
                     $link = array('song_id'=>$song['id']);
-                    $link['role'] = 1;
+                    $link['role'] = '1. Full Track';
                     $link['note'] = '';
                     $songlinks[] = $link; 
                 }

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.20.2 2nd February 2025
+ * @version 0.0.30.2 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -180,9 +180,9 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
-								<p class="xbr09 xbnit"><?php echo Xbtext::_('XBMUSIC_RELEASED',XBSP2).$item->rel_date; ?><br />
+								<p class="xbr09 xbnit"><?php echo Xbtext::_('XBMUSIC_RELEASED',XBSP2 + XBTRL).$item->rel_date; ?><br />
         							<?php if ($item->format) echo $item->format; ?>
-    								<?php if($item->num_discs > 1) echo Xbtext::_('XB_ON',XBSP2). $item->num_discs. Xbtext::_('XBMUSIC_DISCS',XBSP1); ?> 
+    								<?php if($item->num_discs > 1) echo Xbtext::_('XB_ON',XBSP2 + XBTRL). $item->num_discs. Xbtext::_('XBMUSIC_DISCS',XBSP1 + XBTRL); ?> 
         							<?php // if ($item->tot_tracks) echo Xbtext::_('with',XBSP3).$item->tot_tracks.Text::_('tracks');?>	
    								</p>
 							</div>
@@ -230,7 +230,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						<td class="xbr09" onclick="stopProp(event);">
 							<?php if ($item->trkcnt > 1) : ?>
 								<details>
-									<summary><?php echo Text::sprintf('%s XBMUSIC_TRACKS_ALBUM',$item->trkcnt); ?></summary>
+									<summary><?php echo Text::sprintf('XBMUSIC_TRACKS_ALBUM',$item->trkcnt); ?></summary>
 									<ol style="margin:5px;">
 									<?php foreach ($item->tracks as $track) : ?>
                                   		<?php if($item->num_discs > 1) {
@@ -250,7 +250,7 @@ if (strpos($listOrder, 'modified') !== false) {
 				                <?php echo $track['trackname']; ?></a> 
 				                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
 				                <br /><span class="xbnote">
-    				                <?php echo Xbtext::_('XBMUSIC_TRACK',XBSP2).$track['trackno'].Xbtext::_('XBMUSIC_ON_DISC',XBSP3); ?>
+    				                <?php echo Xbtext::_('XBMUSIC_TRACK',XBSP2 + XBTRL).$track['trackno'].Xbtext::_('XBMUSIC_ON_DISC',XBSP3 + XBTRL); ?>
     				                <?php if($item->num_discs > 1) echo $track['discno']; ?>
 				                </span>
 							<?php else : ?>

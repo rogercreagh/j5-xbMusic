@@ -269,9 +269,17 @@
 				<field name="song_id" type="xbsonglist" label="Song Title">
 					<option value=""> </option>	
 				</field>
+				<field name="role" type="xbcombobox" 
+					label="Track type"
+					hint="Type or click for list" 
+					table="xbmusic_tracksong"
+				>
+                  	<option value="1. Full track"></option>
+					<option value="2. In a medley"></option>
+
+                </field>
 				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"
 				/>
-				<field name="role" type="hidden" default="" /> 
 			</form>
 		</field>	
 		

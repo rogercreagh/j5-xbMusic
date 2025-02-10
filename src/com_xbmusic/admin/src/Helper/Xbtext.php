@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/Xbtext.php
- * @version 1.0.0.0 10th November 2024
+ * @version 0.0.30.0 7th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -55,7 +55,7 @@ XBUCALL all upper case
     public static function _(string $text, int $opts = 0, $class = '', $sprint = []) {
         //first do translation and sprintf if required
         if ($opts & XBTRL) {
-            $result = (!empty($sprint)) ? Text::sprintf($text,$translate) : Text::_($text);                      
+            $result = (!empty($sprint)) ? Text::sprintf($text,$sprint) : Text::_($text);                      
         } else {
             $result = $text;
         }
