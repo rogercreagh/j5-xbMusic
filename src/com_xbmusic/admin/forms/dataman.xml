@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.0.19.4 7th January 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -25,7 +25,7 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			size="80"
 			rows="6"
 		/>
-		<field name="filename" type="text" 
+		<field name="filename" type="hidden" 
 			label="File name" description="" 
 		/>
 		<field name="impcat" type="radio"
@@ -38,7 +38,26 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>
 		</field>	
-	
+		<field name="splitsongs" type="radio"
+			label="Split medley to songs"
+			description="attempt to split track titles containing , or / into separate songs"
+			class="btn-group"
+			default=""
+			useglobal="true"
+		>
+			<option value="0">No Split</option>
+			<option value="1">Separate Songs</option>
+		</field>
+		<field name="nobrackets" type="radio"
+			label="Song Title remove brackets"
+			description="Remove text in square or round brackets when cresating song titles. Often this is used to indicate a live performance or recording date, but sometimes may be a valid part of the title. eg 'Have You Ever Been (to Electric Ladyland)"
+			class="btn-group"
+			default=""
+			useglobal="true"
+		>
+			<option value="0">Leave</option>
+			<option value="1">Remove</option>
+		</field>
 		<field name="logfile" type="filelist" 
         	default="0" 
         	label="Select log to view" 

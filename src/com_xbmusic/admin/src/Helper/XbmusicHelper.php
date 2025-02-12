@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.2 9th February 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -132,11 +132,13 @@ class XbmusicHelper extends ComponentHelper
 	 */
 	public static function id3dataToItems(array $id3data, string &$ilogmsg) {
 	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $splitsongs = $params->get('splitsongs',0);
+	    $nobrackets = $params->get('nobrackets',0);
 	    $loglevel = $params->get('loglevel',3);
 	    $items = array();
 	    $trackdata = array(); //only one track
 	    $albumdata = array(); //only one album title allowed, if alternates present reported in log
-	    $songdata = array(); //only one song matching the track, report possible medley but treat as one.
+	    $songdata = array(); //only track may be split into separate songs.
 	    $artistdata = array(); //could be more than one artist imploded with ' || '
 	    $genres = array(); //will will create any genres we find and return them as array of id=>title
 //	    $images = array(); //we will create any images found and return as an array of data
@@ -261,35 +263,51 @@ class XbmusicHelper extends ComponentHelper
 	    //get song info - we assume song has the same title as the track
 	    // we will warn if it could be a medley, but will treat as single song
         $title = trim($trackdata['title']);
-        // we are going to discard anything in brackets at the end of the title
+
         $songtitle = $title;
-        if (strrpos($songtitle,')')+1 == strlen($songtitle)) {
-            $open = strrpos($songtitle,'(');
-            $songtitle = substr($songtitle,0,$open);
-        }
-        $splits = array(",","/"," medley"," Medley");
-        $splitcnt = 0;
-        $fnd = str_replace($splits," || ", $songtitle, $splitcnt);
-        if ($splitcnt > 0) {
-            $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('may possibly be a medley. Will save as one song, use save-copy on song edit to split',XBNL);
-            $ilogmsg .=XBWARN.$msg;
-            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
-        }
-    // 	        if (preg_match('\(.*\)|\[.*\]',$title)) {
-    // 	            $msg = Xbtext::_($title,6).Xbtext::_('contains brackets - may be same song as title without brackets. Please check song list and replace if necessary',12);
-    // 	            $ilogmsg .='[WARN] .'.$msg;
-    // 	            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');
-    // 	        }
+        // we may be going to discard anything in brackets at the end of the title
         $rcnt = 0;
-        $newtitle = preg_replace('\(.*\)|\[.*\]','',$songtitle,4,$rcnt);
-        if ($newtitle && ($rcnt)) {
-            $songtitle = $newtitle;
-            $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',XBNL);
-            $ilogmsg .= XBWARN.$msg;
-            Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
+        $newtitle = preg_replace('/\(.*?\)|\[.*?\]/','',$songtitle,4,$rcnt);
+        if ($newtitle && ($rcnt > 0)) {
+            if ($nobrackets == 1) {
+                $songtitle = $newtitle;
+                $songtitle = trim($songtitle,', ');
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',XBNL);
+                $ilogmsg .= XBWARN.$msg;
+                Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
+            } else {
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text has NOT been removed in song title. Check and remove if necessary',XBNL);
+                $ilogmsg .= XBINFO.$msg;
+                Factory::getApplication()->enqueueMessage(trim($msg),'Info');                
+            }
+             
         }
-    	            
-        $songdata = array('id'=>0, 'title' => $songtitle, 'alias'=>XbcommonHelper::makeAlias($songtitle));
+        // do we have the word medley?
+        // now we may be going to split title into several songs
+        $splits = array(",","/");
+        $splitcnt = 0;
+        $songtitles = str_replace($splits," || ", $songtitle, $splitcnt);
+        $songtitles = explode(" || ", $songtitles);
+        if ($splitcnt > 0) {
+            if ($splitsongs == 1) {
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::sprintf('has been split into %s songs',$splitcnt + 1)."\n";
+                $ilogmsg .=XBWARN.$msg;
+                Factory::getApplication()->enqueueMessage(trim($msg),'Info');               
+            } else {
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('may possibly be a medley. Saved as one song, use save-copy on song edit to split',XBNL);
+                $ilogmsg .=XBWARN.$msg;
+                Factory::getApplication()->enqueueMessage(trim($msg),'Warning');               
+            }
+        } else {
+            if (stripos($songtitle, 'medley') && ($splitsongs == 1)) {
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::_('contains the word Medley but has not been split.')."\n";
+                $ilogmsg .=XBINFO.$msg;
+                Factory::getApplication()->enqueueMessage(trim($msg),'Info');            
+            }           
+        }
+        foreach ($songtitles as $songtitle) {
+            $songdata[] = array('id'=>0, 'title' => $songtitle, 'alias'=>XbcommonHelper::makeAlias($songtitle));
+   	    }        
 	    
 	    //get genres
 	    if (isset($id3data['genre'])) {

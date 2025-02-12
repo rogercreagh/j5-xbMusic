@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.19.3 18th December 2024 -->
+<!-- xbMusic config file v0.0.30.3 12th February 2025 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -162,10 +162,28 @@
 			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>
 		</field>	
-        
+		<field name="splitsongs" type="radio"
+			label="Split medley to Songs"
+			description="split track titles containing , or / into separate songs when importing. NB While this may often be correct for medleys of tunes, sometimes it will produce anomalous results. eg 'Have You Seen Your Mother, Baby, Standing in the Shadow' would become three songs"
+			class="btn-group"
+			default=""
+		>
+			<option value="0">No Split</option>
+			<option value="1">Separate Songs</option>
+		</field>
+		<field name="nobrackets" type="radio"
+			label="Song Title remove brackets"
+			description="Remove text in square or round brackets when cresating song titles. Often this is used to indicate a live performance or recording date, but sometimes may be a valid part of the title. eg 'Have You Ever Been (to Electric Ladyland)"
+			class="btn-group"
+			default=""
+		>
+			<option value="0">Leave</option>
+			<option value="1">Remove</option>
+		</field>
+
         
 		<field name ="genrenote" type="note"
-			description="The following options concern the processing of genre names from the ID3 data to create consistency. eg 'Folk Rock', 'Folk/Rock', and 'Folk-Rock' are all found in the wild and should produce the same tag or category name."
+			description="The following options concern the processing of genre names from the ID3 data to create consistency. eg 'Folk Rock', 'Folk/Rock', and 'Folk-Rock' are all found in the wild and should produce the same tag or category name. 'Folk,Rock' should produce separate tags"
 		/>
         <field name="genrehyphen" type="radio"
         	label="Slash and Hyphen handling"

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -247,34 +247,34 @@ class DatamanModel extends AdminModel {
             if (isset($id3data['songdata'])) {
                 //create songs
                 $songlinks = array(); //will be linked to album and artist once we have ids
-                $song = $id3data['songdata'];
-                $song['catid'] = $this->songcatid;
-                if ($optalbsong & 1) $song['tags'] = $genreids;
-                $song['id'] = XbmusicHelper::createMusicItem($song, 'song');  
-                if ($song['id']=== false) {
-                    $msg = Text::_('failed to save song').Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
-                    $ilogmsg .= XBERR.$msg;
-                    $app->enqueueMessage(trim($msg),'Error');                         
-                } elseif ($song['id'] >0) {
-                    $cnts['newsng'] ++;
-                    $msg = Xbtext::_('new song saved. Id:',XBSP2).$song['id'].Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
-                    $newmsg .= (trim($msg).'<br />');
-                } else {
-                    $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],XBSP3 + XBDQ).Xbtext::_('Please check it is not a different song with the same title',XBNL);
-                    $ilogmsg = XBWARN.$msg;
-                    $app->enqueueMessage(trim($msg),'Warning');
-                    $song['id'] = $song['id'] * -1;
-                    if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to song',XBSP3).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
+                foreach ($id3data['songdata'] as $song) {                   
+                    $song['catid'] = $this->songcatid;
+                    if ($optalbsong & 1) $song['tags'] = $genreids;
+                    $song['id'] = XbmusicHelper::createMusicItem($song, 'song');  
+                    if ($song['id']=== false) {
+                        $msg = Text::_('failed to save song').Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
+                        $ilogmsg .= XBERR.$msg;
+                        $app->enqueueMessage(trim($msg),'Error');                         
+                    } elseif ($song['id'] >0) {
+                        $cnts['newsng'] ++;
+                        $msg = Xbtext::_('new song saved. Id:',XBSP2).$song['id'].Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
+                        if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
+                        $newmsg .= (trim($msg).'<br />');
+                    } else {
+                        $msg = Text::_('Song already exists in database').Xbtext::_($song['title'],XBSP3 + XBDQ).Xbtext::_('Please check it is not a different song with the same title',XBNL);
+                        $ilogmsg = XBWARN.$msg;
+                        $app->enqueueMessage(trim($msg),'Warning');
+                        $song['id'] = $song['id'] * -1;
+                        if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
+                        if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to song',XBSP3).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
+                    }
+                    if ($song['id']>0) {
+                        $link = array('song_id'=>$song['id']);
+                        $link['role'] = '1. Full Track';
+                        $link['note'] = '';
+                        $songlinks[] = $link; 
+                    }
                 }
-                if ($song['id']>0) {
-                    $link = array('song_id'=>$song['id']);
-                    $link['role'] = '1. Full Track';
-                    $link['note'] = '';
-                    $songlinks[] = $link; 
-                }
-                //its a new track so there will be only this song
                 $trackdata['songlist'] = $songlinks;
             }
             

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.20.2 1st February 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -72,6 +72,15 @@ $wa->useScript('joomla.dialog')
 		<div class="col-md-6">
 			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
 	    	<div id="container"> </div>
+	    	<p>
+	         	<?php echo $this->form->renderField('impcat'); ?>
+	        </p>
+	        <p>
+	         	<?php echo $this->form->renderField('splitsongs'); ?>
+			</p>	    	
+	        <p>
+	         	<?php echo $this->form->renderField('nobrackets'); ?>
+			</p>	    	
 	    	<?php $popbody = '<br />Are you really sure?'; 
 	    	  $pophead = 'Confirm Import from MP3'; ?>
         	<p><button id="impmp3" class="btn btn-warning" type="button" 
@@ -90,7 +99,6 @@ $wa->useScript('joomla.dialog')
         	<?php echo $this->form->renderField('selectedfiles'); ?> 
         	<?php echo $this->form->renderField('filepathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
-         	<?php echo $this->form->renderField('impcat'); ?>
        </div>
 	</div>
 </details>
