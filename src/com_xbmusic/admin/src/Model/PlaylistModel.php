@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -71,6 +71,20 @@ class PlaylistModel extends AdminModel {
             Factory::getApplication()->enqueueMessage($message);
         }
         return true;
+    }
+    
+    public function delete(&$pks) {
+        //first need to delete links to albums, artists, tracks
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true);
+        foreach ($pks as $pk) {
+            $query->delete($db->qn('#__xbmusic_trackplaylist'));
+            $query->where($db->qn('playlist_id').' = '.$db->q($pk));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear();
+        }
+        return parent::delete($pks);
     }
     
     protected function canDelete($record) {

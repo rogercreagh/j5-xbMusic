@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.30.2 7th February 2025
+ * @version 0.0.30.4 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -151,12 +151,20 @@ if (strpos($listOrder, 'modified') !== false) {
                                     echo (new PublishedButton())->render((int) $item->status, $i, $options);
                                 ?>
                             </div>
-                            <div>
-                                <?php if ($item->note !='') :?>
-                                	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
-                                		title="<?php echo $item->note; ?>"></span>
-								<?php endif; ?>
-                             </div>
+                            <?php if ($item->status == -2) : ?>
+                            	<div style="float:left;">
+                            		<a href="index.php?option=com_xbmusic&task=song.delete&cid=<?php echo $item->id?>">
+                            			<span class="fas fa-xmark xbred xbpl5" style="font-size:1.6rem;"></span>
+                            		</a>
+                            	</div>
+                            <?php else: ?>
+	                            <div>
+    	                            <?php if ($item->note !='') :?>
+        	                        	<span class="icon-info-circle xbpl5 " style="font-size:1.6rem; color:#78f;" 
+                                    		title="<?php echo $item->note; ?>"></span>
+									<?php endif; ?>
+                    	         </div>
+                    	     <?php endif; ?>
 						</td>
 						<td class="has-context">
 							<div class="pull-left">
@@ -247,7 +255,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php elseif (count($item->tracks)==1) : ?>
 								<?php $track = $item->tracks[0]; ?>
 								<a href="index.php?option=com_xbmusic&task=track.edit&retview=albums&id=<?php echo $track['trackid']; ?>">
-				                <?php echo $track['trackname']; ?></a> 
+				                <?php echo $track['tracktitle']; ?></a> 
 				                <?php if($track['sortartist'] != $item->sortartist) echo ' ('.$track['sortartist'].'}' ?>
 				                <br /><span class="xbnote">
     				                <?php echo Xbtext::_('XBMUSIC_TRACK',XBSP2 + XBTRL).$track['trackno'].Xbtext::_('XBMUSIC_ON_DISC',XBSP3 + XBTRL); ?>

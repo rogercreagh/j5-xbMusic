@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -95,6 +95,11 @@ class TrackModel extends AdminModel {
             $db->execute();
             $query->clear('delete');
             $query->delete($db->qn('#__xbmusic_tracksong'));
+            $db->setQuery($query);
+            $db->execute();
+            $query->clear();
+            $query->clear('delete');
+            $query->delete($db->qn('#__xbmusic_trackplaylist'));
             $db->setQuery($query);
             $db->execute();
             $query->clear();

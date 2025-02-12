@@ -70,7 +70,8 @@ class HtmlView extends BaseHtmlView {
             $toolbar->apply('artist.apply');
             $toolbar->save('artist.save');
         }
-         
+        ToolbarHelper::save2copy('artist.save2copy');
+        
         $toolbar->cancel('artist.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
         $toolbar->inlinehelp();

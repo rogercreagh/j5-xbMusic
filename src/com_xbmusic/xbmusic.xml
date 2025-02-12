@@ -2,7 +2,7 @@
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
 	<creationDate>12th February 2025</creationDate>
-	<version>0.0.30.3</version>
+	<version>0.0.30.4</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>

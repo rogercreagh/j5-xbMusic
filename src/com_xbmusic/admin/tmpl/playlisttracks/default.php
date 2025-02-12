@@ -150,7 +150,7 @@ if ($saveOrder && !empty($this->items)) {
                             </div>
                             <div>
                                 <?php if ($item->note !='') :?>
-                                	<span class="icon-info-circle xbpl5 xbblue" style="font-size:1.6rem;" 
+                                	<span class="icon-info-circle xbpl5 " style="font-size:1.6rem;" 
                                 		title="<?php echo $item->note; ?>"></span>
 								<?php endif; ?>
                              </div>

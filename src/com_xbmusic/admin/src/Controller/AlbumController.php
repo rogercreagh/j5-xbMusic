@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/AlbumController.php
- * @version 0.0.8.0 20th June 2024
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -34,6 +34,19 @@ class AlbumController extends FormController {
         }
     }
 
+    public function batch($model = null)
+    {
+        $this->checkToken();
+        
+        // Set the model
+        $model = $this->getModel('Album', '', []);
+        
+        // Preset the redirect
+        $this->setRedirect(Route::_('index.php?option=com_xbmusic&view=albums' . $this->getRedirectToListAppend(), false));
+        
+        return parent::batch($model);
+    }
+    
 //     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
         
 //         $task = $this->getTask();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Songs/HtmlView.php
- * @version 0.0.5.0 15th May 2024
+ * @version 0.0.30.3 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -92,7 +92,7 @@ class HtmlView extends BaseHtmlView {
         }
         
         if ($this->state->get('filter.status') == -2 && $canDo->get('core.delete')) {
-            $toolbar->delete('songs.delete', 'JTOOLBAR_EMPTY_TRASH')
+            $toolbar->delete('song.delete', 'JTOOLBAR_EMPTY_TRASH')
             ->message('JGLOBAL_CONFIRM_DELETE')
             ->listCheck(true);
         }
