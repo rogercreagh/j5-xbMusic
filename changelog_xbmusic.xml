@@ -2,6 +2,45 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.30.5</version>
+		<date>14th February 2025</date>
+		<title>Improvements and Bugfixes</title>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.30.5</h3> Updated 14th February 2025]]></item>
+			<item>Option to split track songs if separated by commas</item>
+			<item>Can create new tags with hierarchy in tag group fields</item>
+			<item>Artist Save2Copy implemented to make it easier to separate complex artists</item>
+		</addition>
+		<remove>
+			<item></item>
+		</remove>
+		<change>
+			<item></item>
+			<item></item>
+		</change>
+		<other>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
+		</other>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item>Deleting tag from field now saves correctly</item>
+			<item>Song delete now working correctly</item>
+		</fix>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.30.2</version>
 		<date>10th February 2025</date>
 		<title>Improvements and Bugfixes</title>

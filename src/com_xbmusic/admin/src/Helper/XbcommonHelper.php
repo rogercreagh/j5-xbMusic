@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 1.0.0.0 11th December 2024
+ * @version 0.0.30.5 14th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -209,10 +209,32 @@ class XbcommonHelper extends ComponentHelper {
         return $result;
     }
     
+    public static function getCreateTagPath($pathname, $parent_id = 1, $silent = false) {
+        //remove the #new# marker in case this has come from a tags form field
+        $newid = $parent_id; //fallback in case of error
+        $pathname = str_replace('#new#','',$pathname);
+        //breakup path into components
+        $newnames = explode('/',$pathname);
+        if (count($newnames) >1 ){
+            //get or create the tags using each as parent for next
+            for ($i = 0; $i < count($newnames); $i++) {
+                $tag = array('title' => $newnames[$i], 'parent_id' => $newid);
+                $newtag = self::getCreateTag($tag);
+                $newid = $newtag['id'];
+            }
+           // $newid = $parent_id;
+        } else {
+            $newtag = array('title' => $pathname, 'parent_id' => $parent_id);
+            $newtag = self::getCreateTag($newtag);           
+        }
+        return $newtag;
+    }
+    
     /**
      * @name getCreateTag()
      * @desc creates a tag with the passed title and optional other fields including parent_id 
      * and returns an object containg the id and title
+     * the alias will be case insensitive so if title CapitalTag exists then title capitaltag will return id for CaptialTag
      * @param array $tagdata - ['title'=>$mynewtitle] is required as minimum
      * @param boolean $silent - supress messages if true.
      * @return array|false assoc(id, title, alias) plus other data if newly created. false if create failed
@@ -241,8 +263,9 @@ class XbcommonHelper extends ComponentHelper {
             return false;
         } else {
             $tagid = $tagModel->getState('tag.id');
-            $infomsg .= 'New tag '.$tagdata['title'].' created with id '.$tagid;
-            if (!$silent) $app->enqueueMessage('getCreateTag() '.$infomsg, 'Info');
+            $tagdata['id'] = $tagid;
+            $infomsg .= 'New tag '.$tagdata['title'].' created with id '.$tagdata['id'];
+            if ($silent != true) $app->enqueueMessage('getCreateTag() '.$infomsg, 'Info');
             $tagdata['isnew'] = true;
         }        
         return $tagdata;

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.30.3 12th February 2025
+ * @version 0.0.30.5 14th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -353,17 +353,19 @@ class TrackModel extends AdminModel {
             $parr = $taghelp->getTags($parentids);
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
-                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" class="xbtags" />');
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="allow" parent="'.$pid.'" class="xbtags" />');
                 $form->setField($element, null, true, 'taggroups');
                 if (!empty($tagsarr)){
                     $groupnametags = $taghelp->getTagTreeArray($pid);
+                    //set tags that are in this group
                     $grouptags = array_intersect($groupnametags, $tagsarr);
-                    
                     $form->setValue($groupname,null,$grouptags);
+                    //remove group tags from the main tags field
+                    $tagsarr = array_diff($tagsarr, $groupnametags);
                 }
             }
         } // endforeach parenttag
-        
+        $form->setValue('tags', null, $tagsarr);
         return $form;
     }
     
@@ -480,14 +482,23 @@ class TrackModel extends AdminModel {
            
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
+                //$newpid = $pid;
                 if (!empty($trackdata[$groupname])) {
+                    //need to test for #new# in 'id' column and if found create a new tag and add its id to group
+                    foreach ($trackdata[$groupname] as &$value) {
+                        if (strpos($value,'#new#') !== false) {
+                            $newtag = XbcommonHelper::getCreateTagPath($value, $pid);
+                            $value = $newtag['id'];
+                        }
+                    }
                     $trackdata['tags'] = ($trackdata['tags']) ? 
                         array_unique(array_merge($trackdata['tags'],$trackdata[$groupname])) : $trackdata[$groupname];
                 }
-            }
-        } // endforeach parenttag
-        // check if track alias already exists and if it does append [basename(imagename)]
-        if (XbcommonHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
+            } //endforeach parenttag
+        } // endif !empty parentids
+        
+        // if new track check if track alias already exists and if it does append [basename(imagename)]
+        if (($trackdata['id'] == 0 ) && XbcommonHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
             $append = '';
             if (key_exists('sortartist',$trackdata)) $append = $trackdata['sortartist'];
             if ($trackdata['album_id'] > 0) $append .= ' '.$id3data['albumdata']['alias'];

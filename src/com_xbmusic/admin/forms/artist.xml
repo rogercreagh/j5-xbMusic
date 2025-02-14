@@ -93,7 +93,7 @@
 
 		<field 
 			name="tags" type="tag"
-			label="All tags, incl. groups"
+			label="XBMUSIC_TAGS_NOT_ANY_GROUP"
 			description="XB_FIELD_TAGS_ADD_REMOVE_DESC"
 			multiple="true" mode="ajax"
 			custom="deny"

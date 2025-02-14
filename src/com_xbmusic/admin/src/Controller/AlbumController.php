@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/AlbumController.php
- * @version 0.0.30.3 12th February 2025
+ * @version 0.0.30.4 12th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -46,19 +46,6 @@ class AlbumController extends FormController {
         
         return parent::batch($model);
     }
-    
-//     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
-        
-//         $task = $this->getTask();
-//         $item = $model->getItem();
-        
-//         if (($task=='setfolder')) {
-//             $tid = $validData['id'];
-//             if ($tid>0) {
-//                 $this->setRedirect('index.php?option=com_xbmusic&view=album&layout=edit&id='.$tid);
-//             }
-//         }
-// }
     
     public function publish() {
         $jip =  Factory::getApplication()->input;
@@ -146,20 +133,5 @@ class AlbumController extends FormController {
         return false;
     }
     
-    public function batch($model = null) {
-        
-        $this->checkToken();
-        
-        // Set the model
-        /** @var \Joomla\Component\Content\Administrator\Model\ArticleModel $model */
-        $model = $this->getModel('album');
-        
-        // Preset the redirect
-        //        $this->setRedirect(Route::_('index.php?option=com_content&view=articles' . $this->getRedirectToListAppend(), false));
-        $this->setRedirect((string)Uri::getInstance());
-        
-        return parent::batch($model);
-    }
- 
     
 }

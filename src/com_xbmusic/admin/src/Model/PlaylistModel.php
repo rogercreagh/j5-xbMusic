@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.30.3 12th February 2025
+ * @version 0.0.30.5 14th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -142,22 +142,27 @@ class PlaylistModel extends AdminModel {
         }
         
         //dynamically add fields for any taggroups defined in options and add the tags for them
-        $tagsarr = explode(',',$form->getValue('tags',null,''));
+        $tags = $form->getValue('tags',null,'');
+        $tagsarr = (is_array($tags)) ? $tags : explode(',',$tags);
         $parentids = $params->get('playlisttagparents',[]);
         if (!empty($parentids)) {
             $taghelp = new TagsHelper;
             $parr = $taghelp->getTags($parentids);
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
-                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="deny" parent="'.$pid.'" class="xbtags" />');
+                $element = new SimpleXMLElement('<field name="'.$groupname.'" type="xbtags" label="'.ucfirst($parent).' Group" mode="nested" multiple="true" custom="allow" parent="'.$pid.'" class="xbtags" />');
                 $form->setField($element, null, true, 'taggroups');
                 if (!empty($tagsarr)){
                     $groupnametags = $taghelp->getTagTreeArray($pid);
+                    //set tags that are in this group
                     $grouptags = array_intersect($groupnametags, $tagsarr);
                     $form->setValue($groupname,null,$grouptags);
+                    //remove group tags from the main tags field
+                    $tagsarr = array_diff($tagsarr, $groupnametags);
                 }
             }
         } // endforeach parenttag
+        $form->setValue('tags', null, $tagsarr);
         
         return $form;
     }
@@ -245,17 +250,27 @@ class PlaylistModel extends AdminModel {
         }
         
         //merge any tag groups back into tags
-        $parentids = $params->get('playlisttagparents',[]);
+        $parentids = $params->get('tracktagparents',[]);
         if (!empty($parentids)) {
             $thelp = new TagsHelper;
             $parr = $thelp->getTags($parentids);
+            
             foreach ($parr as $pid=>$parent) {
                 $groupname = $parent.'_tags';
+                //$newpid = $pid;
                 if (!empty($data[$groupname])) {
-                    $data['tags'] = ($data['tags']) ? array_unique(array_merge($data['tags'],$data[$groupname])) : $data[$groupname];
+                    //need to test for #new# in 'id' column and if found create a new tag and add its id to group
+                    foreach ($data[$groupname] as &$value) {
+                        if (strpos($value,'#new#') !== false) {
+                            $newtag = XbcommonHelper::getCreateTagPath($value, $pid);
+                            $value = $newtag['id'];
+                        }
+                    }
+                    $data['tags'] = ($data['tags']) ?
+                    array_unique(array_merge($data['tags'],$data[$groupname])) : $data[$groupname];
                 }
-            }
-        } // endforeach parenttag
+            } //endforeach parenttag
+        } // endif !empty parentids
         
         // ok ready to save the playlist data
         if (parent::save($data)) {
