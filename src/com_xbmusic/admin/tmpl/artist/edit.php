@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.30.2 10th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -226,6 +226,7 @@ $item = $this->item;
         		</ul>
         		<hr />
 			<?php endif; ?>
+               <?php if (isset($item->albums)) : ?>
    			<b><?php echo count($item->albums).' '.Text::_('XBMUSIC_ALBUMS'); ?></b>
     		<ul>
     			<?php foreach ($item->albums as $listitem) : ?>
@@ -236,7 +237,11 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+  				<?php else : ?>
+  					<p><i><?php echo Text::_('XBMUSIC_NO_ALBUMS_LISTED'); ?></i></p>
+ 				<?php endif; ?>
     		<hr />
+              <?php if (isset($item->tracks)) : ?>
     		<b><?php echo count($item->tracks).' '.Text::_('XBMUSIC_TRACKS'); ?></b>
     		<ul>
     			<?php foreach ($item->tracks as $listitem) : ?>
@@ -247,7 +252,11 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+  				<?php else : ?>
+  					<p><i><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></i></p>
+ 				<?php endif; ?>
     		<hr />
+              <?php if (isset($item->songs)) : ?>
     		<b><?php echo count($item->songs).' '.Text::_('XBMUSIC_SONGS'); ?></b>
     		<ul>
     			<?php foreach ($item->songs as $listitem) : ?>
@@ -257,6 +266,9 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+  				<?php else : ?>
+  					<p><i><?php echo Text::_('XBMUSIC_NO_SONGS_LISTED'); ?></i></p>
+ 				<?php endif; ?>
     		<hr />
     		<p class="xbnote"><?php echo Text::_('XBMUSIC_LINKS_TO_EDIT'); ?> 
     		  <?php Text::_('XBMUSIC_EYECON_HINT'); ?></p>

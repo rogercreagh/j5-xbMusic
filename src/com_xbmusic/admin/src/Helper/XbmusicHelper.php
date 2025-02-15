@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.3 12th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -566,7 +566,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->select('a.id AS artistid, a.name AS artistname, a.alias AS alias, ta.role AS role, ta.listorder');
 	    $query->from('#__xbmusic_artists AS a');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.artist_id = a.id');
-	    $query->where('ta.track_id = '.$tid);
+	    $query->where('ta.track_id = '.$db->q($tid));
 	    $query->order('ta.listorder ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();
@@ -579,7 +579,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->select('s.id AS songid, s.title AS songtitle, s.alias AS songalias, ts.role AS songrole, ts.listorder AS songorder');
 	    $query->from('#__xbmusic_songs AS s');
 	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
-	    $query->where('ts.track_id = '.$tid);
+	    $query->where('ts.track_id = '.$db->q($tid));
 	    $query->order('ts.listorder ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();
@@ -606,7 +606,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
 	    $query->leftjoin('#__xbmusic_artists AS a ON a.id = ta.artist_id');
-	    $query->where('t.album_id = '.$albumid.' AND a.name <> \'\'');
+	    $query->where('t.album_id = '.$db->q($albumid).' AND a.name <> \'\'');
 	    //$query->group('a.name');
 	    $query->order('a.sortname ASC');
 	    $db->setQuery($query);
@@ -622,7 +622,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->leftjoin('#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
 	    $query->leftjoin('#__xbmusic_songs AS s ON s.id = ts.song_id');
-	    $query->where('t.album_id = '.$albumid);
+	    $query->where('t.album_id = '.$db->q($albumid));
 	    $query->order('s.title ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();
@@ -632,11 +632,11 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('DISTINCT a.id AS artistid, a.name AS artistname, a.imgurl, a.sortname AS artistsort');
+	    $query->select('a.id AS artistid, a.name AS artistname, a.imgurl, a.sortname AS artistsort');
 	    $query->from('#__xbmusic_artists AS a');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.artist_id = a.id');
 	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.track_id = ta.track_id');
-	    $query->where('ts.song_id = '.$songid);
+	    $query->where('ts.song_id = '.$db->q($songid));
 	    $query->group('a.id');
 	    $query->order('a.sortname ASC');
 	    $db->setQuery($query);
@@ -651,7 +651,8 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_albums AS a');
 	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
 	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
-	    $query->where('ts.song_id = '.$songid.' AND t.album_id > 0');
+	    $query->where('ts.song_id = '.$db->q($songid).' AND t.album_id > 0');
+	    $query->group('a.id');
 	    $query->order('a.title ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();	    
@@ -665,7 +666,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_songs AS s');
 	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = ts.track_id');
-	    $query->where('ta.artist_id = '.$artistid);
+	    $query->where('ta.artist_id = '.$db->q($artistid));
 	    $query->group('s.id');
 	    $query->order('s.title ASC');
 	    $db->setQuery($query);
@@ -680,7 +681,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_albums AS a');
 	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.album_id = a.id');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
-	    $query->where('ta.artist_id = '.$artistid.' AND t.album_id > 0');
+	    $query->where('ta.artist_id = '.$db->q($artistid).' AND t.album_id > 0');
 	    $query->order('a.title ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();

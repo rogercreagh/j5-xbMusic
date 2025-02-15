@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/song/edit.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -140,6 +140,7 @@ $item = $this->item;
      		<h4><?php echo Text::_('Connections to other items')?></h4>
      		<hr />
    			<b><?php echo Text::_('Albums'); ?></b>
+   			<?php if (isset($item->albums)) : ?>  			
     		<ul>
     			<?php foreach ($item->albums as $listitem) : ?>
     				<li>
@@ -148,8 +149,12 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+    		<?php else : ?>
+        		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_ALBUMS_LISTED'); ?></p>
+    		<?php endif; ?>
     		<hr />
     		<b><?php echo Text::_('Tracks'); ?></b>
+   			<?php if (isset($item->tracks)) : ?>  			
     		<ul>
     			<?php foreach ($item->tracks as $listitem) : ?>
     				<li>
@@ -158,7 +163,11 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+    		<?php else : ?>
+        		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
+    		<?php endif; ?>
     		<hr />
+   			<?php if (isset($item->artists)) : ?>  			
     		<b><?php echo Text::_('Artists'); ?></b>
     		<ul>
     			<?php foreach ($item->artists as $listitem) : ?>
@@ -168,8 +177,11 @@ $item = $this->item;
         			</li>
     			<?php endforeach; ?>
     		</ul>
+    		<?php else : ?>
+        		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_ARTISTS_LISTED'); ?></p>
+    		<?php endif; ?>
     		<hr />
-    		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+    		<p class="xbnote"><?php echo Text::_('XBMUSIC_LINKS_TO_EDIT'); ?></p>
     		</div>
 	       	<div class="col-12 col-md-9">
 	       		<div class="xbmh800 xbyscroll">

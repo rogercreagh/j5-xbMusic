@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.30.2 9th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -163,6 +163,7 @@ $item = $this->item;
         <div class="row">
         	<div class="col-12">
 				<?php echo $this->form->renderField('albumlinksnote'); ?> 
+				<?php if (isset($item->tracks)) : ?>				
         		<table class="xbtablehgrid xbml100 xbmt20"">
         			<thead>
         				<tr>
@@ -204,6 +205,9 @@ $item = $this->item;
         			</tbody>
         		</table>
         		<p class="xbnote"><?php echo Text::_('XB_LINKS_NOTE_ITEM_EYCON'); ?></p>
+        		<?php else : ?>
+        			<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
+        		<?php endif; ?>
         	</div>
 			<hr />
             <?php echo $this->form->renderField('ext_links');?>

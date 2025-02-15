@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.30.5 14th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -42,6 +42,11 @@ class AlbumModel extends AdminModel {
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
     );
+
+    public function __construct($config = [], $factory = null, $form = null) {
+        parent::__construct($config, $factory, $form);
+    }
+    
     
     public function batch($commands, $pks, $contexts) {
         $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
@@ -315,7 +320,7 @@ class AlbumModel extends AdminModel {
      * @param int $album_id
      * @return array assoc
      */
-    private function getAlbumTrackList(int $albumid) {
+    private function getAlbumTrackList($albumid) {
         $tracklist = XbmusicHelper::getAlbumTracks($albumid);
         foreach ($tracklist as &$track) {
             $track['songlist'] = XbmusicHelper::getTrackSongs($track['trackid']);

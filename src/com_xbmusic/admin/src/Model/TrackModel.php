@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.30.5 14th February 2025
+ * @version 0.0.30.6 15th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -42,8 +42,6 @@ class TrackModel extends AdminModel {
     );
     
     public function __construct($config = [], $factory = null, $form = null) {
-//        $this->genreParentId = XbcommonHelper::getCreateTag(array('title'=>'MusicGenres',
-//            'description'=>Text::_('XBMUSIC_ID3GENRES_TAG_DESC')),true);
         parent::__construct($config, $factory, $form);    
     }
     
@@ -304,28 +302,26 @@ class TrackModel extends AdminModel {
                 if ($item->album_id > 0) $item->album = $this->getAlbum($item->album_id);               
                 $item->artists = $this->getTrackArtistList($item->id);
                 $item->songs = $this->getTrackSongList($item->id);
-            if ($item->id3tags) $item->id3_tags = json_decode($item->id3tags);
-            if ($item->audioinfo) $item->audioinfo = json_decode($item->audioinfo);
-            if ($item->fileinfo) $item->fileinfo = json_decode($item->fileinfo);
-            if ($item->imageinfo) $item->imageinfo = json_decode($item->imageinfo);
-            $item->image_type = ($item->imageinfo) ? $item->imageinfo->picturetype : '';
-            $item->image_desc = ($item->imageinfo) ? $item->imageinfo->description : '';   
-            $item->albumimage = ($item->album_id > 0) ? $item->album['imgurl'] :'';
-
-            if ($app->getUserState('com_xbmusic.edit.track.id3loaded', 0) == 1) {
-                $id3data = $app->getUserState('com_xbmusic.edit.track.id3data', []);
-                if (!empty($id3data)) {                   
-                    $app->enqueueMessage('New ID3 Data loaded but not yet saved','Warning');
-                    //$item->fileinfo = json_decode($id3data['fileinfo']);
-                    //$item->fileinfo = json_decode($id3data['fileinfo']);
-                    $item->imageinfo = (object)$id3data['imageinfo'];
-                    //$item->audioinfo = json_decode($id3data['audioinfo']);
-                    //$item->id3tags = json_decode($id3data['id3tags']);
-                    //$item->imgurl = $id3data['imgurl'];
+                if ($item->id3tags) $item->id3_tags = json_decode($item->id3tags);
+                if ($item->audioinfo) $item->audioinfo = json_decode($item->audioinfo);
+                if ($item->fileinfo) $item->fileinfo = json_decode($item->fileinfo);
+                if ($item->imageinfo) $item->imageinfo = json_decode($item->imageinfo);
+                $item->image_type = ($item->imageinfo) ? $item->imageinfo->picturetype : '';
+                $item->image_desc = ($item->imageinfo) ? $item->imageinfo->description : '';   
+                $item->albumimage = ($item->album_id > 0) ? $item->album['imgurl'] :'';
+    
+                if ($app->getUserState('com_xbmusic.edit.track.id3loaded', 0) == 1) {
+                    $id3data = $app->getUserState('com_xbmusic.edit.track.id3data', []);
+                    if (!empty($id3data)) {                   
+                        $app->enqueueMessage('New ID3 Data loaded but not yet saved','Warning');
+                        //$item->fileinfo = json_decode($id3data['fileinfo']);
+                        //$item->fileinfo = json_decode($id3data['fileinfo']);
+                        $item->imageinfo = (object)$id3data['imageinfo'];
+                        //$item->audioinfo = json_decode($id3data['audioinfo']);
+                        //$item->id3tags = json_decode($id3data['id3tags']);
+                        //$item->imgurl = $id3data['imgurl'];
+                    }
                 }
-            }
-            } else {
-                //we have an item that hasn't been saved
             }
         } else {
             //we have no item
