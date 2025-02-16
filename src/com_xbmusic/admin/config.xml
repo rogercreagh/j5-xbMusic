@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.30.3 12th February 2025 -->
+<!-- xbMusic config file v0.0.30.7 16th February 2025 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -131,14 +131,24 @@
 		
         <field name="genrecattag" type="radio"
         	label="ID3 Genre as Track Cat/Tag"
-        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag and/or Category for track. Genre categories have 'Tracks' as parent category, Genre tags have 'Genres' as parent tag. When bulk importing from ID3 data using DataManager you can override the category option to create date based categories"
+        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag"
  			class="btn-group btn-group-yesno"
-			default="2"
+			default="2"  showon="impcat:0"
 			>
 				<option value="0">Ignore</option>
 				<option value="1">Category</option>
 				<option value="2">Tag</option>
-				<option value="3">Both</option>
+				<option value="3">Cat and Tag</option>
+        </field>
+
+        <field name="genrecattag1" type="radio"
+        	label="ID3 Genre as Track Cat/Tag"
+        	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag and/or Category for track."
+ 			class="btn-group btn-group-yesno"
+			default="2"  showon="impcat:1"
+			>
+				<option value="0">Ignore</option>
+				<option value="2">Tag</option>
         </field>
 
         <field name="genrealbsong" type="radio"
@@ -155,7 +165,7 @@
         
 		<field name="impcat" type="radio"
 			label="Import Category"
-			description="This will override the options above for all items to create a category based on import date when importing from track file ID3 data"
+			description="This will override the options for all items to create a category based on import date when importing from track file ID3 data"
 			class="btn-group "
  			default="1"
 		>

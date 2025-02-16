@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.6 15th February 2025
+ * @version 0.0.30.7 16th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -284,7 +284,7 @@ class XbmusicHelper extends ComponentHelper
         }
         // do we have the word medley?
         // now we may be going to split title into several songs
-        $splits = array(",","/");
+        $splits = array(",","/","->",">");
         $splitcnt = 0;
         $songtitles = str_replace($splits," || ", $songtitle, $splitcnt);
         $songtitles = explode(" || ", $songtitles);
@@ -536,6 +536,7 @@ class XbmusicHelper extends ComponentHelper
 	/**
 	 * @name createGenres()
 	 * @desc takes a string of genre names separated by || and returns them as array of assoc array of data for each
+	 * also splits names on commas
 	 * @param string $genrenames - multiple names separated by ' || '
 	 * @param string $ilogmsg
 	 * @return array genres data including 'isnew' if created
@@ -543,6 +544,8 @@ class XbmusicHelper extends ComponentHelper
 	public static function createGenres(string $genrenames, string &$ilogmsg) {
 	    $params = ComponentHelper::getParams('com_xbmusic');
 	    $optspaces = $params->get('genrespaces',1);
+	    //split names including commas 
+	    $genrenames = str_replace(',', '||', $genrenames);
 	    // if required split names with spaces into two or more genres "Folk Rock" -> "Folk" and "Rock"
 	    if ($optspaces == 3) $genrenames = str_replace(array(' || ', ' '), '||', $genrenames);	        
 	    $genres = array();
@@ -550,6 +553,7 @@ class XbmusicHelper extends ComponentHelper
         //get the parent tag for genre tags
         $parentgenre = XbcommonHelper::getCreateTag(array('title'=>'MusicGenres'));
 	    foreach ($genrenames as &$genre) {
+	        $genre = trim($genre,'-');
 	        $genre = self::normaliseGenrename(trim($genre), $ilogmsg);
 	        //get or create the genre tag id and title
 	        $newtag = XbcommonHelper::getCreateTag(array('title'=>$genre, 'parent_id'=>$parentgenre['id'],
@@ -733,25 +737,20 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static function readlog(string $filename, $filter ='') {
 	    $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
-	    if ($filter == '') return file_get_contents($pathname);
-	    $logstr = '';
-	    $flags = explode(',',$filter);
-	    if ($lines = file($pathname)) {
-	        foreach ($lines as $line) {
-	            foreach ($flags as $flag) {
-	                if (str_starts_with($line, $flag)) $logstr .= $line;
-	            }
-	        }
+	    if (file_exists($pathname)) {
+    	    if ($filter == '') return file_get_contents($pathname);
+            $logstr = '';
+	        $flags = explode(',',$filter);
+    	    if ($lines = file($pathname)) {
+	           foreach ($lines as $line) {
+	                foreach ($flags as $flag) {
+	                    if (str_starts_with($line, $flag)) $logstr .= $line;
+	                }
+	           }
+    	    }
+	    } else {
+	        $logstr = '';
 	    }
-// 	    if ((file_exists($pathname)) && (filesize($pathname) > 0)) {
-// 	        $f = fopen($pathname,'r');
-// 	        if ($f) {
-// 	            $logstr = fread($f, filesize($pathname));
-// 	            fclose($f);
-// 	        } else {
-// 	            Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
-// 	        }
-// 	    }
 	    return $logstr;
 	}
 

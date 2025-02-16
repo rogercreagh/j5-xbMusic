@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.30.3 12th February 2025
+ * @version 0.0.30.7 16th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -79,14 +79,14 @@ class DatamanModel extends AdminModel {
             $errmsg .= Text::_('Invalid files list');
             Factory::getApplication()->enqueueMessage($errmsg,'Error');
             $logmsg .= $loghead.XBERR.$errmsg."\n ============================== \n\n";
-            $this->writelog($logmsg);
+            XbmusicHelper::writelog($logmsg);
             return false;
         }
         if (count($files)==0){
             $errmsg .= Xbtext::_('No mp3 files found in',2).$folder;
             Factory::getApplication()->enqueueMessage($errmsg,'Warning');
             $logmsg .= $loghead.XBWARN.$errmsg.XBENDLOG;
-            $this->writelog($logmsg);
+            XbmusicHelper::writelog($logmsg);
             return false;
         }
         // set up counts for logging and start time
@@ -135,7 +135,7 @@ class DatamanModel extends AdminModel {
         $loghead .= " -------------------------- \n";
         $logmsg = $loghead.$logmsg;
         $logmsg .= '======================================'."\n\n";
-        $this->writelog($logmsg);
+        XbmusicHelper::writelog($logmsg);
         return true;
     } //end parseFilesMp3()    
     
@@ -310,10 +310,6 @@ class DatamanModel extends AdminModel {
                         $artistlinks[] = array('artist_id'=>$artist['id'], 'role'=>'', 'note'=>''); 
                     }                   
                 }
-                $res = $this->addArtistSongs($artist['id'], $songlinks);
-                if ($res>0)
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
-                //will be linked to album once album data loaded
                 //only one new track so ok to use artist list in model 
                 $trackdata['artistlist'] = $artistlinks;
             }
@@ -333,23 +329,6 @@ class DatamanModel extends AdminModel {
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                 if ($imgurl !== false) {
                     unset($imgdata['data']);
-//                     $file = trim(str_replace(Uri::root(),JPATH_ROOT.'/',$imgurl));
-//                     if (file_exists($file)){
-//                         $msg .= Text::_('Created image file').Xbtext::_(str_replace('/images/xbmusic/artwork/','',$imgfilename),XBSP1 + XBDQ + XBNL);
-//                         $ilogmsg .= XBINFO.$msg;
-//                         $newmsg .= trim($msg).'<br />';
-//                         $imgdata['folder'] = dirname(str_replace(Uri::root(),'',$imgurl));
-//                         $imgdata['basename'] = basename($file);
-//                         $bytes = filesize($file);
-//                         $lbl = Array('bytes','kB','MB','GB');
-//                         $factor = floor((strlen($bytes) - 1) / 3);
-//                         $imgdata['filesize'] = sprintf("%.2f", $bytes / pow(1024, $factor)) . @$lbl[$factor];
-//                         $imgdata['filedate'] = date("d M Y at H:i",filemtime($file));
-//                         $imagesize = getimagesize($file);
-//                         $imgdata['filemime'] = $imagesize['mime'];
-//                         $imgdata['filewidth'] = $imagesize[0];
-//                         $imgdata['fileht'] = $imagesize[1];
-//                   }                    
                     $imgdata['imagetitle'] = $imgdata['picturetype'];
                     $imgdata['imagedesc'] = $imgdata['description'];
                     $trackdata['imgurl'] = $imgurl;
@@ -382,14 +361,6 @@ class DatamanModel extends AdminModel {
                     $albumdata['id'] = $albumdata['id'] * -1;
                 }
 
-                //album may have already existed so we need to add to existing artist and song links after creating
-//                 $res = $this->addAlbumSongs($albumdata['id'], $songlinks);
-//                 if ($res>0)
-//                     if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('song links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
-//                     $res = $this->addAlbumArtists($albumdata['id'], $artistlinks);
-//                 if ($res>0)
-//                     if ($loglevel==4) $ilogmsg .= XBINFO.$res.Xbtext::_('artist links added to',XBSP1).Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
-                        
                 if ($optalbsong > 1) {
                     $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
                     if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('genres added to album',XBSP3).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBDQ + XBNL);
@@ -454,35 +425,35 @@ class DatamanModel extends AdminModel {
 //        return file_get_contents($file->getPathname);
     }
     
-    public function writelog(string $logstr, $filename = '') {
-        if ($filename == '') {
-            $filename = 'import_'.date('Y-m-d').'.log';
-        }
-        $logstr .= $this->readlog($filename);
-        $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
-        $f = fopen($pathname, 'w');
-        fwrite($f, $logstr);
-        fclose($f);
-    }
+//     public function writelog(string $logstr, $filename = '') {
+//         if ($filename == '') {
+//             $filename = 'import_'.date('Y-m-d').'.log';
+//         }
+//         $logstr .= $this->readlog($filename);
+//         $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+//         $f = fopen($pathname, 'w');
+//         fwrite($f, $logstr);
+//         fclose($f);
+//     }
     
-    public function readlog(string $filename) {
-        $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
-        return file_get_contents($pathname);
-        $logstr = '';
-        if ((file_exists($pathname)) && (filesize($pathname) > 0)) {
-            $f = fopen($pathname,'r');
-            if ($f) {
-                $logstr = fread($f, filesize($pathname));
-                fclose($f);
-            } else {
-                Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
-            }
-        }
-        return $logstr;
-    }
+//     public function readlog(string $filename) {
+//         $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+//         return file_get_contents($pathname);
+//         $logstr = '';
+//         if ((file_exists($pathname)) && (filesize($pathname) > 0)) {
+//             $f = fopen($pathname,'r');
+//             if ($f) {
+//                 $logstr = fread($f, filesize($pathname));
+//                 fclose($f);
+//             } else {
+//                 Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
+//             }
+//         }
+//         return $logstr;
+//     }
     
-    private function addArtistSongs($artistid, $songList) {
-        $cnt = 0;
+//    private function addArtistSongs($artistid, $songList) {
+//        $cnt = 0;
 //         $db = Factory::getDbo();
 //         $query = $db->getQuery(true);
 //         foreach ($songList as $song) {
@@ -508,71 +479,10 @@ class DatamanModel extends AdminModel {
 //                 }
 //             }
 //         }
-        return $cnt;
-    }
+//        return $cnt;
+//    }
     
-    private function addAlbumArtists($albumid, $artistList) {
-        $cnt = 0;
-//         $db = Factory::getDbo();
-//         $query = $db->getQuery(true);
-//         foreach ($artistList as $artist) {
-//             //check if this link alreasdy exists
-//             $query->clear();
-//             $query->where($db->qn('album_id').' = '.$db->q($albumid));
-//             $query->where($db->qn('artist_id').' = '.$db->q($artist['artist_id']));
-//             $query->select('id')->from('#__xbmusic_artistalbum');
-//             $db->setQuery($query);
-//             if ($db->loadResult()>0) {
-//                 //skipping this one already exists, could update role note and listorder
-//             } else {
-//                 if (!key_exists('listorder', $artist)) $artist['listorder'] = 0;
-//                 $query->clear();
-//                 $query->insert($db->quoteName('#__xbmusic_artistalbum'));
-//                 $query->columns('album_id,artist_id,role,note,listorder');
-//                 $query->values('"'.$albumid.'","'.$artist['artist_id'].'","'.$artist['role'].'","'.$artist['note'].'","'.$artist['listorder'].'"');
-//                 try {
-//                     if ($db->setQuery($query)) $cnt++;
-//                     $db->execute();
-//                 } catch (\Exception $e) {
-//                     $dberr = $e->getMessage();
-//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-//                 }
-//             }
-//         }
-        return $cnt;
-    }
-    
-    private function addAlbumSongs($albumid, $songList) {
-        $cnt = 0;
-//         $db = Factory::getDbo();
-//         $query = $db->getQuery(true);
-//         foreach ($songList as $song) {
-//             //check if this link alreasdy exists
-//             $query->clear();
-//             $query->where($db->qn('album_id').' = '.$db->q($albumid));
-//             $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
-//             $query->select('id')->from('#__xbmusic_songalbum');
-//             $db->setQuery($query);
-//             if ($db->loadResult()>0) {
-//                 //skipping this one already exists, could update role note and listorder
-//             } else {
-//                 if (!key_exists('listorder', $song)) $song['listorder'] = 0;
-//                 $query->clear();
-//                 $query->insert($db->quoteName('#__xbmusic_songalbum'));
-//                 $query->columns('album_id,song_id,role,note,listorder');
-//                 $query->values('"'.$albumid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
-//                 try {
-//                     if ($db->setQuery($query)) $cnt++;
-//                     $db->execute();
-//                 } catch (\Exception $e) {
-//                     $dberr = $e->getMessage();
-//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-//                 }
-//             }
-//         }
-        return $cnt;
-    }
-    
+   
     public function newsymlink($targ, $name) {
         $res = false;
         $mtype = 'Warning';
