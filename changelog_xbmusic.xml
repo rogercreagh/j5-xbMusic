@@ -12,14 +12,14 @@
 		<remove>
 			<item></item>
 		</remove>
-		<change>
-			<item>Reworked Track Load ID3 to fix mulitple bugs</item>
-		</change>
 		<other>
 			<item>Playlist functions missing</item>
 			<item>Azuracast station links not available</item>
 			<item>Front end views not available</item>
 		</other>
+		<change>
+			<item>Reworked Track Load ID3 to fix mulitple bugs</item>
+		</change>
 		<language>
 			<item>en-GB only</item>
 			<item>Language files incomplete</item>
