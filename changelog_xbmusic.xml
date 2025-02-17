@@ -12,11 +12,6 @@
 		<remove>
 			<item></item>
 		</remove>
-		<other>
-			<item>Playlist functions missing</item>
-			<item>Azuracast station links not available</item>
-			<item>Front end views not available</item>
-		</other>
 		<change>
 			<item>Reworked Track Load ID3 to fix mulitple bugs</item>
 		</change>
@@ -30,6 +25,9 @@
 			<item>Bugs fixed in all item edit views</item>
 		</fix>
 		<note>
+			<item>Playlist functions missing</item>
+			<item>Azuracast station links not available</item>
+			<item>Front end views not available</item>
 			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
 			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
 		</note>
