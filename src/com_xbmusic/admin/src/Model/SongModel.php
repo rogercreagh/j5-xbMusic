@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/SongModel.php
- * @version 0.0.30.5 14th February 2025
+ * @version 0.0.30.8 17th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -236,7 +236,8 @@ class SongModel extends AdminModel {
                 }
             }
             //need to copy links
-//            $data->tracklist = $this->getSongTrackList($data->id);
+            $this->storeSongTracks($origTable->id, $data['songlist']);
+            //            $data->tracklist = $this->getSongTrackList($data->id);
             // standard Joomla practice is to set the new copy record as unpublished
             $data['status'] = 0;
         }

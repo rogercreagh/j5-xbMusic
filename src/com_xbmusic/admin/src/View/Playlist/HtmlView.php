@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.30.8 17th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -69,9 +69,24 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             $toolbar->apply('playlist.apply');
-            $toolbar->save('playlist.save');
+            
+            $saveGroup = $toolbar->dropdownButton('save-group');
+            if ($isNew) {
+                $toolbar->save('playlist.save');
+            } else {
+                $saveGroup->configure(
+                    function (Toolbar $childBar) use ($canDo, $isNew) {
+                        $childBar->save('playlist.save');
+                        if (!$isNew && $canDo->get('core.create')) {
+                            $childBar->save2copy('playlist.save2copy');
+                        }
+                        if ($canDo->get('core.create')) {
+                            $childBar->save2new('playlist.save2new');
+                        }
+                    }
+                    );
+            }
         }
-        ToolbarHelper::save2copy('playlist.save2copy');
         
         $toolbar->cancel('playlist.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();

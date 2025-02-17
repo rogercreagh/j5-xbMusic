@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Artist/HtmlView.php
- * @version 0.0.11.7 22nd July 2024
+ * @version 0.0.30.8 17th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -68,9 +68,24 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             $toolbar->apply('artist.apply');
-            $toolbar->save('artist.save');
+            
+            $saveGroup = $toolbar->dropdownButton('save-group');
+            if ($isNew) {
+                $toolbar->save('artist.save');
+            } else {
+                $saveGroup->configure(
+                    function (Toolbar $childBar) use ($canDo, $isNew) {
+                        $childBar->save('artist.save');
+                        if (!$isNew && $canDo->get('core.create')) {
+                            $childBar->save2copy('artist.save2copy');
+                        }
+                        if ($canDo->get('core.create')) {
+                            $childBar->save2new('artist.save2new');
+                        }
+                    }
+                    );
+            }
         }
-        ToolbarHelper::save2copy('artist.save2copy');
         
         $toolbar->cancel('artist.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();

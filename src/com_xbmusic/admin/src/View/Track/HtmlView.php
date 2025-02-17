@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Track/HtmlView.php
- * @version 0.0.19.2 10th December 2024
+ * @version 0.0.30.8 17th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -94,11 +94,28 @@ class HtmlView extends BaseHtmlView {
         
         $itemEditable = $canDo->get('core.edit') || ($canDo->get('core.edit.own') && $this->item->created_by == $userId);
         
-        $loadlbl = ($isNew) ? 'Load ID3' : 'Reload ID3' ;
-        $toolbar->standardButton('loadid3',$loadlbl, 'track.loadid3')->icon('fas fa-file-arrow-down');
         if (!$checkedOut && $itemEditable) {
-            $toolbar->apply('track.apply')->attributes($attrib);
-            $toolbar->save('track.save')->attributes($attrib);
+            $loadlbl = ($isNew) ? 'Load ID3' : 'Reload ID3' ;
+            $toolbar->standardButton('loadid3',$loadlbl, 'track.loadid3')->icon('fas fa-file-arrow-down');
+            
+            $toolbar->apply('track.apply');
+            
+            $saveGroup = $toolbar->dropdownButton('save-group');
+            if ($isNew) {
+                $toolbar->save('track.save');
+            } else {
+                $saveGroup->configure(
+                    function (Toolbar $childBar) use ($canDo, $isNew) {
+                        $childBar->save('track.save');
+                        if (!$isNew && $canDo->get('core.create')) {
+                            $childBar->save2copy('track.save2copy');
+                        }
+                        if ($canDo->get('core.create')) {
+                            $childBar->save2new('track.save2new');
+                        }
+                    }
+                    );
+            }
         }
         
         $toolbar->cancel('track.cancel', 'JTOOLBAR_CLOSE');

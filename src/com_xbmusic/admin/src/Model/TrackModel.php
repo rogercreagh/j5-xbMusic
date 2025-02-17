@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.30.7 16th February 2025
+ * @version 0.0.30.8 17th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -532,7 +532,7 @@ class TrackModel extends AdminModel {
                 $trackdata['audioinfo'] = $id3data['audioinfo'];
                 $trackdata['id3tags'] = $id3data['id3tags'];
             }
-        }
+        } //endif id3data
         $filter = InputFilter::getInstance();
         if (isset($trackdata['created_by_alias'])) {
             $trackdata['created_by_alias'] = $filter->clean($trackdata['created_by_alias'], 'TRIM');
@@ -564,6 +564,26 @@ class TrackModel extends AdminModel {
             } //endforeach parenttag
         } // endif !empty parentids
         
+        //NB save2copy will include any reloaded id3 data in the copy not the original
+        $input  = $app->getInput();
+        if ($input->get('task') == 'save2copy') {
+            $origTable = clone $this->getTable();
+            $origTable->load($input->getInt('id'));
+            
+            if ($trackdata['title'] == $origTable->title) {
+                list($title, $alias) = $this->generateNewTitle($trackdata['catid'], $trackdata['alias'], $trackdata['title']);
+                $trackdata['title'] = $title;
+                $trackdata['alias'] = $alias;
+            } else {
+                if ($trackdata['alias'] == $origTable->alias) {
+                    $trackdata['alias'] = '';
+                }
+            }
+            //need to copy links
+            // standard Joomla practice is to set the new copy record as unpublished
+            $trackdata['status'] = 0;
+        }
+               
         // if new track check if track alias already exists and if it does append [basename(imagename)]
         if (($trackdata['id'] == 0 ) && XbcommonHelper::checkValueExists($trackdata['alias'], '#__xbmusic_tracks', 'alias')) {
             $append = '';
