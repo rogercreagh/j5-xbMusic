@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.20.2 4th February 2025
+ * @version 0.0.40.0 18th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -95,17 +95,14 @@ $input = Factory::getApplication()->getInput();
            		<div class="col-12 col-lg-3">
         			<?php echo $this->form->renderField('status'); ?> 
         			<?php echo $this->form->renderField('catid'); ?> 
-         			<?php echo $this->form->renderField('tags'); ?> 
          			<?php echo $this->form->renderField('access'); ?> 
         			<?php echo $this->form->renderField('ordering'); ?> 
         			<?php echo $this->form->renderField('note'); ?> 
            		</div>
     		</div>
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
-	<?php if (!empty($this->tagparentids)) : ?>
-        if (!empty($parentids)) {
-	    )?>
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
+         
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tag Groups')); ?>
 			<div class="row">
 				<div class="col-12">
                   <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
@@ -123,9 +120,32 @@ $input = Factory::getApplication()->getInput();
  					<?php endif; ?>
 				</div>
     		</div>
-         <?php echo HTMLHelper::_('uitab.endTab'); ?>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
          
-
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+		<div class="row form-vertical">
+    		<div class="col-12 col-md-3">
+     			<h4><?php echo Text::_('XBMUSIC_LINKS_TO_TRACKS')?></h4>
+       			<?php if (isset($item->tracks)) : ?>  			
+        		<ul>
+        			<?php foreach ($item->tracks as $listitem) : ?>
+        				<li>
+        					<a href="<?php echo $trackelink.$listitem['track_id'];?>">
+        						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['artist']; ?>]        			
+            			</li>
+        			<?php endforeach; ?>
+        		</ul>
+        		<?php else : ?>
+            		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
+        		<?php endif; ?>
+			</div>
+    		<div class="col-12 col-md-9">
+	       		<div class="xbmh800 xbyscroll">
+					<?php echo $this->form->renderField('tracklist'); ?>
+				</div>
+    		</div>
+		</div>
+		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
         <div class="row">

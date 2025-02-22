@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/song/edit.php
- * @version 0.0.30.6 15th February 2025
+ * @version 0.0.40.0 18th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -113,7 +113,7 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-       <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
 			<div class="row">
 				<div class="col-12">
                   <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
@@ -137,7 +137,7 @@ $item = $this->item;
 		<?php echo $this->form->renderField('songlinksnote'); ?>	    
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
-     		<h4><?php echo Text::_('Connections to other items')?></h4>
+     		<h4><?php echo Text::_('XB_LINKS_OTHER_ITEMS')?></h4>
      		<hr />
    			<b><?php echo Text::_('Albums'); ?></b>
    			<?php if (isset($item->albums)) : ?>  			

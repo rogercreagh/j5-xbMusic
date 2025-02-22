@@ -27,7 +27,35 @@
 			class="info"
 		/>
 		
-        <field name="space1" type="spacer" hr="true" />
+        <field name="space2" type="spacer" hr="true" />
+        
+        <field name="azuracast" type="radio"
+        	label="Azuracast Integration"
+        	description="Enable if you have API access to a Azuracast intance."
+ 			class="btn-group btn-group-yesno"
+			default="0" 
+        >
+				<option value="0">Off</option>
+				<option value="1">On</option>	
+        </field>
+        
+        <field name="azura_apikey" type="text"
+        	label="Azuracast API Key"
+        	description="Enter your full api key as generated on Azuracast"
+			size="50"
+			hint="1234567890123456:12345678901234567890123456789012"
+			showon="azuracast:1"
+        />
+        
+        <field name="azura_url" type="url"
+        	label="Azuracast Server URL"
+        	description="Enter the fullurlto the root of your azuracast instance"
+			size="50"
+			hint="https://mystation.uk/s"
+			showon="azuracast:1"
+        />
+        
+        <field name="space3" type="spacer" hr="true" />
         
 		<field name="devmode" type="radio" 
 			label="Developer Mode"

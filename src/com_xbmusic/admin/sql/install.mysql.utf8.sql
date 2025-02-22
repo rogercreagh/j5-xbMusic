@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `album_id` int(10),
   `discno` varchar(10) NOT NULL DEFAULT '1/1',
   `disctracks` tinyint(4) NOT NULL DEFAULT '0',
-  `trackno` tinyint(4) NOT NULL DEFAULT '0',
+  `trackno` int(10) NOT NULL DEFAULT '0',
   `ext_links` mediumtext,
   `azuracast_id` varchar(30) NOT NULL DEFAULT '',
   `catid` int(10) NOT NULL  DEFAULT '0',
