@@ -12,7 +12,7 @@
 defined('_JEXEC') or die;
 
 /** constants used by class Xbtext first parameter to flag text modifiers
- * second paramter is an optional class
+ * second paramter to Xbtext is an optional class naem string
  **/
 //bitwise flags to modify or wrap text, default  is 0 = transform
 define('XBSP1', 1); //add a space before the text

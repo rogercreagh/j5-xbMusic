@@ -39,7 +39,7 @@
 				<option value="1">On</option>	
         </field>
         
-        <field name="azura_apikey" type="text"
+        <field name="az_apikey" type="text"
         	label="Azuracast API Key"
         	description="Enter your full api key as generated on Azuracast"
 			size="50"
@@ -47,9 +47,9 @@
 			showon="azuracast:1"
         />
         
-        <field name="azura_url" type="url"
+        <field name="az_url" type="url"
         	label="Azuracast Server URL"
-        	description="Enter the fullurlto the root of your azuracast instance"
+        	description="Enter the full urlto the root of your azuracast instance"
 			size="50"
 			hint="https://mystation.uk/s"
 			showon="azuracast:1"

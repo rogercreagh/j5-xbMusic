@@ -38,7 +38,11 @@ class HtmlView extends BaseHtmlView {
         $this->params      = $this->get('State')->get('params');
                 
         $this->tagparentids = $this->params->get('playlisttagparents',[]);
+        $this->azuracast = $this->params->get('azuracast','0');
+        $this->az_apikey = $this->params->get('az_apikey','');
+        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
             
+        }
             // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

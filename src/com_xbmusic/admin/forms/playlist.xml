@@ -27,6 +27,23 @@
 			hint="JFIELD_ALIAS_PLACEHOLDER"
 			size="40" 
 		/>
+
+		<field name="az_stationid" type="number" 
+			label="Azuracast Station ID"
+			description="The internal azuracast id for the station" 
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+
+		<field name="az_id" type="number" 
+			label="Azuracast Playlist ID"
+			description="The internal azuracast id for the playlist on the station" 
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+
+		
+		
 		
 <!--	</fieldset>
 	

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.18.8 11th November 2024
+ * @version 0.0.40.0 25th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,7 +14,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Changelog\Changelog;
-//use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 //use Joomla\CMS\Toolbar\Toolbar;
 //use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -24,6 +24,7 @@ use DOMDocument;
 use ReflectionClass;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 //use CBOR\OtherObject\TrueObject;
 
 class DashboardModel extends ListModel {
@@ -42,14 +43,32 @@ class DashboardModel extends ListModel {
      */
     public function getClient() {
         $result = array();
-        $client = Factory::getApplication()->client;
+        $app = Factory::getApplication();
+        $client = $app->client;
         $class = new ReflectionClass('Joomla\Application\Web\WebClient');
         $constants = array_flip($class->getConstants());
         
         $result['browser'] = $constants[$client->browser].' '.$client->browserVersion;
         $result['platform'] = $constants[$client->platform].($client->mobile ? ' (mobile)' : '');
         $result['mobile'] = $client->mobile;
+        $result['userip'] = $app->input->server->get('REMOTE_ADDR','not available');
         return $result;
+    }
+    
+    public function getStations() {
+        $api = new AzApi();
+        $stations = $api->azStations();
+        if ($stations) {
+            foreach ($this->stations as &$station) {
+                $station->playlists = $this->azPlaylists($station->id);
+            }
+        }
+        return $api->azStations();
+    }
+    
+    public function azPlaylists(int $stid) {
+        $api = new AzApi();
+        return $api->azPlaylists($stid);
     }
     
     /**

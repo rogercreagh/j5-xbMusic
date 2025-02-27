@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.40.1 26th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -34,6 +34,15 @@ class HtmlView extends BaseHtmlView {
         $params = ComponentHelper::getParams('com_xbmusic');
         $notres = '<span class="xbbadge badge-lt-green">not restricted</span>';
         $catbadge = '<span class="xbbadge badge-cat">';        
+        
+        $this->azuracast = $params->get('azuracast','0');
+        $this->az_apikey = $params->get('az_apikey','0');
+        $this->az_url = $params->get('az_url','');
+        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
+            $this->stations = $this->get('Stations');
+        } else {
+            $this->stations = [];
+        }
         
         $rootcat_album = $params->get('rootcat_album',0);
         if ($rootcat_album == 0) {
@@ -235,6 +244,19 @@ class HtmlView extends BaseHtmlView {
     
     private function itemstr($items, $tag) {
         if (empty($items)) return '';
+        $itemslist = '<li></li>';
+        if (is_array($items['item'])) {
+            foreach ($items['item'] as $item) {
+                if ((!$this->titleok) || !(str_starts_with($item, '<h3>'))) {
+                    $itemslist = '<li>'.$item.'</li>';
+                    
+                }
+            }
+        } else {
+            // if ($items['item']=='') return '';
+            $itemslist = '<li>'.$items['item'].'</li>';
+        }
+        if ($itemslist == '<li></li>' ) return '';
         $ans =  '<div class="changelog"><div class="changelog__item"><div class="changelog__tag">';
         $ans .=  '<span class="badge ';
         if (key_exists($tag, $this->colours)) {
@@ -245,16 +267,8 @@ class HtmlView extends BaseHtmlView {
         }
         $ans .=  '</div>';
         $ans .=  '<div class="changelog__list"><ul>';
-        if (is_array($items['item'])) {
-            foreach ($items['item'] as $item) {
-                if ((!$this->titleok) || !(str_starts_with($item, '<h3>'))) {
-                    $ans .= '<li>'.$item.'</li>';
-                }
-            }
-        } else {
-            $ans .= $items['item'];
-        }
-        $ans .=  '</li></ul>';
+        $ans .= $itemslist;
+        $ans .=  '</ul>';
         $ans .=  '</div></div></div>';
         return $ans;
     }

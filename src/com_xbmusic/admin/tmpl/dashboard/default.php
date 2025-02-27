@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.40.1 26th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,6 +17,7 @@ use Joomla\CMS\Router\Route;
 // use Joomla\CMS\Layout\LayoutHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 HTMLHelper::_('behavior.multiselect');
 HTMLHelper::_('formbehavior.chosen', 'select');
@@ -238,9 +239,10 @@ HTMLHelper::_('formbehavior.chosen', 'select');
           	</div>
           	
 			<div id="xbinfo" class="xbwp40 pull-left" style="max-width:400px;">
+				<div>
 		        	<?php echo HTMLHelper::_('bootstrap.startAccordion', 'slide-dashboard', array('active' => 'sysinfo')); ?>
-	        		<?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('System Info.'), 'sysinfo','xbaccordion'); ?>
-            			<p><b><?php echo Text::_( 'xbMusic' ); ?></b>
+	        		<?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_SYS_INFO'), 'sysinfo','xbaccordion'); ?>
+            			<p><b>xbMusic</b>
     						<br /><?php echo Text::_('XB_VERSION').': <b>'.$this->xmldata['version'].'</b> '.
     							$this->xmldata['creationDate'];?>
                       	</p>
@@ -254,15 +256,17 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						} ?>
                         <div class="clearfix"></div>
                         <hr />
-                      	<p><b><?php echo Text::_( 'XB_YOUR_CLIENT'); ?></b>
-    						<br/><?php echo Text::_( 'XB_PLATFORM' ).' '.$this->client['platform'].'<br/>'.Text::_( 'XB_BROWSER').' '.$this->client['browser']; ?>
+                      	<p><b><?php echo Text::_( 'XB_YOUR_CLIENT'); ?></b><br />
+                      		<?php echo Text::_('XB_YOUR_IP').Xbtext::_($this->client['userip'],XBSP1+XBBR); 
+    						  echo Text::_( 'XB_PLATFORM' ).Xbtext::_($this->client['platform'],XBSP1+XBBR); 
+    						  echo Text::_( 'XB_BROWSER').Xbtext::_($this->client['browser'],XBSP1); ?>
                      	</p>
     				<?php echo HtmlHelper::_('bootstrap.endSlide'); ?>
 	        		<?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_KEY_CONFIG_OPTIONS'), 'keyconfig','xbaccordion'); ?>
 	        			<p><?php echo Text::_('XBMUSIC_CONFIG_SETTINGS'); ?>:
 	        			</p>
 	        			<dl class="xbdlinline">
-	        				<dt><?php echo Text::_('Music Folder'); ?>: </dt>
+	        				<dt><?php echo Text::_('XBMUSIC_MUSIC_FOLDER'); ?>: </dt>
 	        					<dd><?php echo XbmusicHelper::$musicBase; ?></dd>
 	        				<dt><?php echo 'ID3 Genre'; ?></dt>
 	        					<dd><?php echo $this->id3genreuse; ?></dd>
@@ -284,7 +288,47 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                             echo Text::_('XB_BEER_LINK');
                         }?>
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
-					<?php echo HTMLHelper::_('bootstrap.endAccordion'); ?>
+				<?php if($this->azuracast == 1) : ?>
+                      <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard','Azuracast Stations' , 'stations','xbaccordion'); ?>
+					<?php if($this->stations) : ?>
+						<?php foreach($this->stations as $station) : ?>
+							<h4><?php echo $station->name; ?></h4>               
+                        	<dl class="xbdl">
+                        		<dt>Az ID</dt>
+                         		<dd><?php echo $station->id; ?></dd>
+                        		<dt>Website</dt>
+                         		<dd><?php echo $station->url; ?></dd>
+                        		<dt>Listen</dt>
+                         		<dd><?php echo $station->listen_url; ?></dd>
+                        		<dt>Player</dt>
+                         		<dd><?php echo $station->public_player_url; ?></dd>
+                         		<?php if ($station->playlists) : ?>
+                         		<dt><?php echo count($station->playlists); ?> Playlists</dt>
+                         			<dd><?php foreach($station->playlists as $playlist) {
+                         			    if ($playlist->is_enabled) {
+                             			    echo $playlist->name.' ('.$playlist->num_songs.' tracks';
+                         			        if ($playlist->schedule_items) echo ' Scheduled';
+                         			        echo '<br />';
+                         			    }
+                         			}?>
+                         		<?php endif; ?>
+                         		</dd>
+                         		}?>
+                       		</dl>                                
+ 						<?php endforeach; ?>
+ 					<?php else : ?>
+                  		<p><i>No stations found at <code><?php echo $this->az_url; ?></code><br />Please check Azuracast URL and API key in config settings.</i>
+					<?php endif; ?>
+                      	<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
+				<?php endif; ?>
+
+
+						<?php echo HTMLHelper::_('bootstrap.endAccordion'); ?>
+					<?php else : ?>
+                  		<p><i>No stations found at <?php echo $this->az_url; ?>. Please check Azuracast URL and API key.</i>
+					<?php endif; ?>
+				</div>				
+				<?php endif; ?>
 			</div>
 			<div class="clearfix"></div>
 		</div>	

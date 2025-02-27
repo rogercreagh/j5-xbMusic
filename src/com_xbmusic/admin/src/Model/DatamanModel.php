@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.30.7 16th February 2025
+ * @version 0.0.41.0 27th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -22,6 +22,7 @@ use DirectoryIterator;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
+use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
 
 
@@ -425,63 +426,6 @@ class DatamanModel extends AdminModel {
 //        return file_get_contents($file->getPathname);
     }
     
-//     public function writelog(string $logstr, $filename = '') {
-//         if ($filename == '') {
-//             $filename = 'import_'.date('Y-m-d').'.log';
-//         }
-//         $logstr .= $this->readlog($filename);
-//         $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
-//         $f = fopen($pathname, 'w');
-//         fwrite($f, $logstr);
-//         fclose($f);
-//     }
-    
-//     public function readlog(string $filename) {
-//         $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
-//         return file_get_contents($pathname);
-//         $logstr = '';
-//         if ((file_exists($pathname)) && (filesize($pathname) > 0)) {
-//             $f = fopen($pathname,'r');
-//             if ($f) {
-//                 $logstr = fread($f, filesize($pathname));
-//                 fclose($f);
-//             } else {
-//                 Factory::getApplication()->enqueueMessage('readLog() Could not open file <code>/xbxbmusic-logs/'.$filename.'</code> - is it locked?', 'Warning');
-//             }
-//         }
-//         return $logstr;
-//     }
-    
-//    private function addArtistSongs($artistid, $songList) {
-//        $cnt = 0;
-//         $db = Factory::getDbo();
-//         $query = $db->getQuery(true);
-//         foreach ($songList as $song) {
-//            //check if this link alreasdy exists
-//             $query->where($db->qn('artist_id').' = '.$db->q($artistid));
-//             $query->where($db->qn('song_id').' = '.$db->q($song['song_id']));
-//             $query->select('id')->from('#__xbmusic_artistsong');
-//             $db->setQuery($query);
-//             if ($db->loadResult()>0) {
-//                 //skipping this one already exists, could update role note and listorder
-//             } else {
-//                 if (!key_exists('listorder', $song)) $song['listorder'] = 0;
-//                 $query->clear();
-//                 $query->insert($db->quoteName('#__xbmusic_artistsong'));
-//                 $query->columns('artist_id,song_id,role,note,listorder');
-//                 $query->values('"'.$artistid.'","'.$song['song_id'].'","'.$song['role'].'","'.$song['note'].'","'.$song['listorder'].'"');
-//                 try {
-//                     if ($db->setQuery($query)) $cnt++;
-//                     $db->execute();                                    
-//                 } catch (\Exception $e) {
-//                     $dberr = $e->getMessage();
-//                     Factory::getApplication()->enqueueMessage($dberr.'<br />Query: '.$query->dump(), '');
-//                 }
-//             }
-//         }
-//        return $cnt;
-//    }
-    
    
     public function newsymlink($targ, $name) {
         $res = false;
@@ -547,6 +491,25 @@ class DatamanModel extends AdminModel {
             }
         }
         return $result;
+    }
+    
+    public function getAzStations() {
+        $api = new AzApi();
+        return $api->azStations();
+    }
+    
+    public function azPlaylists(int $stid) {
+        $api = new AzApi();
+        return $api->azPlaylists($stid);
+    }
+    
+    public function azPlaylistPls(int $stid, int $plid) {
+        $api = new AzApi();
+        return $api->azPlaylistPls($stid, $plid);
+    }
+    
+    public function getAzuracast() {
+        
     }
 }
 

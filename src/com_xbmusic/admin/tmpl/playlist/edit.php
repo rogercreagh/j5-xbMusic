@@ -71,11 +71,19 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
+    	<?php if(($this->azuracast == 1) && ($this->az_apikey) != '') : ?>
+    		<div class="row">
+    			<div class="col-md-12">
+    				<p>if azid=0 then select station to get list of playlists from station, then button to load playlists
+    					for each azplaylist if azid exists in xbplaylists then update info, otherwise create playlist
+    			</div>
+    		</div>
+    	<?php endif; ?>
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('XB_GENERAL')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
   					<div class="row">
@@ -84,7 +92,7 @@ $input = Factory::getApplication()->getInput();
         				</div>
 		           		<div class="col-12 col-lg-6">
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
-		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
+		           					<?php echo Text::_('XB_PREVIEW_MARKDOWN'); ?>
 		           				</div>
 								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
@@ -122,7 +130,7 @@ $input = Factory::getApplication()->getInput();
     		</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
          
-		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKS')); ?>
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
      			<h4><?php echo Text::_('XBMUSIC_LINKS_TO_TRACKS')?></h4>
@@ -147,7 +155,7 @@ $input = Factory::getApplication()->getInput();
 		</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('XB_PUBLISHING')); ?>
         <div class="row">
             <div class="col-12 col-lg-6">
                 <fieldset id="fieldset-publishingdata" class="options-form">
@@ -169,9 +177,9 @@ $input = Factory::getApplication()->getInput();
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php if ($this->canDo->get('core.admin') ) : ?>
-            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('Permissions')); ?>
+            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('XB_PERMISSIONS')); ?>
             <fieldset id="fieldset-rules" class="options-form">
-                <legend><?php echo Text::_('User Group Permissions'); ?></legend>
+                <legend><?php echo Text::_('XB_USER_GROUP_PERMISSIONS'); ?></legend>
                 <div>
                 	<?php echo $this->form->getInput('rules'); ?>
                 </div>
