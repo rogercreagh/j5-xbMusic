@@ -240,9 +240,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `params` mediumtext NOT NULL DEFAULT '',
   `note` mediumtext,
   PRIMARY KEY (`id`),
-  UNIQUE (`az_id`)
-  UNIQUE (`alias`),
-  UNIQUE (`filepathname`)
+  UNIQUE (`az_id`),
+  UNIQUE (`alias`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 #CREATE UNIQUE INDEX `stationaliasindex` ON `#__xbmusic_azstations` (`alias`);
