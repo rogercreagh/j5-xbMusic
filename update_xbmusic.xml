@@ -14,7 +14,7 @@
         <tags>
           <tag>alpha</tag>
         </tags>
-        <sha256>9d3c600902b4ec3011e9af97a4851cf2ba7b8b9269e420a4b0227fa96942915a</sha256>
+        <sha256>d6cfc8bf4eb2b0576645fa596029fd9397986c8decf7cf5092164f16b9ee6213</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
@@ -35,7 +35,7 @@
         <tags>
           <tag>alpha</tag>
         </tags>
-        <sha256>d6cfc8bf4eb2b0576645fa596029fd9397986c8decf7cf5092164f16b9ee6213</sha256>
+        <sha256>9d3c600902b4ec3011e9af97a4851cf2ba7b8b9269e420a4b0227fa96942915a</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
