@@ -2,10 +2,10 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.41.1</version>
+		<version>0.0.41.2</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.41.1</h3> Updated 28th February 2025]]></item>
-			<item>Update server working</item>
+			<item><![CDATA[<h3>Alpha Release v0.0.41.2</h3> Updated 28th February 2025]]></item>
+			<item>Database changes</item>
 		</addition>
 		<remove>
 		</remove>
