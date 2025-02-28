@@ -59,11 +59,11 @@ class DashboardModel extends ListModel {
         $api = new AzApi();
         $stations = $api->azStations();
         if ($stations) {
-            foreach ($this->stations as &$station) {
+            foreach ($stations as &$station) {
                 $station->playlists = $this->azPlaylists($station->id);
             }
         }
-        return $api->azStations();
+        return $stations;
     }
     
     public function azPlaylists(int $stid) {

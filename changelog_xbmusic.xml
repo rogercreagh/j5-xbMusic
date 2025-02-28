@@ -2,6 +2,35 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.41.1</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.41.1</h3> Updated 28th February 2025]]></item>
+			<item>Update server working</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item></item>
+		</change>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item></item>
+		</fix>
+		<note>
+			<item>Playlist functions missing</item>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.41.0</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.41.0</h3> Updated 27th February 2025]]></item>

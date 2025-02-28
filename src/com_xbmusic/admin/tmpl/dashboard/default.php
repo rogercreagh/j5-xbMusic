@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.40.1 26th February 2025
+ * @version 0.0.41.1 28th February 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -288,47 +288,55 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                             echo Text::_('XB_BEER_LINK');
                         }?>
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
-				<?php if($this->azuracast == 1) : ?>
-                      <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard','Azuracast Stations' , 'stations','xbaccordion'); ?>
-					<?php if($this->stations) : ?>
-						<?php foreach($this->stations as $station) : ?>
-							<h4><?php echo $station->name; ?></h4>               
-                        	<dl class="xbdl">
-                        		<dt>Az ID</dt>
-                         		<dd><?php echo $station->id; ?></dd>
-                        		<dt>Website</dt>
-                         		<dd><?php echo $station->url; ?></dd>
-                        		<dt>Listen</dt>
-                         		<dd><?php echo $station->listen_url; ?></dd>
-                        		<dt>Player</dt>
-                         		<dd><?php echo $station->public_player_url; ?></dd>
-                         		<?php if ($station->playlists) : ?>
-                         		<dt><?php echo count($station->playlists); ?> Playlists</dt>
-                         			<dd><?php foreach($station->playlists as $playlist) {
-                         			    if ($playlist->is_enabled) {
-                             			    echo $playlist->name.' ('.$playlist->num_songs.' tracks';
-                         			        if ($playlist->schedule_items) echo ' Scheduled';
-                         			        echo '<br />';
-                         			    }
-                         			}?>
-                         		<?php endif; ?>
-                         		</dd>
-                         		}?>
-                       		</dl>                                
- 						<?php endforeach; ?>
- 					<?php else : ?>
-                  		<p><i>No stations found at <code><?php echo $this->az_url; ?></code><br />Please check Azuracast URL and API key in config settings.</i>
+					<?php if($this->azuracast == 1) : ?>
+                        <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard','Azuracast Stations' , 'stations','xbaccordion'); ?>
+    					<?php if($this->stations) : ?>
+    						<?php foreach($this->stations as $station) : ?>
+    							<h4 class="xbr11"><?php echo $station->name; ?></h4>               
+                            	<dl>
+                            		<dt>Az ID</dt>
+                             		<dd><?php echo $station->id; ?></dd>
+                             		<?php if (isset($station->url)) : ?>
+                                		<dt>Website</dt>
+                                 		<dd><a href="<?php echo $station->url; ?>" target="_blank">
+                                 			<?php echo $station->url; ?></a></dd>
+                                 	<?php endif; ?>
+                             		<?php if (isset($station->listen_url)) : ?>
+                                		<dt>Stream</dt>
+                                 		<dd><a href="<?php echo $station->listen_url; ?>" target="_blank">
+                                 			<?php echo $station->listen_url; ?></a></dd>
+                                    <?php endif; ?>
+                             		<?php if (isset($station->public_player_url)) : ?>
+	                            		<dt>Public page</dt>
+                                 		<dd><a href="<?php echo $station->public_player_url; ?>" target="_blank">
+                                 			<?php echo $station->public_player_url; ?></a></dd>
+                                   	<?php endif; ?>
+                             		<?php if ($station->playlists) : ?>
+                             			<?php if (isset($station->playlists->error)) : ?>
+                             			 	<p><i>Could not access playlists</i></p>
+                             			<?php else : ?>
+                             				
+                                     		<dt><?php echo count((array) $station->playlists); ?> Playlists</dt>
+                                     		<dd><ul><?php foreach($station->playlists as $playlist) {
+                                     			    if ($playlist->is_enabled) {
+                                         			    echo '<li>'.$playlist->name.' ('.$playlist->num_songs.' tracks)';
+                                     			        if ($playlist->schedule_items) echo ' <i>Scheduled</i>';
+                                     			        echo '</li>';
+                                     			    }
+                                     			} ?>
+                                 			</ul></dd>
+                             			<?php endif; ?>
+                             		<?php endif; ?>
+                           		</dl>                                
+     						<?php endforeach; ?>
+     					<?php else : ?>
+                      		<p><i>No stations found at <code><?php echo $this->az_url; ?></code><br />Please check Azuracast URL and API key in config settings.</i>
+    					<?php endif; ?>
+                   		<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
 					<?php endif; ?>
-                      	<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
-				<?php endif; ?>
 
-
-						<?php echo HTMLHelper::_('bootstrap.endAccordion'); ?>
-					<?php else : ?>
-                  		<p><i>No stations found at <?php echo $this->az_url; ?>. Please check Azuracast URL and API key.</i>
-					<?php endif; ?>
+					<?php echo HTMLHelper::_('bootstrap.endAccordion'); ?>
 				</div>				
-				<?php endif; ?>
 			</div>
 			<div class="clearfix"></div>
 		</div>	

@@ -12,6 +12,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\Helper;
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Button\ActionButton;
@@ -24,41 +25,47 @@ class AzApi {
     protected $azurl;
     protected $authorization;
     
+
     public function __construct() {
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->authorization = "Authorization: Bearer ".$params->get('az_apikey');
-        $this->azurl = trim($params->get('az_url',''),'/').'/api/stations';
+        $this->azurl = trim($params->get('az_url',''),'/').'/api';
         $this->apikey = $params->get('az_apikey');        
     }
     
     public function azStations() {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $this->azurl);
-        $result = curl_exec($ch);
-        curl_close($ch);
-        return json_decode($result);
+        $url=$this->azurl.'/stations';
+        $result = $this->azApiGet($url);
+        return $result;
     }
     
     public function azPlaylists(int $stid) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $this->azurl.'/'.$stid.'/playlists');
-        $result = curl_exec($ch);
-        curl_close($ch);
-        return json_decode($result);
+        $url=$this->azurl.'/station/'.$stid.'/playlists';
+        $result = $this->azApiGet($url);
+        return $result;
     }
     
+    
     public function azPlaylistPls(int $stid,  int $plid) {
+        $url=$this->azurl.'/station/'.$stid.'/playlist/'.$plid.'/export/pls';
+        $result = $this->azApiGet($url);
+        return $result;
+    }
+    
+    private function azApiGet($url) {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $this->azurl.'/'.$stid.'/playlist/'.$plid.'/export/pls');
+        curl_setopt($ch, CURLOPT_URL, $url);
         $result = curl_exec($ch);
         curl_close($ch);
-        return $result;
+        $result = json_decode($result);
+        if (isset($result->code)){
+            Factory::getApplication()->enqueueMessage('Azuracast API Error: code '.$result->code.' - '.$result->type.
+                '<br />'.$result->formatted_message.'<br />'.'URL: '.$url,'Error');
+            $result = (object) ['error' => true];
+        }
+        return $result;       
     }
     
 }
