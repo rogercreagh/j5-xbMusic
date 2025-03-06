@@ -223,7 +223,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `az_info` mediumtext,
   `az_apikey` varchar(80),
   `az_apiname` varchar(80),
-  `az_url` varchar(190) COMMENT `base url only`,
+  `az_url` varchar(190) COMMENT 'base url only',
   `az_mediapath` varchar(190),
   `az_stream` varchar(190) NOT NULL DEFAULT '',
   `website` varchar(190) NOT NULL DEFAULT '',

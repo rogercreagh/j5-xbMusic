@@ -319,9 +319,11 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $db->setQuery('DROP TABLE IF EXISTS   
               `#__xbmusic_albums`,
               `#__xbmusic_artists`,
+              `#__xbmusic_azstations,`
               `#__xbmusic_playlists`,
               `#__xbmusic_songs`,
               `#__xbmusic_tracks`,
+              `#__xbmusic_artistgroup`,
               `#__xbmusic_trackartist`,
               `#__xbmusic_trackplaylist`,
               `#__xbmusic_tracksong`
