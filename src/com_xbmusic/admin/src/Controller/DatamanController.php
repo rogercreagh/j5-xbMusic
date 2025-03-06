@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.19.4 9th January 2025
+ * @version 0.0.41.4 3rd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -54,6 +54,30 @@ class DatamanController extends FormController
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
     }
+    
+    function importazstations() {
+//        $jip = Factory::getApplication()->getInput();
+//        $post   = $jip->get('jform', 'array()', 'ARRAY');
+//        if ($post['loadazid']>0) {
+            $model = $this->getModel('dataman');
+            $wynick = $model->importAzStations();
+            $redirectTo =('index.php?option=com_xbmusic&view=dataman');
+            $this->setRedirect($redirectTo );
+//        }
+    }
+    
+//     function importazst() {
+//         $jip = Factory::getApplication()->getInput();
+//         $post   = $jip->get('jform', 'array()', 'ARRAY');
+//         if ($post['loadazid']>0) {
+//             $model = $this->getModel('dataman');
+//             $wynick = $model->loadAzSt($post['loadazid'],true);
+//             $redirectTo =('index.php?option=com_xbmusic&view=dataman');
+//             $this->setRedirect($redirectTo );
+//         }
+//     }
+    
+//     }
     
     function makesymlink() {
         $jip =  Factory::getApplication()->input;

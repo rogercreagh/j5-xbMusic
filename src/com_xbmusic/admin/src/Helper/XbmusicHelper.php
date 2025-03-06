@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.30.7 16th February 2025
+ * @version 0.0.41.4 5th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -829,5 +829,71 @@ class XbmusicHelper extends ComponentHelper
 	public static function setID3image($imgfilename, $trackfilename) {
 	    
 	}
+	
+	/************ AZURACAST STATION FUNCTIONS ************/
+	
+	public static function getStations() {
+	    $dbstations = [];
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->from('#__xbmusic_azstations');
+	    $db->setQuery($query);
+	    $dbstations = $db->loadAssocList();	    
+	    return $dbstations;
+	}
+	
+    /**
+     * @name getDbStationId()
+     * @desc given the id returns staion details from database
+     * @param int $dbstid - the id column value
+     * @return mixed|NULL - associative array or null
+     */
+	public static function getDbStation(int $dbstid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->from('#__xbmusic_azstations');
+	    $query->where($db->qn('id').' = '. $dbstid);
+	    $db->setQuery($query);
+	    return $db->loadAssoc();
+	}
+	
+	/**
+	 * @name getDbStationAzId()
+	 * @desc given the az_id returns staion details from database
+	 * @param int $azstid - the az_id column value
+	 * @return mixed|NULL - associative array or null
+	 */
+	public static function getAzStation(int $azstid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->from('#__xbmusic_azstations');
+	    $query->where($db->qn('az_id').' = '. $azstid);
+	    $db->setQuery($query);
+	    return $db->loadAssoc();
+	}
+	
+    /**
+     * @name getAzstationPlaylists()
+     * @desc gets playlists assigned to a given Az Station ID
+     * @param int $azstid
+     * @return mixed|NULL
+     */
+	public static function getAzstationPlaylists(int $azstid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->from('#__xbmusic_playlists');
+	    $query->where($db->qn('az_id').' = '. $azstid);
+	    $db->setQuery($query);
+	    return $db->loadAssoc();
+	    
+	}
+	
 	
 } //end xbmusicHelper

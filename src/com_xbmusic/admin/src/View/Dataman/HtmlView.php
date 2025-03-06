@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.19.4 9th January 2025
+ * @version 0.0.41.3 2nd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -22,6 +22,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 // use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -33,6 +34,16 @@ class HtmlView extends BaseHtmlView {
     public function display($tpl = null) {
 
         $params = ComponentHelper::getParams('com_xbmusic');
+        $this->azuracast = $params->get('azuracast',0);
+        $this->xbstations = XbmusicHelper::getStations();
+        if ($this->azuracast ==1) {
+            $api = new AzApi;
+            $this->apiname = $params->get('az_apiname','missing');
+            $this->azurl = $params->get('az_url','missing');
+            $this->azstations = $api->azStations();
+        } else {
+            $this->azstations = '';
+        }
         $this->form = $this->get('Form');
         $this->basemusicfolder = XbmusicHelper::$musicBase;
         $this->log = $this->get('LastImportLog');

@@ -41,17 +41,24 @@
         
         <field name="az_apikey" type="text"
         	label="Azuracast API Key"
-        	description="Enter your full api key as generated on Azuracast"
+        	description="Enter a default api key as generated on Azuracast, this will be saved with the station"
 			size="50"
 			hint="1234567890123456:12345678901234567890123456789012"
 			showon="azuracast:1"
         />
         
+        <field name="az_apiname" type="text"
+        	label="API User:Keyname"
+        	description="The user and name you gave your api key on Azuracast, this will be saved with the station"
+			size="50"
+			showon="azuracast:1"
+        />
+        
         <field name="az_url" type="url"
         	label="Azuracast Server URL"
-        	description="Enter the full urlto the root of your azuracast instance"
+        	description="Enter the full url to the root of your azuracast instance, this will be saved with the station"
 			size="50"
-			hint="https://mystation.uk/s"
+			hint="https://mystation.uk"
 			showon="azuracast:1"
         />
         

@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.30.0 5th February 2025
+# sql installation file for component xbMusic 0.0.41.3 3rd March 2025
 # NB no data is installed with this file, default categories are created by the installation script
 # NB additional indicies for alias fields not created here as conflicts with re-install if data saved
 
@@ -221,10 +221,13 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `alias` varchar(190) NOT NULL,
   `description` mediumtext,
   `az_info` mediumtext,
-  `mediapath` varchar(190),
-  `listen_url` varchar(190) NOT NULL DEFAULT '',
-  `url` varchar(190) NOT NULL DEFAULT '',
-  `public_player_url` varchar(190) NOT NULL DEFAULT '',
+  `az_apikey` varchar(80),
+  `az_apiname` varchar(80),
+  `az_url` varchar(190) COMMENT `base url only`,
+  `az_mediapath` varchar(190),
+  `az_stream` varchar(190) NOT NULL DEFAULT '',
+  `website` varchar(190) NOT NULL DEFAULT '',
+  `az_player` varchar(190) NOT NULL DEFAULT '',
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '1',
   `status` tinyint(3) NOT NULL DEFAULT '1',
@@ -241,7 +244,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `note` mediumtext,
   PRIMARY KEY (`id`),
   UNIQUE (`az_id`),
-  UNIQUE (`alias`)
+  UNIQUE (`alias`),
+  UNIQUE `stid` (`az_id`, `az_url`) USING BTREE
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 #CREATE UNIQUE INDEX `stationaliasindex` ON `#__xbmusic_azstations` (`alias`);

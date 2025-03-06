@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.40.1 26th February 2025
+ * @version 0.0.41.4 5th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -23,6 +23,7 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Joomla\CMS\Helper\TagsHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
 
@@ -38,11 +39,11 @@ class HtmlView extends BaseHtmlView {
         $this->azuracast = $params->get('azuracast','0');
         $this->az_apikey = $params->get('az_apikey','0');
         $this->az_url = $params->get('az_url','');
-        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
-            $this->stations = $this->get('Stations');
-        } else {
-            $this->stations = [];
-        }
+        $this->stations = XbmusicHelper::getStations();            
+ //       if (($this->azuracast == 1) && ($this->az_apikey) != '') {
+ //       } else {
+ //           $this->stations = [];
+ //       }
         
         $rootcat_album = $params->get('rootcat_album',0);
         if ($rootcat_album == 0) {

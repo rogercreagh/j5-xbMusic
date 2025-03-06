@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.41.1 28th February 2025
+ * @version 0.0.41.4 5th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -289,48 +289,30 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                         }?>
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
 					<?php if($this->azuracast == 1) : ?>
-                        <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard','Azuracast Stations' , 'stations','xbaccordion'); ?>
-    					<?php if($this->stations) : ?>
+                        <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard',Text::_('Azuracast Stations') , 'stations','xbaccordion'); ?>
+    					<?php if(!empty($this->stations)) : ?>
     						<?php foreach($this->stations as $station) : ?>
-    							<h4 class="xbr11"><?php echo $station->name; ?></h4>               
-                            	<dl>
-                            		<dt>Az ID</dt>
-                             		<dd><?php echo $station->id; ?></dd>
-                             		<?php if (isset($station->url)) : ?>
-                                		<dt>Website</dt>
-                                 		<dd><a href="<?php echo $station->url; ?>" target="_blank">
-                                 			<?php echo $station->url; ?></a></dd>
-                                 	<?php endif; ?>
-                             		<?php if (isset($station->listen_url)) : ?>
-                                		<dt>Stream</dt>
-                                 		<dd><a href="<?php echo $station->listen_url; ?>" target="_blank">
-                                 			<?php echo $station->listen_url; ?></a></dd>
-                                    <?php endif; ?>
-                             		<?php if (isset($station->public_player_url)) : ?>
-	                            		<dt>Public page</dt>
-                                 		<dd><a href="<?php echo $station->public_player_url; ?>" target="_blank">
-                                 			<?php echo $station->public_player_url; ?></a></dd>
-                                   	<?php endif; ?>
-                             		<?php if ($station->playlists) : ?>
-                             			<?php if (isset($station->playlists->error)) : ?>
-                             			 	<p><i>Could not access playlists</i></p>
-                             			<?php else : ?>
-                             				
-                                     		<dt><?php echo count((array) $station->playlists); ?> Playlists</dt>
-                                     		<dd><ul><?php foreach($station->playlists as $playlist) {
-                                     			    if ($playlist->is_enabled) {
-                                         			    echo '<li>'.$playlist->name.' ('.$playlist->num_songs.' tracks)';
-                                     			        if ($playlist->schedule_items) echo ' <i>Scheduled</i>';
-                                     			        echo '</li>';
-                                     			    }
-                                     			} ?>
-                                 			</ul></dd>
-                             			<?php endif; ?>
-                             		<?php endif; ?>
-                           		</dl>                                
+    							<details>
+    								<summary><?php echo $station['id']; ?> <span class="xbr11"><?php echo $station['title']; ?></span>
+    								</summary>
+									<i>AzURL</i>: 
+									<a href="<?php echo $station['az_url']; ?>" target="_blank">
+                             			<?php echo $station['az_url']; ?></a>
+                             			<br />
+    							    <?php if ($station['az_id']>0 ) : ?>
+    							    	<i>AzID</i>: 
+    							        <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
+    							    <?php else : ?>
+    							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
+    							    <?php endif; ?> 
+    							    <br />
+    							    <i>Website</i>: 
+							     	<a href="<?php echo $station['website']; ?>" target="_blank">
+										<?php echo $station['website']; ?></a>         
+    							</details>
      						<?php endforeach; ?>
      					<?php else : ?>
-                      		<p><i>No stations found at <code><?php echo $this->az_url; ?></code><br />Please check Azuracast URL and API key in config settings.</i>
+                      		<p><i><?php echo Text::_('No stations have been saved yet. Use Dataman - Azuracast tab to fetch available stations'); ?></i>
     					<?php endif; ?>
                    		<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
 					<?php endif; ?>

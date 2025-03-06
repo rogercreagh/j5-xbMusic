@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.40.1 26th February 2025
+ * @version 0.0.41.4 4th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,37 +17,77 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Button\ActionButton;
 use Joomla\Plugin\Fields\SQL\Extension\SQL;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 
 class AzApi {
  
     protected $apikey;
-    protected $azurl;
+    protected $apiname;
+    protected $apiurl;
+    protected $azstid;
     protected $authorization;
     
-
-    public function __construct() {
+    /**
+     * @desc if a db station id is provided will get the url and apikey from database
+     * @desc otherwise will use the values set in component parameters
+     * @param int $dbstid
+     */
+    public function __construct(int $dbstid = 0) {
         $params = ComponentHelper::getParams('com_xbmusic');
-        $this->authorization = "Authorization: Bearer ".$params->get('az_apikey');
-        $this->azurl = trim($params->get('az_url',''),'/').'/api';
-        $this->apikey = $params->get('az_apikey');        
+        if ($dbstid == 0) {
+            $this->apiurl = trim($params->get('az_url',''),'/').'/api';
+            $this->apikey = $params->get('az_apikey',''); 
+            $this->apiname = $params->get('az_apiname'.'');
+            $this->azstid = 0;
+        } else {
+            $station = XbmusicHelper::getDbStation($dbstid);
+            if ($station) {
+                $this->apiurl = $station['az_url'].'/api';
+                $this->apikey = $station['az_apikey'];
+                $this->apiname = $station['az_apiname'];
+                $this->azstid = $station['az_id'];
+            } else {
+                $this->apiurl = trim($params->get('az_url',''),'/').'/api';
+                $this->apikey = $params->get('az_apikey','');
+                $this->apiname = $params->get('az_apiname','');
+                $this->azstid = 0;
+            }
+        }
+        $this->authorization = "Authorization: Bearer ".$this->apikey;
+    }
+    
+    public function getApikey() {
+        return $this->apikey;
+    }
+    
+    public function getApiname() {
+        return $this->apiname;
+    }
+    
+    public function getAzurl() {
+        return str_replace('/api','',$this->apiurl);
     }
     
     public function azStations() {
-        $url=$this->azurl.'/stations';
+        $url=$this->apiurl.'/stations';
         $result = $this->azApiGet($url);
         return $result;
     }
     
-    public function azPlaylists(int $stid) {
-        $url=$this->azurl.'/station/'.$stid.'/playlists';
+    public function azPlaylists() {
+        if ($this->azstid == 0)
+            return (object) ['error' => true, 'msg'=>'Station ID not set'];
+        $url=$this->apiurl.'/station/'.$this->v.'/playlists';
         $result = $this->azApiGet($url);
         return $result;
     }
     
     
-    public function azPlaylistPls(int $stid,  int $plid) {
-        $url=$this->azurl.'/station/'.$stid.'/playlist/'.$plid.'/export/pls';
+    public function azPlaylistPls(int $plid) {
+        if ($this->azstid == 0)
+            return (object) ['error' => true, 'msg'=>'Station ID not set'];
+            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$plid.'/export/pls';
         $result = $this->azApiGet($url);
         return $result;
     }
@@ -63,7 +103,7 @@ class AzApi {
         if (isset($result->code)){
             Factory::getApplication()->enqueueMessage('Azuracast API Error: code '.$result->code.' - '.$result->type.
                 '<br />'.$result->formatted_message.'<br />'.'URL: '.$url,'Error');
-            $result = (object) ['error' => true];
+            $result = (object) ['error' => true, 'msg'=>$result->formatted_message];
         }
         return $result;       
     }

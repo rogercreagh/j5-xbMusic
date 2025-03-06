@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.40.0 25th February 2025
+ * @version 0.0.41.4 5th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -53,22 +53,6 @@ class DashboardModel extends ListModel {
         $result['mobile'] = $client->mobile;
         $result['userip'] = $app->input->server->get('REMOTE_ADDR','not available');
         return $result;
-    }
-    
-    public function getStations() {
-        $api = new AzApi();
-        $stations = $api->azStations();
-        if ($stations) {
-            foreach ($stations as &$station) {
-                $station->playlists = $this->azPlaylists($station->id);
-            }
-        }
-        return $stations;
-    }
-    
-    public function azPlaylists(int $stid) {
-        $api = new AzApi();
-        return $api->azPlaylists($stid);
     }
     
     /**
