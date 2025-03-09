@@ -319,7 +319,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $db->setQuery('DROP TABLE IF EXISTS   
               `#__xbmusic_albums`,
               `#__xbmusic_artists`,
-              `#__xbmusic_azstations,`
+              `#__xbmusic_azstations`,
               `#__xbmusic_playlists`,
               `#__xbmusic_songs`,
               `#__xbmusic_tracks`,
@@ -334,6 +334,14 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 Factory::getApplication()->enqueueMessage($message,'Error');
                 return false;
             }
+            $db->setQuery("DELETE FROM `j512_contentitem_tag_map` WHERE `type_alias` LIKE '%xbmusic%'");
+            $res = $db->execute();
+            if ($res === false) {
+                $message = 'Error clearing xbmusic tag map, please check manually';
+                Factory::getApplication()->enqueueMessage($message,'Error');
+                return false;
+            }
+            
             return true;
         }
 

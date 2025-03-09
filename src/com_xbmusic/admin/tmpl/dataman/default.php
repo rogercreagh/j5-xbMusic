@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.41.4 4th March 2025
+ * @version 0.0.41.5 8th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -60,14 +60,14 @@ $wa->useScript('joomla.dialog')
 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
     
-	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'import', Text::_('Import')); ?>
+	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'import', Text::_('XB_IMPORT')); ?>
 	<div>
             <p class="xbinfo">
-            	<?php echo Text::_('Import tab to import tracks from MP3 file ID3 data by folder or selected files, and to import m3u or pls playlists');?>
+            	<?php echo Text::_('XBMUSIC_IMPORT_DETAILS');?>
             </p>
 <details>
 	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('Import Tracks using ID3 data from music folder/files'); ?></span>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_TRACKS'); ?></span>
 	</summary>	
 	<div class="row form-vertical">
 		<div class="col-md-6">
@@ -108,7 +108,7 @@ $wa->useScript('joomla.dialog')
 <hr />
 <details>
 	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('Import Data from CSV file')?></span>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_CSV')?></span>
 	</summary>
 	<p>tba </p>
 <p>Functionality expected here:</p>
@@ -119,7 +119,7 @@ $wa->useScript('joomla.dialog')
 <hr />
 <details>
 	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('Import Playlist from PLS/3U file')?></span>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_PLAYLIST')?></span>
     </summary>		
 <p>Functionality expected here:</p>
 <ol>
@@ -157,9 +157,9 @@ $wa->useScript('joomla.dialog')
           
 	</div>
    			<?php echo HTMLHelper::_('uitab.endTab'); ?>
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'report', Text::_('Report')); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'report', Text::_('XB_REPORT')); ?>
                 <p class="xbinfo">
-                	<?php echo Text::_('Report tab to generate reports of possible data problems (eg multi-song or mutli-artist tracks, orphan artists, missing album/playlist tracks etc')?>
+                	<?php echo Text::_('XBMUSIC_GENERATE_REPORTS')?>
                 </p>
 <p>Functionality expected here:</p>
 <ol>
@@ -171,7 +171,7 @@ $wa->useScript('joomla.dialog')
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'export', Text::_('Export')); ?>
                 <p class="xbinfo">
-                	<?php echo Text::_('Export tab to export track, song, artist, and album data to csv and playlists to m3u/pls') ?>
+                	<?php echo Text::_('XBMUSIC_EXPORT_DETAILS') ?>
                 </p>
 <p>Functionality expected here:</p>
 <ol>
@@ -182,9 +182,9 @@ $wa->useScript('joomla.dialog')
     <li>Export playlist to M3U/PLS</li>
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'delete', Text::_('Delete')); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'delete', Text::_('XB_DELETE')); ?>
                 <p class="xbinfo">
-                	<?php echo Text::_('Delete tab to clean orphans and redundant links and delete selected data')?>
+                	<?php echo Text::_('XBMUSIC_DELETE_DETAILS')?>
                 </p>
 <p>Functionality expected here:</p>
 <ol>
@@ -200,95 +200,106 @@ $wa->useScript('joomla.dialog')
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 <?php if ($this->azuracast == 1) : ?>
-	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', Text::_('Azuracast')); ?>
+	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
         <p class="xbinfo">
-        	<?php echo Text::_('Azuracast functions');?>
+        	<?php echo Text::_('XBMUSIC_AZURACAST_STATIONS');?>
         </p>
         <div class="row">
         	<div class="col-md-6">
         		<h4>Stations in Database</h4>
         		<?php if (empty($this->xbstations)) : ?>
-        			<p><?php echo Text::_('No stations in database yet. Create by importing from Azuracast');?>
+        			<p><?php echo Text::_('XBMUSIC_NO_STATIONS');?>
         			</p>
         		<?php else : ?>
+            	    	<?php $pophead = Text::_('XBMUSIC_CONFIRM_STAT_DEL'); 
+                            $popsure = '<br />'.Text::_('XB_ARE_YOU_SURE'); ?>
         			<?php foreach ($this->xbstations as $station) : ?>
+            				<?php $popbody = Text::sprintf('XBMUSIC_DELETE_STATION',$station['title']).$popsure;
+            				    $confirm = "doConfirm('".$popbody."','".$pophead."','deletestation');"; ?>
 						<details>
 							<summary>id: <?php echo $station['id']; ?> <span class="xbr11"> <?php echo $station['title']; ?></span>
+								<div class="pull-right">
+									<button id="delst<?php echo $station['id']; ?>" 
+									class="btn btn-sm btn-danger" type="button"
+        							onclick="document.getElementById('jform_dbstid').value=
+        							 <?php echo $station['id'].';'.$confirm; ?>;" >
+									<i class="icon-trash icon-white"></i> <?php echo Text::_('XB_DELETE'); ?>
+									</button>
+								</div>
 							</summary>
+							<br /><i>Website</i>: 
+						    <a href="<?php echo $station['website']; ?>" target="_blank">
+								<?php echo $station['website']; ?></a> 
 							<?php if ($station['az_id']>0 ) : ?>
-							    <i>AzID</i>: 
+							    <p><i>AzID</i>: 
 							    <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
 							    <br />
 								<i>AzURL</i>: 
 								<a href="<?php echo $station['az_url']; ?>" target="_blank">
-                         			<?php echo $station['az_url']; ?></a>
+                         			<?php echo $station['az_url']; ?></a></p>
+								<i>AzAPI User</i>: 
+								<a href="<?php echo $station['az_apiname']; ?>" target="_blank">
+                         			<?php echo $station['az_apiname']; ?></a></p>
 							<?php else : ?>
-						        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
-						        <!-- update button -->
+						        <span class="xbit"><?php echo Xbtext::_('XBMUSIC_AZURACAST_NO_DETAILS'); ?></span>
 							<?php endif; ?> 
-							<br /><i>Website</i>: 
-						    <a href="<?php echo $station['website']; ?>" target="_blank">
-								<?php echo $station['website']; ?></a> 
 							<p class="xb09"><?php echo $station['description'];?></p>        
 						</details>
         			    <hr />
         			<?php endforeach; ?>
-        		<?php endif;?>
-        		<p class="xbit xb09"><?php echo Text::_('Use this button to add any additional stations using the apikey currently in config').' (',$this->apiname.')'; ?>
-    	    	<?php $popbody = 'Import missing stations from Azuracast. Existing stations will not be updated.<br />Are you really sure?'; 
-    	    	  $pophead = 'Confirm Import from Azuracast'; 
-    	    	  $confirm = "doConfirm('".$popbody."','".$pophead."','importazstations');"; 
-    	    	  ?>
-    	    	 <br /><button id="impaz" class="btn btn-warning" type="button" 
-            		onclick="<?php echo $confirm; ?>" >
-    					<i class="icon-upload icon-white"></i> 
-            		<?php echo Text::_('XB_IMPORT'); ?>
-            		</button>        		
-    			</p>
-        		
+        		<?php endif;?>        		
         	</div>
         	<div class="col-md-6">
         		<h4>Stations accessible through API</h4>
         		<?php if ($this->azstations) : ?>
-        			<?php foreach($this->azstations as $station) : ?>
-						<details>
-							<summary><i>AzID</i>: <?php echo $station->id; ?> 
-								<span class="xbr11"> <?php echo $station->name; ?></span>
-							</summary>
-							<i>AzURL</i>: <a href="<?php echo $this->azurl; ?>" target="_blank">
-                         			<?php echo $this->azurl; ?></a>
-                         	<br />
-							<i>Website</i>: 
-						    <a href="<?php echo $station->url; ?>" target="_blank">
-								<?php echo $station->url; ?></a>
-							<br /> 
-							<i>Stream</i>: 
-						    <a href="<?php echo $station->listen_url; ?>" target="_blank">
-								<?php echo $station->listen_url; ?></a> 
-							<br />
-							<i>Public page</i>: 
-						    <a href="<?php echo $station->public_player_url; ?>" target="_blank">
-								<?php echo $station->listen_url; ?></a> 
-							<p class="xb09"><?php echo $station->description;?></p>        							
-						</details>
-						<!-- 
-            	    	<?php //$popbody = $station->name.' will be created or updated.<br />Are you really sure?'; 
-            	    	  //$pophead = 'Confirm Import from Azuracast'; 
-            	    	  //$confirm = "doConfirm(".$popbody."','".$pophead."','loadazst');"; 
-            	    	  ?>
-            	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
-                    		onclick="document.getElementById('jform_loadazid').value=<?php //echo $station->id; ?>;<?php //echo $confirm; ?>" >
-            					<i class="icon-upload icon-white"></i> 
-                    		<?php //echo Text::_('XB_IMPORT'); ?>
-                    		</button>        		
-            			</p>
- 						 -->
-    				<?php endforeach; ?>
-        			<?php // +
-                    		
-                    		echo $this->form->renderField('loadazid'); ?>
+        			<?php if (isset($this->azstations->code)) : ?>
+        			 <p class="xbit xbred"><?php echo Text::_('XBMUSIC_AZURACAST_ERROR').' '.$this->azstations->code; ?>
+        			 	<br /><?php echo $this->azstations->formatted_message; ?>
+        			 	<br /><?php echo Text::_('XBMUSIC_CHECK_TRY_LATER'); ?>
+        			 </p>
+        			<?php else : ?>
+        				<p><?php echo Text::sprintf('XBMUSIC_STATIONS_AVAILABLE_AT', 
+        				    $this->azurl, $this->apiname); ?>
+        				<br /><?php echo Text::_('XBMUSIC_BUTTONS_TO_IMPORT'); ?> 
+            	    	<?php $pophead = Text::_('XBMUSIC_CONFIRM_AZIMPORT'); 
+                            $popsure = '<br />'.Text::_('XB_ARE_YOU_SURE'); ?>
+            			<?php foreach($this->azstations as $station) : ?>
+            				<?php $popbody = Text::sprintf('XBMUSIC_IMPORT_FROM',$station->name,$this->azurl).$popsure;
+            				    $confirm = "doConfirm('".$popbody."','".$pophead."','importazstation');"; ?>
+            				<details>
+    							<summary><i>AzID</i>: <?php echo $station->id; ?> 
+    								<span class="xbr11"> <?php echo $station->name; ?></span>
+    								<div class="pull-right">
+    									<button id="impaz<?php echo $station->id; ?>" 
+    									class="btn btn-sm btn-warning" type="button"
+            							onclick="document.getElementById('jform_loadazid').value=
+            							 <?php echo $station->id.';'.$confirm; ?>;" >
+    									<i class="icon-upload icon-white"></i> <?php echo Text::_('XB_IMPORT'); ?>
+										</button>
+    								</div>
+    							</summary>
+    							<i>AzURL</i>: <a href="<?php echo $this->azurl; ?>" target="_blank">
+                             			<?php echo $this->azurl; ?></a>
+                             	<br />
+    							<i><?php echo Text::_('XB_WEBSITE'); ?></i>: 
+    						    <a href="<?php echo $station->url; ?>" target="_blank">
+    								<?php echo $station->url; ?></a>
+    							<br /> 
+    							<i><?php echo Text::_('XBMUSIC_STREAM'); ?></i>: 
+    						    <a href="<?php echo $station->listen_url; ?>" target="_blank">
+    								<?php echo $station->listen_url; ?></a> 
+    							<br />
+    							<i><?php echo Text::_('XBMUSIC_PUBLIC_PAGE'); ?></i>: 
+    						    <a href="<?php echo $station->public_player_url; ?>" target="_blank">
+    								<?php echo $station->public_player_url; ?></a> 
+    							<p class="xb09"><?php echo $station->description;?></p>        							
+    						</details>
+        				<?php endforeach; ?>
+            			<?php echo $this->form->renderField('loadazid'); ?>
+            			<?php echo $this->form->renderField('dbstid'); ?>
+        			<?php endif; ?>
        			<?php else : ?>
-                      <p><i>No stations found at <code><?php echo $this->az_url; ?></code><br />Please check Azuracast URL and API key in config settings.</i>
+                      <p><i><?php echo Text::sprintf('XBMUSIC_NO_STATIONS',$this->az_url); ?></i>
                 <?php endif; ?>
         	</div>
         </div>
@@ -296,7 +307,7 @@ $wa->useScript('joomla.dialog')
 	<?php echo HTMLHelper::_('uitab.endTab'); ?>
 <?php endif; ?>
 			
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'filemanager', Text::_('Files')); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'filemanager', Text::_('XB_FILES')); ?>
 
         	<?php echo $this->form->renderField('fmnote1'); ?> 
 			<?php if (empty($this->symlinks)) : ?>

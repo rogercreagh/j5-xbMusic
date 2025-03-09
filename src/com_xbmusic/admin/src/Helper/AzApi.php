@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.41.4 4th March 2025
+ * @version 0.0.41.5 8th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -35,6 +35,7 @@ class AzApi {
      */
     public function __construct(int $dbstid = 0) {
         $params = ComponentHelper::getParams('com_xbmusic');
+        if ($params->get('azuracast',0) == 0) return false;
         if ($dbstid == 0) {
             $this->apiurl = trim($params->get('az_url',''),'/').'/api';
             $this->apikey = $params->get('az_apikey',''); 
@@ -75,6 +76,12 @@ class AzApi {
         return $result;
     }
     
+    public function azStation($azstid) {
+        $url=$this->apiurl.'/station/'.$azstid;
+        $result = $this->azApiGet($url);
+        return $result;
+    }
+    
     public function azPlaylists() {
         if ($this->azstid == 0)
             return (object) ['error' => true, 'msg'=>'Station ID not set'];
@@ -100,12 +107,7 @@ class AzApi {
         $result = curl_exec($ch);
         curl_close($ch);
         $result = json_decode($result);
-        if (isset($result->code)){
-            Factory::getApplication()->enqueueMessage('Azuracast API Error: code '.$result->code.' - '.$result->type.
-                '<br />'.$result->formatted_message.'<br />'.'URL: '.$url,'Error');
-            $result = (object) ['error' => true, 'msg'=>$result->formatted_message];
-        }
-        return $result;       
+        return $result;       //check for error code on return to calling function
     }
     
 }

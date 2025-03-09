@@ -431,6 +431,145 @@ class DatamanModel extends AdminModel {
     /************ AZURACAST FUNCTIONS ************/
     
     /**
+     * @name importAzStation()
+     * @desc creates or updates a single station with details from Azuracast 
+     * @desc using the curent config credentials
+     * @param int $azstid
+     * @return int|object - id of new/updated dbstation is ok or error object if fails
+     */
+    public function importAzStation(int $azstid) {
+//        $params = ComponentHelper::getParams('com_xbmusic');
+//        $azurl = $params->get('az_url');
+        $api = new AzApi();
+        $azstation = $api->azStation($azstid);
+        if (isset($azstation->code))
+            return $azstation;            
+        //now test if dbstastion exists ? update ELSE create
+        $dbstid = $this->getDbStid(trim($azstation->url,'/'), $azstation->id);
+        if ($dbstid > 0) {
+            $res = $this->updateDbStation($dbstid,$azstation);
+        } else {
+            $res = $this->createDbStation($azstation);
+        }
+        return $res;
+    }
+    
+    /**
+     * @name getDbStid()
+     * @desc returns the id of a station in the db which has the given azurl and azid
+     * @param string $azurl
+     * @param int $azstid
+     * @return int|NULL null if the query fails
+     */
+    public function getDbStid(string $azurl, int $azstid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('id');
+        $query->from('#__xbmusic_azstations');
+        $query->where($db->qn('az_url').' = '.$db->quote($azurl).' AND '.$db->qn('az_id').' = '.$db->q($azstid));
+        $db->setQuery($query);
+        return $db->loadResult();       
+    }
+    
+    /**
+     * @name updateDbStation()
+     * @replaces the azuracast data in a station with a fresh copy
+     * @param int $dbstid
+     * @param object $azstation
+     * @return \Exception|boolean true if okay
+     */
+    public function updateDbStation(int $dbstid,object $azstation) {
+        $api = new AzApi();
+        $apikey = $api->getApikey();
+        $azurl = $api->getAzurl();
+        $apiname = $api->getApiname();
+        // we need to update title alias apikey apiname azstream website azplayer description az info modified modified_by    
+        $db = $this->getDatabase();
+        $conditions = array('title='.$db->q($azstation->name), 'alias='.$db->q($azstation->shortcode),
+            'az_id='.$db->q($azstation->id), 'az_apikey='.$db->q($apikey), 'az_apiname='.$db->q($apiname),
+            'az_stream='.$db->q($azstation->listen_url), 'website='.$db->q($azstation->url),
+            'az_player='.$db->q($azstation->public_player_url), 'description='.$db->q($azstation->description), 
+            'az_info='.$db->q(json_encode($azstation)), 
+            'modified='.$db->q(Factory::getDate()->toSql()), 'modified_by='.$db->q($this->getCurrentUser()->id));
+        
+        $query = $db->getQuery(true);
+        $query->update($db->qn('#__xbmusic_azstations'));
+        $query->set($conditions);
+        $query->where($db->qn('id').' = '.$db->q($dbstid));
+        try {
+            $db->setQuery($query);
+            $res = $db->execute();
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return $e;
+        }
+        Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_STATION_UPDATED',$dbstid, $azstation->name));
+        return $res;
+    }
+    
+    /**
+     * @name createDbStation()
+     * @desc given details of an azuracast station creates a matching station in database
+     * @param object $station
+     * returns boolean|Exception true if ok
+     */
+    public function createDbStation($station) {
+        $api = new AzApi();
+        $apikey = $api->getApikey();
+        $azurl = $api->getAzurl();
+        $apiname = $api->getApiname();
+        $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
+//        XbcommonHelper::getCreateCat($catdata)
+        $colarr = array('id', 'az_id', 'title', 'alias',
+            'az_apikey', 'az_apiname', 'az_url',
+            'az_stream','website', 'az_player',
+            'catid', 'description', 'az_info',
+            'created','created_by', 'created_by_alias'
+        );
+        $db = $this->getDatabase();
+        $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
+            $db->q($apikey), $db->q($apiname), $db->q($azurl),
+            $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
+            $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
+            $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast')
+        );
+        //$db = Factory::getContainer()->get(DatabaseInterface::cl
+        $query = $db->getQuery(true);
+        $query->insert($db->qn('#__xbmusic_azstations'));
+        $query->columns(implode(',',$db->qn($colarr)));
+        $query->values(implode(',',$values));
+        try {
+            $db->setQuery($query);
+            $res = $db->execute();            
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return $e;
+        }
+        if ($res == true) { 
+            $newid = $db->insertid();
+            Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$station->name));
+        }
+        return $res; 
+    }
+    
+    public function deleteDbStation(int $stid) {
+        //needs dbstid to delete
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->delete($db->qn('#__xbmusic_azstations'));
+        $query->where($db->qn('id').' = '.$db->q($stid));
+        try {
+            $db->setQuery($query);
+            $res = $db->execute();
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return $e;
+        }
+        return $res;
+        //needs to also delete stid from playlists, tracks
+    }
+    
+    /**
      * @name importAzStations()
      * @desc this will retrieve all stations available using the config api key
      * @desc this may not be the same as the key saved with the station in the database
@@ -438,64 +577,64 @@ class DatamanModel extends AdminModel {
      * @desc then a new station will be created
      * @desc existing stations in the database will not be updated
      */
-    public function importAzStations() {
-        $api = new AzApi();
-        $apikey = $api->getApikey();
-        $azurl = $api->getAzurl();
-        $apiname = $api->getApiname();
-        $azstations = $api->azStations();
-        $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id;
-        $uid = $this->getCurrentUser()->id;
+//     public function importAzStations() {
+//         $api = new AzApi();
+//         $apikey = $api->getApikey();
+//         $azurl = $api->getAzurl();
+//         $apiname = $api->getApiname();
+//         $azstations = $api->azStations();
+//         if (isset($azstations->code)) 
+//             return $azstations;
+//         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id;
+//         $uid = $this->getCurrentUser()->id;
         
-        if ($azstations) {
-            //$db = Factory::getContainer()->get(DatabaseInterface::cl
-            $db = Factory::getDbo();
-            $query = $db->getQuery(true);
-            $query->select('az_id');
-            $query->from('#__xbmusic_azstations');
-            $query->where($db->qn('az_url').' = '.$db->q($azurl));
-            $db->setQuery($query);
-            $dbstations = $db->loadColumn();
-            $missing = [];
-            if ($dbstations) {
-                foreach ($azstations as $station) {
-                    if (!in_array($station->id, $dbstations)) {
-                        $missing[] = $station;
-                    }
-                }
-                $colarr = array('id', 'az_id', 'title', 'alias', 
-                    'az_apikey', 'az_apiname', 'az_url',
-                    'az_stream','website', 'az_player', 
-                    'catid', 'description', 'az_info',
-                    'created','created_by', 'created_by_alias'
-                );
-                if (count($missing)>0) {
-                    foreach ($missing as $station) {
-                        $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
-                            $db->q($apikey), $db->q($apiname), $db->q($azurl),
-                            $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
-                            $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
-                            $db->q(Factory::getDate()->toSql()),$db->q($uid), $db->q('import from Azuracast')
-                        );
-                        $query->clear();
-                        $query->insert($db->qn('#__xbmusic_azstations'));
-                        $query->columns(implode(',',$db->qn($colarr)));
-                        $query->values(implode(',',$values));
-                        $db->setQuery($query);
-                        $res = $db->execute();
-                        if ($res == false) Factory::getApplication()->enqueueMessage('sql error '. $query>dump());       
-                    }
-                }
-                
-            }
-        }
-    }
+//         if ($azstations) {
+//             //$db = Factory::getContainer()->get(DatabaseInterface::cl
+//             $db = Factory::getDbo();
+//             $query = $db->getQuery(true);
+//             $query->select('az_id');
+//             $query->from('#__xbmusic_azstations');
+//             $query->where($db->qn('az_url').' = '.$db->q($azurl));
+//             $db->setQuery($query);
+//             $dbstations = $db->loadColumn();
+//             $missing = [];
+//             if ($dbstations) {
+//                 foreach ($azstations as $station) {
+//                     if (!in_array($station->id, $dbstations)) {
+//                         $missing[] = $station;
+//                     }
+//                 }
+//             } else {
+//                 $missing = $azstations;
+//             }
+//             $colarr = array('id', 'az_id', 'title', 'alias', 
+//                     'az_apikey', 'az_apiname', 'az_url',
+//                     'az_stream','website', 'az_player', 
+//                     'catid', 'description', 'az_info',
+//                     'created','created_by', 'created_by_alias'
+//                 );
+//             if (count($missing)>0) {
+//                 foreach ($missing as $station) {
+//                     $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
+//                         $db->q($apikey), $db->q($apiname), $db->q($azurl),
+//                         $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
+//                         $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
+//                         $db->q(Factory::getDate()->toSql()),$db->q($uid), $db->q('import from Azuracast')
+//                     );
+//                     $query->clear();
+//                     $query->insert($db->qn('#__xbmusic_azstations'));
+//                     $query->columns(implode(',',$db->qn($colarr)));
+//                     $query->values(implode(',',$values));
+//                     $db->setQuery($query);
+//                     $res = $db->execute();
+//                     if ($res == false) Factory::getApplication()->enqueueMessage('sql error '. $query>dump());       
+//                 }
+//             }                          
+//         }
+//         return true;
+//     }
     
-    public function loadAzSt($azid) {
-        
-        return false;
-    }
-    
+   
     public function getAzStations() {
         $api = new AzApi();
         return $api->azStations();

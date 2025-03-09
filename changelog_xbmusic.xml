@@ -2,9 +2,9 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.41.4</version>
+		<version>0.0.41.5</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.41.4</h3> Updated 6th March 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.41.5</h3> Updated 8th March 2025]]></item>
 			<item>Database - new table #__xbmusic_azstations</item>
 			<item>Azuracast stations in Dashboard and DataManger tab</item>
 		</addition>
@@ -14,7 +14,8 @@
 			<item>Database new Azuracast related columns in tracks and playlists</item>
 			<item>Config options for Azuracast API key, keyname, and URL</item>
 			<item>Azuracast stations summary in Dashboard</item>
-			<item>Azuracast tab in DataManager showing Azuracast stations in database and missing ones on Azuracast server with option to add to database</item>
+			<item>Azuracast tab in DataManager showing stations in database and ones on Azuracast server</item>
+			<item>Dataman Station options to add new to database, update from Azuracast, and delete from database</item>
 		</change>
 		<language>
 			<item>en-GB only</item>

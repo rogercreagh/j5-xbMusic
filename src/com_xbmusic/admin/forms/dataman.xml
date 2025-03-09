@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.0.41.3 3rd March 2025
+ * @version 0.0.41.5 8th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -87,6 +87,9 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 	<fieldset name="azuracast" label="Azuracast"
 	>
 		<field name="loadazid" type="hidden"
+			default="0"
+		/>
+		<field name="dbstid" type="hidden"
 			default="0"
 		/>
 	</fieldset>

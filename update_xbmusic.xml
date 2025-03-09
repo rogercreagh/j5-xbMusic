@@ -6,6 +6,27 @@
 		<element>com_xbmusic</element>
 		<type>component</type>
 		<client>administrator</client>
+		<version>0.0.41.5</version>
+		<infourl>https://crosborne.uk/xbmusic</infourl>
+		<downloads>
+			<downloadurl type="full" format="zip">https://crosborne.uk/downloads?download=28</downloadurl>
+		</downloads>
+        <tags>
+          <tag>alpha</tag>
+        </tags>
+        <sha256>0d3c06791ad61b394cc10f701b2707283ef600d75ce86c74aee72018eeea1c7e</sha256>
+    	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
+		<maintainer>Roger C-O</maintainer>
+		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
+		<targetplatform name="joomla" version="5.*"/>	
+		<php_minimum>8.2</php_minimum>
+	</update>
+	<update>
+		<name>xbMusic</name>
+		<description>Database of songs, artists,tracks,albums</description>
+		<element>com_xbmusic</element>
+		<type>component</type>
+		<client>administrator</client>
 		<version>0.0.41.4</version>
 		<infourl>https://crosborne.uk/xbmusic</infourl>
 		<downloads>
