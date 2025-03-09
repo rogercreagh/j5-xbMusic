@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.41.4 5th March 2025
+ * @version 0.0.41.5 9th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -245,11 +245,11 @@ class HtmlView extends BaseHtmlView {
     
     private function itemstr($items, $tag) {
         if (empty($items)) return '';
-        $itemslist = '<li></li>';
+        $itemslist = '';
         if (is_array($items['item'])) {
             foreach ($items['item'] as $item) {
                 if ((!$this->titleok) || !(str_starts_with($item, '<h3>'))) {
-                    $itemslist = '<li>'.$item.'</li>';
+                    $itemslist .= '<li>'.$item.'</li>';
                     
                 }
             }
@@ -257,7 +257,7 @@ class HtmlView extends BaseHtmlView {
             // if ($items['item']=='') return '';
             $itemslist = '<li>'.$items['item'].'</li>';
         }
-        if ($itemslist == '<li></li>' ) return '';
+        if ($itemslist == '' ) return '';
         $ans =  '<div class="changelog"><div class="changelog__item"><div class="changelog__tag">';
         $ans .=  '<span class="badge ';
         if (key_exists($tag, $this->colours)) {
