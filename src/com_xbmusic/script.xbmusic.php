@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.42.0 11th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -216,9 +216,6 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
             }
             
-            $message .= '<br />Checking indicies... ';
-            $this->createAliasIndex(array('album','artist','playlist','song','track'));
-            
             Factory::getApplication()->enqueueMessage($message,'Info');
         }
         if (($type=='install') || ($type=='discover_install') || ($type == 'update')) {
@@ -317,16 +314,17 @@ class Com_xbmusicInstallerScript extends InstallerScript
             $message = '';
             $db = Factory::getDBO();
             $db->setQuery('DROP TABLE IF EXISTS   
-              `#__xbmusic_albums`,
-              `#__xbmusic_artists`,
-              `#__xbmusic_azstations`,
-              `#__xbmusic_playlists`,
-              `#__xbmusic_songs`,
-              `#__xbmusic_tracks`,
               `#__xbmusic_artistgroup`,
               `#__xbmusic_trackartist`,
               `#__xbmusic_trackplaylist`,
-              `#__xbmusic_tracksong`
+              `#__xbmusic_tracksong`,
+              `#__xbmusic_albums`,
+              `#__xbmusic_artists`,
+              `#__xbmusic_azschedules`,
+              `#__xbmusic_azstations`,
+              `#__xbmusic_playlists`,
+              `#__xbmusic_songs`,
+              `#__xbmusic_tracks`
             ');
             $res = $db->execute();
             if ($res === false) {
@@ -334,7 +332,8 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 Factory::getApplication()->enqueueMessage($message,'Error');
                 return false;
             }
-            $db->setQuery("DELETE FROM `j512_contentitem_tag_map` WHERE `type_alias` LIKE '%xbmusic%'");
+            //need to clear the entries in the joomla tag map table
+            $db->setQuery("DELETE FROM `#__contentitem_tag_map` WHERE `type_alias` LIKE '%xbmusic%'");
             $res = $db->execute();
             if ($res === false) {
                 $message = 'Error clearing xbmusic tag map, please check manually';
@@ -345,27 +344,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             return true;
         }
 
-protected function createAliasIndex(array $types) {
-            $db = Factory::getDbo();
-            $errmsg = '';
-            foreach ($types as $type) {
-                $querystr = 'ALTER TABLE `#__xbmusic_'.$type.'s` ADD INDEX `'.$type.'aliasindex` (`alias`)';
-                try {
-                    $db->setQuery($querystr);
-                    $db->execute();
-                } catch (Exception $e) {
-                    if($e->getCode() == 1061) {
-                        $errmsg = $type.' alias index already exists. ';
-                        Factory::getApplication()->enqueueMessage($errmsg, 'Warning');
-                    } else {
-                        $errmsg .= '[ERROR creating '.$type.'.aliasindex: '.$e->getCode().' '.$e->getMessage().']<br />';
-                    }
-                }          
-            }
-            if ($errmsg !='') Factory::getApplication()->enqueueMessage($errmsg, 'Error');
-       }
- 
-       public function remSymlinks($path = '') {
+        public function remSymlinks($path = '') {
            if ($path=='') $path = JPATH_ROOT . '/xbmusic/*';
            $result = [];
            $folders = glob($path, GLOB_ONLYDIR);

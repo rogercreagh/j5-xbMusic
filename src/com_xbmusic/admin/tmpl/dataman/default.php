@@ -299,7 +299,7 @@ $wa->useScript('joomla.dialog')
             			<?php echo $this->form->renderField('dbstid'); ?>
         			<?php endif; ?>
        			<?php else : ?>
-                      <p><i><?php echo Text::sprintf('XBMUSIC_NO_STATIONS',$this->az_url); ?></i>
+                      <p><i><?php echo Text::sprintf('XBMUSIC_NO_STATIONS_AT',$this->az_url); ?></i>
                 <?php endif; ?>
         	</div>
         </div>

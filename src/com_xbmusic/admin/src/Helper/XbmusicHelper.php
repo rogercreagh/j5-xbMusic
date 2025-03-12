@@ -839,7 +839,8 @@ class XbmusicHelper extends ComponentHelper
 	    $query->select('*');
 	    $query->from('#__xbmusic_azstations');
 	    $db->setQuery($query);
-	    $dbstations = $db->loadAssocList();	    
+	    $dbstations = $db->loadAssocList();	
+	    if (!is_array($dbstations)) $dbstations = [];
 	    return $dbstations;
 	}
 	

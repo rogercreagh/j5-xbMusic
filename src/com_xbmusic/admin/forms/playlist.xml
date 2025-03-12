@@ -27,8 +27,20 @@
 			hint="JFIELD_ALIAS_PLACEHOLDER"
 			size="40" 
 		/>
+		
+		<field name="show" type="radio"
+			label="Show in Schedule"
+			description="Set to Hide to prevent list taking space in xbMusic schedule displays on public pages. eg use for the default list that has no scheduled times and for jingle, ident and promo playlists where they have scheduled times"
+			default="1"
+		>
+			<option value="0"></option>
+		</field>
 
-		<field name="az_stationid" type="number" 
+	</fieldset>
+	
+<!-- Azuracast specific values -->
+	<fieldset name="azuracast">
+		<field name="az_stid" type="number" 
 			label="Azuracast Station ID"
 			description="The internal azuracast id for the station" 
 			class="readonly" readonly="true"
@@ -42,13 +54,75 @@
 			size="10" default="0"			 
 		/>
 
+		<field name="az_name" type="text"
+			label="Azuracast Name"
+			description="This name is used by Azuracast to display in the schedule. It should be limited to 20 chars to be sure to fit the Azuracast schedule display. The Playlist Title will default to the Azuracast name if not set, but can be longer and is used in the xbMusic schedule display"
+			maxlength="20"
+			size="20"
+		/>
+		<field name="az_info" type="hidden"
+			default=""
+		/>
 		
+		<field name="az_type" type="radio"
+			label="Playlist Type"
+			description="'General Rotation' : Standard playlist, shuffles with other standard playlists based on weight, 'N Songs' : plays once every number of songs, 'N Minutes' : plays once every number of minutes, 'Hourly' : plays at the specified minute past the hour, 'Custom' : is for use with a custom Liquidsoap configuration"		
+		>
+			<option value="0">General</option>
+			<option value="1">N Songs</option>
+			<option value="2">N Minutes</option>
+			<option value="3">Hourly</option>
+			<option value="-1">Custom</option>
+		</field>
 		
+		<field name="az_cntper" type="number"
+			label=""
+			description=""
+			min="0" max="59" step="1"
+			default="0"
+			showon="az_type>0"
+		/>
 		
-<!--	</fieldset>
+		<field name="az_order" type="radio"
+			label="List Ordering"
+			description="'Shuffled' : The full playlist is shuffled and then played through in the shuffled order. 'Random' : A completely random track is picked for playback every time the queue is populated. 'Sequential' : The order of the playlist is manually specified and followed by the AutoDJ."		
+		>
+			<option value="1">Shuffled</option>
+			<option value="2">Random</option>
+			<option value="3">Sequential</option>
+		</field>
+		
+		<field name="az_jingle" type="radio"
+			label="Jingle Mode"
+			description="Enable this setting to prevent metadata from being sent to the AutoDJ for files in this playlist. This is useful if the playlist contains jingles or bumpers."
+ 			class="btn-group btn-group-yesno"
+ 			default="0"
+		>
+			<option value="0"></option>
+			<option value="1"></option>
+		</field>
+		
+		<field name="az_weight" type="number"
+			label=""
+			description="Lower weight playlists have lower priority"
+			min="1" max="25" step="1"
+			default="3"		
+		/>
+		
+		<field name="az_jingle" type="radio"
+			label="Jingle Mode"
+			description="Enable this setting to prevent metadata from being sent to the AutoDJ for files in this playlist. This is useful if the playlist contains jingles or bumpers."
+ 			class="btn-group btn-group-yesno"
+ 			default="0"		
+		>
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		
+	</fieldset>
 	
- description, status, access, ordering, cat, alltags, note
-	<fieldset name="details"> -->
+<!-- description, status, access, ordering, cat, alltags, note -->
+	<fieldset name="details"> 
 	
 		<field name="description" type="textarea"
 			label="Edit Description" description="Plain text or Markdown code. " 
@@ -81,7 +155,7 @@
 		<field 
 			name="catid" type="xbsubcat"
 			extension="com_xbmusic"
-			itemtype="song"
+			itemtype="playlist"
 			label="JCATEGORY"
 			description="XB_FIELD_CATEGORY_DESC"
 			required="true"

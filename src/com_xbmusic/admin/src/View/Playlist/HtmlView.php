@@ -20,6 +20,7 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -39,10 +40,13 @@ class HtmlView extends BaseHtmlView {
                 
         $this->tagparentids = $this->params->get('playlisttagparents',[]);
         $this->azuracast = $this->params->get('azuracast','0');
-        $this->az_apikey = $this->params->get('az_apikey','');
-        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
+        $this->az_apiname = $this->params->get('az_apiname','not set');
+        $this->az_url = $this->params->get('az_url','not set');
+        $this->stncnt = count(XbmusicHelper::getStations());
+//        $this->az_apikey = $this->params->get('az_apikey','');
+//        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
             
-        }
+//        }
             // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

@@ -211,7 +211,7 @@
 			label="Split medley to Songs"
 			description="split track titles containing , or / into separate songs when importing. NB While this may often be correct for medleys of tunes, sometimes it will produce anomalous results. eg 'Have You Seen Your Mother, Baby, Standing in the Shadow' would become three songs"
 			class="btn-group"
-			default=""
+			default="1"
 		>
 			<option value="0">No Split</option>
 			<option value="1">Separate Songs</option>
@@ -220,7 +220,7 @@
 			label="Song Title remove brackets"
 			description="Remove text in square or round brackets when cresating song titles. Often this is used to indicate a live performance or recording date, but sometimes may be a valid part of the title. eg 'Have You Ever Been (to Electric Ladyland)"
 			class="btn-group"
-			default=""
+			default="1"
 		>
 			<option value="0">Leave</option>
 			<option value="1">Remove</option>

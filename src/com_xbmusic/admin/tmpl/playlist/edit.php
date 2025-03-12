@@ -71,17 +71,36 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
-    	<?php if(($this->azuracast == 1) && ($this->az_apikey) != '') : ?>
+    	<?php if ($this->azuracast == 1) : ?>
     		<div class="row">
     			<div class="col-md-12">
-    				<p>if azid=0 then select station to get list of playlists from station, then button to load playlists
-    					for each azplaylist if azid exists in xbplaylists then update info, otherwise create playlist
+    			<?php  if ($this->stncnt == 0) : ?>
+    				<p>No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials in Config Options - API: <code><?php echo $this->az_apiname; ?></code> at <code><?php echo $this->az_url; ?></code></p>
+    			<?php elseif ($this->item->az_stid == 0) : ?>
+    				<p>To import a playlist from Azuracast first select the station to import from.</p>
+    			<?php elseif ($this->item->az_id == 0) :?>
+    				<p>To import a playlist from Azuracast now select playlist</p>
+    			<?php endif; ?>
     			</div>
     		</div>
     	<?php endif; ?>
     	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
+
+    	<?php if(($this->azuracast == 1) && ($this->az_url) != '') : ?>
+
+	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
+	        
+	        	<h4><?php echo Text::_('Azuracast Specific Values'); ?></h4>
+	        	<p class="xbnote"><?php Text::_('Use the button below to sync changes with Azuracast'); ?>
+	        	</p>
+	    
+        		<?php $this->form->renderFieldset('azuracast') ;?>
+        	
+			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+        
+	    <?php endif; ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('XB_GENERAL')); ?>
 			<div class="row form-vertical">

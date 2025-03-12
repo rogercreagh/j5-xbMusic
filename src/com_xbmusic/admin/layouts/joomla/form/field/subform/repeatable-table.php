@@ -105,7 +105,7 @@ if (!empty($groupByFieldset)) {
         <div class="table-responsive">
             <table class="table" id="subfieldList_<?php echo $fieldId; ?>">
                 <caption class="visually-hidden">
-                    <?php echo Text::_('JGLOBAL_REPEATABLE_FIELDS_TABLE_CAPTION'); ?>
+                    <?php echo ''; ?>
                 </caption>
                 <thead>
                     <tr>
