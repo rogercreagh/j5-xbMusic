@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.40.0 18th February 2025
+ * @version 0.0.42.3 15th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -17,14 +17,19 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 // use Joomla\Registry\Registry;
 use Joomla\CMS\Router\Route;
-// use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
-->useScript('xbmusic.showdown');
+->useScript('xbmusic.showdown')
+->useScript('xbmusic.getplaylists');
+
+$root = Uri::root();
+$document = Factory::getApplication()->getDocument();
+$document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -54,11 +59,13 @@ $input = Factory::getApplication()->getInput();
         var descHtml = converter.makeHtml(descText);
 		document.getElementById('pv_desc').innerHTML= descHtml;
     }
-
- 	function postFolder() {
- 		document.getElementById('task').value='track.setfolder';
- 		this.form.submit();
+ 	
+ 	function loadplaylist(azid) {
+ 		document.getElementById('jform_az_id').value = azid;
+ 		document.getElementById('jform_az_dbstid').value = document.getElementById('jform_azstation').value;
+ 		Joomla.submitform('playlist.loadplaylist',document.getElementById('item-form'));
  	}
+ 	
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
@@ -71,24 +78,40 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
-    	<?php if ($this->azuracast == 1) : ?>
+    	<?php if (($this->azuracast == 1) || ($this->item->azdbstid > 0)) : ?>
     		<div class="row">
-    			<div class="col-md-12">
-    			<?php  if ($this->stncnt == 0) : ?>
-    				<p>No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials in Config Options - API: <code><?php echo $this->az_apiname; ?></code> at <code><?php echo $this->az_url; ?></code></p>
-    			<?php elseif ($this->item->az_stid == 0) : ?>
-    				<p>To import a playlist from Azuracast first select the station to import from.</p>
-    			<?php elseif ($this->item->az_id == 0) :?>
-    				<p>To import a playlist from Azuracast now select playlist</p>
-    			<?php endif; ?>
-    			</div>
-    		</div>
+				<?php if ($this->stncnt == 0)  : ?>
+    				<p>No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials below set in Config Options
+    				<br />APIname: <code><?php echo $this->az_apiname; ?></code> at <code><?php echo $this->az_url; ?></code></p>
+				<?php else : ?>
+        			<div class="col-md-6" id="loadstations" >
+        				<p>To import a playlist from Azuracast first select the station to import from.
+        					<br /><?php echo $this->form->renderField('azstation'); ?>
+        				</p>
+        			</div>
+        			<div class="col-md-6" id="loadplaylists" >
+        				<p>To import a playlist from Azuracast select playlist</p>
+        				<div id="playlists"></div>   				
+        			</div>
+        		<?php endif; ?>
+            </div>
+			<?php if (isset($this->station)) : ?>
+    				<p><?php echo Text::_('Azuracast station').' '.$this->station['title'].' at '.$this->station['az_url']; ?>
+    		<?php endif; ?>
+    		<?php if ($this->item->az_id > 0) : ?>
+    				<?php echo Text::_('Azuracast playlist').' '.$this->item->az_id.' : '.$this->item->az_name; ?>
+    				<div class="pull-right importlist">
+     					<button type="button" class="btn btn-danger btn-sm" onclick="unlinkaz();">Disconnect Azuracast</button>
+     				</div>
+     		<?php endif; ?>
+    				   		
     	<?php endif; ?>
-    	<hr />
+		<?php echo $this->form->renderField('az_dbstid'); ?>
+		<?php echo $this->form->renderField('az_id'); ?>    	<hr />
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-    	<?php if(($this->azuracast == 1) && ($this->az_url) != '') : ?>
+    	<?php if(($this->azuracast == 1) && ($this->item->az_dbstid) > 0) : ?>
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
 	        

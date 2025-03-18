@@ -59,10 +59,6 @@ $item = $this->item;
 		document.getElementById('pv_desc').innerHTML= descHtml;
     }
 
- 	function postFolder() {
- 		document.getElementById('task').value='track.setfolder';
- 		this.form.submit();
- 	}
 </script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=song&layout=edit&id='. (int) $item->id); ?>"

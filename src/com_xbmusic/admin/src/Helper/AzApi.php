@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.41.5 8th March 2025
+ * @version 0.0.42.3 18th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -70,13 +70,17 @@ class AzApi {
         return str_replace('/api','',$this->apiurl);
     }
     
+    public function getAzstid() {
+        return $this->azstid;
+    }
+    
     public function azStations() {
         $url=$this->apiurl.'/stations';
         $result = $this->azApiGet($url);
         return $result;
     }
     
-    public function azStation($azstid) {
+    public function azStation(int $azstid) {
         $url=$this->apiurl.'/station/'.$azstid;
         $result = $this->azApiGet($url);
         return $result;
@@ -84,30 +88,53 @@ class AzApi {
     
     public function azPlaylists() {
         if ($this->azstid == 0)
-            return (object) ['error' => true, 'msg'=>'Station ID not set'];
-        $url=$this->apiurl.'/station/'.$this->v.'/playlists';
+            return (object) ['code' => true, 'msg'=>'Station ID not set'];
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlists';
+        $result = $this->azApiGet($url);
+        return $result;
+    }
+    
+    public function azPlaylist(int $azplid) {
+        if ($this->azstid == 0)
+            return (object) ['code' => true, 'msg'=>'Station ID not set'];
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid;
         $result = $this->azApiGet($url);
         return $result;
     }
     
     
-    public function azPlaylistPls(int $plid) {
+    public function azPlaylistPls(int $azplid) {
         if ($this->azstid == 0)
-            return (object) ['error' => true, 'msg'=>'Station ID not set'];
-            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$plid.'/export/pls';
+            return (object) ['code' => true, 'msg'=>'Station ID not set'];
+            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/pls';
         $result = $this->azApiGet($url);
         return $result;
     }
     
     private function azApiGet($url) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_URL, $url);
-        $result = curl_exec($ch);
-        curl_close($ch);
-        $result = json_decode($result);
-        return $result;       //check for error code on return to calling function
+        $ok = false;
+        $cnt = 0;
+        while (!$ok) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($result);
+            if (isset($result->code) && ($result->code == 429)) {
+                //we have an api overload so wait 2 secs for a max of 2 times
+                if ($cnt >1) {
+                    $ok = true;
+                } else {
+                    sleep(2);
+                    $cnt ++;               
+                }
+            } else {
+                $ok = true;
+            }        
+        }        
+        return $result;       //check for other error codes on return to calling function
     }
     
 }

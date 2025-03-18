@@ -4,6 +4,7 @@
 	<config>
 		<inlinehelp button="show"/>
 	</config>
+
 <!-- Title, Alias, Id, fileinfo -->	
 	<fieldset name="general"
 	>
@@ -30,29 +31,45 @@
 		
 		<field name="show" type="radio"
 			label="Show in Schedule"
-			description="Set to Hide to prevent list taking space in xbMusic schedule displays on public pages. eg use for the default list that has no scheduled times and for jingle, ident and promo playlists where they have scheduled times"
+			description="Set to Hide to prevent list taking space in xbMusic schedule displays on public pages. eg  for jingle, ident and promo playlists where they have scheduled times. Does not affect azuracast public schedule page or embed widgets"
+			class="btn-group btn-group-yesno"
 			default="1"
 		>
-			<option value="0"></option>
+			<option value="0">Hide</option>
+			<option value="1">Show</option>
 		</field>
 
+		<field name="azstation" type="xbazstations" 
+			label="Azuracast Station xbID"
+			description="The xbMusic database id for the station (NOT the internal azuracast station id which may no be unique across servers)" 
+			onchange="getplaylists();"
+			default="0"			 
+		>
+			<option value="0">Select Station</option>
+		</field>
+		
+		<field name="azplaylist" type="xbazplaylists" 
+			label="Azuracast Playlist"
+			description="Azuracast Playlist linked to this one" 
+			dbstid=""
+			showon="azstation>0"
+			default="0"			 
+		>
+			<option value="0">Select Playlist</option>
+		</field>
+		
+		<field name="az_dbstid" type="hidden"
+			default=""
+		/>
+
+		<field name="az_id" type="hidden"
+			default=""
+		/>
+		
 	</fieldset>
 	
 <!-- Azuracast specific values -->
-	<fieldset name="azuracast">
-		<field name="az_stid" type="number" 
-			label="Azuracast Station ID"
-			description="The internal azuracast id for the station" 
-			class="readonly" readonly="true"
-			size="10" default="0"			 
-		/>
-
-		<field name="az_id" type="number" 
-			label="Azuracast Playlist ID"
-			description="The internal azuracast id for the playlist on the station" 
-			class="readonly" readonly="true"
-			size="10" default="0"			 
-		/>
+	<fieldset name="azuracast" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field">
 
 		<field name="az_name" type="text"
 			label="Azuracast Name"

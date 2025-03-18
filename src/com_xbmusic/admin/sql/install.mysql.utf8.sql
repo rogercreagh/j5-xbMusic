@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `show` tinyint(1) NOT NULL DEFAULT '1',
   `az_id` int(10) unsigned NOT NULL Default '0',
   `az_name` varchar(20),
-  `az_stid` int(10) unsigned NOT NULL Default '0',
+  `az_dbstid` int(10) unsigned NOT NULL Default '0',
   `az_info` mediumtext,
   `az_type` tinyint(3),
   `az_cntper` tinyint(3) unsigned,

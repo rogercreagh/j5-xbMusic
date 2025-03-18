@@ -2,9 +2,9 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.42.1</version>
+		<version>0.0.42.2</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.42.1</h3> Updated 12th March 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.42.2</h3> Updated 13th March 2025]]></item>
 			<item>Database - new columns for Azuracast Playlists</item>
 			<item>Database - new table for Azuracast schedule items</item>			
 		</addition>

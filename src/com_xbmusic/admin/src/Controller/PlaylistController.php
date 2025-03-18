@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.11.6 16th July 2024
+ * @version 0.0.42.3 18th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -46,6 +46,25 @@ class PlaylistController extends FormController {
 //             }
 //         }
 // }
+    
+//     public function setstation() {
+//         $jip =  Factory::getApplication()->input;bstid, $azplid
+//         $pid =  $jip->get('azstation');
+//         $model = $this->getModel('playlist');
+//         $wynik = $model->setStation($pid);
+//         $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+//         $this->setRedirect($redirectTo );
+//     }
+    
+    public function loadplaylist() {
+        $jip =  Factory::getApplication()->input;
+        $data = $jip->get('jform',[]);
+        $model = $this->getModel('playlist');
+        $wynik = $model->loadPlaylist($data);
+        if (!($wynik>0)) $wynik = $data['id'];
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$wynik);
+        $this->setRedirect($redirectTo );
+    }
     
     public function publish() {
         $jip =  Factory::getApplication()->input;

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.30.8 17th February 2025
+ * @version 0.0.42.3 18th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -30,7 +30,9 @@ use Joomla\Filter\OutputFilter;
 use Joomla\Registry\Registry;
 //use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
+//use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 //use Symfony\Component\Validator\Constraints\IsNull;
 
 class PlaylistModel extends AdminModel {
@@ -187,26 +189,26 @@ class PlaylistModel extends AdminModel {
                         ((isset($filters['status']) && $filters['status'] !== '') ? $filters['status'] : null)
                         )
                     );
-                    $data->set('catid', $app->getInput()->getInt('catid', (!empty($filters['category_id']) ? $filters['category_id'] : null)));
+                $data->set('catid', $app->getInput()->getInt('catid', (!empty($filters['category_id']) ? $filters['category_id'] : null)));
 
-                     if ($app->isClient('administrator')) {
-                         $data->set('language', $app->getInput()->getString('language', (!empty($filters['language']) ? $filters['language'] : null)));
-                     }
-    
-                    $data->set(
-                        'access',
-                        $app->getInput()->getInt('access', (!empty($filters['access']) ? $filters['access'] : $app->get('access')))
-                        );
+                if ($app->isClient('administrator')) {
+                     $data->set('language', $app->getInput()->getString('language', (!empty($filters['language']) ? $filters['language'] : null)));
                 }
+
+                $data->set(
+                    'access',
+                    $app->getInput()->getInt('access', (!empty($filters['access']) ? $filters['access'] : $app->get('access')))
+                    );
             }
-            
-            // If there are params fieldsets in the form it will fail with a registry object
-            if (isset($data->params) && $data->params instanceof Registry) {
-                $data->params = $data->params->toArray();
-            }
-            
-            return $data;
         }
+        
+        // If there are params fieldsets in the form it will fail with a registry object
+        if (isset($data->params) && $data->params instanceof Registry) {
+            $data->params = $data->params->toArray();
+        }
+        
+        return $data;
+    }
         
     public function save($data) {
         $app    = Factory::getApplication();
@@ -350,6 +352,43 @@ class PlaylistModel extends AdminModel {
         }
     }
 
-    
+    public function loadPlaylist($dbdata) {
+        //get existing data
+        //$dbdata = $this->loadFormData();
+        //get api with dbstid
+        $api = new AzApi($dbdata['azstation']);
+        //get azplaylist
+        $azpldata = $api->azPlaylist($dbdata['azplaylist']);
+        if (isset($azpldata->code)) {
+            Factory::getApplication()->enqueueMessage('Azuracast API Error: code '.$azpldata->code.' - '.$azpldata->type.
+                '<br />'.$azpldata->formatted_message,'Warning');
+            return false;
+        }
+        Factory::getApplication()->enqueueMessage('<pre>'.print_r($azpldata, true).'</pre>');
+        if ($dbdata['id'] > 0) {
+            //we have an existing pl to update so dont mess with title or alias (possible option)
+        } else {
+            //its a new one so set all required fields including cat default
+            if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
+            if ($dbdata['alias'] != '') $dbdata['title'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
+        }
+        $dbdata['az_id'] = $azpldata->id;
+        $dbdata['az_name'] = $azpldata->name;
+        $dbdata['az_dbstid'] = $dbdata['azstation'];
+        $dbdata['az_info'] = json_encode($azpldata);
+ //       $dbdata['az_type'] = $azpldata->name;
+//        $dbdata['az_name'] = $azpldata->name;
+//        $dbdata['az_name'] = $azpldata->name;
+//        if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
+//        if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
+        //set data fields as appropriate
+        //save data
+        $this->save($dbdata);
+        $id = $this->getState('playlist.id');
+        //save schedule data
+        //get id
+        Factory::getApplication()->enqueueMessage('Saved with id:'.$id);
+        return $id;
+    }
 }
 

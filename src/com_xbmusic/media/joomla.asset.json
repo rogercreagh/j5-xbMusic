@@ -1,44 +1,43 @@
 {
-    "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
-    "name": "com_xbmusic",
-    "version": "4.0.0",
-    "description": "assets used by xbmusic",
-    "license": "GPL-3.0-or-later",
-    "assets": [
-      {
-        "name": "xbmusic.styles",
-        "description": "xbMusic custom css",
-        "type": "style",
-        "uri": "com_xbmusic/xbmusic.css"
-      },
-      {
-        "name": "xbcommon.styles",
-        "description": "xb common component css",
-        "type": "style",
-        "uri": "com_xbmusic/xbcommon.css"
-      },
-      {
-		  "name": "xbmusic.foldertree",
-		  "description": "foldertree ajax file/folder selection",
-		  "type": "script",
-		  "uri": "com_xbmusic/foldertree.js"
-	  },
-      {
-		  "name": "xbmusic.showdown",
-		  "description": "showdown markdown utilties",
-		  "type": "script",
-		  "uri": "com_xbmusic/showdown.js"
-	  },
-     {
-		  "name": "xbtags.field-fancy-select",
-		  "description": "modified version of joomla-fancy-field-select.js",
-		  "type": "script",
-		  "uri": "com_xbmusic/xbtags-field-fancy-select.js",
-      "dependencies": [
-        "wcpolyfill",
-        "choicesjs"
-      ]
-    }
-	  
-    ]
+	"$schema" : "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+	"name" : "com_xbmusic",
+	"version" : "4.0.0",
+	"description" : "assets used by xbmusic",
+	"license" : "GPL-3.0-or-later",
+	"assets" : [{
+			"name" : "xbmusic.styles",
+			"description" : "xbMusic custom css",
+			"type" : "style",
+			"uri" : "com_xbmusic/xbmusic.css"
+		}, {
+			"name" : "xbcommon.styles",
+			"description" : "xb common component css",
+			"type" : "style",
+			"uri" : "com_xbmusic/xbcommon.css"
+		}, {
+			"name" : "xbmusic.foldertree",
+			"description" : "foldertree ajax file/folder selection",
+			"type" : "script",
+			"uri" : "com_xbmusic/foldertree.js"
+		}, {
+			"name" : "xbmusic.showdown",
+			"description" : "showdown markdown utilties",
+			"type" : "script",
+			"uri" : "com_xbmusic/showdown.js"
+		}, {
+			"name" : "xbmusic.getplaylists",
+			"description" : "ajax load playlist field",
+			"type" : "script",
+			"uri" : "com_xbmusic/getplaylists.js"
+		}, {
+			"name" : "xbtags.field-fancy-select",
+			"description" : "modified version of joomla-fancy-field-select.js",
+			"type" : "script",
+			"uri" : "com_xbmusic/xbtags-field-fancy-select.js",
+			"dependencies" : [
+				"wcpolyfill",
+				"choicesjs"
+			]
+		}
+	]
 }

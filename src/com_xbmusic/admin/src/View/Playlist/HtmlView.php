@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.30.8 17th February 2025
+ * @version 0.0.42.2 12th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -43,10 +43,9 @@ class HtmlView extends BaseHtmlView {
         $this->az_apiname = $this->params->get('az_apiname','not set');
         $this->az_url = $this->params->get('az_url','not set');
         $this->stncnt = count(XbmusicHelper::getStations());
-//        $this->az_apikey = $this->params->get('az_apikey','');
-//        if (($this->azuracast == 1) && ($this->az_apikey) != '') {
-            
-//        }
+        if ($this->item->az_dbstid > 0) {
+            $this->station = XbmusicHelper::getDbStation($this->item->az_dbstid);
+        }
             // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
