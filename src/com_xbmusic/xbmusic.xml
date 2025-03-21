@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>17th March 2025</creationDate>
-	<version>0.0.42.3</version>
+	<creationDate>20th March 2025</creationDate>
+	<version>0.0.42.4</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>

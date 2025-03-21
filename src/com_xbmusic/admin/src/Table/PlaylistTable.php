@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/PlaylistTable.php
- * @version 0.0.11.6 16th July 2024
+ * @version 0.0.42.4 20th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -90,8 +90,11 @@ class PlaylistTable extends Table implements VersionableTableInterface, Taggable
 //         }
         
         // Set created date if not set.
-        if (!(int) $this->created) {
+        if (empty($this->created)) {
             $this->created = Factory::getDate()->toSql();
+        }
+        if ($this->created_by == '') {
+            $this->created_by = Factory::getApplication()->getIdentity()->id;
         }
         
         // Set ordering
@@ -122,7 +125,8 @@ class PlaylistTable extends Table implements VersionableTableInterface, Taggable
             $registry = new Registry($array['params']);
             //check stuff in the params
         }
-       
+        if (empty($array['modified'])) $array['modified'] = null;
+        
         return parent::bind($array, $ignore);
     }
     

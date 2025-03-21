@@ -97,7 +97,6 @@
 			description=""
 			min="0" max="59" step="1"
 			default="0"
-			showon="az_type>0"
 		/>
 		
 		<field name="az_order" type="radio"
@@ -107,16 +106,6 @@
 			<option value="1">Shuffled</option>
 			<option value="2">Random</option>
 			<option value="3">Sequential</option>
-		</field>
-		
-		<field name="az_jingle" type="radio"
-			label="Jingle Mode"
-			description="Enable this setting to prevent metadata from being sent to the AutoDJ for files in this playlist. This is useful if the playlist contains jingles or bumpers."
- 			class="btn-group btn-group-yesno"
- 			default="0"
-		>
-			<option value="0"></option>
-			<option value="1"></option>
 		</field>
 		
 		<field name="az_weight" type="number"
@@ -227,6 +216,7 @@
 			class="inputbox" size="20" 			
 			translateformat="true"
 			showtime="true"
+            format="%Y-%m-%d %H:%i:%s"
 			filter="user_utc" />
 
 		<field name="created_by" type="user"
@@ -244,6 +234,7 @@
 			class="inputbox" size="20" 			
 			translateformat="true"
 			showtime="true"
+            format="%Y-%m-%d %H:%i:%s"
 			filter="user_utc" />
 
 		<field name="modified_by" type="user"

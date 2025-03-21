@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.42.3 18th March 2025
+ * @version 0.0.42.4 20th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -46,19 +46,11 @@ class PlaylistController extends FormController {
 //             }
 //         }
 // }
-    
-//     public function setstation() {
-//         $jip =  Factory::getApplication()->input;bstid, $azplid
-//         $pid =  $jip->get('azstation');
-//         $model = $this->getModel('playlist');
-//         $wynik = $model->setStation($pid);
-//         $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
-//         $this->setRedirect($redirectTo );
-//     }
-    
+        
     public function loadplaylist() {
-        $jip =  Factory::getApplication()->input;
-        $data = $jip->get('jform',[]);
+        $jip =  Factory::getApplication()->getInput();
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+//        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
         $model = $this->getModel('playlist');
         $wynik = $model->loadPlaylist($data);
         if (!($wynik>0)) $wynik = $data['id'];
@@ -67,7 +59,7 @@ class PlaylistController extends FormController {
     }
     
     public function publish() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid);
@@ -76,7 +68,7 @@ class PlaylistController extends FormController {
     }
     
     public function unpublish() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,0);
@@ -85,7 +77,7 @@ class PlaylistController extends FormController {
     }
     
     public function archive() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,2);
@@ -94,7 +86,7 @@ class PlaylistController extends FormController {
     }
     
     public function delete() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->delete($pid);
@@ -103,7 +95,7 @@ class PlaylistController extends FormController {
     }
     
     public function trash() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,-2);
@@ -112,7 +104,7 @@ class PlaylistController extends FormController {
     }
     
     public function checkin() {
-        $jip =  Factory::getApplication()->input;
+        $jip =  Factory::getApplication()->getInput();
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->checkin($pid);

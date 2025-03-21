@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.42.3 18th March 2025
+ * @version 0.0.42.3 20th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,21 +19,12 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-// use Joomla\CMS\Plugin\PluginHelper;
-// use Joomla\CMS\String\PunycodeHelper;
-// use Joomla\CMS\Table\Table;
-// use Joomla\CMS\Table\TableInterface;
-// use Joomla\CMS\UCM\UCMType;
-// use Joomla\Component\Fields\Administrator\Helper\FieldsHelper;
-// use Joomla\Database\ParameterType;
 use Joomla\Filter\OutputFilter;
 use Joomla\Registry\Registry;
-//use Joomla\Component\Categories\Administrator\Helper\CategoriesHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
 //use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
-//use Symfony\Component\Validator\Constraints\IsNull;
 
 class PlaylistModel extends AdminModel {
   
@@ -77,6 +68,7 @@ class PlaylistModel extends AdminModel {
     
     public function delete(&$pks) {
         //first need to delete links to albums, artists, tracks
+        //this should now be down by sql cascade
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         foreach ($pks as $pk) {
@@ -238,14 +230,9 @@ class PlaylistModel extends AdminModel {
         }
         
        
-        //alias is the name so we'll set and check it every time
-        $newalias = OutputFilter::stringURLSafe($data['name']);
-        if (($data['id'] == 0) && XbcommonHelper::checkValueExists($newalias, '#__xbmusic_playlists', 'alias')) {
-            $warnmsg .= 'Duplicate alias - this playlist name is already in the database';
-            $app->enqueueMessage($warnmsg,'Error');
-            return false;
-        }
-        $data['alias'] = $newalias;        
+        //alias defaults to title
+        if ($data['alias'] == '') $data['alias'] = OutputFilter::stringURLSafe($data['title']);
+        $data['alias'] = XbcommonHelper::makeUniqueAlias($data['alias'], '#__xbmusic_playlists');
         
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
@@ -353,8 +340,6 @@ class PlaylistModel extends AdminModel {
     }
 
     public function loadPlaylist($dbdata) {
-        //get existing data
-        //$dbdata = $this->loadFormData();
         //get api with dbstid
         $api = new AzApi($dbdata['azstation']);
         //get azplaylist
@@ -364,25 +349,58 @@ class PlaylistModel extends AdminModel {
                 '<br />'.$azpldata->formatted_message,'Warning');
             return false;
         }
-        Factory::getApplication()->enqueueMessage('<pre>'.print_r($azpldata, true).'</pre>');
+//        Factory::getApplication()->enqueueMessage('<pre>'.print_r($azpldata, true).'</pre>');
         if ($dbdata['id'] > 0) {
-            //we have an existing pl to update so dont mess with title or alias (possible option)
+            $dbdata['modified_by'] = $this->getCurrentUser()->id;
+            $dbdata['modified'] = Factory::getDate()->toSql();
         } else {
-            //its a new one so set all required fields including cat default
-            if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
-            if ($dbdata['alias'] != '') $dbdata['title'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
+            $dbdata['created_by'] = $this->getCurrentUser()->id;
+            $dbdata['created_by_alias'] = 'import from Azuracast API';
         }
+        if ($dbdata['title'] == '') $dbdata['title'] = $azpldata->name;
+        if ($dbdata['alias'] == '') $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
         $dbdata['az_id'] = $azpldata->id;
         $dbdata['az_name'] = $azpldata->name;
         $dbdata['az_dbstid'] = $dbdata['azstation'];
+        
         $dbdata['az_info'] = json_encode($azpldata);
- //       $dbdata['az_type'] = $azpldata->name;
+        
+        $dbdata['az_cntper'] = 0;
+        $type = $azpldata->type;
+        switch ($type) {
+            case 'default':
+                $dbdata['az_type'] = 1;
+                break;
+            case 'once_per_x_songs':
+                $dbdata['az_type'] = 2;
+                $dbdata['az_cntper'] = $azpldata->play_per_songs;
+                break;
+            case 'once_per_x_minutes':
+                $dbdata['az_type'] = 3;
+                $dbdata['az_cntper'] = $azpldata->play_per_minutes;
+                break;
+            case 'once_per_hour':
+                $dbdata['az_type'] = 4;
+                $dbdata['az_cntper'] = $azpldata->play_per_hour_minute;
+                break;
+            case 'custom':
+                $dbdata['az_type'] = -1;
+                break;
+                
+            default:
+                $dbdata['az_type'] = 0;
+                break;
+        }
+        $dbdata['az_order'] = $azpldata->order;
+        $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
+        $dbdata['az_weight'] = $azpldata->weight;
+        if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
+        
+        //       $dbdata['az_type'] = $azpldata->name;
 //        $dbdata['az_name'] = $azpldata->name;
 //        $dbdata['az_name'] = $azpldata->name;
-//        if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
-//        if ($dbdata['title'] != '') $dbdata['title'] = $azpldata->name;
-        //set data fields as appropriate
-        //save data
+//       Factory::getApplication()->enqueueMessage('<pre>'.print_r($dbdata, true).'</pre>','warning');
+        
         $this->save($dbdata);
         $id = $this->getState('playlist.id');
         //save schedule data

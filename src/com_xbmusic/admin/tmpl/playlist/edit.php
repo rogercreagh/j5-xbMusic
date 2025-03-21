@@ -80,6 +80,16 @@ $input = Factory::getApplication()->getInput();
     	</div>
     	<?php if (($this->azuracast == 1) || ($this->item->azdbstid > 0)) : ?>
     		<div class="row">
+        		<?php if ($this->item->az_id > 0) : ?>
+        			<div class="col-md-6">
+        				<div class="pull-right importlist">
+         					<button type="button" class="btn btn-danger btn-sm" onclick="unlinkaz();">Disconnect Azuracast</button>
+         				</div>
+        				<?php echo Text::_('Azuracast playlist').' '.$this->item->az_id.' : '.$this->item->az_name; ?>
+        			</div>
+        			<div class="col-md-6">
+        			</div>
+         		<?php endif; ?>
 				<?php if ($this->stncnt == 0)  : ?>
     				<p>No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials below set in Config Options
     				<br />APIname: <code><?php echo $this->az_apiname; ?></code> at <code><?php echo $this->az_url; ?></code></p>
@@ -98,12 +108,6 @@ $input = Factory::getApplication()->getInput();
 			<?php if (isset($this->station)) : ?>
     				<p><?php echo Text::_('Azuracast station').' '.$this->station['title'].' at '.$this->station['az_url']; ?>
     		<?php endif; ?>
-    		<?php if ($this->item->az_id > 0) : ?>
-    				<?php echo Text::_('Azuracast playlist').' '.$this->item->az_id.' : '.$this->item->az_name; ?>
-    				<div class="pull-right importlist">
-     					<button type="button" class="btn btn-danger btn-sm" onclick="unlinkaz();">Disconnect Azuracast</button>
-     				</div>
-     		<?php endif; ?>
     				   		
     	<?php endif; ?>
 		<?php echo $this->form->renderField('az_dbstid'); ?>
@@ -119,7 +123,11 @@ $input = Factory::getApplication()->getInput();
 	        	<p class="xbnote"><?php Text::_('Use the button below to sync changes with Azuracast'); ?>
 	        	</p>
 	    
-        		<?php $this->form->renderFieldset('azuracast') ;?>
+        		<?php $this->form->renderField('az_name') ;?>
+        		<?php $this->form->renderField('az_type') ;?>
+        		<?php $this->form->renderField('az_cntper') ;?>
+        		<?php $this->form->renderField('az_jingle') ;?>
+        		<?php $this->form->renderField('az_weight') ;?>
         	
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
         
