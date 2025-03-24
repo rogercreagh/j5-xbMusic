@@ -26,7 +26,7 @@
 			"uri" : "com_xbmusic/showdown.js"
 		}, {
 			"name" : "xbmusic.getplaylists",
-			"description" : "ajax load playlist field",
+			"description" : "ajax load playlist select field",
 			"type" : "script",
 			"uri" : "com_xbmusic/getplaylists.js"
 		}, {
@@ -38,6 +38,16 @@
 				"wcpolyfill",
 				"choicesjs"
 			]
+		}, {
+			"name" : "xbmusic.markdownhelper",
+			"description" : "functions associated with markdown description field",
+			"type" : "script",
+			"uri" : "com_xbmusic/markdownhelper.js"			
+		}, {
+			"name" : "xbmusic.playlisthelper",
+			"description" : "confirm functions for reloading, putting, deleting, and unlinking playlists",
+			"type" : "script",
+			"uri" : "com_xbmusic/playlisthelper.js"	
 		}
 	]
 }

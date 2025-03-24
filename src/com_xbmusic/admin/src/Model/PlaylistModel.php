@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.42.3 20th March 2025
+ * @version 0.0.42.6 24th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -24,7 +24,6 @@ use Joomla\Registry\Registry;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
-//use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class PlaylistModel extends AdminModel {
   
@@ -119,6 +118,7 @@ class PlaylistModel extends AdminModel {
             if (!empty($item->id)) {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.playlist');  
+                if ($item->az_info) $item->az_info = json_decode($item->az_info);
             }
         }        
         return $item;
@@ -231,8 +231,10 @@ class PlaylistModel extends AdminModel {
         
        
         //alias defaults to title
-        if ($data['alias'] == '') $data['alias'] = OutputFilter::stringURLSafe($data['title']);
-        $data['alias'] = XbcommonHelper::makeUniqueAlias($data['alias'], '#__xbmusic_playlists');
+        if ($data['alias'] == '') {
+            $data['alias'] = OutputFilter::stringURLSafe($data['title']);
+            $data['alias'] = XbcommonHelper::makeUniqueAlias($data['alias'], '#__xbmusic_playlists');
+        }
         
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
@@ -345,11 +347,10 @@ class PlaylistModel extends AdminModel {
         //get azplaylist
         $azpldata = $api->azPlaylist($dbdata['azplaylist']);
         if (isset($azpldata->code)) {
-            Factory::getApplication()->enqueueMessage('Azuracast API Error: code '.$azpldata->code.' - '.$azpldata->type.
+            Factory::getApplication()->enqueueMessage('loadPlaylist Azuracast API Error: code '.$azpldata->code.' - '.$azpldata->type.
                 '<br />'.$azpldata->formatted_message,'Warning');
             return false;
         }
-//        Factory::getApplication()->enqueueMessage('<pre>'.print_r($azpldata, true).'</pre>');
         if ($dbdata['id'] > 0) {
             $dbdata['modified_by'] = $this->getCurrentUser()->id;
             $dbdata['modified'] = Factory::getDate()->toSql();
@@ -358,7 +359,8 @@ class PlaylistModel extends AdminModel {
             $dbdata['created_by_alias'] = 'import from Azuracast API';
         }
         if ($dbdata['title'] == '') $dbdata['title'] = $azpldata->name;
-        if ($dbdata['alias'] == '') $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
+        $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
+        $dbdata['alias'] = XbcommonHelper::makeUniqueAlias($dbdata['alias'], '#__xbmusic_playlists');
         $dbdata['az_id'] = $azpldata->id;
         $dbdata['az_name'] = $azpldata->name;
         $dbdata['az_dbstid'] = $dbdata['azstation'];
@@ -396,17 +398,145 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_weight'] = $azpldata->weight;
         if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
         
-        //       $dbdata['az_type'] = $azpldata->name;
-//        $dbdata['az_name'] = $azpldata->name;
-//        $dbdata['az_name'] = $azpldata->name;
-//       Factory::getApplication()->enqueueMessage('<pre>'.print_r($dbdata, true).'</pre>','warning');
-        
-        $this->save($dbdata);
-        $id = $this->getState('playlist.id');
-        //save schedule data
-        //get id
-        Factory::getApplication()->enqueueMessage('Saved with id:'.$id);
-        return $id;
+        $ans = $this->save($dbdata);
+        if ($ans) {
+            $id = $this->getState('playlist.id');
+            Factory::getApplication()->enqueueMessage(Text::_('Playlist imported from Azuracast with id:'.$id),'Success');
+            return $id;
+        } else {
+            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+        }
+        return false;
     }
+    
+    public function reloadPlaylist($dbdata) {
+        $api = new AzApi($dbdata['az_dbstid']);
+        $azpldata = $api->azPlaylist($dbdata['az_id']);
+        if (isset($azpldata->code)) {
+            Factory::getApplication()->enqueueMessage('reloadPlaylist Azuracast API Error: code '.$azpldata->code.
+                ' - '.$azpldata->type.'<br />'.$azpldata->formatted_message,'Warning');
+            return false;
+        }
+        $dbdata['modified_by'] = $this->getCurrentUser()->id;
+        $dbdata['modified'] = Factory::getDate()->toSql();
+        if ($dbdata['alias'] == '') $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
+//         $dbdata['az_id'] = $azpldata->id;
+        $dbdata['az_name'] = $azpldata->name;
+//         $dbdata['az_dbstid'] = $dbdata['azstation'];
+        
+        $dbdata['az_info'] = json_encode($azpldata);
+        
+        $dbdata['az_cntper'] = 0;
+        $type = $azpldata->type;
+        switch ($type) {
+            case 'default':
+                $dbdata['az_type'] = 1;
+                break;
+            case 'once_per_x_songs':
+                $dbdata['az_type'] = 2;
+                $dbdata['az_cntper'] = $azpldata->play_per_songs;
+                break;
+            case 'once_per_x_minutes':
+                $dbdata['az_type'] = 3;
+                $dbdata['az_cntper'] = $azpldata->play_per_minutes;
+                break;
+            case 'once_per_hour':
+                $dbdata['az_type'] = 4;
+                $dbdata['az_cntper'] = $azpldata->play_per_hour_minute;
+                break;
+            case 'custom':
+                $dbdata['az_type'] = -1;
+                break;
+                
+            default:
+                $dbdata['az_type'] = 0;
+                break;
+        }
+        $dbdata['az_order'] = $azpldata->order;
+        $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
+        $dbdata['az_weight'] = $azpldata->weight;
+        if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
+        
+        $ans = $this->save($dbdata);
+        
+        if ($ans) {
+            $id = $this->getState('playlist.id');
+            Factory::getApplication()->enqueueMessage(Text::sprintf('reloaded playlist %s',$dbdata['az_name']),'Success');
+        return $id;
+        } else {
+            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+        }
+        return false;
+    }
+    
+    public function putPlaylist($dbdata) {
+        $data = array();
+        $data['name'] = $dbdata['az_name'];
+        $data['play_per_songs'] = '0';
+        $data['play_per_minutes'] = '0';
+        $data['play_per_hour_minute'] = '0';
+        
+        switch ($dbdata['az_type']) {
+            case 1:
+                $data['type'] = 'default';
+                break;
+            case 2:
+                $data['type'] = 'once_per_x_songs';
+                $data['play_per_songs'] = $dbdata['az_cntper'];
+                break;
+            case 3:
+                $data['type'] = 'once_per_x_minutes';
+                $data['play_per_minutes'] = $dbdata['az_cntper'];
+                break;
+            case 4:
+                $data['type'] = 'once_per_hour';
+                $data['play_per_hour_minute'] = $dbdata['az_cntper'];
+                break;
+            case -1:
+                $data['type'] = 'custom';            
+                break;
+            
+            default:
+                $data['type'] = 'default';                
+            break;
+        }
+        $data['order'] = $dbdata['az_order'];
+        $data['is_jingle'] = $dbdata['az_jingle'];
+        $data['weight'] = $dbdata['az_weight'];
+        
+        $jsondata = json_encode($data);
+        $api = new AzApi($dbdata['az_dbstid']);
+        $putres = $api->putAzPlaylist($dbdata['az_id'], $jsondata);
+        if (isset($putres->code)) {
+            Factory::getApplication()->enqueueMessage('putPlaylist Azuracast API Error: code '.$putres->code.' - '.$putres->type.
+                '<br />'.$putres->formatted_message,'Warning');
+            return false;
+        }
+        $ans = $this->reloadPlaylist($dbdata);
+        return $ans;
+    }
+    
+    public function unlinkPlaylist($dbdata) {
+        $dbdata['modified_by'] = $this->getCurrentUser()->id;
+        $dbdata['modified'] = Factory::getDate()->toSql();
+        $dbdata['az_name'] = null;
+        $dbdata['az_info'] = null;
+        $dbdata['az_cntper'] = null;
+        $dbdata['az_type'] = null;
+        $dbdata['az_order'] = null;
+        $dbdata['az_jingle'] = null;
+        $dbdata['az_weight'] = null;
+        $dbdata['az_id'] = 0;
+        $dbdata['az_dbstid'] = 0;
+        
+        $ans = $this->save($dbdata);
+        if ($ans) {
+            Factory::getApplication()->enqueueMessage(Text::_('Playlist unlinked from Azuracast'),'Success');
+        } else {
+            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+        }
+        return $ans;
+    }
+    
 }
 

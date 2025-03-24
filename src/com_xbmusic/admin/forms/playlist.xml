@@ -77,39 +77,43 @@
 			maxlength="20"
 			size="20"
 		/>
+		
 		<field name="az_info" type="hidden"
 			default=""
 		/>
 		
-		<field name="az_type" type="radio"
+		<field name="az_type" type="list"
 			label="Playlist Type"
-			description="'General Rotation' : Standard playlist, shuffles with other standard playlists based on weight, 'N Songs' : plays once every number of songs, 'N Minutes' : plays once every number of minutes, 'Hourly' : plays at the specified minute past the hour, 'Custom' : is for use with a custom Liquidsoap configuration"		
+			description="'General Rotation' : Standard playlist, shuffles with other standard playlists based on weight, 'N Songs' : plays once every number of songs, 'N Minutes' : plays once every number of minutes, 'Hourly' : plays at the specified minute past the hour, 'Custom' : is for use with a custom Liquidsoap configuration - must be edited in Azuracast"		
 		>
-			<option value="0">General</option>
-			<option value="1">N Songs</option>
-			<option value="2">N Minutes</option>
-			<option value="3">Hourly</option>
-			<option value="-1">Custom</option>
+			<option value="1">General Rotation</option>
+			<option value="2">Once per N Songs</option>
+			<option value="3">Once per N Minutes</option>
+			<option value="4">Hourly at Nth minute of hour</option>
+			<option value="-1">Custom - special Liquidsoap Configuration</option>
 		</field>
 		
 		<field name="az_cntper" type="number"
-			label=""
-			description=""
+			label="Interval"
+			description="the number of songs (N Songs) or minutes (N Minutes) to repeat the playlist, or the minutes past every hour (Hourly)"
 			min="0" max="59" step="1"
 			default="0"
+			showon="az_type:2[OR]az_type:3[OR]az_type:4"
 		/>
 		
 		<field name="az_order" type="radio"
 			label="List Ordering"
-			description="'Shuffled' : The full playlist is shuffled and then played through in the shuffled order. 'Random' : A completely random track is picked for playback every time the queue is populated. 'Sequential' : The order of the playlist is manually specified and followed by the AutoDJ."		
+			description="'Shuffled' : The full playlist is shuffled and then played through in the shuffled order. 'Random' : A completely random track is picked for playback every time the queue is populated. 'Sequential' : The order of the playlist is manually specified and followed by the AutoDJ."	
+			class="btn-group"
+				
 		>
-			<option value="1">Shuffled</option>
-			<option value="2">Random</option>
-			<option value="3">Sequential</option>
+			<option value="shuffle">Shuffle</option>
+			<option value="random">Random</option>
+			<option value="sequential">Sequential</option>
 		</field>
 		
 		<field name="az_weight" type="number"
-			label=""
+			label="List Weight"
 			description="Lower weight playlists have lower priority"
 			min="1" max="25" step="1"
 			default="3"		
@@ -124,6 +128,14 @@
 			<option value="0">JNO</option>
 			<option value="1">JYES</option>
 		</field>
+		
+		<field name="az_info" type="textarea"
+			label="raw data"
+			description="This is the raw data stored on azuracast."
+			readonly="true"
+
+		/>
+		
 		
 	</fieldset>
 	

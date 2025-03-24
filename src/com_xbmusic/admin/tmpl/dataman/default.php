@@ -90,7 +90,7 @@ $wa->useScript('joomla.dialog')
 	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
         		onclick="<?php echo $confirm; ?>" >
 					<i class="icon-upload icon-white"></i> 
-        		<?php echo Text::_('XB_IMPORT'); ?>
+        			<?php echo Text::_('XB_IMPORT'); ?>
         		</button>        		
 			</p>
 		</div>

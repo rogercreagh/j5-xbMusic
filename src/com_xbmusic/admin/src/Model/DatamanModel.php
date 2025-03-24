@@ -25,11 +25,6 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
 
-
-const XBINFO = '[INFO] ';
-const XBWARN = '[WARNING] ';
-const XBERR = '[ERROR] ';
-
 class DatamanModel extends AdminModel {
 
     protected $trackcatid = 0;

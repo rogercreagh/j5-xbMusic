@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.42.2 12th March 2025
+ * @version 0.0.42.6 23rd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -34,6 +34,71 @@ class HtmlView extends BaseHtmlView {
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
 //        $this->state = $this->get('State');
+        if (isset($this->item->az_info)) {
+            $this->azschedule = $this->item->az_info->schedule_items;
+            unset($this->item->az_info->schedule_items);
+            $this->azlinks = $this->item->az_info->links;
+            unset($this->item->az_info->links);
+            $this->azpodcasts = $this->item->az_info->podcasts;
+            unset($this->item->az_info->podcasts);
+            $this->azbackend = $this->item->az_info->backend_options;
+            unset($this->item->az_info->backend_options);
+        }
+        
+        if ($this->item->az_id > 0) {
+            $this->azchanged = true;
+            $cntr = 0; 
+            switch ($this->item->az_type) {
+                case '1':
+                    if ($this->item->az_info->type == 'default') $this->azchanged = false;
+                    break;
+                case '2':
+                    if ($this->item->az_info->type == 'once_per_x_songs') $this->azchanged = false;
+                    $cntr = $this->item->az_info->play_per_songs;
+                    break;
+                case '3':
+                    if ($this->item->az_info->type == 'once_per_x_minutes') $this->azchanged = false;
+                    $cntr = $this->item->az_info->play_per_minutes;
+                    break;
+                case '4':
+                    if ($this->item->az_info->type == 'once_per_hour') $this->azchanged = false;
+                    $cntr = $this->item->az_info->play_per_hour_minute;
+                    break;
+                case '-1':
+                    if ($this->item->az_info->type == 'custom')  $this->azchanged = false;
+                    break;                
+                default:
+                    if ($this->item->az_info->type == '') $this->azchanged = false;
+                    break;
+            }
+            if ($this->azchanged == false) {
+                if ($cntr != $this->item->az_cntper)  $this->azchanged = true;
+            }
+            if ($this->azchanged == false) {
+                if ($this->item->az_name != $this->item->az_info->name) $this->azchanged = true;
+            }
+            if ($this->azchanged == false) {
+                if ($this->item->az_jingle != $this->item->az_info->is_jingle) $this->azchanged = true;
+            }
+            if ($this->azchanged == false) {
+                if ($this->item->az_weight != $this->item->az_info->weight) $this->azchanged = true;
+            }
+            if ($this->azchanged == false) {
+                if ($this->item->az_order != $this->item->az_info->order) $this->azchanged = true;
+            }
+            
+            $this->frmtlength = $this->item->az_info->total_length;
+            if ($this->frmtlength > 86399) {
+                $this->frmtlength = gmdate("z \d\a\y\s H \h\o\u\\r\s i \m\i\\n\s s \s\\e\c\s", $this->frmtlength);
+            } elseif ($this->frmtlength > 3599) {
+                $this->frmtlength = gmdate("H \h\o\u\\r\s i \m\i\\n\s s \s\\e\c\s", $this->frmtlength);
+            } elseif ($this->frmtlength > 59) {
+                $this->frmtlength = gmdate("i \m\i\\n\s s \s\\e\c\s", $this->frmtlength);
+            } else {
+                $this->frmtlength .= ' seconds';
+            }
+        } //endif item->az_type
+        
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'playlist', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');

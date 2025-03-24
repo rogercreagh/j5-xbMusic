@@ -2,7 +2,7 @@
  * @package xbmusic
  * @filesource /media/js/getplaylists.js
  * @version 0.0.42.3 17th March 2025
- * @desc used by ajax call to get playlists for station
+ * @description used by ajax call to playlist selector for given station
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 

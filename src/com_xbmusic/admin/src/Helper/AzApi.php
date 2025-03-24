@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.42.3 18th March 2025
+ * @version 0.0.42.6 23rd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -101,17 +101,24 @@ class AzApi {
         $result = $this->azApiGet($url);
         return $result;
     }
-    
-    
-    public function azPlaylistPls(int $azplid) {
+       
+    public function azPlaylistM3u(int $azplid) {
         if ($this->azstid == 0)
-            return (object) ['code' => true, 'msg'=>'Station ID not set'];
-            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/pls';
-        $result = $this->azApiGet($url);
-        return $result;
+                return (object) ['code' => true, 'msg'=>'Station ID not set'];
+            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/m3u';
+            $result = $this->azApiGet($url);
+            return $result;
     }
     
-    private function azApiGet($url) {
+    public function putAzPlaylist(int $azplid, string $jsondata) {
+        if ($this->azstid == 0)
+                return (object) ['code' => true, 'msg'=>'Station ID not set'];
+            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid;
+            $result = $this->azApiPut($url, $jsondata);
+            return $result;
+    }
+    
+    private function azApiGet($url, string $bodytext = '') {
         $ok = false;
         $cnt = 0;
         while (!$ok) {
@@ -128,12 +135,40 @@ class AzApi {
                     $ok = true;
                 } else {
                     sleep(2);
-                    $cnt ++;               
+                    $cnt ++;
                 }
             } else {
                 $ok = true;
-            }        
-        }        
+            }
+        }
+        return $result;       //check for other error codes on return to calling function
+    }
+    
+    private function azApiPut($url, string $data_json = '') {
+        $ok = false;
+        $cnt = 0;
+        while (!$ok) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization,'Content-Length: ' . strlen($data_json) ));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
+            curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($result);
+            if (isset($result->code) && ($result->code == 429)) {
+                //we have an api overload so wait 2 secs for a max of 2 times
+                if ($cnt >1) {
+                    $ok = true;
+                } else {
+                    sleep(2);
+                    $cnt ++;
+                }
+            } else {
+                $ok = true;
+            }
+        }
         return $result;       //check for other error codes on return to calling function
     }
     

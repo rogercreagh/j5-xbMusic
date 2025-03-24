@@ -1,7 +1,7 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.30.1 7th February 2025
+ * @version xbmusic-J5 0.0.42.5 22nd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -162,6 +162,7 @@ ul.nav-tabs {
     width: auto;
     padding: 0 1rem;
     font-weight: 700;
+    margin-bottom: 0.5rem;
 }
 .xbboxwht, .xbbgwht {
 	background-color: #f7f7f7; /* to lift from pure white bckgrnd */
@@ -505,7 +506,7 @@ dl.xbdl dt{
     clear: left; 
 	font-weight:normal;
 	font-style:italic;
-	min-width: 100px;
+	min-width: 120px;
 	text-align:right;
 }
 dl.xbdl dt:after{
@@ -516,7 +517,7 @@ dl.xbdl dd:before {
   content:'';
 }
 dl.xbdl dd {
-	padding: 0 0 0.5em 0;
+	padding: 0 0 2px 0;
 	margin:0;
 }
 

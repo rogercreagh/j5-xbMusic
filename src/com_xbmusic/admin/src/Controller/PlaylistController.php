@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.42.4 20th March 2025
+ * @version 0.0.42.6 24th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -50,11 +50,47 @@ class PlaylistController extends FormController {
     public function loadplaylist() {
         $jip =  Factory::getApplication()->getInput();
         $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
-//        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
+        //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
         $model = $this->getModel('playlist');
         $wynik = $model->loadPlaylist($data);
         if (!($wynik>0)) $wynik = $data['id'];
         $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$wynik);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function reloadplaylist() {
+        $jip =  Factory::getApplication()->getInput();
+        $id = $jip->get('id',0);
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
+        $model = $this->getModel('playlist');
+        $wynik = $model->reloadPlaylist($data);
+        //if (!($wynik>0)) $wynik = $data['id'];
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function putplaylist() {
+        $jip =  Factory::getApplication()->getInput();
+        $id = $jip->get('id',0);
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
+        $model = $this->getModel('playlist');
+        $wynik = $model->putPlaylist($data);
+        //if (!($wynik>0)) $wynik = $data['id'];
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function unlinkplaylist() {
+        $jip =  Factory::getApplication()->getInput();
+        $id = $jip->get('id',0);
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
+        $model = $this->getModel('playlist');
+        $wynik = $model->unlinkPlaylist($data);
+        //if (!($wynik>0)) $wynik = $data['id'];
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
         $this->setRedirect($redirectTo );
     }
     

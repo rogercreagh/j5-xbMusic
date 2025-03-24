@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.42.3 15th March 2025
+ * @version 0.0.42.6 23rd March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,13 +19,17 @@ use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 /** @var Joomla\CMS\WebAsset\WebAssetManager $wa */
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
 ->useScript('xbmusic.showdown')
-->useScript('xbmusic.getplaylists');
+->useScript('xbmusic.markdownhelper')
+->useScript('xbmusic.playlisthelper')
+->useScript('xbmusic.getplaylists')
+->useScript('joomla.dialog');
 
 $root = Uri::root();
 $document = Factory::getApplication()->getDocument();
@@ -38,35 +42,8 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 $input = Factory::getApplication()->getInput();
 
 ?>
-<script>
-	function clearmd() {
-    	var descMd = document.getElementById('jform_description').value;
-    	var converter = new showdown.Converter();
-        var descHtml = converter.makeHtml(descMd);
-		var descText = stripHtml(descHtml);
-        document.getElementById('jform_description').value = descText;
-        updatePvMd();
-	}
-	
-    function stripHtml(html) {
-	   let doc = new DOMParser().parseFromString(html, 'text/html');
-	   return doc.body.textContent || "";
-    }
+<script type="module" src="/media/com_xbmusic/js/xbdialog.js"></script>
 
-	function updatePvMd() {
-    	var descText = document.getElementById('jform_description').value;
-		var converter = new showdown.Converter();
-        var descHtml = converter.makeHtml(descText);
-		document.getElementById('pv_desc').innerHTML= descHtml;
-    }
- 	
- 	function loadplaylist(azid) {
- 		document.getElementById('jform_az_id').value = azid;
- 		document.getElementById('jform_az_dbstid').value = document.getElementById('jform_azstation').value;
- 		Joomla.submitform('playlist.loadplaylist',document.getElementById('item-form'));
- 	}
- 	
-</script>
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
@@ -78,35 +55,46 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
-    	<?php if (($this->azuracast == 1) || ($this->item->azdbstid > 0)) : ?>
+    	<?php if ($this->azuracast == 1) : ?>
     		<div class="row">
-        		<?php if ($this->item->az_id > 0) : ?>
-        			<div class="col-md-6">
-        				<div class="pull-right importlist">
-         					<button type="button" class="btn btn-danger btn-sm" onclick="unlinkaz();">Disconnect Azuracast</button>
-         				</div>
-        				<?php echo Text::_('Azuracast playlist').' '.$this->item->az_id.' : '.$this->item->az_name; ?>
-        			</div>
-        			<div class="col-md-6">
-        			</div>
-         		<?php endif; ?>
 				<?php if ($this->stncnt == 0)  : ?>
-    				<p>No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials below set in Config Options
-    				<br />APIname: <code><?php echo $this->az_apiname; ?></code> at <code><?php echo $this->az_url; ?></code></p>
+    				<p><?php echo Text::_('No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials defined in Config Options'); ?>
+    				<br /><?php echo Text::_('Current credentials'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
+    				at <code><?php echo $this->az_url; ?></code></p>
+				<?php elseif ($this->item->az_id > 0) : ?>
+        			<div class="col-md-6">
+    					<p><i><?php echo Text::_('Azuracast station'); ?></i> : 
+    						<?php echo $this->station['title'].' at '.$this->station['az_url']; ?>
+        				<br /><i><?php echo Text::_('Azuracast playlist'); ?></i> : 
+        					<?php echo $this->item->az_id.' - '.$this->item->az_name; ?>
+        				</p>
+        			</div>
+        			<div class="col-md-6">
+            	    	<?php $popbody = "'Unlink playlist id:'+document.getElementById('jform_az_id').value+' from Azuracast'"; 
+            	    	  $pophead = 'Confirm Unlink Playlist from Azuracast'; 
+            	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.unlinkplaylist');"; 
+            	    	  ?>                
+            	    	 <p><button id="reload" class="btn btn-danger icon-white" type="button" 
+                    		onclick="<?php echo $confirm; ?>" >
+            					<i class="fas fa-link-slash"></i> &nbsp; 
+                    			<?php echo Text::_('Unlink from to Azuracast'); ?>
+                    		</button>        		
+            			</p>
+        			</div>				
 				<?php else : ?>
         			<div class="col-md-6" id="loadstations" >
-        				<p>To import a playlist from Azuracast first select the station to import from.
+        				<p><?php echo Text::_('To import a playlist from Azuracast first select the station'); ?>
         					<br /><?php echo $this->form->renderField('azstation'); ?>
+        					<br /><?php echo Text::_('if the station you want is not listed')?>
         				</p>
         			</div>
         			<div class="col-md-6" id="loadplaylists" >
-        				<p>To import a playlist from Azuracast select playlist</p>
+        				<p><?php echo Text::_('Select playlist to import'); ?></p>
         				<div id="playlists"></div>   				
-        			</div>
-        		<?php endif; ?>
+        			</div>				    				   
+         		<?php endif; ?>
             </div>
 			<?php if (isset($this->station)) : ?>
-    				<p><?php echo Text::_('Azuracast station').' '.$this->station['title'].' at '.$this->station['az_url']; ?>
     		<?php endif; ?>
     				   		
     	<?php endif; ?>
@@ -120,15 +108,77 @@ $input = Factory::getApplication()->getInput();
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
 	        
 	        	<h4><?php echo Text::_('Azuracast Specific Values'); ?></h4>
-	        	<p class="xbnote"><?php Text::_('Use the button below to sync changes with Azuracast'); ?>
-	        	</p>
-	    
-        		<?php $this->form->renderField('az_name') ;?>
-        		<?php $this->form->renderField('az_type') ;?>
-        		<?php $this->form->renderField('az_cntper') ;?>
-        		<?php $this->form->renderField('az_jingle') ;?>
-        		<?php $this->form->renderField('az_weight') ;?>
-        	
+	    		<div class="row">
+	    			<div class="col-md-6">
+           				<p><?php echo Text::_('Local data'); ?></p>
+                		<?php echo $this->form->renderField('az_name') ;?>
+                		<?php echo $this->form->renderField('az_type') ;?>
+                		<?php echo $this->form->renderField('az_cntper') ;?>
+                		<?php echo $this->form->renderField('az_jingle') ;?>
+                		<?php echo $this->form->renderField('az_weight') ;?>
+                		<?php echo $this->form->renderField('az_order') ;?>
+                		<p><?php echo Text::_('If you edit the settings above then they will not take effect on the stastion until you Push the changes back to Azuracast. Other fields listed in the right hand panel are not editable within xbMusic, and have no impact on xbMusic views.')?></p>
+                		<?php if($this->azchanged == true) : ?>
+                			<p class="xbred"><?php echo Text::_('xbMusic data no longer matches Azuracast data - please reload from Azuracast or push changes to Azuracast'); ?></p>
+                		<?php endif; ?>
+	    			</div>
+	    			<div class="col-md-6">
+           				<p><?php echo Text::_('Saved raw data from Azuracast'); ?></p>
+    					<?php if (!empty($this->item->az_info)) : ?>
+        					<fieldset id="azinfo" class="xbbox xbboxwht ">
+        						<legend><?php echo Text::_('Azuracast Settings'); ?></legend>
+        						<dl class="xbdl">
+                            		<?php foreach ($this->item->az_info as $key=>$value) : ?>
+                            			<?php if ($key == 'total_length') 
+                            			    $value = $this->frmtlength; ?>
+                            			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                            		<?php endforeach; ?>        
+        						</dl>
+        					</fieldset>
+        					<p class="info"><?php echo Text::_('Check Schedule tab for Azuracast schedule entries'); ?></p>
+    					<?php else : ?>
+    						<p class="xbit"><?php echo Text::_('Azuracast Info Missing'); ?></p>
+    					<?php endif; ?>
+        			</div>
+        		</div>
+                <?php if($this->azchanged == true) : ?>
+            		<div class="row">
+            			<div class="col-md-6">
+    	        			<p class="xbnote">
+    	        				<?php echo Text::_('Use Reload button to get settings from Azuracast - will overwrite any local changes'); ?>
+    	        				<br /><?php echo Text::_('Use Push button to post changes to Azuracast - will overwrite any changes there'); ?>
+    	        			</p>
+            			</div>
+            			<div class="col-md-6">
+        					<div class="pull-left">
+                    	    	<?php $popbody = "'Reloading playlist id:'+document.getElementById('jform_az_id').value+
+                                                ' from station id: X'"; 
+                    	    	      $pophead = 'Confirm Reload playlist from Azuracast'; 
+                    	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.reloadplaylist');"; 
+                    	    	  ?>                
+                    	    	 <p><button id="reload" class="btn btn-info" type="button" 
+                            		onclick="<?php echo $confirm; ?>" >
+                    					<i class="icon-download icon-black"></i> 
+                            			<?php echo Text::_('Reload from Azuracast'); ?>
+                            		</button>        		
+                    			</p>
+        					</div>
+        					<div class="pull-right">
+                    	    	<?php $popbody = "'Write changes back to playlist id:'+document.getElementById('jform_az_id').value+
+                                                ' on Azuracast'"; 
+                    	    	      $pophead = 'Confirm Put changes to Azuracast'; 
+                    	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.putplaylist');"; 
+                    	    	  ?>                
+                    	    	 <p><button id="reload" class="btn btn-warning" type="button" 
+                            		onclick="<?php echo $confirm; ?>" >
+                    					<i class="icon-upload icon-white"></i> 
+                            			<?php echo Text::_('Put changes to Azuracast'); ?>
+                            		</button>        		
+                    			</p>
+        					</div>
+            			</div>
+            		</div>
+        		<?php endif; ?>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
         
 	    <?php endif; ?>
