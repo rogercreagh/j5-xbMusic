@@ -2,13 +2,17 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.0.41.5 8th March 2025
+ * @version 0.0.42.7 25th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
 -->
  
 <form>
+	<config>
+		<inlinehelp button="show"/>
+	</config>
+
 	<fieldset name="import" label="Import Settings"
 addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
 	>	

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.41.5 8th March 2025
+ * @version 0.0.42.7 25th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,7 +14,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
-// use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
@@ -27,8 +26,8 @@ $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
 ->useScript('xbmusic.foldertree')
-->useScript('xbmusic.showdown');
-$wa->useScript('joomla.dialog')
+->useScript('xbmusic.showdown')
+->useScript('joomla.dialog');
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -38,17 +37,9 @@ $wa->useScript('joomla.dialog')
 
 ?>
 <link rel="stylesheet" href="<?php echo Uri::root(true);?>/media/com_xbmusic/css/foldertree.css">
-<script type="module" >
-    import JoomlaDialog from 'joomla.dialog';
 
-    window.doConfirm = function(poptext,pophead,task) {
-        JoomlaDialog.confirm(poptext,pophead).then((result) => { 
-        if(result) {
-            Joomla.submitbutton('dataman.'+task);
-          };
-       });
-    }
-</script>
+<script type="module" src="/media/com_xbmusic/js/xbdialog.js"></script>
+
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
       <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
@@ -73,26 +64,6 @@ $wa->useScript('joomla.dialog')
 		<div class="col-md-6">
 			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
 	    	<div id="container"> </div>
-	    	<p>
-	         	<?php echo $this->form->renderField('impcat'); ?>
-	        </p>
-	        <p>
-	         	<?php echo $this->form->renderField('splitsongs'); ?>
-			</p>	    	
-	        <p>
-	         	<?php echo $this->form->renderField('nobrackets'); ?>
-			</p>	    	
-	    	<?php $popbody = '<br />Are you really sure?'; 
-	    	  $pophead = 'Confirm Import from MP3'; 
-	    	  $confirm = "doConfirm('<i>Import from </i>'+document.getElementById('jform_foldername').value+
-        			'".$popbody."','".$pophead."','importmp3');"; 
-	    	  ?>
-	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
-        		onclick="<?php echo $confirm; ?>" >
-					<i class="icon-upload icon-white"></i> 
-        			<?php echo Text::_('XB_IMPORT'); ?>
-        		</button>        		
-			</p>
 		</div>
 		<div class="col-md-6">
         	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
@@ -103,6 +74,26 @@ $wa->useScript('joomla.dialog')
         	<?php echo $this->form->renderField('filepathname'); ?> 
         	<?php echo $this->form->renderField('filename'); ?> 
        </div>
+	</div>
+	<hr />
+	<div class="row">
+		<div class="col-md-6">
+         	<?php echo $this->form->renderField('impcat'); ?>
+         	<?php echo $this->form->renderField('splitsongs'); ?>
+         	<?php echo $this->form->renderField('nobrackets'); ?>
+		</div>
+		<div class="col-md-6">
+	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
+	    	  $pophead = 'Confirm Import from MP3'; 
+	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3');"; 
+	    	  ?>
+	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
+        		onclick="<?php echo $confirm; ?>" >
+					<i class="icon-download"></i> &nbsp;
+        			<?php echo Text::_('XB_IMPORT'); ?>
+        		</button>        		
+			</p>
+		</div>
 	</div>
 </details>
 <hr />
@@ -211,11 +202,10 @@ $wa->useScript('joomla.dialog')
         			<p><?php echo Text::_('XBMUSIC_NO_STATIONS');?>
         			</p>
         		<?php else : ?>
-            	    	<?php $pophead = Text::_('XBMUSIC_CONFIRM_STAT_DEL'); 
-                            $popsure = '<br />'.Text::_('XB_ARE_YOU_SURE'); ?>
+            	    	<?php $pophead = Text::_('XBMUSIC_CONFIRM_STAT_DEL'); ?>
         			<?php foreach ($this->xbstations as $station) : ?>
-            				<?php $popbody = Text::sprintf('XBMUSIC_DELETE_STATION',$station['title']).$popsure;
-            				    $confirm = "doConfirm('".$popbody."','".$pophead."','deletestation');"; ?>
+            				<?php $popbody = "'". Text::sprintf('XBMUSIC_DELETE_STATION',$station['title'])."'";
+            				    $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.deletestation');"; ?>
 						<details>
 							<summary>id: <?php echo $station['id']; ?> <span class="xbr11"> <?php echo $station['title']; ?></span>
 								<div class="pull-right">
@@ -223,7 +213,7 @@ $wa->useScript('joomla.dialog')
 									class="btn btn-sm btn-danger" type="button"
         							onclick="document.getElementById('jform_dbstid').value=
         							 <?php echo $station['id'].';'.$confirm; ?>;" >
-									<i class="icon-trash icon-white"></i> <?php echo Text::_('XB_DELETE'); ?>
+									<i class="icon-trash icon-white"></i> &nbsp;<?php echo Text::_('XB_DELETE'); ?>
 									</button>
 								</div>
 							</summary>
@@ -261,11 +251,10 @@ $wa->useScript('joomla.dialog')
         				<p><?php echo Text::sprintf('XBMUSIC_STATIONS_AVAILABLE_AT', 
         				    $this->azurl, $this->apiname); ?>
         				<br /><?php echo Text::_('XBMUSIC_BUTTONS_TO_IMPORT'); ?> 
-            	    	<?php $pophead = Text::_('XBMUSIC_CONFIRM_AZIMPORT'); 
-                            $popsure = '<br />'.Text::_('XB_ARE_YOU_SURE'); ?>
+            	    	<?php $pophead = "'".Text::_('XBMUSIC_CONFIRM_AZIMPORT')."'"; ?>
             			<?php foreach($this->azstations as $station) : ?>
-            				<?php $popbody = Text::sprintf('XBMUSIC_IMPORT_FROM',$station->name,$this->azurl).$popsure;
-            				    $confirm = "doConfirm('".$popbody."','".$pophead."','importazstation');"; ?>
+            				<?php $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$station->name,$this->azurl)."'";
+            				    $confirm = "doConfirm(".$popbody.",".$pophead.",'dataman.importazstation');"; ?>
             				<details>
     							<summary><i>AzID</i>: <?php echo $station->id; ?> 
     								<span class="xbr11"> <?php echo $station->name; ?></span>
@@ -274,7 +263,7 @@ $wa->useScript('joomla.dialog')
     									class="btn btn-sm btn-warning" type="button"
             							onclick="document.getElementById('jform_loadazid').value=
             							 <?php echo $station->id.';'.$confirm; ?>;" >
-    									<i class="icon-upload icon-white"></i> <?php echo Text::_('XB_IMPORT'); ?>
+    									<i class="icon-download"></i> <?php echo Text::_('XB_IMPORT'); ?>
 										</button>
     								</div>
     							</summary>

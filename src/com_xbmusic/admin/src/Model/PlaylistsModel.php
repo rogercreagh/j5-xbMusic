@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.30.0 5th February 2025
+ * @version 0.0.42.7 25th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -114,6 +114,7 @@ class PlaylistsModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.description, '
+                    .'a.show, a.scheduled, a.az_id, a.az_name, a.az_type,'
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
@@ -122,7 +123,11 @@ class PlaylistsModel extends ListModel {
             );
         $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
         $query->from('#__xbmusic_playlists AS a');
-                        
+        
+        // Join azstations
+        $query->select('st.title AS azstation' )
+        ->join('LEFT', '#__xbmusic_azstations AS st ON st.id = a.az_dbstid');
+        
         // Join over the users for the checked out user.
         $query->select('uc.name AS editor')
         ->join('LEFT', '#__users AS uc ON uc.id=a.checked_out');

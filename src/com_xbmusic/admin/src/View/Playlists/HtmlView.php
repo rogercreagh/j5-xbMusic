@@ -46,6 +46,7 @@ class HtmlView extends BaseHtmlView {
         $this->activeFilters = $this->get('ActiveFilters');
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
+        $this->azuracast = $this->params->get('azuracast','0');
         
         $this->addToolbar();
         

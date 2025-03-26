@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.30.4 12th February 2025
+ * @version 0.0.42.7 25th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -102,6 +102,10 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
+						<?php if($this->azuracast) : ?>
+							<th>Azuracast
+							</th>
+						<?php endif; ?>
 						<th><?php echo Text::_('Tracks'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
@@ -183,6 +187,13 @@ if (strpos($listOrder, 'modified') !== false) {
 								</p>
 							</div>
 						</td>
+						<?php if($this->azuracast) : ?>
+							<td><?php if ($item->az_id) : ?>
+								<?php echo $item->azstation; ?><br />
+								<?php echo $item->az_name; ?>
+							<?php endif; ?>
+							</td>
+						<?php endif; ?>
 						<td class="xbr09" onclick="stopProp(event);">
 							<?php if($item->trkcnt > 0): ?>
 								<details>

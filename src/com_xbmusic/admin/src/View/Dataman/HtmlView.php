@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.41.5 8th March 2025
+ * @version 0.0.42.7 25th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -81,12 +81,14 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGS', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         
+        $toolbar->divider();
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         if ($canDo->get('core.admin')) {
             //$toolbar->preferences('com_xbmusic');
             ToolbarHelper::preferences('com_xbmusic');
         }
+        $toolbar->inlinehelp();
         $toolbar->help('Dataman:',false,'https://crosborne.uk/xbmusic/doc#dataman');
         
     }

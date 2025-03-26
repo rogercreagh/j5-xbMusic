@@ -2,10 +2,11 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.42.6</version>
+		<version>0.0.42.7</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.42.6</h3> Updated 24th March 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.42.6</h3> Updated 26th March 2025]]></item>
 			<item>Playlist Azuracast load, re-load, put, unlimk functions</item>
+			<item>Playlists show Az stations &amp; name</item>
 		</addition>
 		<remove>
 		</remove>
@@ -22,7 +23,6 @@
 			<item></item>
 		</fix>
 		<note>
-			<item>Playlist functions missing</item>
 			<item>Front end views not available</item>
 			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
 			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
