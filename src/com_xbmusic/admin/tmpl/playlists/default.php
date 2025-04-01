@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.42.7 25th March 2025
+ * @version 0.0.50.0 27th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -106,7 +106,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<th>Azuracast
 							</th>
 						<?php endif; ?>
-						<th><?php echo Text::_('Tracks'); ?>
+						<th><?php echo Text::_('XBMUSIC_TRACKS'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -185,6 +185,8 @@ if (strpos($listOrder, 'modified') !== false) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
+								<p class="xb09r"><i>Alias</i>: &nbsp;<?php echo $item->alias; ?>
+								</p>
 							</div>
 						</td>
 						<?php if($this->azuracast) : ?>
@@ -198,7 +200,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if($item->trkcnt > 0): ?>
 								<details>
 									<summary class="xbnit"><?php echo $item->trkcnt; 
-									echo ($item->trkcnt==1)? Xbtext::_('track',XBSP1 + XBTRL) : Xbtext::_('tracks',XBSP1 + XBTRL); ?>
+									echo ($item->trkcnt==1)? Xbtext::_('XBMUSIC_TRACK',XBSP1 + XBLC1 + XBTRL) : Xbtext::_('XBMUSIC_TRACKS',XBSP1 + XBLC1 + XBTRL); ?>
 								    </summary>
 								    <div class="xbmh400 xbyscroll">
     									<ul style="margin:5px;list-style: none;">
@@ -209,7 +211,7 @@ if (strpos($listOrder, 'modified') !== false) {
 								    </div>
 								</details>
 							<?php else: ?>
-								<p class="xbit"><?php echo Text::_('no items in playlist'); ?></p>
+								<p class="xbit"><?php echo Text::_('XBMUSIC_NO_PLAYLIST_ITEMS'); ?></p>
 							<?php endif; ?>
 						</td>
 						<td class="nowrap">

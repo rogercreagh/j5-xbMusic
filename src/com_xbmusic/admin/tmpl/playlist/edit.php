@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.42.6 23rd March 2025
+ * @version 0.0.50.1 1st April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -43,6 +43,29 @@ $input = Factory::getApplication()->getInput();
 
 ?>
 <script type="module" src="/media/com_xbmusic/js/xbdialog.js"></script>
+<style>
+/* set colum,n widths for schedule table - override Joomla default share space equally*/
+    #subfieldList_jform_schedulelist thead th:first-child { width:70px !important; color:grey; }
+    #subfieldList_jform_schedulelist thead th:nth-child(2) {width:70px !important; color:grey; }
+    #subfieldList_jform_schedulelist thead th:nth-child(3) {width:100px !important; color:green; }
+    #subfieldList_jform_schedulelist thead th:nth-child(4) {width:100px !important; color:red; }
+    #subfieldList_jform_schedulelist thead th:nth-child(5) {width:250px !important; color:green; }
+    #subfieldList_jform_schedulelist thead th:nth-child(6) {width:250px !important; color:red; }
+    #subfieldList_jform_schedulelist thead th:nth-child(7) {width:unset !important; }
+    #subfieldList_jform_schedulelist thead th:nth-child(8) {width:125px !important; }
+    #subfieldList_jform_schedulelist thead th:nth-child(9) {width:125px !important; }
+    #subfieldList_jform_schedulelist thead td {width:unset !important;}
+/* set style for calendar controls on subform */
+    #subfieldList_jform_schedulelist .field-calendar .input-group {flex-wrap:nowrap;}
+    #subfieldList_jform_schedulelist .field-calendar .input-group button  
+    {background-color: #fff;
+        color: #777;
+        border: 1px solid;     
+        border-color:  #B8C9E0 #B8C9E0 #B8C9E0 transparent;                                                              
+        font-size: 1.2rem;
+        padding: 0 15px;
+    }
+</style>
 
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
@@ -64,8 +87,8 @@ $input = Factory::getApplication()->getInput();
 				<?php elseif ($this->item->az_id > 0) : ?>
         			<div class="col-md-6">
     					<p><i><?php echo Text::_('Azuracast station'); ?></i> : 
-    						<?php echo $this->station['title'].' at '.$this->station['az_url']; ?>
-        				<br /><i><?php echo Text::_('Azuracast playlist'); ?></i> : 
+    						<?php echo $this->station['title'].' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
+        				<br /><i><?php echo Text::_('Azuracast playlist'); ?></i> : #
         					<?php echo $this->item->az_id.' - '.$this->item->az_name; ?>
         				</p>
         			</div>
@@ -74,7 +97,7 @@ $input = Factory::getApplication()->getInput();
             	    	  $pophead = 'Confirm Unlink Playlist from Azuracast'; 
             	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.unlinkplaylist');"; 
             	    	  ?>                
-            	    	 <p><button id="reload" class="btn btn-danger icon-white" type="button" 
+            	    	 <p><button id="reload" class="btn btn-danger btn-sm icon-white" type="button" 
                     		onclick="<?php echo $confirm; ?>" >
             					<i class="fas fa-link-slash"></i> &nbsp; 
                     			<?php echo Text::_('Unlink from to Azuracast'); ?>
@@ -120,6 +143,38 @@ $input = Factory::getApplication()->getInput();
                 		<p><?php echo Text::_('If you edit the settings above then they will not take effect on the stastion until you Push the changes back to Azuracast. Other fields listed in the right hand panel are not editable within xbMusic, and have no impact on xbMusic views.')?></p>
                 		<?php if($this->azchanged == true) : ?>
                 			<p class="xbred"><?php echo Text::_('xbMusic data no longer matches Azuracast data - please reload from Azuracast or push changes to Azuracast'); ?></p>
+    	        			<p class="xbnote">
+    	        				<?php echo Text::_('Use Reload button to get settings from Azuracast - will overwrite any local changes'); ?>
+    	        				<br /><?php echo Text::_('Use Push button to post changes to Azuracast - will overwrite any changes there'); ?>
+    	        			</p>
+    	        			<div>
+            					<div class="pull-left">
+                        	    	<?php $popbody = "'Reloading playlist id:'+document.getElementById('jform_az_id').value+
+                                                    ' from station id: X'"; 
+                        	    	      $pophead = 'Confirm Reload playlist from Azuracast'; 
+                        	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.reloadplaylist');"; 
+                        	    	  ?>                
+                        	    	 <p><button id="reload" class="btn btn-info" type="button" 
+                                		onclick="<?php echo $confirm; ?>" >
+                        					<i class="icon-download icon-black"></i> 
+                                			<?php echo Text::_('Reload from Azuracast'); ?>
+                                		</button>        		
+                        			</p>
+            					</div>
+            					<div class="pull-right">
+                        	    	<?php $popbody = "'Write changes back to playlist id:'+document.getElementById('jform_az_id').value+
+                                                    ' on Azuracast'"; 
+                        	    	      $pophead = 'Confirm Put changes to Azuracast'; 
+                        	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.putplaylist');"; 
+                        	    	  ?>                
+                        	    	 <p><button id="reload" class="btn btn-warning" type="button" 
+                                		onclick="<?php echo $confirm; ?>" >
+                        					<i class="icon-upload icon-white"></i> 
+                                			<?php echo Text::_('Put changes to Azuracast'); ?>
+                                		</button>        		
+                        			</p>
+            					</div>    	        			
+    	        			</div>
                 		<?php endif; ?>
 	    			</div>
 	    			<div class="col-md-6">
@@ -127,13 +182,17 @@ $input = Factory::getApplication()->getInput();
     					<?php if (!empty($this->item->az_info)) : ?>
         					<fieldset id="azinfo" class="xbbox xbboxwht ">
         						<legend><?php echo Text::_('Azuracast Settings'); ?></legend>
-        						<dl class="xbdl">
+        						<dl class="xbdl xbmb0">
                             		<?php foreach ($this->item->az_info as $key=>$value) : ?>
                             			<?php if ($key == 'total_length') 
                             			    $value = $this->frmtlength; ?>
                             			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
                             		<?php endforeach; ?>        
         						</dl>
+								<dl class="xbdl">
+                                	<dt>Schedule Items</dt><dd><?php echo $this->item->schedulecnt; ?></dd>
+                                </dl>
+								<?php echo $this->form->renderField('schedulecnt') ;?>        						
         					</fieldset>
         					<p class="info"><?php echo Text::_('Check Schedule tab for Azuracast schedule entries'); ?></p>
     					<?php else : ?>
@@ -144,42 +203,20 @@ $input = Factory::getApplication()->getInput();
                 <?php if($this->azchanged == true) : ?>
             		<div class="row">
             			<div class="col-md-6">
-    	        			<p class="xbnote">
-    	        				<?php echo Text::_('Use Reload button to get settings from Azuracast - will overwrite any local changes'); ?>
-    	        				<br /><?php echo Text::_('Use Push button to post changes to Azuracast - will overwrite any changes there'); ?>
-    	        			</p>
             			</div>
             			<div class="col-md-6">
-        					<div class="pull-left">
-                    	    	<?php $popbody = "'Reloading playlist id:'+document.getElementById('jform_az_id').value+
-                                                ' from station id: X'"; 
-                    	    	      $pophead = 'Confirm Reload playlist from Azuracast'; 
-                    	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.reloadplaylist');"; 
-                    	    	  ?>                
-                    	    	 <p><button id="reload" class="btn btn-info" type="button" 
-                            		onclick="<?php echo $confirm; ?>" >
-                    					<i class="icon-download icon-black"></i> 
-                            			<?php echo Text::_('Reload from Azuracast'); ?>
-                            		</button>        		
-                    			</p>
-        					</div>
-        					<div class="pull-right">
-                    	    	<?php $popbody = "'Write changes back to playlist id:'+document.getElementById('jform_az_id').value+
-                                                ' on Azuracast'"; 
-                    	    	      $pophead = 'Confirm Put changes to Azuracast'; 
-                    	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.putplaylist');"; 
-                    	    	  ?>                
-                    	    	 <p><button id="reload" class="btn btn-warning" type="button" 
-                            		onclick="<?php echo $confirm; ?>" >
-                    					<i class="icon-upload icon-white"></i> 
-                            			<?php echo Text::_('Put changes to Azuracast'); ?>
-                            		</button>        		
-                    			</p>
-        					</div>
             			</div>
             		</div>
         		<?php endif; ?>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+        
+	    <?php endif; ?>
+
+    	<?php if($this->item->schedulecnt > 0) : ?>
+
+	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'schedule', 'Schedule'); ?>
+	        	<?php echo $this->form->renderField('schedulelist'); ?>
+ 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
         
 	    <?php endif; ?>
 
@@ -230,7 +267,7 @@ $input = Factory::getApplication()->getInput();
     		</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
          
-		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKS')); ?>
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('XBMUSIC_TRACKS').' &amp;'.Text::_('XB_LINKS')); ?>
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
      			<h4><?php echo Text::_('XBMUSIC_LINKS_TO_TRACKS')?></h4>

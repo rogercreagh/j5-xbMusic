@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.42.0 11th March 2025
+# sql installation file for component xbMusic 0.0.50.1 1st April 2025
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -118,8 +118,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
   `title` varchar(190) NOT NULL DEFAULT '',
   `alias` varchar(190) NOT NULL DEFAULT '',
-  `show` tinyint(1) NOT NULL DEFAULT '1',
-  `scheduled` tinyint(1) NOT NULL DEFAULT '0',
+#  `show` tinyint(1) NOT NULL DEFAULT '1',
+  `scheduledcnt` int(10) unsigned NOT NULL DEFAULT '0',
   `az_id` int(10) unsigned NOT NULL Default '0',
   `az_name` varchar(20),
   `az_dbstid` int(10) unsigned NOT NULL Default '0',
@@ -255,21 +255,15 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
-  `title` varchar(190) NOT NULL DEFAULT '',
-  `alias` varchar(190) NOT NULL DEFAULT '',
+  `dbplid` int(10) unsigned NOT NULL Default '0',
   `az_id` int(10) unsigned NOT NULL Default '0',
-  `az_stid` int(10) unsigned NOT NULL Default '0',
-  `az_plid` int(10),
   `az_starttime` time,
   `az_endtime` time,
   `az_startdate` date,
   `az_enddate` date,
-  `az_days` varchar(7),
+  `az_days` varchar(25),
   `az_loop` boolean,  
-  `az_info` mediumtext,
-  `description` mediumtext,
-  `catid` int(10) NOT NULL  DEFAULT '0',
-  `access` int(10) NOT NULL  DEFAULT '0',
+  `showpublic` tinyint(1) NOT NULL DEFAULT '1',
   `status` tinyint(3) NOT NULL DEFAULT '0',
   `created` datetime,
   `created_by` int(10) NOT NULL DEFAULT '0',
@@ -278,13 +272,20 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   `checked_out_time` datetime,
   `modified` datetime,
   `modified_by` int(10) NOT NULL DEFAULT '0',
-  `metadata` mediumtext NOT NULL DEFAULT '',
-  `ordering` int(10) NOT NULL DEFAULT '0',
-  `params` mediumtext NOT NULL DEFAULT '',
+#  `title` varchar(190) NOT NULL DEFAULT '',
+#  `alias` varchar(190) NOT NULL DEFAULT '',
+#  `az_stid` int(10) unsigned NOT NULL Default '0',
+#  `az_plid` int(10),
+#  `az_info` mediumtext,
+#  `description` mediumtext,
+#  `catid` int(10) NOT NULL  DEFAULT '0',
+#  `access` int(10) NOT NULL  DEFAULT '0',
+#  `metadata` mediumtext NOT NULL DEFAULT '',
+#  `ordering` int(10) NOT NULL DEFAULT '0',
+#  `params` mediumtext NOT NULL DEFAULT '',
   `note` mediumtext,
   PRIMARY KEY (`id`),
-  UNIQUE (`alias`),
-  UNIQUE `plidx` (`az_id`, `az_stid`)
+#  UNIQUE `plidx` (`az_id`, `az_stid`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 # new link tables tracksong, trackartist, trackplaylist

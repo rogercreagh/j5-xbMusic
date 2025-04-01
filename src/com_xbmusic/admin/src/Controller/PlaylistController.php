@@ -186,11 +186,12 @@ class PlaylistController extends FormController {
         
         // Set the model
         /** @var \Joomla\Component\Content\Administrator\Model\ArticleModel $model */
-        $model = $this->getModel('playlist');
+       // $model = $this->getModel('playlist');
+        $model = $this->getModel('Playlist', '', []);
         
         // Preset the redirect
-        //        $this->setRedirect(Route::_('index.php?option=com_content&view=articles' . $this->getRedirectToListAppend(), false));
-        $this->setRedirect((string)Uri::getInstance());
+        $this->setRedirect(Route::_('index.php?option=com_xbmusic&view=playlists' . $this->getRedirectToListAppend(), false));
+        //$this->setRedirect((string)Uri::getInstance());
         
         return parent::batch($model);
     }

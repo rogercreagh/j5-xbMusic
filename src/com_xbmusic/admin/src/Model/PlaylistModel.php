@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.42.6 24th March 2025
+ * @version 0.0.50.1 28th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -42,7 +42,7 @@ class PlaylistModel extends AdminModel {
         $taghelper = new TagsHelper();
         $message = 'tag:'.$value.' removed from playlists :';
         foreach ($pks as $pk) {
-            if ($this->user->authorise('core.edit', $contexts[$pk])) {
+            if ($this->getCurrentUser()->authorise('core.edit', $contexts[$pk])) {
                 $existing = $taghelper->getItemTags('com_xbmusic.playlist', $pk, false);
                 $oldtags = array_column($existing,'tag_id');
                 $newtags = array();
@@ -169,7 +169,7 @@ class PlaylistModel extends AdminModel {
         if (empty($data)) {
             $data = $this->getItem();
             $data->tracklist = $this->getPlaylistTrackList();
-            
+            $data->schedulelist = $this->getScheduleList($data->id);
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
             if (($this->getState('playlist.id') == 0) && ($retview != '')) {
@@ -265,8 +265,10 @@ class PlaylistModel extends AdminModel {
         
         // ok ready to save the playlist data
         if (parent::save($data)) {
-            $sid = $this->getState('playlist.id');
-            $this->storePlaylistTracks($sid, $data['tracklist']);
+            if (isset($data['tracklist'])) {
+                $sid = $this->getState('playlist.id');
+                $this->storePlaylistTracks($sid, $data['tracklist']);                
+            }
             // Check possible workflow
             if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');            
             return true;
@@ -328,15 +330,17 @@ class PlaylistModel extends AdminModel {
         $db->setQuery($query);
         $db->execute();
         //restore the new list
+        $n = 1;
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
                 $query = $db->getQuery(true);
                 $query->insert($db->quoteName('#__xbmusic_trackplaylist'));
                 $query->columns('playlist_id,track_id,note,listorder');
-                $query->values('"'.$playlist_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$trk['oldorder'].'"');
+                $query->values('"'.$playlist_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$n.'"');
                 //try
                 $db->setQuery($query);
                 $db->execute();
+                $n ++;
             }
         }
     }
@@ -396,11 +400,15 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_order'] = $azpldata->order;
         $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
         $dbdata['az_weight'] = $azpldata->weight;
+        $dbdata['schedulecnt'] = count($azpldata->schedule_items);
         if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
         
         $ans = $this->save($dbdata);
         if ($ans) {
+            //also need to remove existing schedule items for this playlist and generate new ones
             $id = $this->getState('playlist.id');
+            $this->deleteSchedules($id);
+            $this->createSchedules($id, $azpldata);
             Factory::getApplication()->enqueueMessage(Text::_('Playlist imported from Azuracast with id:'.$id),'Success');
             return $id;
         } else {
@@ -455,12 +463,16 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_order'] = $azpldata->order;
         $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
         $dbdata['az_weight'] = $azpldata->weight;
+        $dbdata['schedulecnt'] = count($azpldata->schedule_items);
         if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
         
         $ans = $this->save($dbdata);
         
         if ($ans) {
+            //also need to remove existing schedule items for this playlist and generate new ones
             $id = $this->getState('playlist.id');
+            $this->deleteSchedules($id);
+            $this->createSchedules($id, $azpldata);
             Factory::getApplication()->enqueueMessage(Text::sprintf('reloaded playlist %s',$dbdata['az_name']),'Success');
         return $id;
         } else {
@@ -468,6 +480,72 @@ class PlaylistModel extends AdminModel {
         }
         return false;
     }
+    
+    private function deleteSchedules(int $dbplid){
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_azschedules'));
+        $query->where('dbplid = '.$dbplid);
+        try {
+            $db->setQuery($query);
+            $res = $db->execute();            
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return $e;
+        }
+        return $res;
+    }
+    
+    private function createSchedules(int $dbplid, $azpldata) {
+        $scheduleitems = $azpldata->schedule_items;
+        $status = ($azpldata->is_enabled == true) ? 1 : 0;
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $res = true;
+        $cnt = 0;
+        $dayarr = array('M','Tu','W','Th','F','Sa','Su');
+        foreach ($scheduleitems as $schd) {
+            $daystr ='';
+            foreach ($schd->days as $day) {
+                $daystr .= $dayarr($day-1).',';
+            }
+            $daysstr = trim($daystr,', ');
+            if ($daysstr == '') $daysstr = implode(', ',$dayarr);
+            $azloop = ($schd->loop_once == true) ? 1 : 0;
+            $dostart = !empty($schd->start_date);
+            $doend = !empty($schd->end_date);
+            $query->clear();
+            $query->insert($db->qn('#__xbmusic_azschedules'));
+            $columns = 'dbplid, az_id, az_starttime, az_endtime,';
+            if ($dostart) $columns .= 'az_startdate,';
+            if ($doend) $columns .= 'az_enddate,';
+            $columns .= 'az_days, az_loop, status, created, created_by, created_by_alias, note';
+            $query->columns($columns);
+            $values = $db->q($dbplid).','.$db->q($schd->id).','.
+                $db->q(date("H:i:s", strtotime($schd->start_time))).','.
+                $db->q(date("H:i:s", strtotime($schd->end_time))).',';
+            if ($dostart) $values .= $db->q($schd->start_date).',';
+            if ($doend) $values .= $db->q($schd->end_date).',';
+            $values .= $db->q($daysstr).','.
+                $db->q($azloop).','.
+                $db->q($status).','.
+                $db->q(Factory::getDate()->toSql()).','.
+                $db->q(Factory::getApplication()->getIdentity()->id).','.
+                $db->q('import from Azuracast API').','.
+                $db->q('');
+                $query->values($values); //(implode(',',$values));
+                Factory::getApplication()->enqueueMessage($query->dump());
+                $db->setQuery($query);
+                $res = $db->execute();
+                if ($res == false) {
+                    Factory::getApplication()->enqueueMessage('Problem saving schedule item '. $schd->id, 'Warning');
+                } else {
+                    $cnt ++;
+                }
+            }
+            if ($res == true)   Factory::getApplication()->enqueueMessage($cnt.' schedule items saved', 'Success');
+            return $res;
+        }    
     
     public function putPlaylist($dbdata) {
         $data = array();
@@ -504,6 +582,8 @@ class PlaylistModel extends AdminModel {
         $data['is_jingle'] = $dbdata['az_jingle'];
         $data['weight'] = $dbdata['az_weight'];
         
+        /*************** ADD BACK SCHEDULE ITEMS ****************/
+        
         $jsondata = json_encode($data);
         $api = new AzApi($dbdata['az_dbstid']);
         $putres = $api->putAzPlaylist($dbdata['az_id'], $jsondata);
@@ -531,12 +611,53 @@ class PlaylistModel extends AdminModel {
         
         $ans = $this->save($dbdata);
         if ($ans) {
+            //delete playlist schdules
+            $this->deleteSchedules($dbdata->id);
             Factory::getApplication()->enqueueMessage(Text::_('Playlist unlinked from Azuracast'),'Success');
         } else {
             Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
         }
         return $ans;
     }
+
+    public function getScheduleList($playlist_id) {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('sh.id AS id, sh.az_id AS az_id, sh.dbplid AS dbplid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop');
+        $query->from('#__xbmusic_azschedules AS sh');
+        $query->innerjoin('#__xbmusic_playlists AS a ON sh.dbplid= a.id');
+        $query->where('sh.dbplid = '.$playlist_id);
+        $query->order('sh.az_startdate ASC', 'sh.az_starttime ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+    }
+    
+    function storeScheduleList($playlist_id, $scheduleList) {
+        //delete existing role list
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->delete($db->quoteName('#__xbmusic_azschedules'));
+        $query->where('playlist_id = '.$playlist_id);
+        $db->setQuery($query);
+        $db->execute();
+        //restore the new list
+                $query = $db->getQuery(true);
+                $query->insert($db->quoteName('#__xbmusic_azschedules'));
+                $query->columns('id, dbplid, az_id, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop, status, created, created_by, created_by_alias, note');
+                $query->values('');
+        foreach ($scheduleList as $schd) {
+            $query->clear('values');
+            
+//            if ($trk['track_id'] > 0) {
+//                $query->values('"'.$playlist_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$n.'"');
+                //try
+//                $db->setQuery($query);
+//                $db->execute();
+//                $n ++;
+//            }
+        }
+    }
+    
     
 }
 

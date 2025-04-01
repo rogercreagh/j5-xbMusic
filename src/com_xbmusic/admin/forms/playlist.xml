@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Playlist Form file v0.0.40.0 18th February 2025 -->
+<!-- xbMusic Playlist Form file v0.0.50.1 1st April 2025 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
@@ -29,16 +29,6 @@
 			size="40" 
 		/>
 		
-		<field name="show" type="radio"
-			label="Show in Schedule"
-			description="Set to Hide to prevent list taking space in xbMusic schedule displays on public pages. eg  for jingle, ident and promo playlists where they have scheduled times. Does not affect azuracast public schedule page or embed widgets"
-			class="btn-group btn-group-yesno"
-			default="1"
-		>
-			<option value="0">Hide</option>
-			<option value="1">Show</option>
-		</field>
-
 		<field name="azstation" type="xbazstations" 
 			label="Azuracast Station xbID"
 			description="The xbMusic database id for the station (NOT the internal azuracast station id which may no be unique across servers)" 
@@ -135,8 +125,58 @@
 			readonly="true"
 
 		/>
-		
-		
+		<field name="schedulecnt" type="hidden" 
+			label="Schedule Items"
+			description="JGLOBAL_FIELD_ID_DESC" 
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+	</fieldset>
+	<fieldset name="azschedules" >
+		<field name="schedulelist" type="subform"
+			label="Schedule Items"
+			description="Scheduled play time for this playlist"			
+			multiple="true" min= "0" max= "2000"
+			buttons="add,remove"
+			layout="joomla.form.field.subform.repeatable-table"
+			class="xbsubformcompact"
+			groupByFieldset="false" 
+		>
+			<form>
+				<field name="id" type="number" label="Id" readonly="true">
+				</field>
+				<field name="az_id" type="number" label="AzId" readonly="true">
+				</field>
+				<field name="az_starttime" type="time" label="Start"
+				/>
+				<field name="az_endtime" type="time" label="End"
+				/>
+				<field name="az_startdate" type="calendar" label="From date"
+				/>
+				<field name="az_enddate" type="calendar" label="End date"
+                  showtime="false"
+				/>
+				<field name="az_days" type="text" label="Days of Week" 
+                  showtime="false"
+				/>
+				<field name="az_loop" type="radio" label="Loop"
+                  class="btn-group-sm">
+                  <option value="1">Once</option>
+                  <option value="0">Timed</option>
+                </field>
+				<field name="showpublic" type="radio"
+					label="Show in Schedule"
+					class="btn-group btn-group-yesno btn-group-sm"
+					default="1"
+				>
+					<option value="0">Hide</option>
+					<option value="1">Show</option>
+				</field>
+
+			</form>
+		</field>			
+	
+	
 	</fieldset>
 	
 <!-- description, status, access, ordering, cat, alltags, note -->

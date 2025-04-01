@@ -425,6 +425,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbpr5, .xbnit { padding-right:5px; }
 .xbpr10 { padding-right:10px;}
 .xbpr20 { padding-right:20px;}
+.xbpt5 { padding-top:5px;}
 .xbpt17 { padding-top:17px;}
 
 /* heights */
@@ -617,6 +618,13 @@ dl.xbdl dd {
   margin-bottom:2px;
 }
 
+joomla-field-subform .table .control-group .controls {
+	min-width: unset;
+}
+joomla-field-subform .table  td .form-control {
+	width:100%;
+}
+
 /** subform text fields width **/
 joomla-field-subform .table td input[type="text"],
 joomla-field-subform .table td input[type="url"] 
@@ -624,5 +632,4 @@ joomla-field-subform .table td input[type="search"]
 joomla-field-subform .table td input[type="tel"] {
 	width:100%;
 }
-
 

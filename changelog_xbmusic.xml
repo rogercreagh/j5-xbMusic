@@ -2,10 +2,38 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.50.1</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.50.0</h3> Updated 28th March 2025]]></item>
+			<item>Azuracast playlist schedules loading, reloading and deleting</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Playlist edit has schedule tab</item>
+		</change>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item></item>
+		</fix>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.42.7</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.42.7</h3> Updated 26th March 2025]]></item>
-			<item>Playlist Azuracast load, re-load, put, unlimk functions</item>
+			<item>Playlist Azuracast load, re-load, put, unlink functions</item>
 			<item>Playlists show Az stations &amp; name</item>
 		</addition>
 		<remove>
