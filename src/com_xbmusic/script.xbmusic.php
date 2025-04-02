@@ -11,7 +11,7 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Application\ApplicationHelper;
+//use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Filesystem\Folder;
 use Joomla\CMS\Filesystem\Path;
@@ -19,7 +19,7 @@ use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Installer\InstallerScript;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Version;
-use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Uri\Uri;
 
 class Com_xbmusicInstallerScript extends InstallerScript
 {

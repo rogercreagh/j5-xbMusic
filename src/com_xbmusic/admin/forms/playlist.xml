@@ -165,7 +165,7 @@
                   <option value="0">Timed</option>
                 </field>
 				<field name="showpublic" type="radio"
-					label="Show in Schedule"
+					label="Show Public"
 					class="btn-group btn-group-yesno btn-group-sm"
 					default="1"
 				>

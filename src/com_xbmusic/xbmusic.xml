@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>29th March 2025</creationDate>
+	<creationDate>1st April 2025</creationDate>
 	<version>0.0.50.1</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
@@ -25,12 +25,12 @@
 		</sql>
 	</uninstall> 
 	<!-- 
-	 -->
 	<update>
 		<schemas>
 			<schemapath type="mysql">sql/updates/mysql</schemapath>
 		</schemas>
 	</update>
+	 -->
 
 	<media destination="com_xbmusic" folder="media">
 		<file>joomla.asset.json</file>

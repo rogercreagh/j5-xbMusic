@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.50.1 28th March 2025
+ * @version 0.0.50.1 1st April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -409,10 +409,10 @@ class PlaylistModel extends AdminModel {
             $id = $this->getState('playlist.id');
             $this->deleteSchedules($id);
             $this->createSchedules($id, $azpldata);
-            Factory::getApplication()->enqueueMessage(Text::_('Playlist imported from Azuracast with id:'.$id),'Success');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_IMPORT_OK'.$id),'Success');
             return $id;
         } else {
-            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');
         }
         return false;
     }
@@ -473,10 +473,10 @@ class PlaylistModel extends AdminModel {
             $id = $this->getState('playlist.id');
             $this->deleteSchedules($id);
             $this->createSchedules($id, $azpldata);
-            Factory::getApplication()->enqueueMessage(Text::sprintf('reloaded playlist %s',$dbdata['az_name']),'Success');
+            Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_PLAYLIST_RELOAD_OK',$dbdata['az_name']),'Success');
         return $id;
         } else {
-            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');
         }
         return false;
     }
@@ -613,9 +613,9 @@ class PlaylistModel extends AdminModel {
         if ($ans) {
             //delete playlist schdules
             $this->deleteSchedules($dbdata->id);
-            Factory::getApplication()->enqueueMessage(Text::_('Playlist unlinked from Azuracast'),'Success');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_UNLINK_OK'),'Success');
         } else {
-            Factory::getApplication()->enqueueMessage(Text::_('Failed to save playlist'),'Error');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');
         }
         return $ans;
     }

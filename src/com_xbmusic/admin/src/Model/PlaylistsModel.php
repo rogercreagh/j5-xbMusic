@@ -114,7 +114,7 @@ class PlaylistsModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.description, '
-                    .'a.show, a.az_id, a.az_name, a.az_type,'
+                    .'a.az_id, a.az_name, a.az_type,'
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '

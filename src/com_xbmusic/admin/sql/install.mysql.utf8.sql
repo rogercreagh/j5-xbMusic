@@ -118,7 +118,6 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
   `title` varchar(190) NOT NULL DEFAULT '',
   `alias` varchar(190) NOT NULL DEFAULT '',
-#  `show` tinyint(1) NOT NULL DEFAULT '1',
   `scheduledcnt` int(10) unsigned NOT NULL DEFAULT '0',
   `az_id` int(10) unsigned NOT NULL Default '0',
   `az_name` varchar(20),
@@ -284,8 +283,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
 #  `ordering` int(10) NOT NULL DEFAULT '0',
 #  `params` mediumtext NOT NULL DEFAULT '',
   `note` mediumtext,
-  PRIMARY KEY (`id`),
-#  UNIQUE `plidx` (`az_id`, `az_stid`)
+  PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 # new link tables tracksong, trackartist, trackplaylist

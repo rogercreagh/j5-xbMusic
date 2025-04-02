@@ -81,14 +81,14 @@ $input = Factory::getApplication()->getInput();
     	<?php if ($this->azuracast == 1) : ?>
     		<div class="row">
 				<?php if ($this->stncnt == 0)  : ?>
-    				<p><?php echo Text::_('No radio stations have been defined yet, visit DataManager to import stations from Azuracast using the credentials defined in Config Options'); ?>
-    				<br /><?php echo Text::_('Current credentials'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
+    				<p><?php echo Text::_('XBMUSIC_NO_STATIONS_YET'); ?>
+    				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
     				at <code><?php echo $this->az_url; ?></code></p>
 				<?php elseif ($this->item->az_id > 0) : ?>
         			<div class="col-md-6">
-    					<p><i><?php echo Text::_('Azuracast station'); ?></i> : 
+    					<p><i><?php echo Text::_('XBMUSIC_AZURACAST_STATION'); ?></i> : 
     						<?php echo $this->station['title'].' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
-        				<br /><i><?php echo Text::_('Azuracast playlist'); ?></i> : #
+        				<br /><i><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST'); ?></i> : #
         					<?php echo $this->item->az_id.' - '.$this->item->az_name; ?>
         				</p>
         			</div>
@@ -100,19 +100,19 @@ $input = Factory::getApplication()->getInput();
             	    	 <p><button id="reload" class="btn btn-danger btn-sm icon-white" type="button" 
                     		onclick="<?php echo $confirm; ?>" >
             					<i class="fas fa-link-slash"></i> &nbsp; 
-                    			<?php echo Text::_('Unlink from to Azuracast'); ?>
+                    			<?php echo Text::_('XBMUSIC_UNLINK_AZURACAST'); ?>
                     		</button>        		
             			</p>
         			</div>				
 				<?php else : ?>
         			<div class="col-md-6" id="loadstations" >
-        				<p><?php echo Text::_('To import a playlist from Azuracast first select the station'); ?>
+        				<p><?php echo Text::_('XMMUSIC_TO_IMPORT_PLAYLIST'); ?>
         					<br /><?php echo $this->form->renderField('azstation'); ?>
-        					<br /><?php echo Text::_('if the station you want is not listed')?>
+        					<br /><?php echo Text::_('XBMUSIC_IF_STATION_NOT_LISTED')?>
         				</p>
         			</div>
         			<div class="col-md-6" id="loadplaylists" >
-        				<p><?php echo Text::_('Select playlist to import'); ?></p>
+        				<p><?php echo Text::_('XBMUSIC_SELECT_PLAYLIST_IMPORT'); ?></p>
         				<div id="playlists"></div>   				
         			</div>				    				   
          		<?php endif; ?>
@@ -130,22 +130,22 @@ $input = Factory::getApplication()->getInput();
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
 	        
-	        	<h4><?php echo Text::_('Azuracast Specific Values'); ?></h4>
+	        	<h4><?php echo Text::_('XBMUSIC_AZURACAST_VALUES'); ?></h4>
 	    		<div class="row">
 	    			<div class="col-md-6">
-           				<p><?php echo Text::_('Local data'); ?></p>
+           				<p><?php echo Text::_('XB_LOCAL_DATA'); ?></p>
                 		<?php echo $this->form->renderField('az_name') ;?>
                 		<?php echo $this->form->renderField('az_type') ;?>
                 		<?php echo $this->form->renderField('az_cntper') ;?>
                 		<?php echo $this->form->renderField('az_jingle') ;?>
                 		<?php echo $this->form->renderField('az_weight') ;?>
                 		<?php echo $this->form->renderField('az_order') ;?>
-                		<p><?php echo Text::_('If you edit the settings above then they will not take effect on the stastion until you Push the changes back to Azuracast. Other fields listed in the right hand panel are not editable within xbMusic, and have no impact on xbMusic views.')?></p>
+                		<p><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST_EDIT_INFO')?></p>
                 		<?php if($this->azchanged == true) : ?>
-                			<p class="xbred"><?php echo Text::_('xbMusic data no longer matches Azuracast data - please reload from Azuracast or push changes to Azuracast'); ?></p>
+                			<p class="xbred"><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST_DATA_MATCH_INFO'); ?></p>
     	        			<p class="xbnote">
-    	        				<?php echo Text::_('Use Reload button to get settings from Azuracast - will overwrite any local changes'); ?>
-    	        				<br /><?php echo Text::_('Use Push button to post changes to Azuracast - will overwrite any changes there'); ?>
+    	        				<?php echo Text::_('XBMUSIC_AZURACAST_RELOAD_INFO'); ?>
+    	        				<br /><?php echo Text::_('XBMUSIC_AZURACAST_PUT_INFO'); ?>
     	        			</p>
     	        			<div>
             					<div class="pull-left">
@@ -157,7 +157,7 @@ $input = Factory::getApplication()->getInput();
                         	    	 <p><button id="reload" class="btn btn-info" type="button" 
                                 		onclick="<?php echo $confirm; ?>" >
                         					<i class="icon-download icon-black"></i> 
-                                			<?php echo Text::_('Reload from Azuracast'); ?>
+                                			<?php echo Text::_('XBMUSIC_AZURACAST_RELOAD'); ?>
                                 		</button>        		
                         			</p>
             					</div>
@@ -170,7 +170,7 @@ $input = Factory::getApplication()->getInput();
                         	    	 <p><button id="reload" class="btn btn-warning" type="button" 
                                 		onclick="<?php echo $confirm; ?>" >
                         					<i class="icon-upload icon-white"></i> 
-                                			<?php echo Text::_('Put changes to Azuracast'); ?>
+                                			<?php echo Text::_('XBMUSIC_AZURACAST_PUT'); ?>
                                 		</button>        		
                         			</p>
             					</div>    	        			
@@ -178,10 +178,10 @@ $input = Factory::getApplication()->getInput();
                 		<?php endif; ?>
 	    			</div>
 	    			<div class="col-md-6">
-           				<p><?php echo Text::_('Saved raw data from Azuracast'); ?></p>
+           				<p><?php echo Text::_('XBMUSIC_AZURACAST_RAW_DATA'); ?></p>
     					<?php if (!empty($this->item->az_info)) : ?>
         					<fieldset id="azinfo" class="xbbox xbboxwht ">
-        						<legend><?php echo Text::_('Azuracast Settings'); ?></legend>
+        						<legend><?php echo Text::_('XBMUSIC_AZURACAST_SETTINGS'); ?></legend>
         						<dl class="xbdl xbmb0">
                             		<?php foreach ($this->item->az_info as $key=>$value) : ?>
                             			<?php if ($key == 'total_length') 
@@ -194,7 +194,7 @@ $input = Factory::getApplication()->getInput();
                                 </dl>
 								<?php echo $this->form->renderField('schedulecnt') ;?>        						
         					</fieldset>
-        					<p class="info"><?php echo Text::_('Check Schedule tab for Azuracast schedule entries'); ?></p>
+        					<p class="info"><?php echo Text::_('XBMUSIC_CHECK_SCHEDULES_TAB'); ?></p>
     					<?php else : ?>
     						<p class="xbit"><?php echo Text::_('Azuracast Info Missing'); ?></p>
     					<?php endif; ?>

@@ -4,7 +4,7 @@
 		<type>component</type>
 		<version>0.0.50.1</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.50.0</h3> Updated 28th March 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.50.0</h3> Updated 1st April 2025]]></item>
 			<item>Azuracast playlist schedules loading, reloading and deleting</item>
 		</addition>
 		<remove>
@@ -19,7 +19,7 @@
 		<security>
 		</security>
 		<fix>
-			<item></item>
+			<item>Subform table layout styling</item>
 		</fix>
 		<note>
 			<item>Front end views not available</item>
@@ -48,7 +48,7 @@
 		<security>
 		</security>
 		<fix>
-			<item></item>
+			<item>Playlist batch bug fixed</item>
 		</fix>
 		<note>
 			<item>Front end views not available</item>
