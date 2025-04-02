@@ -4,7 +4,7 @@
 		<type>component</type>
 		<version>0.0.50.1</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.50.0</h3> Updated 1st April 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.50.1</h3> Updated 1st April 2025]]></item>
 			<item>Azuracast playlist schedules loading, reloading and deleting</item>
 		</addition>
 		<remove>
