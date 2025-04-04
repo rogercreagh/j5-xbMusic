@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.50.0 27th March 2025
+ * @version 0.0.50.2 4th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -190,10 +190,40 @@ if (strpos($listOrder, 'modified') !== false) {
 							</div>
 						</td>
 						<?php if($this->azuracast) : ?>
-							<td><?php if ($item->az_id) : ?>
-								<?php echo $item->azstation; ?><br />
-								<?php echo $item->az_name; ?>
-							<?php endif; ?>
+							<td class="xbmt5 xbmh400 xbyscroll <?php if(!$item->publicschd) echo 'xbdim'; ?>" onclick="stopProp(event);">
+    							<?php if ($item->az_id) : ?>
+    								on <?php echo $item->azstation; ?>
+    								<?php if ($item->scheduledcnt > 0) : ?>
+    									<details>
+    										<summary class="xbnit"><?php echo $item->scheduledcnt; 
+    										echo ($item->scheduledcnt==1) ? Xbtext::_('XBMUSIC_SHD_TIME',XBSP1+XBLC1+XBTRL) : Xbtext::_('XBMUSIC_SHD_TIMES',XBSP1+XBLC1+XBTRL); ?>											
+    										</summary>
+    										<div class="xbmt5 xbmh400 xbyscroll">
+    											<ul style="margin:5px;">
+                									<?php foreach ($item->schedules as $schd) : ?>
+                										<li><?php echo $schd['az_starttime'];
+                										if ($schd['az_days'] != '') { 
+                										    echo '<i> on </i>'.$schd['az_days'];
+                										} else {
+                										    echo '<i>'.Xbtext::_('XBMUSIC_EVERYDAY',XBLC1+XBTRL).'</i>';
+                										}
+                										if ($schd['az_startdate']) {
+                										    echo '<span class="xbpl20 xbit">from </span>'
+                                                                .$schd['az_startdate'].'<i> to </i>'.$schd['az_enddate'];
+                										} else {
+                										    echo '<span class="xbpl20 xbit">'
+                                                                .Xbtext::_('XBMUSIC_ALWAYS',XBLC1+XBTRL).'</span>';
+                										}
+                										?></li>
+                									<?php endforeach; ?>
+        										</ul>										
+        									</div>
+    									</details>
+    								<?php else: ?>
+    									<br /><i><?php echo Text::_('No scheduled times'); ?></i>
+    								<?php endif; ?>
+    							<?php endif; ?>
+    							<?php if (!$item->publicschd) echo '<i><b>'.Text::_('XBMUSIC_NOT_PUB_SCHD').'</b></i>'; ?>
 							</td>
 						<?php endif; ?>
 						<td class="xbr09" onclick="stopProp(event);">

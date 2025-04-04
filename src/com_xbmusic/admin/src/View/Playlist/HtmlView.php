@@ -98,7 +98,6 @@ class HtmlView extends BaseHtmlView {
                 $this->frmtlength .= ' seconds';
             }
         } //endif item->az_type
-        
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'playlist', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');

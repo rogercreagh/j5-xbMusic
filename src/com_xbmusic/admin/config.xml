@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic config file v0.0.30.7 16th February 2025 -->
+<!-- xbMusic config file v0.0.50.2 2nd April 2025 -->
 <config>
 	<inlinehelp button="show"/>
 <!-- GENERAL TAB -->				
@@ -65,10 +65,10 @@
         <field name="space3" type="spacer" hr="true" />
         
 		<field name="devmode" type="radio" 
-			label="Developer Mode"
+			label="Developer Options"
 			description="Turn on to enable save data on uninstall options and some features used during development"
  			class="btn-group btn-group-yesno"
-			default="0" 
+			default="1" 
 		>
 				<option value="0" >Off</option>
 				<option value="1">On</option>
@@ -114,7 +114,7 @@
 			label="Keep Log files"
 			description="Option to keep the log files in /xbmusic_logs when uninstalling the xbMusic component."
  			class="btn-group btn-group-yesno"
-			default="1"
+			default="0"
 			showon="devmode:1[AND]savedata:0"
 			>
 				<option value="1">KEEP</option>

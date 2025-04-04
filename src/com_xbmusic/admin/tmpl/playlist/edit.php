@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.50.1 1st April 2025
+ * @version 0.0.50.2 3rd April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -78,12 +78,20 @@ $input = Factory::getApplication()->getInput();
     			<?php echo $this->form->renderField('id'); ?> 
     		</div>
     	</div>
+    	<div class="row">
+    		<div class="col-md-12">
+    			<div style="max-width:500px; float:left; margin-right:50px;">
+    				<?php echo $this->form->renderField('scheduledcnt'); ?>     			
+				</div>
+    			<?php echo $this->form->renderField('publicschd'); ?>     			
+    		</div>
+    	</div>
     	<?php if ($this->azuracast == 1) : ?>
     		<div class="row">
 				<?php if ($this->stncnt == 0)  : ?>
     				<p><?php echo Text::_('XBMUSIC_NO_STATIONS_YET'); ?>
     				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
-    				at <code><?php echo $this->az_url; ?></code></p>
+    				at <code><?php echo $this->az_url; ?></code> <?php echo Text::_('XBMUSIC_OPTIONS_LINK'); ?></p>
 				<?php elseif ($this->item->az_id > 0) : ?>
         			<div class="col-md-6">
     					<p><i><?php echo Text::_('XBMUSIC_AZURACAST_STATION'); ?></i> : 
@@ -190,9 +198,9 @@ $input = Factory::getApplication()->getInput();
                             		<?php endforeach; ?>        
         						</dl>
 								<dl class="xbdl">
-                                	<dt>Schedule Items</dt><dd><?php echo $this->item->schedulecnt; ?></dd>
+                                	<dt>Schedule Items</dt><dd><?php echo $this->item->scheduledcnt; ?></dd>
                                 </dl>
-								<?php echo $this->form->renderField('schedulecnt') ;?>        						
+								<?php echo $this->form->renderField('scheduledcnt') ;?>        						
         					</fieldset>
         					<p class="info"><?php echo Text::_('XBMUSIC_CHECK_SCHEDULES_TAB'); ?></p>
     					<?php else : ?>
@@ -212,7 +220,7 @@ $input = Factory::getApplication()->getInput();
         
 	    <?php endif; ?>
 
-    	<?php if($this->item->schedulecnt > 0) : ?>
+    	<?php if($this->item->scheduledcnt > 0) : ?>
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'schedule', 'Schedule'); ?>
 	        	<?php echo $this->form->renderField('schedulelist'); ?>

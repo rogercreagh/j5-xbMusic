@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.50.1 1st April 2025
+ * @version 0.0.50.2 4th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -170,6 +170,7 @@ class PlaylistModel extends AdminModel {
             $data = $this->getItem();
             $data->tracklist = $this->getPlaylistTrackList();
             $data->schedulelist = $this->getScheduleList($data->id);
+            $data->scheduledcnt = count($data->schedulelist);
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
             if (($this->getState('playlist.id') == 0) && ($retview != '')) {
@@ -400,7 +401,7 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_order'] = $azpldata->order;
         $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
         $dbdata['az_weight'] = $azpldata->weight;
-        $dbdata['schedulecnt'] = count($azpldata->schedule_items);
+        $dbdata['scheduledcnt'] = count($azpldata->schedule_items);
         if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
         
         $ans = $this->save($dbdata);
@@ -463,7 +464,7 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_order'] = $azpldata->order;
         $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
         $dbdata['az_weight'] = $azpldata->weight;
-        $dbdata['schedulecnt'] = count($azpldata->schedule_items);
+        $dbdata['scheduledcnt'] = count($azpldata->schedule_items);
         if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
         
         $ans = $this->save($dbdata);
@@ -507,7 +508,7 @@ class PlaylistModel extends AdminModel {
         foreach ($scheduleitems as $schd) {
             $daystr ='';
             foreach ($schd->days as $day) {
-                $daystr .= $dayarr($day-1).',';
+                $daystr .= $dayarr[$day-1].',';
             }
             $daysstr = trim($daystr,', ');
             if ($daysstr == '') $daysstr = implode(', ',$dayarr);
@@ -534,7 +535,6 @@ class PlaylistModel extends AdminModel {
                 $db->q('import from Azuracast API').','.
                 $db->q('');
                 $query->values($values); //(implode(',',$values));
-                Factory::getApplication()->enqueueMessage($query->dump());
                 $db->setQuery($query);
                 $res = $db->execute();
                 if ($res == false) {
@@ -620,14 +620,15 @@ class PlaylistModel extends AdminModel {
         return $ans;
     }
 
-    public function getScheduleList($playlist_id) {
+    public function getScheduleList($playlist_id = 0) {
+        if ($playlist_id <1) $playlist_id = 0;
         $db = $this->getDbo();
         $query = $db->getQuery(true);
         $query->select('sh.id AS id, sh.az_id AS az_id, sh.dbplid AS dbplid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop');
         $query->from('#__xbmusic_azschedules AS sh');
         $query->innerjoin('#__xbmusic_playlists AS a ON sh.dbplid= a.id');
         $query->where('sh.dbplid = '.$playlist_id);
-        $query->order('sh.az_startdate ASC', 'sh.az_starttime ASC');
+        $query->order('az_startdate ASC', 'az_starttime ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }

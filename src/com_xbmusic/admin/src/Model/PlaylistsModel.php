@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.42.7 25th March 2025
+ * @version 0.0.50.2 4th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -115,10 +115,11 @@ class PlaylistsModel extends ListModel {
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.description, '
                     .'a.az_id, a.az_name, a.az_type,'
+                    .'a.scheduledcnt, publicschd,'
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
-                    .'a.note'
+                    .'a.note, st.title AS st_name, st.az_apiname AS az_apiname, st.az_url AS st_url'
                 )
             );
         $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
@@ -289,6 +290,7 @@ class PlaylistsModel extends ListModel {
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.playlist' , $item->id);     
                 
                 $item->tracks = $this->getPlaylistTracks($item->id);
+                $item->schedules = $this->getPlaylistSchedule($item->id);
             } //end foreach
         } //endif items
         return $items;
@@ -303,6 +305,18 @@ class PlaylistsModel extends ListModel {
         $query->from('#__xbmusic_tracks AS t');
         $query->where('pt.playlist_id = '.$pid);
         $query->order('pt.listorder, t.title ASC');
+        $db->setQuery($query);
+        $res = $db->loadAssocList();
+        return $res;
+    }
+    
+    public function getPlaylistSchedule($pid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('s.id AS schdbid, s.az_starttime, s.az_endtime, s.az_startdate, s.az_enddate, s.az_days, s.az_loop');
+        $query->from('#__xbmusic_azschedules AS s');
+        $query->where('s.dbplid = '.$pid);
+        $query->order('s.az_startdate, s.az_starttime ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
     }
