@@ -38,7 +38,7 @@ $wa->useScript('keepalive')
 ?>
 <link rel="stylesheet" href="<?php echo Uri::root(true);?>/media/com_xbmusic/css/foldertree.css">
 
-<script type="module" src="/media/com_xbmusic/js/xbdialog.js"></script>
+<script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">

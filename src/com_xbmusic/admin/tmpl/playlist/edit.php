@@ -42,7 +42,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 $input = Factory::getApplication()->getInput();
 
 ?>
-<script type="module" src="/media/com_xbmusic/js/xbdialog.js"></script>
+<script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 <style>
 /* set colum,n widths for schedule table - override Joomla default share space equally*/
     #subfieldList_jform_schedulelist thead th:first-child { width:70px !important; color:grey; }
