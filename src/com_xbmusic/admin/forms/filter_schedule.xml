@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Scedule Form file v0.0.51.1 8th April 2025 -->
+<form>
+	<config>
+		<inlinehelp button="show"/>
+	</config>
+	<fields name="filter" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field">
+		<field
+			name="dbstid" type="xbazstations"
+			label="Station"
+			description="Select which station to show"
+			onchange="this.form.submit();"
+			>
+		</field>
+		<field
+			name="startdate" type="calendar"
+			label="Start date"
+			description="Choose start date for display"
+			showon="dbstid!:0"
+			>
+		</field>
+
+		<field name="numdays" type="integer" 
+			label="Number of Days" 
+			description="Number of days to display from start date"
+			first="1" last="31" step="1"
+			showon="dbstid!:0"
+		/>
+
+		<field name="starttime" type="time"
+			label="Start time"
+			description="Hour of day to display from"
+			min="0" max="86400" step="900"
+			showon="dbstid!:0"
+		/>
+
+		<field name="numhours" type="integer" 
+			label="Hours to display" 
+			description="Number of hours to display from start time"
+			first="1" last="24" step="1"
+			showon="dbstid!:0"
+		/>
+
+		<field name="displayfmt" type="radio" 
+			label="Display Format" 
+			description="List will simply show schduled items in an ordered list with breaks between days. Table will display with times in the left column and a column for each day"
+ 			class="btn-group btn-group-yesno"
+			showon="dbstid!:0"
+		>
+			<option value="0">List</option>
+			<option value="1">Table</option>
+		</field>
+				
+		<field name="publiconly" type="radio" 
+			label="Only Public Items" 
+			description="Restrict list to public items only, or show hidden items"
+ 			class="btn-group btn-group-yesno"
+			showon="dbstid!:0"
+		>
+			<option value="1">Public</option>
+			<option value="0">All</option>
+		</field>
+				
+	</fields>
+</form>

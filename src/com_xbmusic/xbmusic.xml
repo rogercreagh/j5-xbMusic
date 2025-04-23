@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>4th April 2025</creationDate>
-	<version>0.0.50.3</version>
+	<creationDate>21st April 2025</creationDate>
+	<version>0.0.51.4</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -50,7 +50,7 @@
 			<folder>src</folder>
 			<folder>sql</folder>
 			<folder>tmpl</folder>
-<!--  -->			<folder>vendor</folder>
+			<folder>vendor</folder>
 		</files>
 		
 		<menu img="class:default" link="option=com_xbmusic">com_xbmusic</menu>
@@ -79,6 +79,14 @@
 					<menu-quicktask-title>XBMUSIC_VIEW_PLAYLISTS</menu-quicktask-title>
 					<menu-quicktask-icon>eye</menu-quicktask-icon>
 					<menu-quicktask>index.php?option=com_xbmusic&amp;view=playlists</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=schedule" >
+				xbmusic_iconmenu_schedule
+				<params>
+					<menu-quicktask-title>XBMUSIC_VIEW_SCHEDULE</menu-quicktask-title>
+					<menu-quicktask-icon>eye</menu-quicktask-icon>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=schedule</menu-quicktask>
 				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=songs" >
@@ -116,7 +124,7 @@
 		
 	</administration>
 
-    	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
+    <changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 
 	<updateservers>
 		<server type="extension" priority="1" name="xbMusic Updates">

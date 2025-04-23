@@ -1,11 +1,17 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.50.2 4th April 2025
+ * @version xbmusic-J5 0.0.51.4 19th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
+/****
+ Contents
+ 1. Atum admin template changes
+ 2. Joomla core css changes
+ 
+****/
 
 /* reduce Atum bottom margin on details */
 #xbcomponent details {
@@ -136,6 +142,11 @@ ul.nav-tabs {
 }
 .xbaccordion .accordion-body {
 	background-color:aliceblue;
+}
+
+/** class to reduce label width on horizontal form layout **/
+.xblblcompact .control-group .control-label {
+	width: unset;
 }
 
 /* end of joomla system overrides */
@@ -405,6 +416,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 
 .xbmr10 { margin-right:10px; }
 .xbmr20 { margin-right:20px; }
+.xbmr50 { margin-right:50px; }
 
 .xbmt2 { margin-top:2px; }
 .xbmt5 { margin-top:5px; }

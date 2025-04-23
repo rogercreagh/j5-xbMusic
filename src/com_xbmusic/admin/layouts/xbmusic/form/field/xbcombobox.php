@@ -73,7 +73,7 @@ foreach ($options as $option) {
     name="<?php echo $name; ?>"
     id="<?php echo $id; ?>"
     list="xbcombo"
-    placeholder="<?php echo Text::_('type or click for list'); ?>";
+    placeholder="<?php echo Text::_('XBMUSIC_COMBO_PLACEHOLDER'); ?>";
     value="<?php echo htmlspecialchars($value, ENT_COMPAT, 'UTF-8'); ?>"
     <?php echo $attr; ?>
 > 

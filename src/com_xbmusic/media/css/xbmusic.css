@@ -1,7 +1,7 @@
 /*******
  * @package xbMusic
  * @filesource media/css/xbmusic.css
- * @version 0.0.30.1 7th February 2025
+ * @version 0.0.51.4 19th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -32,20 +32,6 @@ audio {
 #pvModal .modal-body { 
 	margin:10px 30px;
 }
-/** table freeze header row: wrap table in <div class="table-scroll and <table class="table-freeze **/
-.table-scroll {
-	max-height:80vh;
-	overflow:auto;
-	width:100%;
-}
-.table-freeze {
-	text-align: left;
-	position: relative;
-}
-.table-freeze th {
-	position: sticky;
-	top: 0;
-}
 
 /** subform header row make space at end of empty table to match space with row buttons **/
 table[id^=subfieldList] thead tr td div.btn-group {
@@ -61,9 +47,17 @@ table[id^=subfieldList] thead tr td div.btn-group {
 #toolbar-views {
 	margin-left:auto !important;
 }
-/** remove left margin on Options button if OtherViews present **/
+/** remove left auto margin on Options button if OtherViews present **/
 #toolbar-views + .ms-auto {
 	margin-left:20px !important;
+}
+/** remove left auto margin on inline-help on schedule view **/
+.view-schedule #toolbar-inlinehelp.ms-auto {
+	margin-left:30px !important;
+}
+/** remove left auto margin on inline-help on dataman view **/
+.view-dataman #toolbar-inlinehelp.ms-auto {
+	margin-left:30px !important;
 }
 
 /** spacer before the saveId3 button in Toolbar **/

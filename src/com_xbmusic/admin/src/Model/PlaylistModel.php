@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.50.2 4th April 2025
+ * @version 0.0.50.3 18th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -504,14 +504,15 @@ class PlaylistModel extends AdminModel {
         $query = $db->getQuery(true);
         $res = true;
         $cnt = 0;
-        $dayarr = array('M','Tu','W','Th','F','Sa','Su');
+        //$dayarr = array('M','Tu','W','Th','F','Sa','Su');
         foreach ($scheduleitems as $schd) {
-            $daystr ='';
-            foreach ($schd->days as $day) {
-                $daystr .= $dayarr[$day-1].',';
-            }
-            $daysstr = trim($daystr,', ');
-            if ($daysstr == '') $daysstr = implode(', ',$dayarr);
+//            $daystr ='';
+//            foreach ($schd->days as $day) {
+//                $daystr .= $dayarr[$day-1].',';
+//            }
+//            $daysstr = trim($daystr,', ');
+//            if ($daysstr == '') $daysstr = implode(', ',$dayarr);
+            $azdays = $schd->az_days;
             $azloop = ($schd->loop_once == true) ? 1 : 0;
             $dostart = !empty($schd->start_date);
             $doend = !empty($schd->end_date);
@@ -527,7 +528,7 @@ class PlaylistModel extends AdminModel {
                 $db->q(date("H:i:s", strtotime($schd->end_time))).',';
             if ($dostart) $values .= $db->q($schd->start_date).',';
             if ($doend) $values .= $db->q($schd->end_date).',';
-            $values .= $db->q($daysstr).','.
+            $values .= $db->q($azdays).','.
                 $db->q($azloop).','.
                 $db->q($status).','.
                 $db->q(Factory::getDate()->toSql()).','.

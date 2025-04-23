@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlists/HtmlView.php
- * @version 0.0.12.0 7th August 2024
+ * @version 0.0.51.2 13th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -106,6 +106,7 @@ class HtmlView extends BaseHtmlView {
         }
         
         $toolbar->standardButton('playlisttracksview', 'Tracks List', 'dashboard.toPlaylisttracks')->listCheck(true)->icon('fas fa-headphones') ;
+        $toolbar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
         
         $dropdown = $toolbar->dropdownButton('views')
         ->text('XBMUSIC_OTHER_VIEWS')

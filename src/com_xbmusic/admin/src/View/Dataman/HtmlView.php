@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.50.2 3rd April 2025
+ * @version 0.0.51.2 13th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -64,7 +64,6 @@ class HtmlView extends BaseHtmlView {
         //$toolbar = Factory::getContainer()->get(ToolbarFactoryInterface::class)->createToolbar($name);
         
         ToolbarHelper::title(Text::_('XBMUSIC_ADMIN_DATAMAN_TITLE'), 'database');
-        $toolbar->inlinehelp();
        
         $dropdown = $toolbar->dropdownButton('views')
         ->text('XBMUSIC_OTHER_VIEWS')
@@ -77,6 +76,7 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
         $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
         $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        $childBar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
@@ -88,6 +88,7 @@ class HtmlView extends BaseHtmlView {
             //$toolbar->preferences('com_xbmusic');
             ToolbarHelper::preferences('com_xbmusic');
         }
+        $toolbar->inlinehelp();
         $toolbar->help('Dataman:',false,'https://crosborne.uk/xbmusic/doc#dataman');
         
     }

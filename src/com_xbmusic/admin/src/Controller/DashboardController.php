@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DashboardController.php
- * @version 0.0.13.0 20th August 2024
+ * @version 0.0.51.2 13th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -39,6 +39,9 @@ class DashboardController extends AdminController
         $jip =  Factory::getApplication()->input;
         $pid =  $jip->get('cid');
         $this->setRedirect('index.php?option=com_xbmusic&view=playlisttracks&id='.$pid[0]);
+    }
+    public function toSchedule() {
+        $this->setRedirect('index.php?option=com_xbmusic&view=schedule');
     }
     public function toSongs() {
         $this->setRedirect('index.php?option=com_xbmusic&view=songs');

@@ -40,7 +40,7 @@ class SongsModel extends ListModel {
                 'created_by', 'a.created_by',
                 'created_by_alias', 'a.created_by_alias',
                 'ordering', 'a.ordering',
-                'status', 'category_id', 'level'
+                'category_id', 'level'
             );
             
         }
@@ -305,25 +305,6 @@ class SongsModel extends ListModel {
         return $items;
         
     } // end getItems
-    
-/**    
-    public function getTracks($id) {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select('t.id AS trackid, t.filename AS trackname, t.rel_date AS rel_date, '
-            .' GROUP_CONCAT(CONCAT(p.id,'|'.p.name) SEPARATOR '.$db->q(' | ').') AS performers, '
-            .' st.note AS note, al.id AS albumid, al.title AS albumtitle');
-        $query->from('#__xbmusic_tracks AS t');
-        $query->join('LEFT','#__xbmusic_tracksong AS st ON st.track_id = t.id');
-        $query->join('LEFT','#__xbmusic_albums AS al ON al.id = t.album_id');
-        $query->join('LEFT','#__xbmusic_trackartist AS at ON at.track_id = t.id');
-        $query->join('LEFT','#__xbmusic_artists AS p ON p.id = at.artist_id');
-        $query->where('st.song_id = '.$id);
-        $query->order('t.rec_date DESC, t.title ASC');
-        $db->setQuery($query);
-        return $db->loadAssocList();
-    }
-**/
     
     public function getSongTracksAlbums($sid) {
         $db = $this->getDatabase();

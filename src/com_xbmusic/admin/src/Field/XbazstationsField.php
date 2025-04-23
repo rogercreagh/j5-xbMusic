@@ -33,7 +33,7 @@ class XbazstationsField extends ListField {
         $options = parent::getOptions();
         $db = Factory::getDbo();
         $query  = $db->getQuery(true);
-        $query->select('id AS value, CONCAT(title) AS text, az_url')->from('#__xbmusic_azstations');
+        $query->select('id AS value, CONCAT(title," @ ",az_url) AS text, az_url')->from('#__xbmusic_azstations');
         $query->order('az_url ASC')->order('title ASC');
         $db->setQuery($query);
         $result = $db->loadObjectList();

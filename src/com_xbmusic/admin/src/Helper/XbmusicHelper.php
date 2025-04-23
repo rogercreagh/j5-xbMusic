@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.41.4 5th March 2025
+ * @version 0.0.51.0 6th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -145,7 +145,7 @@ class XbmusicHelper extends ComponentHelper
 	    if (isset($id3data['title'])) { 
 	        $trackdata['title'] = $id3data['title'];
 	    } else { //no title found
-	        $msg = Xbtext::_('No track title found in ID3 data. Cannot import',XBNL);
+	        $msg = Xbtext::_('XBMUSIC_NO_TRACK_TITLE_IN_ID3',XBNL);
 	        $ilogmsg .= '[ERROR] '.$msg;
 	        Factory::getApplication()->enqueueMessage(trim($msg),'Error');
 	        return false;
@@ -205,7 +205,7 @@ class XbmusicHelper extends ComponentHelper
                  $splitcnt = 0;
                  $fnd = str_replace($splits," || ", $artistname, $splitcnt);
                  if ($splitcnt > 0) {
-                     $msg = Xbtext::_($artistname,XBSP2 + XBDQ).Xbtext::_('may possibly be more than one artist. Will save as one, use save-copy on artist edit to split',XBDQ + XBNL);
+                     $msg = Xbtext::_($artistname,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLY_SPLIT_ARTIST',XBDQ + XBNL);
                      $ilogmsg .='[WARN] .'.$msg;
                      Factory::getApplication()->enqueueMessage($msg,'Warning');
                 }           
@@ -222,7 +222,7 @@ class XbmusicHelper extends ComponentHelper
 	        $albumstr = $id3data['album'];
 	        $albcnt = substr_count($albumstr,'||') + 1;
 	        if ($albcnt > 1) {
-	            $ilogmsg .= XBWARN.Xbtext::_('more than one album name in ID3, only first will be used',XBNL);
+	            $ilogmsg .= XBWARN.Xbtext::_('XBMUSIC_ALBUM_MULTI_TITLE',XBNL);
 	            $ilogmsg .= XBWARN.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
 	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
@@ -272,11 +272,11 @@ class XbmusicHelper extends ComponentHelper
             if ($nobrackets == 1) {
                 $songtitle = $newtitle;
                 $songtitle = trim($songtitle,', ');
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text in track title removed to make song title. Check and restore if necessary',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_REMOVED',XBNL);
                 $ilogmsg .= XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
             } else {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('Bracketed text has NOT been removed in song title. Check and remove if necessary',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_NOT_REMOVED',XBNL);
                 $ilogmsg .= XBINFO.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');                
             }
@@ -290,17 +290,17 @@ class XbmusicHelper extends ComponentHelper
         $songtitles = explode(" || ", $songtitles);
         if ($splitcnt > 0) {
             if ($splitsongs == 1) {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::sprintf('has been split into %s songs',$splitcnt + 1)."\n";
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::sprintf('XBMUSIC_HAS_BEEN_SPLIT_SONGS',$splitcnt + 1)."\n";
                 $ilogmsg .=XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');               
             } else {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('may possibly be a medley. Saved as one song, use save-copy on song edit to split',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLE_SONG_MEDLEY',XBNL);
                 $ilogmsg .=XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Warning');               
             }
         } else {
             if (stripos($songtitle, 'medley') && ($splitsongs == 1)) {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::_('contains the word Medley but has not been split.')."\n";
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Text::_('XBMUSIC_MEDLEY_NOT_SPLIT.')."\n";
                 $ilogmsg .=XBINFO.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');            
             }           
@@ -432,9 +432,9 @@ class XbmusicHelper extends ComponentHelper
 	    //create the folder if it doesn't exist (eg new initial)
 	    if (file_exists($imgpath)==false) {
 	        if (mkdir($imgpath,0775,true)) {
-	            if ($loglevel==4) $flogmsg .= XBINFO.Text::_('artwork folder created',2).Xbtext::_($folder,XBSP1 + XBDQ + XBNL);
+	            if ($loglevel==4) $flogmsg .= XBINFO.Text::_('XBMUSIC_ARTWORK_FOLDER_CREATED',2).Xbtext::_($folder,XBSP1 + XBDQ + XBNL);
 	        } else  {
-	            $flogmsg .= XBERR.Text::_('failed to create artwork folder').Xbtext::_($imgpath,XBSP1 + XBDQ + XBNL);
+	            $flogmsg .= XBERR.Text::_('XBMUSIC_ARTWORK_FOLDER_FAILED').Xbtext::_($imgpath,XBSP1 + XBDQ + XBNL);
 	           return false;
 	        }
 	    }
@@ -446,7 +446,7 @@ class XbmusicHelper extends ComponentHelper
 	    $imgok = false;
 	    if (file_exists($imgpathfile)) {
 	        $imgok = true;
-	        if ($loglevel==4) $flogmsg .= '[INFO] '.Text::sprintf('Artwork file "%s" already exists',$xbfilename)."\n";
+	        if ($loglevel==4) $flogmsg .= '[INFO] '.Text::sprintf('XBMUSIC_ARTWORK_FILE_EXISTS',$xbfilename)."\n";
 	    } else {
 	        $params = ComponentHelper::getParams('com_xbmusic');
 	        $maxpx = $params->get('imagesize',500);
@@ -476,10 +476,10 @@ class XbmusicHelper extends ComponentHelper
 	        unset($imgdata['data']);
 	        $imgdata['imgurl'] = $imgurl;
 	        $imgdata = array_merge($imgdata, self::getImageInfo($imgdata));
-	        if ($loglevel==4) $flogmsg .= XBINFO.Text::_('image created').Xbtext::_($xbfilename,XBSP1 + XBDQ + XBNL);
+	        if ($loglevel==4) $flogmsg .= XBINFO.Text::_('XBMUSIC_ARTWORK_CREATED').Xbtext::_($xbfilename,XBSP1 + XBDQ + XBNL);
 	        return $imgurl;
 	    }
-	    $flogmsg .= XBERR.Text::_('failed to create image').Xbtext::_($imgpathfile,XBSP1 + XBDQ + XBNL);
+	    $flogmsg .= XBERR.Text::_('XBMUSIC_ARTWORK_CREATE_FAILED').Xbtext::_($imgpathfile,XBSP1 + XBDQ + XBNL);
 	    
 	    return false;
 	} //end createImageFile()

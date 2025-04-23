@@ -10,6 +10,25 @@
 		/>
 
 		<field
+			name="dbstid" type="xbazstations"
+			label="Station"
+			description="Filter by single station"
+			onchange="this.form.submit();"
+			>
+		</field>
+
+		<field name="schedonly" type="radio" 
+			label="Only Lists with Schedule" 
+			description="Restrict list to scheduled only"
+  			class="btn-group btn-small radiotop"
+			default="0"
+			onchange="this.form.submit();"
+		>
+			<option value="0">All</option>
+			<option value="1">Scheduled</option>
+		</field>
+				
+		<field
 			name="status" type="status"
 			label="COM_CONTENT_FILTER_PUBLISHED"
 			description="COM_CONTENT_FILTER_PUBLISHED_DESC"

@@ -43,7 +43,7 @@ if (!is_null($result)) {
 <fieldset>
 
 <label id="batch-playlist-lbl" for="batch-playlist" >
-	<?php echo Text::_('Add to Playlist'); ?>	
+	<?php echo Text::_('XBMUSIC_ADD_TO_PLAYLIST'); ?>	
 </label>
 <select name="batch[playlist]" class= "form-select" id="batch-playlist">
 	<option value=""><?php echo Text::_('JLIB_HTML_BATCH_TAG_NOCHANGE'); ?></option>
