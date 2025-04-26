@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/schedule/default.php
- * @version 0.0.51.4 19th April 2025
+ * @version 0.0.51.6 26th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -81,40 +81,51 @@ $wa->useScript('xbmusic.xbtimefunctions')
 			<thead>
 				<tr>
 					<th>Time</th>
-					<?php for ($i = 0; $i < $this->numdays; $i++) : ?>
-    					<th>Day <?php echo $i; ?></th>
-					    
-					<?php endfor; ?>
+					<?php foreach ($this->items as $key=>$day) : ?>
+    					<th><?php echo $key; ?></th>					    
+					<?php endforeach; ?>
 				</tr>
 			</thead>
-				<?php foreach ($this->items as $item) : ?>
-					<tr>
-					<?php for ($i = 0; $i < $this->numdays; $i++) : ?>
-						<td><?php echo $item->az_starttime; ?><br />
-							<?php echo $item->pltitle; ?><br />
-							<?php echo $item->az_endtime; ?>
-						</td>
-					    
-					<?php endfor; ?>
-					</tr>				  
-				<?php endforeach; ?>
 			<tbody>
+				<?php $firsthr = (int)substr($this->starttime,0,2);
+				for ($hour = $firsthr; $hour < ($firsthr + $this->numhours); $hour++) : ?>
+					<tr>
+					<td><?php echo $hour.':00'; ?></td>
+					<?php foreach ($this->items as $dayslots) : ?>
+    					<td>				    
+						<?php foreach ($dayslots as $slot) {						    
+						    if (substr($slot->az_starttime,0,2) == $hour ) {
+						        echo '<div class="schbox">';
+						        echo $slot->az_starttime.'<br >';
+						        echo $slot->pltitle.'<br />';
+						        echo $slot->az_endtime;
+						        echo '</div>';
+						    }
+						} ?>
+						</td>    
+					<?php endforeach; ?>					
+					</tr>				
+				<?php endfor; ?>
 			</tbody>
 		</table>
+			
 		<?php else : ?>
 			<i>List of slots with date separator, start time, end time, title, decription</i>
-					<?php for ($i = 0; $i < $this->numdays; $i++) : ?>
-    					<p>Day <?php echo $i; ?></br>
-						<?php foreach ($this->items as $item) : ?>
-					    	<?php echo $item->az_starttime; ?>
-							<?php echo $item->pltitle; ?>
-							<?php echo $item->az_endtime; ?>
-						<?php endforeach; ?>
-					<?php endfor; ?>
+						<?php foreach ($this->items as $key=>$dayslots) : ?>
+						    <h4><?php echo $key; ?></h4>
+							<?php foreach ($dayslots as $slot) {						    
+						        echo '<div class="schbox">';
+						        echo $slot->az_starttime.'<br >';
+						        echo $slot->pltitle.'<br />';
+						        echo $slot->az_endtime;
+						        echo '</div>';
+						    } ?>
+						    <hr />
+						<?php endforeach; ?> 
 			
-		<?php endif; ?>
+		<?php endif; //displayfmt?>
 		
-		<?php endif; ?>
+		<?php endif; //dbstid ?>
 		<?php //Factory::getApplication()->enqueuemessage('<pre>'.print_r($this->activeFilters,true).'</pre>'); ?>
 
 			<?php // Load the batch processing form. ?>

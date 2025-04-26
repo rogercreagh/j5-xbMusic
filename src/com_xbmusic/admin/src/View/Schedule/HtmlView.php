@@ -62,6 +62,9 @@ class HtmlView extends BaseHtmlView {
                 ? $this->activeFilters['numdays'] : $this->state->get('filter.numdays',1) ; 
         }
 
+        //we now need to reorgaise the items into and array of numdays and inside each arrays of the schedule items that are valid in time order
+        
+        
         $this->addToolbar();
         
         parent::display($tpl);

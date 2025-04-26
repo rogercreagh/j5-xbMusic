@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ScheduleModel.php
- * @version 0.0.51.5 26th April 2025
+ * @version 0.0.51.6 26th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -15,6 +15,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Date\Date;
 //use Joomla\CMS\Form\FormHelper;
 //use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\MVC\Model\AdminModel;
@@ -224,58 +225,43 @@ WHERE st.id = 2
     public function getItems() {
         $items  = parent::getItems();
         if ($items) {
-//            $displayfmt = $this->getState('filter.displayfmt');
-//            $numhours = $this->getState('filter.numhours');
-//            $starttime = $this->getState('filter.starttime');
-//            $tabledays = $this->getState('filter.tabledays');
-//            $listdays = $this->getState('filter.listdays');
-//            $numdays = ($displayfmt == 0) ? $this->getState('filter.listdays') : $this->getState('filter.tabledays');
-//            $filterstartdate = $this->getState('filter.startdate');
-//            if ($filterstartdate == '') $filterstartdate = strtotime(date('Y-m-d'));
-            //convert start and end date to timestamp
-//         $enddatestamp = strtotime($startdate. '+ '.$days.' days');
-//         $startdatestamp = strtotime($startdate);
-//         //get start and end times as timestamp
-//         $endtimestamp = strtotime($starttime. '+ '.$numhours.' hours');
-//         $starttimestamp = strtotime($starttime);
-//            $numhours = $this->getState('filter.numhours');
-//            $filterstarttime = $this->getState('filter.starttime');
-//            if ($filterstarttime == '') $filterstarttime = strtotime('00:00:00');
-//            $filterendtime = strtotime($filterstarttime. ' + '. $numhours. ' hours');
-            
-        
-//             $displayfmt = $this->getState('filter.displayfmt');
-//             $items->schedule = [];
-//             //we need to get the schedules from all playlists sorted in startdate order then start time
- //           $today = strtotime(date('Y-m-d'));
-//              foreach ($items as $key=>$item) {
-//                  //convert start and end date to timestamp and remove item if out of range
-//                  if ($item->az_enddate != '') {
-//                      $enddatestamp = strtotime($item->az_enddate. '+ '.((int)$numdays-1).' days');
-//                      if ($filterstartdate > $enddatestamp) unset($items[$key]);
-                     
-//                  } elseif ($item->az_startdate != '') {
-//                      $startdatestamp = strtotime($item->az_startdate);
-//                      if ($filterstartdate < $startdatestamp) unset($items[$key]);                   
-                 
-//                  //now drop any that end before the start time or start after the end time
-//                  } elseif ($filterstarttime > strtotime($item->az_endtime)) { 
-//                      unset($items[$key]); 
-//                  } elseif($filterendtime < strtotime($item->az_starttime)) {
-//                      unset($items[$key]);
-//                  }
-// //                 $item->schedules[] = $this->getPlaylistSchedule($item->plid);
-//              } //end foreach
+            //we now need to reorganise the items into an array of numdays and inside each arrays of the schedule items that are valid in time order
+            $numdays = $this->getState('filter.numdays');
+            $startdate = $this->getState('filter.startdate');
+            $thisdate = strtotime($startdate);
+            $schedule = array();
+            for ($i = 0; $i < $numdays; $i++) {
+                $dayofweek = date('N', $thisdate);
+              //  $thisdate = new Date($startdate);
+              //  $thisdate->modify('+ '.$i.' days');
+                $schitems = [];
+                foreach ($items as $item) {
+                    $ok = true;
+                    if ($item->az_days != '') {
+                        if (strpos($item->az_days,$dayofweek) === false) $ok = false;
+                    }               
+                    //check if $item->az_startdate is null or < thisdate
+                    if ($item->az_startdate) {
+                        if (strtotime($item->az_startdate) > $thisdate) $ok = false;
+                    }
+                    //check if $item->az_endate is null or > thisdate
+                    if ($item->az_enddate) {
+                        if (strtotime($item->az_enddate) < $thisdate) $ok = false;
+                    }
+                    //times have already been dealt with in the main query
+                    if ($ok) $schitems[] = $item;
+                }
+                $d = date('Y-m-d',$thisdate);
+                $schedule[$d] = $schitems;
+                $thisdate += 24*60*60;
+            }
+            return $schedule;            
+
         } //endif items
         
         
         return $items;
         
     } // end getItems
-    
- //   public function getForm() {
-       // FormHelper::addFieldPath(JPATH_COMPONENT . '/models/fields');
- //       $form = $this->loadForm('com_mycomponent.filter', 'filter', array('control' => 'jform', 'load_data' => true));
- //   }
     
 }
