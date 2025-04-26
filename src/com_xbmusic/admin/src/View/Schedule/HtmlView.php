@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Schedule/HtmlView.php
- * @version 0.0.51.1 12th April 2025
+ * @version 0.0.51.5 24th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -36,12 +36,18 @@ class HtmlView extends BaseHtmlView {
         
         //$this->form = $this->filterForm;
         
-        $this->filterForm  = $this->get('filterForm');
-        $this->items  = $this->get('Items');           
-        $this->state = $this->get('State');
+        $this->items         = $this->get('Items');
+        $this->state         = $this->get('State');
+        $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
+        
+        // Check for errors.
+        if (\count($errors = $this->get('Errors')) ) {
+            throw new GenericDataException(implode("\n", $errors), 500);
+        }
+        
         $this->dbstid = (key_exists('dbstid', $this->activeFilters))
-            ? $this->activeFilters['dbstid'] : $this->state->get('filter.dbstid',0);
+            ? $this->activeFilters['dbstid'] : $this->state->get('filter.dbstid','');
         if ($this->dbstid >0) {
             $this->station = XbmusicHelper::getDbStation($this->dbstid);
             $this->displayfmt = (key_exists('displayfmt', $this->activeFilters)) 

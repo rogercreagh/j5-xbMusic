@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbtimeField.php
- * @version 0.0.51.4 23rd April 2025
+ * @version 0.0.51.5 26th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -25,16 +25,17 @@ class XbtimeField extends TimeField
                 $this->$name = (int) $value;
                 break;
             case 'default':
-                if ($value == 'now') {
-                    $this->name = date('H:i:00');
-                } else {
-                    parent::__set($name, $value);
+                if ($this->value == 'now') {
+//                    if ($value == 'now') {
+                        $this->value = date('H:i');
+//                    } else {
+//                        parent::__set($name, $value);
+//                    }
                 }
                 break;
             default:
                 parent::__set($name, $value);
         }
     }
-    
-    
+       
 }

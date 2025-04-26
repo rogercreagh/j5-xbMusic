@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ScheduleModel.php
- * @version 0.0.51.1 11th April 2025
+ * @version 0.0.51.5 26th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,13 +14,14 @@ defined('_JEXEC') or die;
 
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Form\FormHelper;
-use Joomla\CMS\Helper\TagsHelper;
-use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\CMS\Component\ComponentHelper;
+//use Joomla\CMS\Form\FormHelper;
+//use Joomla\CMS\Helper\TagsHelper;
+//use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\Utilities\ArrayHelper;
+//use Joomla\Utilities\ArrayHelper;
 // use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Table\Table;
+//use Joomla\CMS\Table\Table;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class ScheduleModel extends ListModel {
@@ -29,15 +30,24 @@ class ScheduleModel extends ListModel {
     {        
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
-                'dbstid', 'startdate', 'numdays', 'starttime', 'numhours', 'displayfmt', 'publiconly'  
+                'dbstid', 'startdate', 'numdays', 'starttime', 'numhours', 'displayfmt', 'publiconly',
+                'az_startdate','az_starttime'
             );           
         }
         parent::__construct($config);
     }
     
-    protected function populateState($ordering = null, $direction = null)
+    public function getFilterForm($data = [], $loadData = true)
     {
+        $form = parent::getFilterForm($data, $loadData);
+        
+        return $form;
+        
+    }
+     
+    protected function populateState($ordering = 'az_starttime', $direction = 'asc') {
         $app = Factory::getApplication();
+        $input = $app->getInput();
         
         // Adjust the context to support modal layouts.
         if ($layout = $app->input->get('layout'))
@@ -45,14 +55,22 @@ class ScheduleModel extends ListModel {
             $this->context .= '.' . $layout;
         }
         
-        $publiconly = $this->getUserStateFromRequest($this->context . '.filter.publiconly', 'filter_publiconly', '');
-        $displayfmt = $this->getUserStateFromRequest($this->context . '.filter.displayfmt', 'filter_displayfmt', '');
-        $numhours = $this->getUserStateFromRequest($this->context . '.filter.numhours', 'filter_numhours', '');
-        $starttime = $this->getUserStateFromRequest($this->context . '.filter.starttime', 'filter_starttime', '');
-        $numdays = $this->getUserStateFromRequest($this->context . '.filter.numdays', 'filter_numdays', '');
-        $startdate = $this->getUserStateFromRequest($this->context . '.filter.startdate', 'filter_startdate', '');
-        $dbstid = $this->getUserStateFromRequest($this->context . '.filter.dbstid', 'filter_dbstid', '');
+        //$publiconly = 
+        $this->getUserStateFromRequest($this->context . '.filter.publiconly', 'filter_publiconly', '');
+        //$displayfmt = 
+        $this->getUserStateFromRequest($this->context . '.filter.displayfmt', 'filter_displayfmt', '');
+        //$numhours = 
+        $this->getUserStateFromRequest($this->context . '.filter.numhours', 'filter_numhours', '');
+        //$starttime = 
+        $this->getUserStateFromRequest($this->context . '.filter.starttime', 'filter_starttime', '');
+        //$numdays = 
+        $this->getUserStateFromRequest($this->context . '.filter.numdays', 'filter_numdays', '');
+        //$startdate = 
+        $this->getUserStateFromRequest($this->context . '.filter.startdate', 'filter_startdate', '');
+        //$dbstid = 
+        $this->getUserStateFromRequest($this->context . '.filter.dbstid', 'filter_dbstid', '');
         
+/*
         $posted = $app->input->post->get('filter');
         if ($posted) {
             
@@ -84,6 +102,8 @@ class ScheduleModel extends ListModel {
         $data['dbstid'] = $dbstid;
         $form = parent::getFilterForm($data, $loadData);
         $form->bind($data);
+ */        
+        
 //         $numdays = ($display=0) ? $listdays : $tabledays;
         
 //         //convert start and end date to timestamp
@@ -98,6 +118,35 @@ class ScheduleModel extends ListModel {
         
     }
     
+    /**
+     * Method to get a store id based on model configuration state.
+     *
+     * This is necessary because the model is used by the component and
+     * different modules that might need different sets of data or different
+     * ordering requirements.
+     *
+     * @param   string  $id  A prefix for the store id.
+     *
+     * @return  string  A store id.
+     *
+     * @since   1.6
+     */
+    protected function getStoreId($id = '')
+    {
+        // Compile the store id.
+        $id .= ':' . $this->getState('filter.publiconly');
+        $id .= ':' . serialize($this->getState('filter.displayfmt'));
+        $id .= ':' . $this->getState('filter.numhours');
+        $id .= ':' . serialize($this->getState('filter.starttime'));
+        $id .= ':' . serialize($this->getState('filter.numdays'));
+        $id .= ':' . $this->getState('filter.startdate');
+        $id .= ':' . serialize($this->getState('filter.dbstid'));
+        
+        return parent::getStoreId($id);
+    }
+    
+    
+/*     
     public function loadFormData(){
         $this->get('State');
         $res = parent::loadFormData();
@@ -105,12 +154,7 @@ class ScheduleModel extends ListModel {
         return $res;
     }
     
-    public function getFilterForm($data = [], $loadData = true) {
-        $form = parent::getFilterForm($data, $loadData);
-        
-        
-    }
-    
+ */    
     protected function getListQuery() {
         
         // Create a new query object.
@@ -145,15 +189,32 @@ WHERE st.id = 2
 		
 		if ($dbstid>0) $query->where('st.id = '.$dbstid);
 		$query->where('a.scheduledcnt > 0');
+
         //get filters
-        
+	    $publiconly = $this->getState('filter.publiconly',0);		
+		if ($publiconly > 0) $query->where('a.publicschd = '.$db->q((int) $publiconly));
+		$startdate = $this->getState('filter.startdate','');
+		$numdays = $this->getState('filter.numdays','1');
+		$enddate = date('Y-m-d', strtotime('+'.$numdays.' days', strtotime($startdate)));
+		if ($startdate != '') {
+		    $query->where('(sh.az_startdate IS NULL OR sh.az_startdate <= '.$db->q( $enddate)
+		        .') AND (sh.az_enddate IS NULL OR sh.az_enddate >= '.$db->q( $startdate).')');		    
+		}
+		$starttime = $this->getState('filter.starttime','00:00:00');
+		if (strlen($starttime < 7)) $starttime .= ':00';
+		$numhours = (int)$this->getState('filter.numhours','24');
+		$endhour = $numhours + (int)substr($starttime,0,2);
+		$endtime = ($endhour > 23) ? '24:00:00' : date('H:i:s', strtotime($starttime . ' + '.$numhours.' hours'));
+		$query->where('sh.az_starttime BETWEEN '.$db->q($starttime). ' AND '.$db->q($endtime));
 		
-	    $publiconly = $this->getState('filter.publiconly',0);
+		//we'll check az_days when building schedule
 		
-		if ($publiconly > 0) $query->where('a.publicschd = '.$db->q((int) $publiconly));						
 		
-		$orderCol  = 'sh.az_starttime';
-		$orderDirn = 'ASC';
+//		$orderCol  = 'sh.az_starttime';
+//		$orderDirn = 'ASC';
+		$orderCol  = $this->state->get('list.ordering', 'sh.az_starttime');
+		$orderDirn = $this->state->get('list.direction', 'ASC');
+		
 		
 		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 		

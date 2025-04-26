@@ -48,6 +48,11 @@
 			"description" : "confirm functions for reloading, putting, deleting, and unlinking playlists",
 			"type" : "script",
 			"uri" : "com_xbmusic/playlisthelper.js"	
+		}, {
+			"name" : "xbmusic.xbtimefunctions",
+			"description" : "functions to handle time strings",
+			"type" : "script",
+			"uri" : "com_xbmusic/xbtimefunctions.js"
 		}
 	]
 }

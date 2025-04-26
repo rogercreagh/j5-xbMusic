@@ -27,11 +27,15 @@ $app       = Factory::getApplication();
 $user  = Factory::getApplication()->getIdentity();
 $userId    = $user->get('id');
 
+$wa = $this->document->getWebAssetManager();
+$wa->useScript('xbmusic.xbtimefunctions')
+
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=schedule'); ?>" method="post" name="adminForm" id="adminForm">
 		<?php  if ($this->dbstid == '') : ?>
 			<h3 class="xbred"><?php echo Text::_('Please select station to continue'); ?></h3>
+			<div style="80vh;"> </div>
 		<?php else: ?>
 			<h3><?php echo Text::sprintf('Schedule for %s at %s', $this->station['title'], $this->station['az_url']); ?></h3>
 		<?php // Search tools bar
@@ -69,6 +73,8 @@ $userId    = $user->get('id');
 		<p class="xbtr xbmr50">
 		</p>
 		<hr />
+		<pre><?php echo print_r($this->items,true); ?>
+		</pre>
 		<?php if ($this->displayfmt == 1) :?>	
 		<i>freeze header table with a row for each hour and a column for each day. cells show start and end and title (poss colour coded background)</i>
 		<table>

@@ -16,6 +16,7 @@
 			name="startdate" type="calendar"
 			label="Start date"
 			description="Choose start date for display"
+			default="now"
 			showon="dbstid!:0"
 			>
 		</field>
@@ -24,6 +25,7 @@
 			label="Number of Days" 
 			description="Number of days to display from start date"
 			first="1" last="31" step="1"
+			default="3"
 			showon="dbstid!:0"
 		/>
 
@@ -31,13 +33,16 @@
 			label="Start time"
 			description="Hour of day to display from"
 			min="0" max="86400" step="900"
+			default="now"
+			onchange="steptime(this);"
 			showon="dbstid!:0"
 		/>
 
-		<field name="numhours" type="integer" 
+		<field name="numhours" type="integer"
 			label="Hours to display" 
 			description="Number of hours to display from start time"
 			first="1" last="24" step="1"
+			default="6"
 			showon="dbstid!:0"
 		/>
 
@@ -45,6 +50,7 @@
 			label="Display Format" 
 			description="List will simply show schduled items in an ordered list with breaks between days. Table will display with times in the left column and a column for each day"
  			class="btn-group btn-group-yesno"
+ 			default="1"
 			showon="dbstid!:0"
 		>
 			<option value="0">List</option>
@@ -55,6 +61,7 @@
 			label="Only Public Items" 
 			description="Restrict list to public items only, or show hidden items"
  			class="btn-group btn-group-yesno"
+ 			default="0"
 			showon="dbstid!:0"
 		>
 			<option value="1">Public</option>
@@ -62,4 +69,25 @@
 		</field>
 				
 	</fields>
+	<fields name="list">
+		<field
+			name="fullordering"
+			type="list"
+			label="JGLOBAL_SORT_BY"
+			class="js-select-submit-on-change"
+			default="a.id DESC"
+			validate="options"
+			>
+			<option value="az_startdate ASC">Startdate ASC</option>
+		</field>
+
+		<field
+			name="limit"
+			type="limitbox"
+			label="JGLOBAL_LIST_LIMIT"
+			default="0"
+			class="js-select-submit-on-change"
+		/>
+	</fields>
+	
 </form>
