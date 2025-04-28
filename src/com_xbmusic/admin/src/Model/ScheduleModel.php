@@ -176,7 +176,8 @@ WHERE st.id = 2
         $query->select(
             $this->getState(
                 'list.select',
-                'a.id AS plid , a.title AS pltitle, a.az_jingle, a.publicschd' 
+                'a.id AS plid , a.title AS pltitle, a.az_jingle, a.publicschd'
+                .', IF(a.status = "1", "1", "0") as enabled'
                 .', sh.az_startdate AS az_startdate, sh.az_enddate AS az_enddate'
                 .', sh.az_starttime AS az_starttime, sh.az_endtime AS az_endtime'
                 .', sh.az_days AS az_days, sh.az_loop AS az_loop'
@@ -224,7 +225,7 @@ WHERE st.id = 2
     
     public function getItems() {
         $items  = parent::getItems();
-        if ($items) {
+        if (($this->getState('filter.dbstid',0) > 0) AND ($items)) {
             //we now need to reorganise the items into an array of numdays and inside each arrays of the schedule items that are valid in time order
             $numdays = $this->getState('filter.numdays');
             $startdate = $this->getState('filter.startdate');
@@ -251,7 +252,7 @@ WHERE st.id = 2
                     //times have already been dealt with in the main query
                     if ($ok) $schitems[] = $item;
                 }
-                $d = date('Y-m-d',$thisdate);
+                $d = $thisdate;
                 $schedule[$d] = $schitems;
                 $thisdate += 24*60*60;
             }
@@ -260,7 +261,7 @@ WHERE st.id = 2
         } //endif items
         
         
-        return $items;
+        return false;
         
     } // end getItems
     

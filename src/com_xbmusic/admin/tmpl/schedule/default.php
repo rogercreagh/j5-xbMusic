@@ -54,15 +54,9 @@ $wa->useScript('xbmusic.xbtimefunctions')
 			<div class="col-md-2">
 				<?php echo $this->filterForm->renderField('numhours', 'filter'); ?>
         	</div>
-		</div>
-		<div class="row form-horizontal xblblcompact">
-			<div class="col-md-4">
-				<?php echo $this->filterForm->renderField('displayfmt', 'filter'); ?>
-			</div>
-			<div class="col-md-4">
-				<?php echo $this->filterForm->renderField('publiconly', 'filter'); ?>
-			</div>
-			<div class="col-md-4">
+			<div class="col-md-1">
+              </div>
+			<div class="col-md-2">
     			<button id="btnsub" class="btn btn-success" type="button" 
             		onclick="Joomla.submitbutton();" >
     				<i class="icon-clock"></i> &nbsp;
@@ -70,53 +64,71 @@ $wa->useScript('xbmusic.xbtimefunctions')
             	</button>        		
 			</div>
 		</div>
+		<div class="row form-horizontal xblblcompact">
+			<div class="col-md-3">
+				<?php echo $this->filterForm->renderField('displayfmt', 'filter'); ?>
+			</div>
+			<div class="col-md-3">
+				<?php echo $this->filterForm->renderField('publiconly', 'filter'); ?>
+			</div>
+			<div class="col-md-3">
+			</div>
+			<div class="col-md-1">
+              </div>
+			<div class="col-md-2">
+    			<button id="btnsub" class="btn btn-primary" type="button" 
+            		onclick="return false;" >
+    				<i class="icon-clock"></i> &nbsp;
+            			<?php echo Text::_('Clear Filters'); ?>
+            	</button>        		
+			</div>
+		</div>
 		<p class="xbtr xbmr50">
 		</p>
 		<hr />
-		<pre><?php echo print_r($this->items,true); ?>
+		<pre><?php //echo print_r($this->items,true); ?>
 		</pre>
 		<?php if ($this->displayfmt == 1) :?>	
-		<i>freeze header table with a row for each hour and a column for each day. cells show start and end and title (poss colour coded background)</i>
-		<table>
-			<thead>
-				<tr>
-					<th>Time</th>
-					<?php foreach ($this->items as $key=>$day) : ?>
-    					<th><?php echo $key; ?></th>					    
-					<?php endforeach; ?>
-				</tr>
-			</thead>
-			<tbody>
-				<?php $firsthr = (int)substr($this->starttime,0,2);
-				for ($hour = $firsthr; $hour < ($firsthr + $this->numhours); $hour++) : ?>
-					<tr>
-					<td><?php echo $hour.':00'; ?></td>
-					<?php foreach ($this->items as $dayslots) : ?>
-    					<td>				    
-						<?php foreach ($dayslots as $slot) {						    
-						    if (substr($slot->az_starttime,0,2) == $hour ) {
-						        echo '<div class="schbox">';
-						        echo $slot->az_starttime.'<br >';
-						        echo $slot->pltitle.'<br />';
-						        echo $slot->az_endtime;
-						        echo '</div>';
-						    }
-						} ?>
-						</td>    
-					<?php endforeach; ?>					
-					</tr>				
-				<?php endfor; ?>
-			</tbody>
-		</table>
-			
+		<div class="table-scroll">
+    		<table class="table-freeze xbwp100">
+    			<thead>
+    				<tr>
+    					<th class="xbpt10 xbpr20 xbpb10 xbpl20">Time</th>
+    					<?php foreach ($this->items as $key=>$day) : ?>
+        					<th class="xbtc"><?php echo date('jS M Y\\<\\b\\r\\>l',$key); ?></th>					    
+    					<?php endforeach; ?>
+    				</tr>
+    			</thead>
+    			<tbody>
+    				<?php $firsthr = (int)substr($this->starttime,0,2);
+    				for ($hour = $firsthr; $hour < ($firsthr + $this->numhours); $hour++) : ?>
+    					<tr>
+    					<td class="xbbgwhite xbtc" style="vertical-align:top;"><?php echo $hour.':00'; ?></td>
+    					<?php foreach ($this->items as $dayslots) : ?>
+        					<td>				    
+    						<?php foreach ($dayslots as $slot) {						    
+    						    if (substr($slot->az_starttime,0,2) == $hour ) {
+    						        echo '<div class="schbox xb09 ">';
+    						        echo $slot->az_starttime.'<br >';
+    						        echo '<span class="xbpl20 xbbold">'.$slot->pltitle.'</span><br />';
+    						        echo $slot->az_endtime;
+    						        echo '</div>';
+    						    }
+    						} ?>
+    						</td>    
+    					<?php endforeach; ?>					
+    					</tr>				
+    				<?php endfor; ?>
+    			</tbody>
+    		</table>
+		</div>			
 		<?php else : ?>
-			<i>List of slots with date separator, start time, end time, title, decription</i>
 						<?php foreach ($this->items as $key=>$dayslots) : ?>
-						    <h4><?php echo $key; ?></h4>
+						    <h4><?php echo date('jS M Y\\<\\b\\r\\>l',$key); ?></h4>
 							<?php foreach ($dayslots as $slot) {						    
 						        echo '<div class="schbox">';
 						        echo $slot->az_starttime.'<br >';
-						        echo $slot->pltitle.'<br />';
+						        echo '<span class="xbpl20 xbbold">'.$slot->pltitle.'</span><br />';
 						        echo $slot->az_endtime;
 						        echo '</div>';
 						    } ?>

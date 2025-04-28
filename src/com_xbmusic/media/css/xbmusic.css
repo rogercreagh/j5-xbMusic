@@ -77,10 +77,12 @@ table[id^=subfieldList] thead tr td div.btn-group {
 .trackcnt { background-color: #efefef !important;  }    
 .othercnt { background-color: #efefef !important;  }    
 
+/* schedule view */
 .schbox {
 	border-top: solid 1px #888;
 	border-bottom: solid 1px #888;
-	background-color:#eee;
+	background-color:#efefef;
+	margin: 10px;
 }
 
 
