@@ -129,6 +129,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `az_order` varchar(20),
   `az_jingle` boolean,
   `az_weight` tinyint(3) unsigned,
+  `az_num_songs` int(10) unsigned NOT NULL DEFAULT '0',
+  `az_total_length` int(10) unsigned NOT NULL DEFAULT '0',
   `description` mediumtext,
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '0',

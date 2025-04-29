@@ -2,6 +2,35 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.51.7</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.51.7</h3> Updated 28th April 2025]]></item>
+			<item>Admin Schedule view</item>
+			<item></item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>DATABASE - playlist additional az_num_songs and az_weight fields</item>
+		</change>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item></item>
+		</fix>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.50.3</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.50.3</h3> Updated 4th April 2025]]></item>

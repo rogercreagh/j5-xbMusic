@@ -77,7 +77,7 @@ $wa->useScript('xbmusic.xbtimefunctions')
               </div>
 			<div class="col-md-2">
     			<button id="btnsub" class="btn btn-primary" type="button" 
-            		onclick="return false;" >
+            		onclick="document.getElementById('task').value='schedule.clearfilter';this.form.submit();" >
     				<i class="icon-clock"></i> &nbsp;
             			<?php echo Text::_('Clear Filters'); ?>
             	</button>        		
