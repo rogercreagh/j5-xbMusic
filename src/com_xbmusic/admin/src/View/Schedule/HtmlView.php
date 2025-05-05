@@ -40,6 +40,7 @@ class HtmlView extends BaseHtmlView {
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->azuracast = $params->get('azuracast',0);
         $this->onestation = 1; //dummy value to hide station button
+        $this->dbstid = '';
         if ($this->azuracast ==1) {
             $this->xbstations = XbmusicHelper::getStations();
             if ($this->xbstations) {

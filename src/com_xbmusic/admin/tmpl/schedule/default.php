@@ -32,19 +32,18 @@ $wa->useScript('xbmusic.xbtimefunctions')
 
 ?>
 <div id="xbcomponent" >
- <?php if ($this->azuracast == 0 ) : ?>
-  <div class="xbbox xbgradpink xbht200">
-  	<h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_ENABLED')?>
-  	</h3>
-  </div>
- <?php elseif (is_null($this->stations)) : ?>
-   <div class="xbbox xbgradyellow xbht200">
-  	<h3><?php echo Text::_('XBMUSIC_AZURACAST_NO_STATIONS')?>
-  	</h3>
-  </div>
- 
- <?php else: ?>
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=schedule'); ?>" method="post" name="adminForm" id="adminForm">
+<?php if ($this->azuracast == 0 ) : ?>
+    <div class="xbbox xbgradpink xbht200 xbflexvc">
+        <div class="xbcentre"><h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_ENABLED')?>
+        </h3></div>
+    </div>
+<?php elseif (!($this->xbstations)) : ?>
+    <div class="xbbox xbgradyellow xbht200 xbflexvc">
+        <div class="xbcentre"><h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_LOADED')?>
+        </h3></div>
+    </div>
+<?php else: ?>
 		<?php  if ($this->dbstid == '') : ?>
 			<h3 class="xbred"><?php echo Text::_('XBMUSIC_SELECT_STATION'); ?></h3>
 			<div style="80vh;"> </div>
@@ -166,10 +165,10 @@ $wa->useScript('xbmusic.xbtimefunctions')
 					$this->loadTemplate('batch_body')
 				); ?>
 			<?php endif; ?>
+<?php endif; ?>
 		<input type="hidden" name="task" value="" />
 		<?php echo HTMLHelper::_('form.token'); ?>
     </form>
- <?php endif; ?>
     <div class="clearfix"></div>
     <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>

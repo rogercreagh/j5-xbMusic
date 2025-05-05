@@ -372,6 +372,9 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 /* centre div or table cell */
 .xbcentre { margin-left:auto; margin-right:auto;}
 
+/*vcentre with flex - container must have specified height */
+.xbflexvc {display:flex; align-items: center; }
+
 /* text alignment */
 .xbtc, .xbcredit {text-align:center;}
 .xbtr {text-align:right;}
