@@ -17,7 +17,8 @@ All_Details.forEach(deet=>{
 /**
  * @name toggleOpenOneOnly()
  * @description close other details sections when one is opened. 
- * Needs a checkbox (or hidden element) with id="autoclose" and attribute checked
+ * Needs an input type checkbox or hidden with id="autoclose" and attribute checked="true"
+ * checkbox enables user to toggle the autoclose, use hidden input to force it always on
  */
 function toggleOpenOneOnly(e) {
   if (document.getElementById('autoclose').checked){
@@ -31,7 +32,7 @@ function toggleOpenOneOnly(e) {
 
 /**
  * @name stopProp()
- * @description prevents upward propogation of click - use on div or td enclosing details in list table to stop checkbox in col1 getting toggled by open/close details 
+ * @description prevents upward propogation of click - in list table use on div or td enclosing details element to stop checkbox in col1 getting toggled by open/close details 
  */
 function stopProp(event) {
 	event.stopPropagation();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.51.2 13th April 2025
+ * @version 0.0.51.8 5th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -38,10 +38,8 @@ class HtmlView extends BaseHtmlView {
         $this->xbstations = XbmusicHelper::getStations();
         if ($this->azuracast ==1) {
             $this->azstations = $this->get('AzStations');
-//             $api = new AzApi;
-             $this->apiname = $params->get('az_apiname','missing');
-             $this->azurl = $params->get('az_url','missing');
-//             $this->azstations = $api->azStations();
+             $this->apiname = $params->get('az_apiname','');
+             $this->azurl = $params->get('az_url','');
         } else {
             $this->azstations = '';
         }

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ScheduleModel.php
- * @version 0.0.51.6 26th April 2025
+ * @version 0.0.51.8 2nd May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -57,22 +57,24 @@ class ScheduleModel extends ListModel {
         }
         
         //$publiconly = 
-        $this->getUserStateFromRequest($this->context . '.filter.publiconly', 'filter_publiconly', '');
+        $this->getUserStateFromRequest($this->context . '.filter.publiconly', 'filter_publiconly', '0');
         //$displayfmt = 
-        $this->getUserStateFromRequest($this->context . '.filter.displayfmt', 'filter_displayfmt', '');
+        $this->getUserStateFromRequest($this->context . '.filter.displayfmt', 'filter_displayfmt', '1');
         //$numhours = 
-        $this->getUserStateFromRequest($this->context . '.filter.numhours', 'filter_numhours', '');
+        $this->getUserStateFromRequest($this->context . '.filter.numhours', 'filter_numhours', '24');
         //$starttime = 
-        $this->getUserStateFromRequest($this->context . '.filter.starttime', 'filter_starttime', '');
+        $this->getUserStateFromRequest($this->context . '.filter.starttime', 'filter_starttime', '00:00');
         //$numdays = 
-        $this->getUserStateFromRequest($this->context . '.filter.numdays', 'filter_numdays', '');
+        $this->getUserStateFromRequest($this->context . '.filter.numdays', 'filter_numdays', '4');
         //$startdate = 
-        $this->getUserStateFromRequest($this->context . '.filter.startdate', 'filter_startdate', '');
+        $this->getUserStateFromRequest($this->context . '.filter.startdate', 'filter_startdate', date('Y-m-d'));
         //$dbstid = 
         $this->getUserStateFromRequest($this->context . '.filter.dbstid', 'filter_dbstid', '');
         
-/*
+/* 
         $posted = $app->input->post->get('filter');
+        $app->enqueueMessage(print_r($posted,true));
+       
         if ($posted) {
             
             if (key_exists('publiconly', $posted)) $publiconly = $posted['publiconly'];
@@ -163,7 +165,12 @@ class ScheduleModel extends ListModel {
         $query = $db->getQuery(true);
         $app = Factory::getApplication();
         $user  = $app->getIdentity();
-        
+		$dbstid = $this->getState('filter.dbstid',0);
+        // if there is only one station we'll make sure it is default
+        if ($dbstid == 0) {
+            $dbstid = XbmusicHelper::singleStationId();
+            $this->setState('filter.dbstid', $dbstid);
+        }
        /*
         SELECT a.id AS plid , a.title AS pltitle, a.az_jingle, a.publicschd
 FROM `j512_xbmusic_playlists` AS a
@@ -187,7 +194,6 @@ WHERE st.id = 2
         $query->join('LEFT', $db->qn('#__xbmusic_azschedules').' AS sh','a.id = sh.dbplid');
         $query->join('LEFT', $db->qn('#__xbmusic_azstations').' AS st',' a.az_dbstid = st.id');
         
-		$dbstid = $this->getState('filter.dbstid',0);
 		
 		if ($dbstid>0) $query->where('st.id = '.$dbstid);
 		$query->where('a.scheduledcnt > 0');
@@ -195,8 +201,8 @@ WHERE st.id = 2
         //get filters
 	    $publiconly = $this->getState('filter.publiconly',0);		
 		if ($publiconly > 0) $query->where('a.publicschd = '.$db->q((int) $publiconly));
-		$startdate = $this->getState('filter.startdate','');
-		$numdays = $this->getState('filter.numdays','1');
+		$startdate = $this->getState('filter.startdate',date('Y-m-d'));
+		$numdays = $this->getState('filter.numdays','4');
 		$enddate = date('Y-m-d', strtotime('+'.$numdays.' days', strtotime($startdate)));
 		if ($startdate != '') {
 		    $query->where('(sh.az_startdate IS NULL OR sh.az_startdate <= '.$db->q( $enddate)
@@ -222,47 +228,48 @@ WHERE st.id = 2
 		
 		return $query;
     } //end getlistquery
-    
+
+    /**
+     * @name getItems()
+     * @desc We have an array of playlist schedule items for the station
+     * @desc we need to transform into array of dates per filters with only valid schedule items per day/time
+     * {@inheritDoc}
+     * @see \Joomla\CMS\MVC\Model\ListModel::getItems()
+     */
     public function getItems() {
         $items  = parent::getItems();
-        if (($this->getState('filter.dbstid',0) > 0) AND ($items)) {
-            //we now need to reorganise the items into an array of numdays and inside each arrays of the schedule items that are valid in time order
-            $numdays = $this->getState('filter.numdays');
-            $startdate = $this->getState('filter.startdate');
-            $thisdate = strtotime($startdate);
-            $schedule = array();
-            for ($i = 0; $i < $numdays; $i++) {
-                $dayofweek = date('N', $thisdate);
-              //  $thisdate = new Date($startdate);
-              //  $thisdate->modify('+ '.$i.' days');
+        $today = date('Y-m-d');
+        $numdays = $this->getState('filter.numdays',4);
+        $startdate = $this->getState('filter.startdate',$today);
+        $thisdate = strtotime($startdate);
+        $schedule = array();
+        for ($i = 0; $i < $numdays; $i++) {
+            $dayofweek = date('N', $thisdate);
+            $d = $thisdate;
+            $schedule[$d] = [];
+            if (($this->getState('filter.dbstid',0) > 0) AND ($items)) {
                 $schitems = [];
                 foreach ($items as $item) {
                     $ok = true;
-                    if ($item->az_days != '') {
+                    if ($item->az_days != '') { //if daysofweek specified check valid
                         if (strpos($item->az_days,$dayofweek) === false) $ok = false;
                     }               
-                    //check if $item->az_startdate is null or < thisdate
-                    if ($item->az_startdate) {
+                    if ($item->az_startdate) { // check startdate is before this date
                         if (strtotime($item->az_startdate) > $thisdate) $ok = false;
                     }
-                    //check if $item->az_endate is null or > thisdate
-                    if ($item->az_enddate) {
+                    if ($item->az_enddate) { //check if enddate after this date
                         if (strtotime($item->az_enddate) < $thisdate) $ok = false;
                     }
                     //times have already been dealt with in the main query
                     if ($ok) $schitems[] = $item;
-                }
-                $d = $thisdate;
+                } //endforeach item
                 $schedule[$d] = $schitems;
-                $thisdate += 24*60*60;
-            }
-            return $schedule;            
+            } //end if items
+            $thisdate += 24*60*60;
+        } //endforeach day
+        
+        return $schedule;            
 
-        } //endif items
-        
-        
-        return false;
-        
     } // end getItems
     
 }

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.42.7 25th March 2025
+ * @version 0.0.51.8 5th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -288,7 +288,11 @@ $wa->useScript('keepalive')
             			<?php echo $this->form->renderField('dbstid'); ?>
         			<?php endif; ?>
        			<?php else : ?>
-                      <p><i><?php echo Text::sprintf('XBMUSIC_NO_STATIONS_AT',$this->az_url); ?></i>
+                     <p><i><?php if ($this->azurl =='') {
+                         echo Text::_('XBMUSIC_AZURACAST_NO_DETAILS').'<br />'.Text::_('XBMUSIC_AZURACAST_SET_OPTS');
+                     } else {
+                         echo Text::sprintf('XBMUSIC_AZURACAST NO_STATIONS',$this->azurl); 
+                     }?></i></p>
                 <?php endif; ?>
         	</div>
         </div>

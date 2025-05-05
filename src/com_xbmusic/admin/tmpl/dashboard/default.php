@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.41.4 5th March 2025
+ * @version 0.0.51.8 30h April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Uri\Uri;
 // use Joomla\CMS\Layout\LayoutHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
@@ -25,7 +26,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dashboard'); ?>" method="post" name="adminForm" id="adminForm">
-
+		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />		
 		<h2><i class='icon-info-circle'></i> <?php echo Text::_('XB_STATUS_SUM'); ?></h2>
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
@@ -203,7 +204,45 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						</tr>
 					</table>
 				</div>
+<?php if ($this->azuracast == 1) : ?>
+				<div class="xbbox gradpurple">
+					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=dataman"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+					<?php if(!empty($this->stations)) : ?>
+						<?php foreach($this->stations as $station) : ?>
+						<?php if(count($this->stations)>1) : ?>
+							<details>
+								<summary><?php echo $station['id']; ?> <span class="xbr11"><?php echo $station['title']; ?></span>
+								</summary>
+						<?php else : ?>
+							<h3><?php echo $station['title']; ?></h3>
+						<?php endif; ?>
+								<i>AzURL</i>: 
+								<a href="<?php echo $station['az_url']; ?>" target="_blank">
+                         			<?php echo $station['az_url']; ?></a>
+                         			<br />
+							    <?php if ($station['az_id']>0 ) : ?>
+							    	<i>AzID</i>: 
+							        <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
+							    <?php else : ?>
+							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
+							    <?php endif; ?> 
+							    <br />
+							    <i>Website</i>: 
+						     	<a href="<?php echo $station['website']; ?>" target="_blank">
+									<?php echo $station['website']; ?></a>  
+								<br /><i><?php echo $station['plcnt'].Xbtext::_('XBMUSIC_PLAYLISTS',XBSP1+XBTRL);?>, 
+									<?php echo $station['schlists'].Xbtext::_('XBMUSIC_WITH_SCHEDULED',XBSP1+XBTRL);?>
+								<?php if($station['schtot']>0) echo '<br />'.Text::sprintf('XBMUSIC_SCHED_HAS_SLOTS',$station['schtot']); ?></i>  
+						<?php if(count($this->stations)>1) : ?>    
+							</details>
+						<?php endif; ?>
+ 						<?php endforeach; ?>
+ 					<?php else : ?>
+                  		<p><i><?php echo Text::_('No stations have been saved yet. Use Dataman - Azuracast tab to fetch available stations'); ?></i>
+					<?php endif; ?>
 
+				</div>
+<?php endif; ?>
 				<div class="xbbox gradcat">
 					<h3 class="xbmb20"><i class='fas fa-folder-tree' ></i> <a href="index.php?option=com_xbmusic&view=catlist"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></span>
@@ -288,34 +327,6 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                             echo Text::_('XB_BEER_LINK');
                         }?>
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
-					<?php if($this->azuracast == 1) : ?>
-                        <?php echo HTMLHelper::_('bootstrap.addSlide', 'slide-dashboard',Text::_('Azuracast Stations') , 'stations','xbaccordion'); ?>
-    					<?php if(!empty($this->stations)) : ?>
-    						<?php foreach($this->stations as $station) : ?>
-    							<details>
-    								<summary><?php echo $station['id']; ?> <span class="xbr11"><?php echo $station['title']; ?></span>
-    								</summary>
-									<i>AzURL</i>: 
-									<a href="<?php echo $station['az_url']; ?>" target="_blank">
-                             			<?php echo $station['az_url']; ?></a>
-                             			<br />
-    							    <?php if ($station['az_id']>0 ) : ?>
-    							    	<i>AzID</i>: 
-    							        <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
-    							    <?php else : ?>
-    							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
-    							    <?php endif; ?> 
-    							    <br />
-    							    <i>Website</i>: 
-							     	<a href="<?php echo $station['website']; ?>" target="_blank">
-										<?php echo $station['website']; ?></a>         
-    							</details>
-     						<?php endforeach; ?>
-     					<?php else : ?>
-                      		<p><i><?php echo Text::_('No stations have been saved yet. Use Dataman - Azuracast tab to fetch available stations'); ?></i>
-    					<?php endif; ?>
-                   		<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
-					<?php endif; ?>
 
 					<?php echo HTMLHelper::_('bootstrap.endAccordion'); ?>
 				</div>				
@@ -340,5 +351,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
         '<div style="margin:10px 30px;">'.$this->changelog.'</div>'
     );
     ?>
+    <script language="JavaScript" type="text/javascript"
+      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
                       	
 

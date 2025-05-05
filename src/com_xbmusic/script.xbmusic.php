@@ -73,7 +73,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             if ($params->get('saveimages',1)==0) {
                 $dest='/images/xbmusic';
-                if (Folder::exists(JPATH_ROOT.$dest)) {
+                if (is_dir(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
                         $message .= ' ...images <code>/images/xbmusic</code> folder deleted';
                     } else {
@@ -84,7 +84,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             if ($params->get('savelogs',1)==0) {
                 $dest='/xbmusic-logs';
-                if (Folder::exists(JPATH_ROOT.$dest)) {
+                if (is_dir(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
                         $message .= ' ...<code>/xbmusic-logs</code> folder deleted';
                     } else {

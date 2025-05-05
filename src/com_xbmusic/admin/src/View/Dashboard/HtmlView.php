@@ -248,9 +248,10 @@ class HtmlView extends BaseHtmlView {
         $itemslist = '';
         if (is_array($items['item'])) {
             foreach ($items['item'] as $item) {
-                if ((!$this->titleok) || !(str_starts_with($item, '<h3>'))) {
-                    $itemslist .= '<li>'.$item.'</li>';
-                    
+                if (is_string($item)) {
+                    if ((!$this->titleok) || !(str_starts_with($item, '<h3>'))) {
+                        $itemslist .= '<li>'.$item.'</li>';                   
+                    }                    
                 }
             }
         } else {

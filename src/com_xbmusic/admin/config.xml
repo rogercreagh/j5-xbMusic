@@ -29,6 +29,12 @@
 		
         <field name="space2" type="spacer" hr="true" />
         
+		<field name="azbasenote" type="note"
+			label="XBCONFIG_AZURACASTNOTE_LABEL"
+			description="XBCONFIG_AZURACASTNOTE_DESC"
+			class="info"
+		/>
+		
         <field name="azuracast" type="radio"
         	label="Azuracast Integration"
         	description="Enable if you have API access to a Azuracast intance."
@@ -61,9 +67,15 @@
 			hint="https://mystation.uk"
 			showon="azuracast:1"
         />
-        
+                
         <field name="space3" type="spacer" hr="true" />
         
+		<field name="devnote" type="note"
+			label="XBCONFIG_DEVNOTE_LABEL"
+			description="XBCONFIG_DEVNOTE_DESC"
+			class="info"
+		/>
+		
 		<field name="devmode" type="radio" 
 			label="Developer Options"
 			description="Turn on to enable save data on uninstall options and some features used during development"
@@ -74,10 +86,6 @@
 				<option value="1">On</option>
 		</field>
 		
-		<field name="devnote" type="note"
-			label="Development Options"
-			showon="devmode:1"
-		/>
   		<field name="savedata" type="radio"
 			label="Keep Data on Uninstall"
 			description="This option allows you to uninstall without deleteing the database tables, categories or options. The categories and global options will be saved as a hidden category. When reinstalling xbMusic categories will be restored with their original IDs so will be correctly linked."
@@ -164,7 +172,17 @@
 				<option value="4">All information</option>
 		</field>
 		
-        <field name="genrecattag" type="radio"
+		<field name="impcat" type="radio"
+			label="Import Category"
+			description="This will override the options for all items to create a category based on import date when importing from track file ID3 data"
+			class="btn-group "
+ 			default="1"
+		>
+			<option value="0">Use Item Defaults</option>
+			<option value="1">Create from Date</option>
+		</field>
+			
+       <field name="genrecattag" type="radio"
         	label="ID3 Genre as Track Cat/Tag"
         	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag"
  			class="btn-group btn-group-yesno"
@@ -177,7 +195,7 @@
         </field>
 
         <field name="genrecattag1" type="radio"
-        	label="ID3 Genre as Track Cat/Tag"
+        	label="ID3 Genre as Track Tag"
         	description="When importing track details from ID3 data use Genre tag, if present, as a Joomla Tag and/or Category for track."
  			class="btn-group btn-group-yesno"
 			default="2"  showon="impcat:1"
@@ -198,15 +216,6 @@
 			<option value="3">Both</option>
         </field>
         
-		<field name="impcat" type="radio"
-			label="Import Category"
-			description="This will override the options for all items to create a category based on import date when importing from track file ID3 data"
-			class="btn-group "
- 			default="1"
-		>
-			<option value="0">Use Item Defaults</option>
-			<option value="1">Create from Date</option>
-		</field>	
 		<field name="splitsongs" type="radio"
 			label="Split medley to Songs"
 			description="split track titles containing , or / into separate songs when importing. NB While this may often be correct for medleys of tunes, sometimes it will produce anomalous results. eg 'Have You Seen Your Mother, Baby, Standing in the Shadow' would become three songs"

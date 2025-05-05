@@ -30,7 +30,10 @@ class ScheduleController extends AdminController {
     
     public function clearFilter() {
         $app = Factory::getApplication();
-        $app->setUserState('com_xbmusic.schedule.section', null);
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('filter', 'array()', 'ARRAY');
+        $app->setUserState('com_xbmusic.schedule.filter', null);
+        $app->setUserState('com_xbmusic.schedule.filter.dbstid', $post['dbstid']);
         $this->setRedirect('index.php?option=com_xbmusic&view=schedule');
     }
 }

@@ -2,8 +2,8 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/schedule/default.php
- * @version 0.0.51.6 26th April 2025
- * @author Roger C-O
+ * @version 0.0.51.8 2nd May 2025
+s * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
@@ -32,12 +32,24 @@ $wa->useScript('xbmusic.xbtimefunctions')
 
 ?>
 <div id="xbcomponent" >
+ <?php if ($this->azuracast == 0 ) : ?>
+  <div class="xbbox xbgradpink xbht200">
+  	<h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_ENABLED')?>
+  	</h3>
+  </div>
+ <?php elseif (is_null($this->stations)) : ?>
+   <div class="xbbox xbgradyellow xbht200">
+  	<h3><?php echo Text::_('XBMUSIC_AZURACAST_NO_STATIONS')?>
+  	</h3>
+  </div>
+ 
+ <?php else: ?>
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=schedule'); ?>" method="post" name="adminForm" id="adminForm">
 		<?php  if ($this->dbstid == '') : ?>
-			<h3 class="xbred"><?php echo Text::_('Please select station to continue'); ?></h3>
+			<h3 class="xbred"><?php echo Text::_('XBMUSIC_SELECT_STATION'); ?></h3>
 			<div style="80vh;"> </div>
 		<?php else: ?>
-			<h3><?php echo Text::sprintf('Schedule for %s at %s', $this->station['title'], $this->station['az_url']); ?></h3>
+			<h3><?php echo Text::sprintf('XBMUSIC_SCHED_FOR_STATION', $this->station['title'], $this->station['az_url']); ?></h3>
 		<?php // Search tools bar
 		  //echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>
@@ -60,7 +72,7 @@ $wa->useScript('xbmusic.xbtimefunctions')
     			<button id="btnsub" class="btn btn-success" type="button" 
             		onclick="Joomla.submitbutton();" >
     				<i class="icon-clock"></i> &nbsp;
-            			<?php echo Text::_('Set Display'); ?>
+            			<?php echo Text::_('XBMUSIC_SET_DISPLAY'); ?>
             	</button>        		
 			</div>
 		</div>
@@ -76,18 +88,17 @@ $wa->useScript('xbmusic.xbtimefunctions')
 			<div class="col-md-1">
               </div>
 			<div class="col-md-2">
-    			<button id="btnsub" class="btn btn-primary" type="button" 
-            		onclick="document.getElementById('task').value='schedule.clearfilter';this.form.submit();" >
+    			<button id="btnclr" class="btn btn-primary" type="button" 
+            		onclick="document.getElementById('task').value='schedule.clearFilter';Joomla.submitbutton();" >
     				<i class="icon-clock"></i> &nbsp;
-            			<?php echo Text::_('Clear Filters'); ?>
+            			<?php echo Text::_('XBMUSIC_CLEAR_FILTERS'); ?>
             	</button>        		
 			</div>
 		</div>
 		<p class="xbtr xbmr50">
 		</p>
 		<hr />
-		<pre><?php //echo print_r($this->items,true); ?>
-		</pre>
+		
 		<?php if ($this->displayfmt == 1) :?>	
 		<div class="table-scroll">
     		<table class="table-freeze xbwp100">
@@ -148,7 +159,7 @@ $wa->useScript('xbmusic.xbtimefunctions')
 					'bootstrap.renderModal',
 					'collapseModal',
 					array(
-						'title'  => Text::_('Set Station for Schedule'),
+						'title'  => Text::_('XBMUSIC_SELECT_STATION'),
 						'footer' => $this->loadTemplate('batch_footer'),
 					    'modalWidth' => '50',
 					),
@@ -158,6 +169,7 @@ $wa->useScript('xbmusic.xbtimefunctions')
 		<input type="hidden" name="task" value="" />
 		<?php echo HTMLHelper::_('form.token'); ?>
     </form>
+ <?php endif; ?>
     <div class="clearfix"></div>
     <?php echo XbcommonHelper::credit('xbMusic');?>
 </div>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.51.0 6th April 2025
+ * @version 0.0.51.8 2nd May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -832,6 +832,11 @@ class XbmusicHelper extends ComponentHelper
 	
 	/************ AZURACAST STATION FUNCTIONS ************/
 	
+	/**
+	 * @name getStations()
+	 * @desc returns array of stations in database with playlist & schedule counts
+	 * @return array|null
+	 */
 	public static function getStations() {
 	    $dbstations = [];
 	    $db = Factory::getDbo();
@@ -840,6 +845,19 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_azstations');
 	    $db->setQuery($query);
 	    $dbstations = $db->loadAssocList();	
+	    if ($dbstations) {
+	        foreach ($dbstations AS &$station) {
+	            $query->clear();
+	            $query->select('COUNT(id) AS plcnt , SUM(scheduledcnt) AS schtot, COUNT(CASE WHEN scheduledcnt > 0 THEN 1 ELSE NULL END) AS schlists');
+	            $query->from('#__xbmusic_playlists');
+	            $query->where('az_dbstid = '.$db->q($station['id']));
+	            $db->setQuery($query);
+	            $cnts = $db->loadAssoc();
+	            $station['plcnt'] = $cnts['plcnt'];
+	            $station['schlists'] = $cnts['schlists'];
+	            $station['schtot'] = $cnts['schtot'];
+	        }
+	    }
 	    if (!is_array($dbstations)) $dbstations = [];
 	    return $dbstations;
 	}
@@ -875,7 +893,8 @@ class XbmusicHelper extends ComponentHelper
 	    $query->from('#__xbmusic_azstations');
 	    $query->where($db->qn('az_id').' = '. $azstid);
 	    $db->setQuery($query);
-	    return $db->loadAssoc();
+	    $station = $db->loadAssoc();
+	    return $station;
 	}
 	
     /**
@@ -896,5 +915,23 @@ class XbmusicHelper extends ComponentHelper
 	    
 	}
 	
+	/**
+	 * @name singleStation()
+	 * @desc if only a single station is in db returns dbid otherwise false
+	 * 
+	 */
+	public static function singleStationId() {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('s.id AS id, (SELECT(COUNT(s2.id)) FROM #__xbmusic_azstations AS s2) AS stncnt');
+	    $query->from('#__xbmusic_azstations AS s');
+	    $db->setQuery($query);
+	    $stn = $db->loadAssoc();
+	    if ($stn['stncnt'] == 1) {
+	        return $stn['id'];
+	    } else {
+	        return 0;
+	    }	    
+	}
 	
 } //end xbmusicHelper

@@ -183,6 +183,7 @@ ul.nav-tabs {
 }
 
 /* box gradientbackgrounds */
+.gradpurple { background-image: linear-gradient(#ffffff, #df7fff); }
 .gradpink { background-image: linear-gradient(#ffffff, #ffc0c0); }
 .gradyellow { background-image: linear-gradient(#ffffff, #ffffaf); }
 .gradgreen { background-image: linear-gradient(#ffffff,#ccffcc); }
