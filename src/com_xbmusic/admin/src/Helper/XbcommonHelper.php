@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.30.5 14th February 2025
+ * @version 0.0.52.0 8th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -486,6 +486,32 @@ class XbcommonHelper extends ComponentHelper {
     }
     
     /**
+     * @name setItemValue()
+     * @desc sets a new value on specified item
+     * @param string $table
+     * @param string $column
+     * @param int $itemid
+     * @param string $newvalue
+     * @return boolean
+     */
+    public static function setItemValue(string $table, string $column, int $itemid, string $newvalue) {
+        $db = Factory::getDbo();
+        $query = $db->getQuery(true);
+        $query->update($db->qn($table));
+        $query->set($db->qn($column).' = '.$db->q($newvalue));
+        $query->where($db->qn('id').' = '.$db->q($itemid));
+        try {
+            $db->setQuery($query);
+            $ret = $db->execute();
+        } catch (Exception $e) {
+            Factory::getApplication()->enqueueMessage('Error in setItemValue()<br/ >'.$e->getMessage().'<br />'.$query->dump());
+            return false;
+        }
+        return $ret;
+        
+    }
+    
+    /**
      * @name getItem()
      * @desc returns a single item row as an object or array. If column values are not unique will return the first found
      * @param string $table - the table name
@@ -557,6 +583,8 @@ class XbcommonHelper extends ComponentHelper {
         return $result;
     }
     
+    /**************** Text Functions ********************/
+
     /**
      * @name makeAlias()
      * @desc takes a text string and removes puntuation before making urlsafe
@@ -588,9 +616,7 @@ class XbcommonHelper extends ComponentHelper {
         }
         return $alias;
     }
-    
-    /**************** Text Functions ********************/
-    
+       
     /**
      * @name stripThe()
      * @param string $name - string to strip the leading 'the ' from

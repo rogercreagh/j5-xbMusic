@@ -34,12 +34,12 @@ $wa->useScript('xbmusic.xbtimefunctions')
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=schedule'); ?>" method="post" name="adminForm" id="adminForm">
 <?php if ($this->azuracast == 0 ) : ?>
-    <div class="xbbox xbgradpink xbht200 xbflexvc">
+    <div class="xbbox gradpink xbht200 xbflexvc">
         <div class="xbcentre"><h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_ENABLED')?>
         </h3></div>
     </div>
 <?php elseif (!($this->xbstations)) : ?>
-    <div class="xbbox xbgradyellow xbht200 xbflexvc">
+    <div class="xbbox gradyellow xbht200 xbflexvc">
         <div class="xbcentre"><h3><?php echo Text::_('XBMUSIC_AZURACAST_NOT_LOADED')?>
         </h3></div>
     </div>

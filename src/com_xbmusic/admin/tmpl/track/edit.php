@@ -444,7 +444,13 @@ $item = $this->item;
     						<legend>Saved ID3 Tags</legend>
     						<dl class="xbdl">
                         		<?php foreach ($item->id3_tags as $key=>$value) : ?>
-                        			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                        			<?php if (is_array($value)) $value=implode(', ', $value); ?>
+                            			<dt><?php echo $key; ?></dt>
+                            			<dd><?php if (is_string($value)) {
+                            			    echo $value;
+                            			} else {
+                            			    echo print_r($value,true);
+                            			}?></dd>
                         		<?php endforeach; ?>        
     						</dl>
     					</fieldset>
@@ -485,8 +491,13 @@ $item = $this->item;
         						<legend>Reloaded ID3 Tags</legend>
         						<dl class="xbdl">
                             		<?php $id3data = json_decode($this->id3data['id3tags']);
-                            		foreach ($id3data as $key=>$value) : ?>
-                            			<dt><?php echo $key; ?></dt><dd><?php echo $value; ?></dd>
+                            		foreach ($id3data as $key=>$value) : ?>                            		
+                            			<dt><?php echo $key; ?></dt>
+                            			<dd><?php if (is_string($value)) {
+                            			    echo $value;
+                            			} else {
+                            			    echo print_r($value,true);
+                            			}?></dd>
                             		<?php endforeach; ?>        
         						</dl>
         					</fieldset>

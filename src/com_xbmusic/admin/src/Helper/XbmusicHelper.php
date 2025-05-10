@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.51.8 2nd May 2025
+ * @version 0.0.52.0 8th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -12,31 +12,21 @@ namespace Crosborne\Component\Xbmusic\Administrator\Helper;
 
 defined('_JEXEC') or die;
 
-//require_once(JPATH_COMPONENT_ADMINISTRATOR.'/src/Helper/getid3/getid3.php');
 require_once (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Access\Access;
-//use Joomla\CMS\Application\ApplicationHelper;
+use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
-//use Joomla\CMS\Filter\OutputFilter;
-//use Joomla\CMS\Filter\InputFilter;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
-//use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
-//use Joomla\Database;
-//use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
 use Joomla\Filter\OutputFilter;
-//use DOMDocument;
 use DateTime;
 use Exception;
-//use Symfony\Component\Validator\Constraints\Existence;
-//use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
-//use Joomla\CMS\Filter\InputFilter;
 
 class XbmusicHelper extends ComponentHelper
 {
@@ -44,9 +34,6 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static $musicBase = JPATH_ROOT.'/xbmusic/';
 	
-//	public static $linktypes = array('trackartist', 'tracksong');
-//, 'artistalbum', 'songalbum', 'artistsong'
-
 	public static function getActions($categoryid = 0) {
 	    $user 	=Factory::getApplication()->getIdentity();
 	    $result = new \stdClass();
@@ -64,6 +51,8 @@ class XbmusicHelper extends ComponentHelper
 	    return $result;
 	}
 
+	/*********** ID3 FUNCTIONS **************/
+	
 	/**
 	 * @name getFileId3()
 	 * @desc this uses j5getID3.php to interface with the getID3 component.
@@ -76,7 +65,6 @@ class XbmusicHelper extends ComponentHelper
 	 * @return array(audioinfo, fileinfo, id3tags, imageinfo)
 	 */
 	public static function getFileId3(string $filename) {
-//	    require_once (JPATH_COMPONENT_ADMINISTRATOR. '/vendor/getID3/j5getID3.php');
 	    $ThisFileInfo = getIdData($filename);
 	    $result = array();	 
 	    $result['audioinfo'] = array();
@@ -97,28 +85,44 @@ class XbmusicHelper extends ComponentHelper
 	    $result['audioinfo']['encoder'] = (isset($ThisFileInfo['audio']['encoder'])) ? $ThisFileInfo['audio']['encoder'] : '';
 	    $result['audioinfo']['playtime_seconds'] = (isset($ThisFileInfo['playtime_seconds'])) ? $ThisFileInfo['playtime_seconds'] : '';
 	    if(isset($ThisFileInfo['comments']['picture'][0])){
-//            $image='data:'.$ThisFileInfo['comments']['picture'][0]['image_mime'].';charset=utf-8;base64,'.base64_encode($OldThisFileInfo['comments']['picture'][0]['data']);
-//            $image = $ThisFileInfo['comments']['picture'][0]['data'];
-//    	    unset($ThisFileInfo['comments']['picture'][0]['data']);
-    	    $result['imageinfo'] = $ThisFileInfo['comments']['picture'][0]; //we're only getting the first image
+    	    $result['imageinfo'] = $ThisFileInfo['comments']['picture'][0]; 
+    	    //we're only getting the first image, but we'll count any others
+    	    $result['imageinfo']['imgcnt'] = count($ThisFileInfo['comments']['picture']);
+    	    //TODO handle multiple images
     	    unset($ThisFileInfo['comments']['picture']);
 	    }
-	    if (isset($ThisFileInfo['comments']['music_cd_identifier'])) { //this can contain binary chars and screws things up
+	    if (isset($ThisFileInfo['comments']['music_cd_identifier'])) { 
+	        //this can contain binary chars which screws things up. We don't need it
 	        unset($ThisFileInfo['comments']['music_cd_identifier']);
 	    }
-	    if (isset($result['imageinfo']['description'])) { //fix for an album with odd encoding on picture description
+	    if (isset($result['imageinfo']['description'])) { 
+	        //fix for odd encoding on picture description found occassionally in the wild
 	        $desc = $result['imageinfo']['description'];
 	        $res = htmlentities($desc, ENT_QUOTES | ENT_IGNORE, 'UTF-8');
 	        $res =  preg_replace('/[\x00-\x1F\x7F-\x9F]/u', '', $res);
 	        $result['imageinfo']['description'] = $res;
 	    }
         $id3tags = array();
-	    foreach ($ThisFileInfo['comments'] as $key => $valuearr) {
-	        // artist, album, genre and maybe others have been seen with mulitple entries
-	        // concat them with ' || ' which will look ok if printed as string but allows to explode to array to handle values separately
-            $id3tags[$key] = implode(' || ', $valuearr);
-	    }
-	    $result['id3tags'] = $id3tags;
+        $urls = array();
+        foreach ($ThisFileInfo['comments'] as $key => $valuearr) {
+            // text (TXXT) tags are an associative array with tag names as keys - break into separate values
+            if (($key == 'text') || ($key=='comment')) {
+                foreach ($valuearr as $name=>$value) {
+                    $newkey = $key.':'.$name;
+                    if (is_array($value)) $value = implode(' || ', $value);
+                    if (filter_var($value, FILTER_VALIDATE_URL)) $urls[] = $value;
+                    $id3tags[$newkey] =  $value; //?poss bug if not array or dupe names
+                    //$id3tags[$key] = $valuearr; //NOT imploded
+                }
+            } else {
+            // other keys can be an array with multiple values. 
+            // concat them with ' || ' which is ok if printed as string and allows to explode to handle values separately
+                $id3tags[$key] = implode(' || ', $valuearr);
+                if(filter_var($id3tags[$key], FILTER_VALIDATE_URL)) $urls[] = $id3tags[$key];               
+            }
+        }
+        $id3tags['urls'] = $urls;
+        $result['id3tags'] = $id3tags;
 	    return $result;
 	} // end getFileID3()
 	    
@@ -213,6 +217,7 @@ class XbmusicHelper extends ComponentHelper
 	                'alias'=>XbcommonHelper::makeAlias($artistname),
 	                'sortname'=>XbcommonHelper::stripThe($artistname)
 	            );
+	            if (isset($id3data['text:url'])) $artist['url'] =  $id3data['text:url'];
 	            $artistdata[] = $artist;
 //	        }
 	    } //endif set artist
@@ -414,6 +419,32 @@ class XbmusicHelper extends ComponentHelper
 //	    }
 //	    return false;
 	}  // end createMusicItem()
+	
+	public static function addExtLink($url, string $itemtype, int $itemid) {
+	    // tests if url already in ext links if not add it
+	    if (strpos(' track song playlist artist album ', $itemtype) == false) {
+	        $app->enqueueMessage('Invalid itemtype to create','Error');
+	        return false;
+	    }
+	    $table = '#__xbmusic_'.$itemtype.'s';
+	    $column = 'ext_links';
+	    $jsonlinks = XbcommonHelper::getItemValue($table, $column, $itemid);
+	    if ((is_null($jsonlinks)) || ($jsonlinks=='null') || (empty($jsonlinks))) {
+	        $linkarray = array();
+	    } else {
+	        $linkarray = json_decode($jsonlinks,true);
+	    }
+        if (array_search($url, array_column($linkarray, 'link_url')) ===false) {
+            $linkarray['ext_links'.count($linkarray)] = array(
+                'link_url'=>$url,
+                'link_text'=>parse_url($url, PHP_URL_HOST), 
+                'link_desc'=>Text::_('imported from id3')
+            );
+            $newlinks = json_encode($linkarray);
+            return XbcommonHelper::setItemValue($table, $column, $itemid, $newlinks);
+        }	    
+	    return false;
+	}
 	
 	/**
 	 * @name createImageFile()
@@ -710,6 +741,8 @@ class XbmusicHelper extends ComponentHelper
 	    
 	} // end getTagItemCnts()
 
+	/************ LOGGING FUNCTIONS ************/
+	
 	public static function getLastImportLog() {
 	    $file = null;
 	    foreach(new \DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {
@@ -754,6 +787,8 @@ class XbmusicHelper extends ComponentHelper
 	    return $logstr;
 	}
 
+	/************ xxx FUNCTIONS ************/
+	
 	/**
 	 * @name getItemdefCats()
 	 * @desc returns object with properties for default categories as set in global options
@@ -935,3 +970,4 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 } //end xbmusicHelper
+

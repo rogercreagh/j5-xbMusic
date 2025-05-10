@@ -13,14 +13,14 @@ namespace Crosborne\Component\Xbmusic\Administrator\Model;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Application\ApplicationHelper;
+//use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Filter\InputFilter;
-use Joomla\Filter\OutputFilter;
+//use Joomla\Filter\OutputFilter;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
@@ -31,11 +31,7 @@ class TrackModel extends AdminModel {
     public $typeAlias = 'com_xbmusic.track';
     
     protected $ilogmsg;
-    
-//    public $genreParentId = false;
-    
-//    private $id3loaded = false;
-    
+        
     protected $xbmusic_batch_commands = array(
         'untag' => 'batchUntag',
         'playlist' => 'batchPlaylist',
@@ -43,7 +39,7 @@ class TrackModel extends AdminModel {
     
     public function __construct($config = [], $factory = null, $form = null) {
         parent::__construct($config, $factory, $form);    
-    }
+    } 
     
     public function batch($commands, $pks, $contexts) {
         $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
@@ -80,7 +76,6 @@ class TrackModel extends AdminModel {
     protected function batchPlaylist($value, $pks, $contexts) {
         Factory::getApplication()->enqueueMessage('Playlist add '.$value.' to '.implode(',',$pks).' contexts '.implode(','.$contexts));
     }
-
     
     public function delete(&$pks) {
         //first need to delete links artists, songs
@@ -107,11 +102,9 @@ class TrackModel extends AdminModel {
     }
     
     public function loadId3() {
-//        $this->id3loaded = 0;
         $app  = Factory::getApplication();
         $app->setUserState('com_xbmusic.edit.track.id3data', null);
         $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);
-        //        $app->enqueueMessage('loadId3()');
         $params = ComponentHelper::getParams('com_xbmusic');
         $loglevel = $params->get('loglevel',3);
         $enditem = " -------------------------- \n";
@@ -238,13 +231,17 @@ class TrackModel extends AdminModel {
             if (isset($id3data['artistdata'])) {
                 foreach ($id3data['artistdata'] as &$artist) {
                     $artist['catid'] = $artistcatid;
-                    if (isset($trackdata['url_artist'])) {
-                        $artist['ext_links']['ext_links0']= array('link_text'=>'internet',
-                            'link_url'=>$trackdata['url_artist'], 
-                            'link_title'=>basename($trackdata['url_artist']), // TODO actually we want the domain name and maybe path
-              'link_desc'=>Text::sprintf('XBMUSIC_LINK_FOUND_IN_ID3', $trackdata['title'])                                        
-                        );
-                    }
+                    //we are assuming any url is artist related -?should we also add to track and album links?
+//                     if (isset($id3data['url'])) {    
+//                         $artist['url'] = $id3data['url'];
+//  //                       if (array_search($id3data['url'], array_column($artist['ext_links'], 'link_url'))===false) {
+// //                            $artist['ext_links']['ext_links0']= array('link_text'=>basename($trackdata['url']),
+//  //                               'link_url'=>$trackdata['url'],
+//                                 //'link_desc'=>Text::sprintf('XBMUSIC_LINK_FOUND_IN_ID3', $trackdata['title'])
+// //                            );
+                            
+// //                        }
+//                     }
                 }
                 $trackdata['artists'] = $id3data['artistdata'];//
             } 
@@ -503,7 +500,10 @@ class TrackModel extends AdminModel {
                         }
                         if ($id < 0) $id = $id * -1;
                         if ($id > 0) {
-                            $trackdata['artistlist'][] = array('artist_id'=>$id,'role'=>'','note'=>'');;
+                            $trackdata['artistlist'][] = array('artist_id'=>$id,'role'=>'','note'=>'');
+                            if (isset($artist['url'])) {
+                                XbmusicHelper::addExtLink($artist['url'], 'artist', $id);
+                            }
                         }
                     }
                 }

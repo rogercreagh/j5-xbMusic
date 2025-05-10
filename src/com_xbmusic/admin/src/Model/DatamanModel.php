@@ -283,13 +283,16 @@ class DatamanModel extends AdminModel {
                 foreach ($id3data['artistdata'] as &$artist) {
                     $artist['catid'] = $this->artistcatid;
                     $artist['songlist'] = $songlinks;
-                    if (isset($trackdata['url_artist'])) {
-                        $artist['ext_links']['ext_links0']= array('link_text'=>'internet', 
-                            'link_url'=>$trackdata['url_artist'],
-                            'link_desc'=>Text::sprintf('XBMUSIC_LINK_FOUND_IN_ID3', $trackdata['title'])
-                            
-                        );
-                    }
+//                     if (isset($id3data['url'])) {
+//                         $artist['url'] = $id3data['url'];
+// //                         if (array_search($trackdata['url'], array_column($artist['ext_links'], 'link_url'))===false) {
+// //                             $artist['ext_links']['ext_links0']= array('link_text'=>'internet', 
+// //                                 'link_url'=>$trackdata['url'],
+// //                                 'link_desc'=>Text::sprintf('XBMUSIC_LINK_FOUND_IN_ID3', $trackdata['title'])
+// //                             );
+                           
+// //                         }
+//                     }
                     $artist['id'] = XbmusicHelper::createMusicItem($artist, 'artist');
                     if ($artist['id'] === false) {
                         $msg = Text::_('XBMUSIC_ARTIST_SAVE_FAILED').Xbtext::_($artist['title'],13);
@@ -306,6 +309,9 @@ class DatamanModel extends AdminModel {
                     }
                     if ($artist['id']>0) { 
                         $artistlinks[] = array('artist_id'=>$artist['id'], 'role'=>'', 'note'=>''); 
+                        if (isset($artist['url'])) {
+                            XbmusicHelper::addExtLink($artist['url'], 'artist', $artist['id']);
+                        }
                     }                   
                 }
                 //only one new track so ok to use artist list in model 
