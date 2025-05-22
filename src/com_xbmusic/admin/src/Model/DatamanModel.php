@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.51.0 6th April 2025
+ * @version 0.0.52.3 15th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,6 +32,7 @@ class DatamanModel extends AdminModel {
     protected $artistcatid = 0;
     protected $songcatid = 0;
     protected $usedaycat = 0;
+    protected $defcats = [];
     //when creating alias with strURLsafe() punction, apostrophes and quotes get converted into hyphens - we don't want that
     protected $unwantedaliaschars = array("?","!",",",";",".","'","\"");
     
@@ -61,6 +62,7 @@ class DatamanModel extends AdminModel {
         //start log
         $loghead = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
         $logmsg = '';
+        $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
         
         //are we doing a whole folder, or selected files?
         if (is_string($files)) {
@@ -91,35 +93,35 @@ class DatamanModel extends AdminModel {
         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
         $starttime = time();
         //default categories for albums, artists and songs
-        $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
-        $this->albumcatid = $params->get('defcat_album',$uncatid);
-        $this->artistcatid = $params->get('defcat_artist',$uncatid);
-        $this->songcatid = $params->get('defcat_song',$uncatid);
-        $this->trackcatid = $params->get('defcat_track',$uncatid);
-        //track category may be overriden by genre (tracks-genres-genre) on per item basis
-        if ($this->usedaycat == 1) {
-            //we are going to change the defaults to a day category under \imports 
-            $daycatid = 0;
-            $daycattitle = date('Y-m-d');
-            $dcparent = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-            if ($dcparent === false) {
-                $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
-                $dcparent = XbcommonHelper::createCategory($catdata, true);
-            }
-            $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-            if ($daycatid === false) {
-                $parentcat = XbcommonHelper::getCatByAlias('imports');
-                $parentid = ($parentcat>0) ? $parentcat->id : 1;
-                $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
-                $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
-            }
-            if ($daycatid > 0) {
-                $this->albumcatid = $daycatid;
-                $this->artistcatid = $daycatid;
-                $this->songcatid = $daycatid;
-                $this->trackcatid = $daycatid;
-            }
-        } //endif cattype=1
+//         $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
+//         $this->albumcatid = $params->get('defcat_album',$uncatid);
+//         $this->artistcatid = $params->get('defcat_artist',$uncatid);
+//         $this->songcatid = $params->get('defcat_song',$uncatid);
+//         $this->trackcatid = $params->get('defcat_track',$uncatid);
+//         //track category may be overriden by genre (tracks-genres-genre) on per item basis
+//         if ($this->usedaycat == 1) {
+//             //we are going to change the defaults to a day category under \imports 
+//             $daycatid = 0;
+//             $daycattitle = date('Y-m-d');
+//             $dcparent = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+//             if ($dcparent === false) {
+//                 $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
+//                 $dcparent = XbcommonHelper::createCategory($catdata, true);
+//             }
+//             $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
+//             if ($daycatid === false) {
+//                 $parentcat = XbcommonHelper::getCatByAlias('imports');
+//                 $parentid = ($parentcat>0) ? $parentcat->id : 1;
+//                 $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
+//                 $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
+//             }
+//             if ($daycatid > 0) {
+//                 $this->albumcatid = $daycatid;
+//                 $this->artistcatid = $daycatid;
+//                 $this->songcatid = $daycatid;
+//                 $this->trackcatid = $daycatid;
+//             }
+//         } //endif cattype=1
         
         // ok we're going to iterate through the files
         $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
@@ -221,10 +223,10 @@ class DatamanModel extends AdminModel {
                     $trackdata['catid'] = $thisgid;
                     
                 } else {
-                    $trackdata['catid'] = $this->trackcatid;
+                    $trackdata['catid'] = $this->defcats['track'];
                 }
             } else {
-                $trackdata['catid'] = $this->trackcatid;
+                 ['catid'] = $this->defcats['track'];
             }
             
             if (isset($filedata['audioinfo']['playtime_seconds'])) $trackdata['duration'] = (int)$filedata['audioinfo']['playtime_seconds'];
@@ -246,7 +248,7 @@ class DatamanModel extends AdminModel {
                 //create songs
                 $songlinks = array(); //will be linked to album and artist once we have ids
                 foreach ($id3data['songdata'] as $song) {                   
-                    $song['catid'] = $this->songcatid;
+                    $song['catid'] = $this->defcats['song'];
                     if ($optalbsong & 1) $song['tags'] = $genreids;
                     $song['id'] = XbmusicHelper::createMusicItem($song, 'song');  
                     if ($song['id']=== false) {
@@ -281,7 +283,7 @@ class DatamanModel extends AdminModel {
             if (isset($id3data['artistdata'])) {
                 $artistlinks =[];
                 foreach ($id3data['artistdata'] as &$artist) {
-                    $artist['catid'] = $this->artistcatid;
+                    $artist['catid'] = $this->defcats['artist'];
                     $artist['songlist'] = $songlinks;
 //                     if (isset($id3data['url'])) {
 //                         $artist['url'] = $id3data['url'];
@@ -347,7 +349,7 @@ class DatamanModel extends AdminModel {
 //7. get album data and create album if necessary
             if (isset($id3data['albumdata'])) {
                 $albumdata = $id3data['albumdata'];
-                $albumdata['catid'] = $this->albumcatid;                
+                $albumdata['catid'] = $this->defcats['album'];                
                 if (isset($imgdata)) $albumdata['imageinfo'] = $imgdata;                   
                 if ($optalbsong > 1) $albumdata['tags'] = $genreids;
                 if ($imgurl != false) $albumdata['imgurl'] = $imgurl;
@@ -410,25 +412,6 @@ class DatamanModel extends AdminModel {
         return $ilogmsg;
     } //end parseID3()
         
-    public function getLastImportLog() {
-        $file = null;
-        foreach(new DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {
-            if ($item->isFile() && (empty($file) || $item->getMTime() > $file->getMTime())) {
-                $file = clone $item;
- //               $pathname = ;
-            }
-        }
-        if (!is_null($file)) {
-//            if (file_exists($file->getPathname)) { //do we need this? surely it exists
-                $logtxt = file_get_contents($file->getPathname());
-                return $logtxt;
-//            }
-        }
-        return '';
-        
-//        return file_get_contents($file->getPathname);
-    }
-    
     /************ AZURACAST FUNCTIONS ************/
     
     /**

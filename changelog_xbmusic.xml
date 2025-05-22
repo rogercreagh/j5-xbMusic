@@ -2,6 +2,38 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.52.3</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.52.2</h3> Updated 15th May 2025]]></item>
+			<item>ID3 Import URLs detected and added to artists and tracks</item>
+			<item></item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Added Import date categories to restricted xbsubcat control</item>
+			<item>Improvements and bug fixes to ID3 import routines</item>
+			<item>Track ID3 tracks display now truncates overlong strings</item>
+		</change>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+			<item>Import date categories now being correctly assigned</item>
+			<item>Dataman not retrieving last import log</item>
+		</fix>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.51.8</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.51.8</h3> Updated 3rd May 2025]]></item>

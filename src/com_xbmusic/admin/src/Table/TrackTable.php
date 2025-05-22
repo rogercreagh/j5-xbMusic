@@ -55,7 +55,7 @@ class TrackTable extends Table implements VersionableTableInterface, TaggableTab
             return false;
         }
         
-        // Set name
+            // Set name
         $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
         
         //json encode ext_links if set

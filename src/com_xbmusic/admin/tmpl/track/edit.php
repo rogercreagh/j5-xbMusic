@@ -20,6 +20,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
+use Joomla\Component\Finder\Administrator\Indexer\Parser\Html;
 
 HTMLHelper::_('jquery.framework');
 
@@ -447,7 +448,7 @@ $item = $this->item;
                         			<?php if (is_array($value)) $value=implode(', ', $value); ?>
                             			<dt><?php echo $key; ?></dt>
                             			<dd><?php if (is_string($value)) {
-                            			    echo $value;
+                            			    echo HtmlHelper::_('string.truncate',$value,40);
                             			} else {
                             			    echo print_r($value,true);
                             			}?></dd>

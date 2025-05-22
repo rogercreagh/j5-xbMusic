@@ -45,7 +45,7 @@ class HtmlView extends BaseHtmlView {
         }
         $this->form = $this->get('Form');
         $this->basemusicfolder = XbmusicHelper::$musicBase;
-        $this->log = $this->get('LastImportLog');
+        $this->log = XbmusicHelper::getLastImportLog();
         $this->log = str_replace("\n", '<br />', $this->log);
         $this->warnings = $this->get('Warnings');
         $this->symlinks = $this->get('Symlinks');

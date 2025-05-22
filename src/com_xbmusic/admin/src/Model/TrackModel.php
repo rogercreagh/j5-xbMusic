@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.30.8 17th February 2025
+ * @version 0.0.52.1 13th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -165,45 +165,62 @@ class TrackModel extends AdminModel {
             $trackdata['foldername'] = $data['foldername'];
             $trackdata['selectedfiles'] = $data['selectedfiles'];
             // get genres list, catids are defined above in parseFilesMp3()           
-            $genreids = (isset($id3data['genres'])) ? array_column($id3data['genres'],'id') : [];
+            $defcats = XbmusicHelper::getDefaultItemCats();
+            
+            
             $optimpcat = $params->get('impcat','0');
-            $optalbsong = $params->get('genrealbsong',0);
             $optcattag = ($optimpcat == 1) ? $params->get('genrecattag1',2) : $params->get('genrecattag',2);
-            //default categories for albums, artists and songs
-            $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
-            $albumcatid = $params->get('defcat_album',$uncatid);
-            $artistcatid = $params->get('defcat_artist',$uncatid);
-            $songcatid = $params->get('defcat_song',$uncatid);
-            $trackcatid = $params->get('defcat_track',$uncatid);
-            //track category may be overriden by genre (tracks-genres-genre) on per item basis
-            if ($optimpcat == 1) {
-                //we are going to change the defaults to a day category under \imports
-                $daycatid = 0;
-                $daycattitle = date('Y-m-d');
-                $impcatdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>Text::_('XBMUSIC_IMPCAT_DESC'));
-                $daycatparent = XbcommonHelper::getCreateCat($impcatdata);
-                $daycatdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$daycatparent,'description'=>'items inported on '.date('D jS M Y'));
-                $daycatid = XbcommonHelper::getcreateCat($daycatdata, true)->id;
-                if ($daycatid > 0) {
-                    $albumcatid = $daycatid;
-                    $artistcatid = $daycatid;
-                    $songcatid = $daycatid;
-                    $trackcatid = $daycatid;
-                }
-            } else { //endif impcat=1
-                //we might use genre for track category (optcattag) 
+            $genreids = (isset($id3data['genres'])) ? array_column($id3data['genres'],'id') : [];
+            if ($optimpcat == 0) {
                 if (($optcattag & 1) && (!empty($genreids))) { //cat or both cat&tag
                     //we will be creating genre categories under tracks since they only apply to tracks
                     $genrecatparent = ($params->get('rootcat_album')==0) ? $params->get('defcat_track',0) : $params->get('rootcat_album',0);
                     if ($genrecatparent=0) {
                         $genrecatparent = XbcommonHelper::getcreateCat(array('title'=>'MusicGenres'));
                     }
-                    $this->trackcatid = XbcommonHelper::getCreateCat(array( 
+                    $defcats['track'] = XbcommonHelper::getCreateCat(array(
                         'title'=>$id3data['genres'][0]['title'],
-                        'parent_id'=>$genrecatparent),true)>id; 
-                }                
-            } //endif impcat
-            $trackdata['catid'] = $trackcatid;
+                        'parent_id'=>$genrecatparent),true)>id;
+                }            
+            }
+            
+            $optalbsong = $params->get('genrealbsong',0);
+//             $optcattag = ($optimpcat == 1) ? $params->get('genrecattag1',2) : $params->get('genrecattag',2);
+//             //default categories for albums, artists and songs
+//             $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
+//             $albumcatid = $params->get('defcat_album',$uncatid);
+//             $artistcatid = $params->get('defcat_artist',$uncatid);
+//             $songcatid = $params->get('defcat_song',$uncatid);
+//             $trackcatid = $params->get('defcat_track',$uncatid);
+//             //track category may be overriden by genre (tracks-genres-genre) on per item basis
+//             if ($optimpcat == 1) {
+//                 //we are going to change the defaults to a day category under \imports
+//                 $daycatid = 0;
+//                 $daycattitle = date('Y-m-d');
+//                 $impcatdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>Text::_('XBMUSIC_IMPCAT_DESC'));
+//                 $daycatparent = XbcommonHelper::getCreateCat($impcatdata);
+//                 $daycatdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$daycatparent,'description'=>'items inported on '.date('D jS M Y'));
+//                 $daycatid = XbcommonHelper::getcreateCat($daycatdata, true)->id;
+//                 if ($daycatid > 0) {
+//                     $albumcatid = $daycatid;
+//                     $artistcatid = $daycatid;
+//                     $songcatid = $daycatid;
+//                     $trackcatid = $daycatid;
+//                 }
+//             } else { //endif impcat=1
+//                 //we might use genre for track category (optcattag) 
+//                 if (($optcattag & 1) && (!empty($genreids))) { //cat or both cat&tag
+//                     //we will be creating genre categories under tracks since they only apply to tracks
+//                     $genrecatparent = ($params->get('rootcat_album')==0) ? $params->get('defcat_track',0) : $params->get('rootcat_album',0);
+//                     if ($genrecatparent=0) {
+//                         $genrecatparent = XbcommonHelper::getcreateCat(array('title'=>'MusicGenres'));
+//                     }
+//                     $this->trackcatid = XbcommonHelper::getCreateCat(array( 
+//                         'title'=>$id3data['genres'][0]['title'],
+//                         'parent_id'=>$genrecatparent),true)>id; 
+//                 }                
+//             } //endif impcat
+            $trackdata['catid'] = $defcats['track'];
             if ($optcattag > 1) $trackdata['tags'] = $genreids;           
             //well be setting the album & song genre tags when we get there
             if (isset($filedata['imageinfo']['data'])){
@@ -220,7 +237,7 @@ class TrackModel extends AdminModel {
             $trackdata['songdata'] = [];
             if (isset($id3data['songdata'])) {
                 foreach ($id3data['songdata'] as &$song) {
-                    $song['catid'] = $songcatid;
+                    $song['catid'] = $defcats['song'];
                     if ($optalbsong & 1) $song['tags'] = $genreids;       
                 }
             }
@@ -230,7 +247,7 @@ class TrackModel extends AdminModel {
 // get artist details and save in trackdata            
             if (isset($id3data['artistdata'])) {
                 foreach ($id3data['artistdata'] as &$artist) {
-                    $artist['catid'] = $artistcatid;
+                    $artist['catid'] = $defcats['artist'];
                     //we are assuming any url is artist related -?should we also add to track and album links?
 //                     if (isset($id3data['url'])) {    
 //                         $artist['url'] = $id3data['url'];
@@ -271,11 +288,10 @@ class TrackModel extends AdminModel {
 // get album details
             if (isset($id3data['albumdata'])) {
                 $trackdata['albumdata'] = $id3data['albumdata'];
-                $trackdata['albumdata']['catid'] = $albumcatid;
+                $trackdata['albumdata']['catid'] = $defcats['album'];
                 if ($optalbsong > 1) $id3data['albumdata']['tags'] = $genreids;
                 if (isset($imgdata)) $id3data['albumdata']['imageinfo'] = $imgdata;
                 if ($imgurl != false) $id3data['albumdata']['imgurl'] = $imgurl;
-                $trackdata['albumdata'] = $id3data['albumdata'];
                 $trackdata['albumdata']['id'] = XbmusicHelper::getItemIdFromAlias('#__xbmusic_albums', $trackdata['albumdata']['alias']);
             }
 

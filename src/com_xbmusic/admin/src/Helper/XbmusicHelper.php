@@ -115,9 +115,10 @@ class XbmusicHelper extends ComponentHelper
                     //$id3tags[$key] = $valuearr; //NOT imploded
                 }
             } else {
-            // other keys can be an array with multiple values. 
+            // other keys can be an array with multiple values, or a plain value
             // concat them with ' || ' which is ok if printed as string and allows to explode to handle values separately
                 $id3tags[$key] = implode(' || ', $valuearr);
+                //if original value is a url add it to array
                 if(filter_var($id3tags[$key], FILTER_VALIDATE_URL)) $urls[] = $id3tags[$key];               
             }
         }
@@ -329,6 +330,37 @@ class XbmusicHelper extends ComponentHelper
 	    return $items;
 	    
 	} // end id3dataToItems()
+	
+	/************ other FUNCTIONS ************/
+	
+	public static function getDefaultItemCats($forcedaycat = 0) {
+	    $defcats = array();
+	    $params = ComponentHelper::getParams('com_xbmusic');
+	    $optimpcat = $params->get('impcat','0'); //0=item defaults, 1=use daycat
+	    //default categories for albums, artists and songs
+	    $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
+	    $defcats['album'] = $params->get('defcat_album',$uncatid);
+	    $defcats['artist'] = $params->get('defcat_artist',$uncatid);
+	    $defcats['song'] = $params->get('defcat_song',$uncatid);
+	    $defcats['track'] = $params->get('defcat_track',$uncatid);
+	    //track category may be overriden by genre (tracks-genres-genre) on per item basis
+	    if (($optimpcat == 1) || ($forcedaycat == 1)) {
+	        //we are going to change the defaults to a day category under \imports
+	        $daycatid = 0;
+	        $daycattitle = date('Y-m-d');
+	        $impcatdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>Text::_('XBMUSIC_IMPCAT_DESC'));
+	        $daycatparent = XbcommonHelper::getCreateCat($impcatdata);
+	        $daycatdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$daycatparent,'description'=>'items inported on '.date('D jS M Y'));
+	        $daycatid = XbcommonHelper::getCreateCat($daycatdata, true);
+	        if ($daycatid > 0) {
+	            $defcats['album'] = $daycatid;
+	            $defcats['artist'] = $daycatid;
+	            $defcats['song'] = $daycatid;
+	            $defcats['track'] = $daycatid;
+	        }
+	    } //endif impcat
+	    return $defcats;
+	}
 	
 	public static function getItemIdFromAlias(string $table, string $alias){
         $db = Factory::getDbo();

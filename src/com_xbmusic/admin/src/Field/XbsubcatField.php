@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbsubcatField.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.52.2 14th May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,6 +21,7 @@ use Joomla\CMS\Form\Field\ListField;
 //use Joomla\CMS\Log\Log;
 //use Joomla\Utilities\ArrayHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use \stdClass;
 
 /**
  * @name Xbsubcatfield
@@ -57,7 +58,6 @@ class XbsubcatField extends ListField {
             $rootcat=$db->loadObject();
         }
         $start = $incroot ? '>=' : '>';
-        
         $query->clear();
         $query->select('id AS value, title AS text, level')->from('#__categories')
         ->where('extension = '.$db->quote($extension));
@@ -77,8 +77,24 @@ class XbsubcatField extends ListField {
                 $item->text = str_repeat('- ', $item->level - $startlevel).$item->text;
             }
         }
-        // Merge any additional options in the XML definition.
-        $options = array_merge(parent::getOptions(),$defopt, $options);
+        // also show import date categories if they exist
+        $importparent = XbcommonHelper::getCatByAlias('imports',$extension);
+        $importcats = [];
+        if ($importparent) {
+            $query->clear();
+            $query->select('id AS value, title AS text')->from('#__categories')
+                ->where('extension = '.$db->quote($extension));
+            $query->where('parent_id = '.$importparent->id);
+            $query->order('title DESC');  
+            $db->setQuery($query);
+            $importcats = $db->loadObjectList();
+            $blank = new stdClass();
+            $blank->value = 0;
+            $blank->text = '---import dates ---';
+            $options[] = $blank;           
+        }        
+        // Merge options with import cats and anything set in the XML definition.
+        $options = array_merge(parent::getOptions(),$defopt, $options,$importcats);
         return $options;
     }
     
