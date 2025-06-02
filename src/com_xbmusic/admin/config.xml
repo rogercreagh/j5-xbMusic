@@ -215,7 +215,18 @@
 			<option value="2">Album</option>
 			<option value="3">Both</option>
         </field>
-        
+
+		<field name="urlhandling" type="checkboxes"
+			label="Add urls to ext_links"
+			description="If urls are found in the ID3 tags add them as an external links to item types. Urls will always be listed in the ID3 tag data box for the track so can be copied manaully."
+			multiple="true"
+		>
+			<option value="1">Track</option>
+			<option value="2">Song</option>
+			<option value="4">Album</option>
+			<option value="8">Artist</option>		
+		</field>        
+		
 		<field name="splitsongs" type="radio"
 			label="Split medley to Songs"
 			description="split track titles containing , or / into separate songs when importing. NB While this may often be correct for medleys of tunes, sometimes it will produce anomalous results. eg 'Have You Seen Your Mother, Baby, Standing in the Shadow' would become three songs"

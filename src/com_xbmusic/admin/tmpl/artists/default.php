@@ -233,6 +233,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if (count($item->albums) > 1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('XBMUSIC_N_ALBUMS',count($item->albums)); ?></summary>
+									<div class="xbyscroll" style="max-height:180px;">
 									<ul style="margin:5px;list-style: none;">
 									<?php foreach ($item->albums as $album) : ?>
 										<li>							
@@ -253,6 +254,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							            </li>
 									<?php endforeach; ?>
 									</ul>
+									</div>
 								</details>
 							<?php elseif (count($item->albums)==1) : ?>
 								<?php $album = $item->albums[0]; ?>
@@ -278,6 +280,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if (count($item->singles) > 1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('XBMUSIC_N_SINGLES',count($item->singles)); ?></summary>
+									<div class="xbyscroll" style="max-height:180px;">
 									<ul style="margin:5px;">
 									<?php foreach ($item->singles as $single) : ?>
 										<li>
@@ -298,6 +301,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							            </li>
 									<?php endforeach; ?>
 									</ul>
+									</div>
 								</details>
 							<?php elseif (count($item->singles)==1) : ?>
 								<?php $single = $item->singles[0]; ?>
@@ -323,6 +327,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php if (count($item->songs) > 1) : ?>
 								<details>
 									<summary><?php echo Text::sprintf('XBMUSIC_N_SONGS',count($item->songs)); ?></summary>
+									<div class="xbyscroll" style="max-height:180px;">
 									<ul style="margin:5px;">
 									<?php foreach ($item->songs as $song) : ?>
 										<li>
@@ -332,6 +337,7 @@ if (strpos($listOrder, 'modified') !== false) {
 							            </li>
 									<?php endforeach; ?>
 									</ul>
+									</div>
 								</details>
 							<?php elseif (count($item->songs)==1) : ?>
 								<?php $song = $item->songs[0]; ?>

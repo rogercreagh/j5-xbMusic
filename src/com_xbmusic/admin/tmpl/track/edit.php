@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.30.2 9th February 2025
+ * @version 0.0.52.5 31st May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -445,13 +445,13 @@ $item = $this->item;
     						<legend>Saved ID3 Tags</legend>
     						<dl class="xbdl">
                         		<?php foreach ($item->id3_tags as $key=>$value) : ?>
-                        			<?php if (is_array($value)) $value=implode(', ', $value); ?>
-                            			<dt><?php echo $key; ?></dt>
-                            			<dd><?php if (is_string($value)) {
-                            			    echo HtmlHelper::_('string.truncate',$value,40);
-                            			} else {
-                            			    echo print_r($value,true);
-                            			}?></dd>
+                        			<?php if (is_array($value)) $value=implode(',<br />', $value); ?>
+                        			<dt><?php echo $key; ?></dt>
+                        			<dd><?php if (is_string($value)) {
+                        			    echo HtmlHelper::_('string.truncate',$value,40);
+                        			} else {
+                        			    echo print_r($value,true);
+                        			} ?></dd>
                         		<?php endforeach; ?>        
     						</dl>
     					</fieldset>

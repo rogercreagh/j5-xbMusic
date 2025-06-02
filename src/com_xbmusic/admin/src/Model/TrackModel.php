@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.52.1 13th May 2025
+ * @version 0.0.52.5 31st May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -139,7 +139,7 @@ class TrackModel extends AdminModel {
                 $fpath = XbcommonHelper::getItemValue('#__xbmusic_tracks', 'filepathname', $fid);
                 $msg = Text::_('XBMUSIC_FILENAME_IN_DB').Xbtext::_($fpath,7).Text::_('XBMUSIC_WITH_TKID').Xbtext::_($fid,XBDQ + XBNL);
                 $ilogmsg .= XBWARN.$msg;
-                $msg2 = Xbtext::_('XBMUSIC_IMPORTING_ANYWAY',XBNL);
+                $msg2 = Xbtext::_('XBMUSIC_IMPORTING_ANYWAY',XBNL + XBTRL);
                 $app->enqueueMessage(trim($msg).'<br />'.trim($msg2),'Warning');
                 $ilogmsg .= XBWARN.$msg2;
             }            
@@ -148,7 +148,7 @@ class TrackModel extends AdminModel {
 //3. okay, now get the id3 data        
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         if (!isset($filedata['id3tags']['title'])) { //could add any other required elements to the isset() function
-            $msg = Xbtext::_('XBMUSIC_NO_ID3_TITLE',XBNL);
+            $msg = Xbtext::_('XBMUSIC_NO_ID3_TITLE',XBNL + XBTRL);
             $ilogmsg .= XBERR.$msg.$enditem;
             $app->enqueueMessage(trim($msg),'Error');
             XbmusicHelper::writelog($ilogmsg);
@@ -472,6 +472,11 @@ class TrackModel extends AdminModel {
         
         $app  = Factory::getApplication();
         $params = ComponentHelper::getParams('com_xbmusic');
+        $urlhandling = $params->get('urlhandling',[]);
+        $dotrackurl = (key_exists(0, $urlhandling)) ? true : false;
+        $dosongurl = (key_exists(1, $urlhandling)) ? true : false;
+        $doalbumurl = (key_exists(2, $urlhandling)) ? true : false;
+        $doartisturl = (key_exists(3, $urlhandling)) ? true : false;
         $infomsg = '';
         $ilogmsg = '';
         if ($app->getUserState('com_xbmusic.edit.track.id3loaded', 0) == 1) {
@@ -497,6 +502,11 @@ class TrackModel extends AdminModel {
                         }
                         if ($id < 0) $id = $id * -1;
                         if ($id > 0) {
+                            if ($dosongurl) {
+                                foreach ($id3data['urls'] as $url) {
+                                    XbmusicHelper::addExtLink($url, 'song', $id);
+                                }                               
+                            }
                             $trackdata['songlist'][] = array('song_id'=>$id,'role'=>'','note'=>'');;
                         }
                     }
@@ -517,8 +527,13 @@ class TrackModel extends AdminModel {
                         if ($id < 0) $id = $id * -1;
                         if ($id > 0) {
                             $trackdata['artistlist'][] = array('artist_id'=>$id,'role'=>'','note'=>'');
-                            if (isset($artist['url'])) {
-                                XbmusicHelper::addExtLink($artist['url'], 'artist', $id);
+//                             if (isset($artist['url'])) {
+//                                 XbmusicHelper::addExtLink($artist['url'], 'artist', $id);
+//                             }
+                            if ($doartisturl) {
+                                foreach ($id3data['urls'] as $url) {
+                                    XbmusicHelper::addExtLink($url, 'artist', $id);
+                                }
                             }
                         }
                     }
@@ -536,10 +551,20 @@ class TrackModel extends AdminModel {
                         $app->enqueueMessage(trim($msg).'<br />','Error');
                     }
                     if ($id < 0) $id = $id * -1;
-                    if ($id > 0) $trackdata['album_id'] = $id;
+                    if ($id > 0) {
+                        if ($doalbumurl) {
+                            foreach ($id3data['urls'] as $url) {
+                                XbmusicHelper::addExtLink($url, 'album', $id);
+                            }
+                        }
+//                         foreach ($id3data['albumdata']['urls'] as $url) {
+//                             XbmusicHelper::addExtLink($url, 'album', $id);
+//                         }
+                        $trackdata['album_id'] = $id;
+                    }
                 } else {
                     //its a single
-                    $msg = Xbtext::_('XBMUSIC_NO_ALBUM_FOUND',XBNL);
+                    $msg = Xbtext::_('XBMUSIC_NO_ALBUM_FOUND',XBNL + XBTRL);
                     if ($loglevel>2) $ilogmsg .= XBWARN.$msg;
                     $app->enqueueMessage(trim($msg).'<br />','Warning');
                 }
@@ -614,6 +639,14 @@ class TrackModel extends AdminModel {
             $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);
             $tid = $this->getState('track.id');
             // if a new track we need to create and link any songs and artists and add genre to song and artist per options,
+            if ($dotrackurl) {
+                foreach ($id3data['urls'] as $url) {
+                    XbmusicHelper::addExtLink($url, 'track', $tid);
+                }
+            }
+//             foreach ($id3data['trackdata']['urls'] as $url) {
+//                 XbmusicHelper::addExtLink($url, 'track', $tid);
+//             }
             $trackdata['songlist'] = XbcommonHelper::uniqueNestedArray($trackdata['songlist'], 'song_id');
             $this->storeTrackSongs($tid, $trackdata['songlist']);
             

@@ -1,3 +1,14 @@
+<?php 
+/*******
+ * @package xbMusic - Streamer
+ * @filesource /streamer/history.php
+ * @version 0.1.0.0 12th May 2025
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ ******/
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,19 +16,16 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Wreckers Radio showcases and celebrates folk, roots, country, blues, acoustic and traditional music. We focus on music that is Cornish, Devonian, Cornwall- or Devon-based or has a connection with Dumnonia. We also play music from the South West of England, the British Isles and around the world." />
-        <meta name="author" content="Cornwall Folk Radio" />
-        <title>Wreckers Radio - folk, roots, country, blues, acoustic and traditional music from West-the-Exe ad over the Tamar</title>
+        <meta name="description" content="Wreckers Radio showcases and celebrates folk, roots, country, blues, acoustic and traditional music. We focus on music that is Cornish, Cornwall-based or has a connection with Cornwall. We also play music from the South West of England, the British Isles and around the world." />
+        <meta name="author" content="Wreckers Radio" />
+        <title>Wreckers Radio - Cornish, folk, roots, country, blues, acoustic and traditional music</title>
 
         <!-- Favicon-->
-    <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
-    <link rel="shortcut icon" href="/favicons/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="Wreckers Radio" />
-    <link rel="manifest" href="/favicons/site.webmanifest" />
-
-
-
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="theme-color" content="#ffffff">
 
@@ -30,7 +38,6 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <!-- -->
         <link href="css/styles.css" rel="stylesheet" />
-        <link href="css/wrnowstyles.css" rel="stylesheet" />
      <!--   -->
 
 <!-- Player -->
@@ -45,22 +52,22 @@
 	jQuery(function() {
 		setTimeout(function(){
 				jQuery("#lbg_audio6_html5_shoutcast_1").audio6_html5({
-					radio_stream:"https://radio.xbone.uk/listen/wreckers_radio/radio.mp3",
-                    azuracast_api_nowplaying_url:"https://radio.xbone.uk/api/nowplaying/wreckers_radio",
-                    azuracast_get_image:true,
-					radio_name:"Wreckers Radio",
-					playerWidth:180,
-					imageHeight:180,
-					skin:"blackControllers",
+					radio_stream:"https://azuracast.spollin.net:8010/radio.mp3",
+                    azuracast_api_nowplaying_url:"https://azuracast.spollin.net/api/nowplaying/cornwall_folk_radio",
+                    			azuracast_get_image:true,
+					radio_name:"Cornwall Folk Radio",
+					playerWidth:355,
+					imageHeight:355,
+					skin:"whiteControllers",
 					responsive:true,
-					grabLastFmPhoto:true,
-					autoPlay:true,
-					songTitleColor:"#fff",
-					authorTitleColor:"#fff",
-					lineSeparatorColor:"transparent",
+					grabLastFmPhoto:false,
+					autoPlay:false,
+					songTitleColor:"#000000",
+					authorTitleColor:"#000000",
+					lineSeparatorColor:"#ffffff",
 					radioStationColor:"#000000",
-					frameBehindTextColor:"transparent",
-					frameBehindButtonsColor:"transparent",
+					frameBehindTextColor:"#ffffff",
+					frameBehindButtonsColor:"#ffffff",
 					sticky:false,
 					startMinified:false,
 					showOnlyPlayButton:false,
@@ -76,10 +83,10 @@
 					showRadioStation:false,
 					showTitle:true,
 					showHistoryBut:false,
-					showHistory:false,
-					showHistoryOnInit:false,
+					showHistory:true,
+					showHistoryOnInit:true,
 					translateReadingData:"reading data...",
-					historyTranslate:"HISTORY - last three songs",
+					historyTranslate:"HISTORY - last five songs",
 					historyTitleColor:"#858585",
 					historyBgColor:"#ffffff",
 					historyRecordBgColor:"transparent",
@@ -87,52 +94,40 @@
 					historyRecordSongColor:"#000000",
 					historyRecordSongBottomBorderColor:"#cfcfcf",
 					historyRecordAuthorColor:"#6d6d6d",
-					numberOfThumbsPerScreen:3,
+					numberOfThumbsPerScreen:5,
 					historyPadding:16,
 					historyRecordTitleLimit:25,
 					historyRecordAuthorLimit:36,
-					nowPlayingInterval:10,
+					nowPlayingInterval:20,
 					noImageAvailable:"noimageavailable.jpg",
 					showListeners:true
 				});
 		}, 1000);
 	});
 </script>
-
     </head>
 
     <body id="page-top">
-<script>
-function myFunction() {
-//alert('hello');
-window.open ('now.php', 'newwindow', config='height=600,width=500,toolbar=no,menubar=1,scrollbars=no,resizable=no,location=no,directories=no,status=no');}
-</script>
+<style>
+.thumbsHolderWrapper {top:440px !important;}
+</style>
 
         <!-- Listen -->
-      <div class="wrnow">
-        <section class="content-section" id="listen" style="padding:0;">
-            <div class="container px-4 px-lg-5 text-center" style="padding:0; color:white;">
+        <section class="content-section bg-light" id="listen">
+            <div class="container px-4 px-lg-5 text-center">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-10" style="width:300px;">
-        <?php if ($_GET['b']) : ?>
-        	<div style="float:left; margin-bottom:5px;"><i>now playing</i></div>
-        	<div style="float:right; margin-bottom:5px;">
-         		<span class="fa-solid fa-arrow-up-right-from-square" onclick="myFunction();" title="open in new window"></span>
-         	</div>
-         <?php else : ?>
-         	<div style="margin-bottom:5px;"><i>now playing</i></div>
-       	<?php endif; ?>
-<div class="clearfix"></div>
+                    <div class="col-lg-10">
+        <h4>Cornwall Folk Radio</h4>
+        <div style="margin-bottom:10px;"><i>now playing</i></div>
+
              <div class="audio6_html5">
              	<div id="lbg_audio6_html5_shoutcast_1"></div>
              </div>
-
                     </div>
                 </div>
             </div>
         </section>
-	</div>
-	
+
        <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->

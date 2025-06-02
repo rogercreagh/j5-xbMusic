@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.52.0 8th May 2025
+ * @version 0.0.52.5 31st May 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -70,6 +70,7 @@ class XbmusicHelper extends ComponentHelper
 	    $result['audioinfo'] = array();
 	    $result['imageinfo'] = array();
 	    $result['id3tags'] = array();
+	    $result['foundurls'] = array();
 	    $result['fileinfo'] = array();
 	    $result['fileinfo']['playtime_string'] = (isset($ThisFileInfo['playtime_string'])) ? $ThisFileInfo['playtime_string'] : '';
 	    $result['fileinfo']['mime_type'] = (isset($ThisFileInfo['mime_type'])) ? $ThisFileInfo['mime_type'] : '';
@@ -123,6 +124,7 @@ class XbmusicHelper extends ComponentHelper
             }
         }
         $id3tags['urls'] = $urls;
+        $result['foundurls'] = $urls;
         $result['id3tags'] = $id3tags;
 	    return $result;
 	} // end getFileID3()
@@ -140,6 +142,11 @@ class XbmusicHelper extends ComponentHelper
 	    $splitsongs = $params->get('splitsongs',0);
 	    $nobrackets = $params->get('nobrackets',0);
 	    $loglevel = $params->get('loglevel',3);
+	    $urlhandling = $params->get('urlhandling',[]);
+	    $dotrackurl = (key_exists(0, $urlhandling)) ? true : false;
+	    $dosongurl = (key_exists(1, $urlhandling)) ? true : false;
+	    $doalbumurl = (key_exists(2, $urlhandling)) ? true : false;
+	    $doartisturl = (key_exists(3, $urlhandling)) ? true : false;
 	    $items = array();
 	    $trackdata = array(); //only one track
 	    $albumdata = array(); //only one album title allowed, if alternates present reported in log
@@ -218,7 +225,8 @@ class XbmusicHelper extends ComponentHelper
 	                'alias'=>XbcommonHelper::makeAlias($artistname),
 	                'sortname'=>XbcommonHelper::stripThe($artistname)
 	            );
-	            if (isset($id3data['text:url'])) $artist['url'] =  $id3data['text:url'];
+//	            if (isset($id3data['text:url'])) $artist['url'] =  $id3data['text:url'];
+	            $artist['urls'] = ($doartisturl) ? $id3data['urls'] : [];
 	            $artistdata[] = $artist;
 //	        }
 	    } //endif set artist
@@ -263,6 +271,8 @@ class XbmusicHelper extends ComponentHelper
                 }
             }
             $albumdata['compilation'] = (isset($trackdata['part_of_a_compilation'])) ? '1' : '0';   
+            $albumdata['urls'] = ($doalbumurl) ? $id3data['urls'] : [];
+            
 	    } //end albuminfo
 	    
 	    
@@ -311,14 +321,16 @@ class XbmusicHelper extends ComponentHelper
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');            
             }           
         }
+   	    $urls = ($dosongurl) ? $id3data['urls'] : [];
         foreach ($songtitles as $songtitle) {
-            $songdata[] = array('id'=>0, 'title' => $songtitle, 'alias'=>XbcommonHelper::makeAlias($songtitle));
+            $songdata[] = array('id'=>0, 'title' => $songtitle, 'alias'=>XbcommonHelper::makeAlias($songtitle),'urls'=>$urls);
    	    }        
-	    
+   	    
 	    //get genres
 	    if (isset($id3data['genre'])) {
 	        $genres = self::createGenres($id3data['genre'], $ilogmsg);
 	    }
+	    $trackdata['urls'] = ($dotrackurl) ? $id3data['urls'] : [];
 	    
 	    //images are handled separately
 	    

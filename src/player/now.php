@@ -5,9 +5,9 @@
 
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="Wreckers Radio showcases and celebrates folk, roots, country, blues, acoustic and traditional music. We focus on music that is Cornish, Devonian, Cornwall- or Devon-based or has a connection with Dumnonia. We also play music from the South West of England, the British Isles and around the world." />
-        <meta name="author" content="Cornwall Folk Radio" />
-        <title>Wreckers Radio - folk, roots, country, blues, acoustic and traditional music from West-the-Exe ad over the Tamar</title>
+        <meta name="description" content="Wreckers Radio showcases and celebrates folk, roots, country, blues, acoustic and traditional music. We focus on music that is Cornish, Cornwall-based or has a connection with Cornwall. We also play music from the South West of England, the British Isles and around the world." />
+        <meta name="author" content="Wreckers Radio" />
+        <title>Wreckers Radio - Cornish, folk, roots, country, blues, acoustic and traditional music</title>
 
         <!-- Favicon-->
     <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg" />
@@ -15,11 +15,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="Wreckers Radio" />
     <link rel="manifest" href="/favicons/site.webmanifest" />
-
-
-
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
 
         <!-- Font Awesome icons (free version)-->
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -30,7 +25,6 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <!-- -->
         <link href="css/styles.css" rel="stylesheet" />
-        <link href="css/wrnowstyles.css" rel="stylesheet" />
      <!--   -->
 
 <!-- Player -->
@@ -47,20 +41,20 @@
 				jQuery("#lbg_audio6_html5_shoutcast_1").audio6_html5({
 					radio_stream:"https://radio.xbone.uk/listen/wreckers_radio/radio.mp3",
                     azuracast_api_nowplaying_url:"https://radio.xbone.uk/api/nowplaying/wreckers_radio",
-                    azuracast_get_image:true,
+                    			azuracast_get_image:true,
 					radio_name:"Wreckers Radio",
-					playerWidth:180,
-					imageHeight:180,
-					skin:"blackControllers",
+					playerWidth:355,
+					imageHeight:355,
+					skin:"whiteControllers",
 					responsive:true,
 					grabLastFmPhoto:true,
 					autoPlay:true,
-					songTitleColor:"#fff",
-					authorTitleColor:"#fff",
-					lineSeparatorColor:"transparent",
+					songTitleColor:"#000000",
+					authorTitleColor:"#000000",
+					lineSeparatorColor:"#ffffff",
 					radioStationColor:"#000000",
-					frameBehindTextColor:"transparent",
-					frameBehindButtonsColor:"transparent",
+					frameBehindTextColor:"#ffffff",
+					frameBehindButtonsColor:"#ffffff",
 					sticky:false,
 					startMinified:false,
 					showOnlyPlayButton:false,
@@ -75,9 +69,9 @@
 					showVolume:false,
 					showRadioStation:false,
 					showTitle:true,
-					showHistoryBut:false,
-					showHistory:false,
-					showHistoryOnInit:false,
+					showHistoryBut:true,
+					showHistory:true,
+					showHistoryOnInit:true,
 					translateReadingData:"reading data...",
 					historyTranslate:"HISTORY - last three songs",
 					historyTitleColor:"#858585",
@@ -91,7 +85,7 @@
 					historyPadding:16,
 					historyRecordTitleLimit:25,
 					historyRecordAuthorLimit:36,
-					nowPlayingInterval:10,
+					nowPlayingInterval:20,
 					noImageAvailable:"noimageavailable.jpg",
 					showListeners:true
 				});
@@ -105,22 +99,26 @@
 <script>
 function myFunction() {
 //alert('hello');
-window.open ('now.php', 'newwindow', config='height=600,width=500,toolbar=no,menubar=1,scrollbars=no,resizable=no,location=no,directories=no,status=no');}
+window.open ('now.php', 'newwindow', config='height=560,width=370,popup');}
 </script>
+<style>
+.AudioShowHidePlaylist {width:130px !important;}
+.AudioShowHidePlaylist:before {content:"show/hide history";}
+</style>
 
         <!-- Listen -->
-      <div class="wrnow">
-        <section class="content-section" id="listen" style="padding:0;">
-            <div class="container px-4 px-lg-5 text-center" style="padding:0; color:white;">
+        <section class="content-section" id="listen">
+            <div class="container px-4 px-lg-5 text-center">
                 <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-10" style="width:300px;">
+                    <div class="col-lg-10" style="width:355px;">
+        <h4>Wreckers Radio</h4>
         <?php if ($_GET['b']) : ?>
-        	<div style="float:left; margin-bottom:5px;"><i>now playing</i></div>
-        	<div style="float:right; margin-bottom:5px;">
-         		<span class="fa-solid fa-arrow-up-right-from-square" onclick="myFunction();" title="open in new window"></span>
-         	</div>
+        <div style="float:left; margin-bottom:10px;"><i>now playing</i></div>
+       <div style="float:right; margin-bottom:10px;">
+         	<span class="fa-solid fa-arrow-up-right-from-square" onclick="myFunction();" title="open in new window"></span>
+         </div>
          <?php else : ?>
-         	<div style="margin-bottom:5px;"><i>now playing</i></div>
+         	<div style="margin-bottom:10px;"><i>now playing</i></div>
        	<?php endif; ?>
 <div class="clearfix"></div>
              <div class="audio6_html5">
@@ -131,8 +129,7 @@ window.open ('now.php', 'newwindow', config='height=600,width=500,toolbar=no,men
                 </div>
             </div>
         </section>
-	</div>
-	
+
        <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Core theme JS-->
