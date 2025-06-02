@@ -2,6 +2,34 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.52.5</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.52.5</h3> Updated 31st May 2025]]></item>
+			<item>Imported ID3 urls can be assigned to selected item types</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>multiple urls in id3 detected on import</item>
+			<item>scroll boxes for song and track lists in album list display</item>
+		</change>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<fix>
+		</fix>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.52.3</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.52.2</h3> Updated 15th May 2025]]></item>
