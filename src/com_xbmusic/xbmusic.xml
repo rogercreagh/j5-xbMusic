@@ -112,7 +112,7 @@
 				</params>
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=taglist" >
-				xbmusic_iconmenu_tags
+				xbmusic_iconmenu_taglist
 			</menu>
 			<menu link="option=com_xbmusic&amp;view=dataman" >
 				xbmusic_iconmenu_dataman

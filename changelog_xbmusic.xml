@@ -20,8 +20,9 @@
 		<security>
 		</security>
 		<fix>
-			<item>Bug in Taglist view if item checked out</item>
-			<item>Bad link to Taglist view in Dashboard</item>
+			<item>Taglist view pagination not working</item>
+			<item>Taglist view error if item checked out</item>
+			<item>Dashboard bad link to Taglist view</item>
 		</fix>
 		<note>
 			<item>Front end views not available</item>
