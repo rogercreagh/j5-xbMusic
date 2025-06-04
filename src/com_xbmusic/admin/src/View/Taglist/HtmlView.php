@@ -13,7 +13,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\View\Taglist;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-// use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
 // use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
@@ -44,7 +44,6 @@ class HtmlView extends BaseHtmlView {
         $this->filterForm    = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
         $this->searchTitle = $this->state->get('filter.search');
-                
         $this->addToolbar();
         
         return parent::display($tpl);

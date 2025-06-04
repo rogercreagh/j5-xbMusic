@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/taginfo/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.52.5 3rd June 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -58,7 +58,7 @@ $longlist = 4;
               	<p class="xb095"><?php echo Text::_('XBMUSIC_TAGINFOPAGE_SUBTITLE'); ?></p>
 			</div>
 			<div class= "col-sm-6">
-				<a href="<?php echo $celink.$item->id; ?>" class="xbbadge badge-tag xbr15" style="color:#fff;padding:15px;">
+				<a href="<?php echo $telink.$item->id; ?>" class="xbbadge badge-tag xbr15" style="color:#fff;padding:15px;">
 					<?php echo $item->title; ?>
 				</a>
 			</div>
@@ -67,7 +67,7 @@ $longlist = 4;
 			<div class="col-sm-7">
         		<div class="row">
         			<div class= "col-sm-2">
-        				<p><i><?php echo Text::_('XB_CATEGORY').' '.Text::_('XB_DESCRIPTION'); ?>:</i></p>
+        				<p><i><?php echo Text::_('XB_TAG').' '.Text::_('XB_DESCRIPTION'); ?>:</i></p>
         			</div>
            			<div class="col-sm-5">
         			<?php if ($item->description != '') : ?>
@@ -107,7 +107,7 @@ $longlist = 4;
 		</div>
 		<?php if ($item->level > 1) : ?>
 				<p class="xbmb5"><i><?php echo Text::_('Parent of this tag'); ?></i>
-					<a href="<?php echo $cinflink.$item->parent_id; ?>"   
+					<a href="<?php echo $tinflink.$item->parent_id; ?>"   
 						class="xblabel label-tag xbml15" ><?php echo $item->parent_title; ?></a>
 				</p>
 		<?php endif; ?>
@@ -129,34 +129,23 @@ $longlist = 4;
           	</div>
 		<div class="row">
 			<div class= "col-sm-4">
-				<div class="xbbox <?php echo ($item->albumcnt>0) ? 'gradyellow' : 'xbbggy'; ?>">
+				<div class="xbbox 
+				    <?php echo ($item->albumcnt>0) ? 'gradyellow' : 'xbbggy'; ?>">
 					<p><?php echo ($item->albumcnt==0) ? Text::_('JNO') : $item->albumcnt;
 					echo Xbtext::_('XBMUSIC_ALBUMS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->albumcnt > 0) : ?>
-    					<?php if ($item->albumcnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->albumcnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->albums as $i=>$bk) { 
-    							echo '<li><a href="'.$xblink.'&task=album.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $bk = $item->albums[$i];
-    						    echo '<li><a href="'.$xblink.'&task=album.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->albums); $i++) {
-        						    $bk = $item->albums[$i];
-        						    echo '<li><a href="'.$xblink.'&task=album.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
+        						<?php foreach ($item->albums as $i=>$bk) { 
+        							echo '<li><a href="'.$xblink.'&task=album.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
         						} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    						</ul>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>
@@ -166,29 +155,17 @@ $longlist = 4;
 					echo Xbtext::_('XBMUSIC_ARTISTS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->artistcnt > 0) : ?>
-    					<?php if ($item->artistcnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->artistcnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->artists as $i=>$bk) { 
-    							echo '<li><a href="'.$xblink.'&task=artist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $bk = $item->artists[$i];
-    						    echo '<li><a href="'.$xblink.'&task=artist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->artists); $i++) {
-        						    $bk = $item->artists[$i];
-        						    echo '<li><a href="'.$xblink.'&task=artist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
+        						<?php foreach ($item->artists as $i=>$bk) { 
+        							echo '<li><a href="'.$xblink.'&task=artist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
         						} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    						</ul>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>
@@ -198,29 +175,17 @@ $longlist = 4;
 					echo Xbtext::_('XBMUSIC_PLAYLISTS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->playlistcnt > 0) : ?>
-    					<?php if ($item->playlistcnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->playlistcnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->playlists as $i=>$bk) { 
-    							echo '<li><a href="'.$xblink.'&task=playlist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $bk = $item->playlists[$i];
-    						    echo '<li><a href="'.$xblink.'&task=playlist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->playlists); $i++) {
-        						    $bk = $item->playlists[$i];
-        						    echo '<li><a href="'.$xblink.'&task=playlist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
+        						<?php foreach ($item->playlists as $i=>$bk) { 
+        							echo '<li><a href="'.$xblink.'&task=playlist.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
         						} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    						</ul>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>
@@ -232,29 +197,17 @@ $longlist = 4;
 					echo Xbtext::_('XBMUSIC_SONGS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->songcnt > 0) : ?>
-    					<?php if ($item->songcnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->songcnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->songs as $i=>$bk) { 
-    							echo '<li><a href="'.$xblink.'&task=song.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $bk = $item->songs[$i];
-    						    echo '<li><a href="'.$xblink.'&task=song.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->songs); $i++) {
-        						    $bk = $item->songs[$i];
-        						    echo '<li><a href="'.$xblink.'&task=song.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
+        						<?php foreach ($item->albums as $i=>$bk) { 
+        							echo '<li><a href="'.$xblink.'&task=song.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
         						} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    						</ul>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>
@@ -264,29 +217,17 @@ $longlist = 4;
 					echo Xbtext::_('XBMUSIC_TRACKS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->trackcnt > 0) : ?>
-    					<?php if ($item->trackcnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->trackcnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->tracks as $i=>$bk) { 
-    							echo '<li><a href="'.$xblink.'&task=track.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $bk = $item->tracks[$i];
-    						    echo '<li><a href="'.$xblink.'&task=track.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->tracks); $i++) {
-        						    $bk = $item->tracks[$i];
-        						    echo '<li><a href="'.$xblink.'&task=track.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
+        						<?php foreach ($item->tracks as $i=>$bk) { 
+        							echo '<li><a href="'.$xblink.'&task=track.edit&id='.$bk['id'].'">'.$bk['title'].'</a></li> ';
         						} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    						</ul>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>
@@ -296,33 +237,19 @@ $longlist = 4;
 					echo Xbtext::_('Other Items',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->othercnt > 0) : ?>
-    					<?php if ($item->othercnt < $longlist+1) : ?>
+    					<div 
+    					   <?php if ($item->othercnt > $longlist) : ?>
+								class="xbyscroll" style="max-height:<?php echo $longlist * 25; ?>px;"
+    					   <?php endif; ?>
+							> 
     						<ul>
-    						<?php foreach ($item->others as $i=>$oth) { 
-    						    $comp = substr($oth->type_alias, 0,strpos($oth->type_alias, '.'));
-    						    $ctype = substr($oth->type_alias,strpos($oth->type_alias, '.')+1);
-    						    echo '<li><a href="index.php?option='.$comp.'">'.$comp.'</a> - '.$ctype.': '.$oth->core_title.'</li> ';
-    						} ?>				
+        						<?php foreach ($item->others as $i=>$oth) { 
+        						    $comp = substr($oth->type_alias, 0,strpos($oth->type_alias, '.'));
+        						    $ctype = substr($oth->type_alias,strpos($oth->type_alias, '.')+1);
+        						    echo '<li><a href="index.php?option='.$comp.'">'.$comp.'</a> - '.$ctype.': '.$oth->core_title.'</li> ';
+        						} ?>				
     						</ul>
-    					<?php else : ?>
-    						<ul>
-    						<?php for($i=0; $i<$longlist; $i++) {
-    						    $comp = substr($oth->type_alias, 0,strpos($oth->type_alias, '.'));
-    						    $ctype = substr($oth->type_alias,strpos($oth->type_alias, '.')+1);
-    						    echo '<li><a href="index.php?option='.$comp.'">'.$comp.'</a> - '.$ctype.': '.$oth->core_title.'</li> ';
-    						} ?>				
-    						</ul>
-    						<details>
-    							<summary>see more...</summary>
-    							<ul>
-    							<?php for($i=$longlist; $i<count($item->tracks); $i++) {
-    							    $comp = substr($oth->type_alias, 0,strpos($oth->type_alias, '.'));
-    							    $ctype = substr($oth->type_alias,strpos($oth->type_alias, '.')+1);
-    							    echo '<li><a href="index.php?option='.$comp.'">'.$comp.'</a> - '.$ctype.': '.$oth->core_title.'</li> ';
-    							} ?>				
-    							</ul>
-    						</details>
-    					<?php endif; ?>
+    					</div> 
 					<?php endif; ?>
 				</div>
 			</div>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.51.8 30h April 2025
+ * @version 0.0.52.5 3rd June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -260,7 +260,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 				</div>
 				
 				<div class="xbbox gradtag">
-					<h3 class="xbmb20"><i class='fas fa-tags' ></i> <a href="index.php?option=com_xbmusic&view=tags"><?php echo Text::_('XB_TAGS'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-tags' ></i> <a href="index.php?option=com_xbmusic&view=taglist"><?php echo Text::_('XB_TAGS'); ?></a></h3>
 					<table class="xbwp100">
 						<tr>
 							<td class="xbwp50 xbpl20">

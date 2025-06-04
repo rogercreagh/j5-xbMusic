@@ -2,16 +2,16 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.52.5</version>
+		<version>0.0.52.6</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.52.5</h3> Updated 31st May 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.52.6</h3> Updated 4th June 2025]]></item>
 			<item>Imported ID3 urls can be assigned to selected item types</item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
 			<item>multiple urls in id3 detected on import</item>
-			<item>scroll boxes for song and track lists in album list display</item>
+			<item>scroll boxes for lists in albums and taginfo views</item>
 		</change>
 		<language>
 			<item>en-GB only</item>
@@ -20,6 +20,8 @@
 		<security>
 		</security>
 		<fix>
+			<item>Bug in Taglist view if item checked out</item>
+			<item>Bad link to Taglist view in Dashboard</item>
 		</fix>
 		<note>
 			<item>Front end views not available</item>

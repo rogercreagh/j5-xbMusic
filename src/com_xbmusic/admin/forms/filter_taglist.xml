@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic admin/forms/filter_categories.xml v0.14.0 10th September 2024 -->
+<!-- xbMusic admin/forms/filter_categories.xml v0.52.6 4th June 2025 -->
 <form>
 	<fields name="filter" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" >
 		<field
@@ -21,17 +21,46 @@
 		<field
 			name="branch"
 			type="sql"
-			label="XBMUSIC_TAGBRANCH_LABEL"
-			description="XBMUSIC_TAGBRANCH_DESC"
-			query="SELECT DISTINCT t.id, t.path, t.alias AS alias, t.title AS title FROM `#__tags` AS t LEFT JOIN `#__contentitem_tag_map` AS m ON m.tag_id = t.id WHERE m.type_alias LIKE ('com_music') AND t.level=1 ORDER BY t.title"
+			label="Tag Branch"
+			description="Filter to only show tags under a particular parent tag"
+			query="SELECT DISTINCT t.id, t.path, t.alias AS alias, t.title AS title FROM `#__tags` AS t LEFT JOIN `#__contentitem_tag_map` AS m ON m.tag_id = t.id WHERE t.level=1 ORDER BY t.title"
   			key_field="id"
   			value_field="title"
 			onchange="this.form.submit();"
 			>
-			<option value="">XBFILMS_ENTIRE_TREE</option>
+			<option value="">All Tags</option>
 		</field>
 	</fields>
 	<fields name="list">
+		<field
+			name="fullordering" type="list"
+			label="COM_CONTENT_LIST_FULL_ORDERING"
+			description="COM_CONTENT_LIST_FULL_ORDERING_DESC"
+			onchange="this.form.submit();"
+			default="t.title ASC"
+			>
+			<option value="">JGLOBAL_SORT_BY</option>
+			<option value="t.title ASC">JGLOBAL_TITLE_ASC</option>
+			<option value="t.title DESC">JGLOBAL_TITLE_DESC</option>
+			<option value="t.path ASC">Path</option>
+			<option value="t.path DESC">Path</option>
+			<option value="albumcnt ASC"></option>
+			<option value="albumcnt DESC"></option>
+			<option value="artistcnt ASC"></option>
+			<option value="artistcnt DESC"></option>
+			<option value="playlistcnt ASC"></option>
+			<option value="playlistcnt DESC"></option>
+			<option value="songcnt ASC"></option>
+			<option value="songcnt DESC"></option>
+			<option value="trackcnt ASC"></option>
+			<option value="trackcnt DESC"></option>
+			<option value="t.parent_id ASC"></option>
+			<option value="t.parent_id DESC"></option>
+			<option value="t.published ASC">JSTATUS_ASC</option>
+			<option value="t.published DESC">JSTATUS_DESC</option>
+			<option value="t.id ASC">JGRID_HEADING_ID_ASC</option>
+			<option value="t.id DESC">JGRID_HEADING_ID_DESC</option>
+		</field>
 		<field
 			name="limit"
 			type="limitbox"

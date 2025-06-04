@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/taglist/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.52.5 3rd June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,7 +62,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
     		<?php  echo $this->pagination->getPagesLinks(); ?>
     	</div>
    		<div class="pull-right pagination" style="margin:25px 10px 0 0;">
-    		<?php  echo $this->pagination->getResultsCounter(); ?> 
+    		<?php echo $this->pagination->getResultsCounter(); ?> 
     	</div>
         <div class="clearfix"></div>      
               
@@ -207,7 +207,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
                 			<td style="text-align:center;">
                					<?php if ($item->othcnt >0) : ?> 
                						<span class="xbbadge badge-ltgrey">
-               							<a href="<?php echo $aglink.$item->id;?>"><?php echo $item->othcnt; ?>
+               							<a href="<?php echo $taglink.$item->id;?>"><?php echo $item->othcnt; ?>
                						</a></span>
                					<?php endif; ?>
                				</td>

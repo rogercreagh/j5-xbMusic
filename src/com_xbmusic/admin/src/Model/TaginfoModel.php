@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TaginfoModel.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.52.5 2nd June 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -93,7 +93,7 @@ class TaginfoModel extends ItemModel {
         $query->from('#__contentitem_tag_map AS m');
         $query->join('LEFT','#__ucm_content AS c ON m.core_content_id = c.core_content_id');
         $query->where('m.tag_id = '.$db->q($tagid));
-        $query->where('m.type_alias NOT LIKE ('.$db->q('com_xbmusic').')');
+        $query->where('m.type_alias NOT LIKE ('.$db->q('com_xbmusic%').')');
         $query->order('m.type_alias, c.core_title');
         $db->setQuery($query);
         return $db->loadObjectList();       
