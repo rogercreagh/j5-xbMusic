@@ -290,7 +290,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 								<?php echo Text::_('XB_CHANGELOG');?></a>
 						</div>
 						<?php if ($this->updatable) { 
-						    echo '<div class="pull-right"><a href="http://j5.localhost/administrator/index.php?option=com_installer&view=update"
+						    echo '<div class="pull-right"><a href="index.php?option=com_installer&view=update"
                                 class="btn btn-warning">'.Text::_('XB_UPDATE_AVAILABLE').'</a></div>'; 
 						} ?>
                         <div class="clearfix"></div>

@@ -23,6 +23,7 @@
 			<item>Taglist view pagination not working</item>
 			<item>Taglist view error if item checked out</item>
 			<item>Dashboard bad link to Taglist view</item>
+			<item>display errors in taginfo view fixed</item>
 		</fix>
 		<note>
 			<item>Front end views not available</item>
