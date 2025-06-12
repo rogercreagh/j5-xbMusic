@@ -2,6 +2,34 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.53.0</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.53.0</h3> Updated 7th June 2025]]></item>
+			<item>Dataman Import from ID3 will now recurse 2 folders deep and 4 folders wide at each levels</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Dataman ID3 import now handles up to 5 subfolders at 3 levels</item>
+		</change>
+		<fix>
+			<item>tba</item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.52.6</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.52.6</h3> Updated 4th June 2025]]></item>

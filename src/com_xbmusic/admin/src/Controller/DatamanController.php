@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.41.5 6th March 2025
+ * @version 0.0.53.0 9th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,16 +21,18 @@ class DatamanController extends FormController
     function importmp3() {
         $jip = Factory::getApplication()->getInput();
         $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $folder = trim($post['foldername']);
         $model = $this->getModel('dataman');
-         if ($post['selectedfiles']) {
+        if ($post['selectedfiles']) {
              $files = explode("\n", trim($post['selectedfiles']));
              foreach ($files as &$file) {
-                 $file = trim($post['foldername']).trim($file);
+                 $file = $folder.trim($file);
              }
          } else {
-             $files = trim($post['foldername']);
+             $files = $folder;
          }
         $wynik = $model->parseFilesMp3($files, $post['impcat']); 
+        Factory::getApplication()->enqueueMessage($wynik);
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
         return $wynik;

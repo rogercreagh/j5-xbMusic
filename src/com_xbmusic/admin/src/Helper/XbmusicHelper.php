@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.52.5 31st May 2025
+ * @version 0.0.53.0 9th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -157,7 +157,7 @@ class XbmusicHelper extends ComponentHelper
 	    if (isset($id3data['title'])) { 
 	        $trackdata['title'] = $id3data['title'];
 	    } else { //no title found
-	        $msg = Xbtext::_('XBMUSIC_NO_TRACK_TITLE_IN_ID3',XBNL);
+	        $msg = Xbtext::_('XBMUSIC_NO_TRACK_TITLE_IN_ID3',XBNL + XBTRL);
 	        $ilogmsg .= '[ERROR] '.$msg;
 	        Factory::getApplication()->enqueueMessage(trim($msg),'Error');
 	        return false;
@@ -217,7 +217,7 @@ class XbmusicHelper extends ComponentHelper
                  $splitcnt = 0;
                  $fnd = str_replace($splits," || ", $artistname, $splitcnt);
                  if ($splitcnt > 0) {
-                     $msg = Xbtext::_($artistname,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLY_SPLIT_ARTIST',XBDQ + XBNL);
+                     $msg = Xbtext::_($artistname,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLY_SPLIT_ARTIST',XBDQ + XBNL + XBTRL);
                      $ilogmsg .='[WARN] .'.$msg;
                      Factory::getApplication()->enqueueMessage($msg,'Warning');
                 }           
@@ -236,7 +236,7 @@ class XbmusicHelper extends ComponentHelper
 	        $albumstr = $id3data['album'];
 	        $albcnt = substr_count($albumstr,'||') + 1;
 	        if ($albcnt > 1) {
-	            $ilogmsg .= XBWARN.Xbtext::_('XBMUSIC_ALBUM_MULTI_TITLE',XBNL);
+	            $ilogmsg .= XBWARN.Xbtext::_('XBMUSIC_ALBUM_MULTI_TITLE',XBNL + XBTRL);
 	            $ilogmsg .= XBWARN.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
 	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
@@ -288,11 +288,11 @@ class XbmusicHelper extends ComponentHelper
             if ($nobrackets == 1) {
                 $songtitle = $newtitle;
                 $songtitle = trim($songtitle,', ');
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_REMOVED',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_REMOVED',XBNL + XBTRL);
                 $ilogmsg .= XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Warning');	            
             } else {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_NOT_REMOVED',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_BRACKETED_TEXT_NOT_REMOVED',XBNL + XBTRL);
                 $ilogmsg .= XBINFO.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');                
             }
@@ -310,7 +310,7 @@ class XbmusicHelper extends ComponentHelper
                 $ilogmsg .=XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Info');               
             } else {
-                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLE_SONG_MEDLEY',XBNL);
+                $msg = Xbtext::_($songtitle,XBSP2 + XBDQ).Xbtext::_('XBMUSIC_POSSIBLE_SONG_MEDLEY',XBNL + XBTRL);
                 $ilogmsg .=XBWARN.$msg;
                 Factory::getApplication()->enqueueMessage(trim($msg),'Warning');               
             }

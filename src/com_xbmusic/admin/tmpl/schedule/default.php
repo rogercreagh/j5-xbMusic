@@ -45,7 +45,7 @@ $wa->useScript('xbmusic.xbtimefunctions')
     </div>
 <?php else: ?>
 		<?php  if ($this->dbstid == '') : ?>
-			<h3 class="xbred"><?php echo Text::_('XBMUSIC_SELECT_STATION'); ?></h3>
+			<h3 class="xbred"><?php echo Text::_('XBMUSIC_SELECT_STATION_CONTINUE'); ?></h3>
 			<div style="80vh;"> </div>
 		<?php else: ?>
 			<h3><?php echo Text::sprintf('XBMUSIC_SCHED_FOR_STATION', $this->station['title'], $this->station['az_url']); ?></h3>

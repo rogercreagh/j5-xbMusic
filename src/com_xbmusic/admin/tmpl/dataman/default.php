@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.51.8 5th May 2025
+ * @version 0.0.53.0 5th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,6 +29,16 @@ $wa->useScript('keepalive')
 ->useScript('xbmusic.showdown')
 ->useScript('joomla.dialog');
 
+/**
+$wa->addInlineScript("window.onload = function() {
+    var selfolder = sessionStorage.getItem('selfolder');
+    if (selfolder) {
+        var sellink = document.querySelector('#container li.folder a[rel=selfolder]');
+        if (sellink) { sellink.parentElement.classList.add('selected expanded');}
+    }
+};");
+**/
+
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
@@ -42,10 +52,12 @@ $wa->useScript('keepalive')
 
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
-      <input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
-      <input type="hidden" id="multi" value="1" />
-      <input type="hidden" id="extlist" value="mp3" />
-      <input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
+		<input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
+		<input type="hidden" id="multi" value="1" />
+		<input type="hidden" id="extlist" value="mp3" />
+		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
+		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />
+
         <h3>xbMusic Data Manager</h3>
 
 		<div class="main-card">
@@ -56,7 +68,7 @@ $wa->useScript('keepalive')
             <p class="xbinfo">
             	<?php echo Text::_('XBMUSIC_IMPORT_DETAILS');?>
             </p>
-<details>
+<details id="imptk">
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_TRACKS'); ?></span>
 	</summary>	
@@ -77,12 +89,12 @@ $wa->useScript('keepalive')
 	</div>
 	<hr />
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-8 form-vertical">
          	<?php echo $this->form->renderField('impcat'); ?>
          	<?php echo $this->form->renderField('splitsongs'); ?>
          	<?php echo $this->form->renderField('nobrackets'); ?>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-4">
 	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
 	    	  $pophead = 'Confirm Import from MP3'; 
 	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3');"; 
@@ -97,7 +109,7 @@ $wa->useScript('keepalive')
 	</div>
 </details>
 <hr />
-<details>
+<details id="impcsv">
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_CSV')?></span>
 	</summary>
@@ -105,10 +117,12 @@ $wa->useScript('keepalive')
 <p>Functionality expected here:</p>
 <ol>
     <li>Import datatype from csv</li>
+    <li>choose file</li>
+    
 </ol>
 </details>
 <hr />
-<details>
+<details id="imppl">
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_PLAYLIST')?></span>
     </summary>		
@@ -116,7 +130,9 @@ $wa->useScript('keepalive')
 <ol>
     <li>Import playlist
     	<ul>
-    		<li>Select type PLS/M3U</li>
+    		<li>set playlist (new/existing) - if existing append or replace
+    		<li>Select file</li>
+    		<li>foreach line check file
     		<li>List missing tracks in warnings box</li>
     	</ul>
     </li>
@@ -160,7 +176,7 @@ $wa->useScript('keepalive')
     <li></li>
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
-			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'export', Text::_('Export')); ?>
+			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'export', Text::_('XB_EXPORT')); ?>
                 <p class="xbinfo">
                 	<?php echo Text::_('XBMUSIC_EXPORT_DETAILS') ?>
                 </p>
@@ -291,7 +307,7 @@ $wa->useScript('keepalive')
                      <p><i><?php if ($this->azurl =='') {
                          echo Text::_('XBMUSIC_AZURACAST_NO_DETAILS').'<br />'.Text::_('XBMUSIC_AZURACAST_SET_OPTS');
                      } else {
-                         echo Text::sprintf('XBMUSIC_AZURACAST NO_STATIONS',$this->azurl); 
+                         echo Text::sprintf('XBMUSIC_AZURACAST_NO_STATIONS',$this->azurl); 
                      }?></i></p>
                 <?php endif; ?>
         	</div>
@@ -364,4 +380,8 @@ $wa->useScript('keepalive')
 	</form>
     <p>&nbsp;</p>
     <?php echo XbcommonHelper::credit('xbMusic');?>
+    
+    <script language="JavaScript" type="text/javascript"
+      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
+    
 </div>

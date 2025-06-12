@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.52.5 31st May 2025
+ * @version 0.0.53.0 12th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,6 +19,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Uri\Uri;
 use DirectoryIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
@@ -44,7 +46,7 @@ class DatamanModel extends AdminModel {
         }
         return $form;
     }
- 
+    
 /************ IMPORT MUSIC FUNCTIONS ************/
     
     /**
@@ -56,88 +58,146 @@ class DatamanModel extends AdminModel {
      * @return boolean
      */
     public function parseFilesMp3($files, $usedaycat) {
-        //if ($usedaycat == '') $usedaycat = $params->get('usedaycat','0');
+        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
+        $dosubfolders = true;
+        $maxitems = 50;
+        $maxlevels = 6;
+        $itemcnt = 0;
+        $app =Factory::getApplication();
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
+        $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
         //start log
         $loghead = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
-        $logmsg = '';
-        $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
-        
+        $logmsg = '';            //        }
+        // set up counts for logging and start time
+        $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
+        $starttime = time();
         //are we doing a whole folder, or selected files?
         if (is_string($files)) {
-            $folder = trim($files);
-            //get files in folder to array
+            //we have a folder name with trailing slash
+            $folder = $files;
             $files = [];
-            $dirit = new \DirectoryIterator(JPATH_ROOT.'/xbmusic/'.$folder);
-            foreach ($dirit as $fileinfo) {
-                if (strtolower($fileinfo->getExtension()) == 'mp3') {
-                    $files[] = trim($folder.$fileinfo->getFilename());
+            if (trim($folder,'/') != '') {
+                //start by getting any mp3s in the base folder
+                $mp3list = $this->getMp3FileList($basemusicfolder.$folder);
+                $itemcnt = count($mp3list);
+                if ($itemcnt > $maxitems) {
+                    $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
+                    $app->enqueueMessage($errmsg,'Error');
+                    $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
+                    XbmusicHelper::writelog($logmsg);
+                    return false;
+                } else {
+                    $files = $mp3list;
+                    $msg = Text::sprintf('Found %s mp3s in %s',$itemcnt,$folder);
+                    //$app->enqueueMessage($msg);
+                    $logmsg .= $msg."\n";
                 }
-            }            
-        } elseif (!is_array($files)) {
+            } //endif folder ok
+            if ($dosubfolders) {
+                $subfolders = $this->getSubfolderList($basemusicfolder.$folder,0,$maxlevels,$maxitems, $itemcnt);
+ //               $foldercnt = count($subfolders);
+                if ($itemcnt > $maxitems) {
+                    $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
+                    $app->enqueueMessage($errmsg,'Error');
+                    $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
+                    XbmusicHelper::writelog($logmsg);
+                    return false;
+                } else {
+                    foreach ($subfolders as $folder) {
+                        $mp3list = $this->getMp3FileList($folder);
+                        $foundcnt = count($mp3list);
+                        $files = array_merge($files,$mp3list);
+                        $msg = Text::sprintf('Found %s mp3 files in %s and subfolders',$foundcnt,$folder);
+                        $app->enqueueMessage($msg);
+                        $logmsg .= $msg."\n";
+                    }
+                }
+                
+            }
+        } elseif (is_array($files)) {
+            //we've got a list of files, make the paths complete
+            foreach ($files as &$file) {
+                $file = $basemusicfolder.$file;
+            }
+        } else {
+            // not a string and not an array - invalid
             $errmsg .= Text::_('XBMUSIC_INVALID_FILES_LIST');
             Factory::getApplication()->enqueueMessage($errmsg,'Error');
-            $logmsg .= $loghead.XBERR.$errmsg."\n ============================== \n\n";
+            $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
             XbmusicHelper::writelog($logmsg);
             return false;
-        }
+        } //endif
         if (count($files)==0){
-            $errmsg .= Xbtext::_('XBMUSIC_NO_MP3_FOUND',2 + XBTRL).$folder;
+            $errmsg .= Xbtext::_('XBMUSIC_NO_MP3_FOUND',XBSP2 + XBTRL).$folder;
             Factory::getApplication()->enqueueMessage($errmsg,'Warning');
             $logmsg .= $loghead.XBWARN.$errmsg.XBENDLOG;
             XbmusicHelper::writelog($logmsg);
             return false;
         }
-        // set up counts for logging and start time
-        $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
-        $starttime = time();
-        //default categories for albums, artists and songs
-//         $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
-//         $this->albumcatid = $params->get('defcat_album',$uncatid);
-//         $this->artistcatid = $params->get('defcat_artist',$uncatid);
-//         $this->songcatid = $params->get('defcat_song',$uncatid);
-//         $this->trackcatid = $params->get('defcat_track',$uncatid);
-//         //track category may be overriden by genre (tracks-genres-genre) on per item basis
-//         if ($this->usedaycat == 1) {
-//             //we are going to change the defaults to a day category under \imports 
-//             $daycatid = 0;
-//             $daycattitle = date('Y-m-d');
-//             $dcparent = XbcommonHelper::checkValueExists('imports', '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-//             if ($dcparent === false) {
-//                 $catdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>'parent for import date categories used when importing items from MP3');
-//                 $dcparent = XbcommonHelper::createCategory($catdata, true);
-//             }
-//             $daycatid = XbcommonHelper::checkValueExists($daycattitle, '#__categories', 'alias', "`extension` = 'com_xbmusic'");
-//             if ($daycatid === false) {
-//                 $parentcat = XbcommonHelper::getCatByAlias('imports');
-//                 $parentid = ($parentcat>0) ? $parentcat->id : 1;
-//                 $catdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$parentid,'description'=>'items inported on '.date('D jS M Y'));
-//                 $daycatid = XbcommonHelper::createCategory($catdata, true)->id;
-//             }
-//             if ($daycatid > 0) {
-//                 $this->albumcatid = $daycatid;
-//                 $this->artistcatid = $daycatid;
-//                 $this->songcatid = $daycatid;
-//                 $this->trackcatid = $daycatid;
-//             }
-//         } //endif cattype=1
-        
         // ok we're going to iterate through the files
-        $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
+        // $logmsg .= $file."\n";
+        $app->enqueueMessage('parsing '.count($files));
         foreach ($files as $file) {
-            $logmsg .= $this->parseID3($basemusicfolder.$file, $cnts);            
+            $logmsg .= $this->parseID3($file, $cnts);
         }
         //update the log file with counts at the top
         $loghead .= '[SUM] '.$cnts['newtrk'].' new tracks, '.$cnts['duptrk'].' duplicates'."\n";
         $loghead .= '[SUM] '.$cnts['newalb'].' new albums, '.$cnts['newart'].' new artists, '.$cnts['newsng'].' new songs, '."\n";
         $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
-        $loghead .= " -------------------------- \n";
-        $logmsg = $loghead.$logmsg;
-        $logmsg .= '======================================'."\n\n";
+        $loghead .= XBENDITEM;
+        $logmsg = $loghead.$logmsg.XBENDLOG;
         XbmusicHelper::writelog($logmsg);
         return true;
-    } //end parseFilesMp3()    
+    } //end parseFilesMp3()
+    
+    private function getMp3FileList($folder, $ext = 'mp3') {
+        //$folder must be full path
+        $mp3list =[];
+        $dirit = new \DirectoryIterator($folder);
+        foreach ($dirit as $fileinfo) {
+            if (strtolower($fileinfo->getExtension()) == $ext) {
+                $mp3list[] = $folder.$fileinfo->getFilename();
+            }
+        }
+        return $mp3list;
+    }
+    
+    private function getSubfolderList($folder, $level, $maxlevels, $maxitems, &$itemcnt) {
+        //            Factory::getApplication()->enqueueMessage('in getSubfolderList level: '.$level.' maxfolders: '.$maxitems.' itemcnt: '.$itemcnt.'- folder: '.$folder);
+        $level ++;
+        if ($level == $maxlevels) {
+            Factory::getApplication()->enqueueMessage('Maximum depth reched, will not check subfolders');
+        }
+        $subfolderlist = [];
+        
+        $items = scandir($folder);
+        $subcnt = 0;
+        
+        foreach ($items as $item) {
+            if ($item == '..' || $item == '.') continue;
+//            if (is_dir($folder . $item)) $subcnt ++;
+            if (pathinfo($item,PATHINFO_EXTENSION) == 'mp3') $itemcnt++;
+        }
+        if ($itemcnt > $maxitems) {
+            //            Factory::getApplication()->enqueueMessage('Item limit exceeded ('.$itemcnt.' &gt; '.$maxitems.'). Ending scan','Error');
+            return [];
+        }
+        foreach ($items as $item) {
+            if ($item == '..' || $item == '.') continue;
+            if (is_dir($folder . $item)) {
+                $subfolderlist[] = $folder.$item.'/';
+                if ($level < $maxlevels) {
+                    $subsublist = $this->getSubFolderList($folder.$item.'/',$level, $maxlevels, $maxitems, $itemcnt);
+                    $subfolderlist = array_merge($subfolderlist, $subsublist);
+                }
+            }
+        }
+        //            Factory::getApplication()->enqueueMessage('done getSubfolderList - subfolders: '.count($subfolderlist).' in '.basename($folder).' items: '.$itemcnt);
+        return $subfolderlist;
+        
+    }
     
     /**
      * @name parseID3()
