@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.53.0 9th June 2025
+ * @version 0.0.53.1 12th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,11 +116,13 @@ class XbmusicHelper extends ComponentHelper
                     //$id3tags[$key] = $valuearr; //NOT imploded
                 }
             } else {
-            // other keys can be an array with multiple values, or a plain value
-            // concat them with ' || ' which is ok if printed as string and allows to explode to handle values separately
-                $id3tags[$key] = implode(' || ', $valuearr);
-                //if original value is a url add it to array
-                if(filter_var($id3tags[$key], FILTER_VALIDATE_URL)) $urls[] = $id3tags[$key];               
+                if ($key !='music_cd_identifier') {
+                    // other keys can be an array with multiple values, or a plain value
+                // concat them with ' || ' which is ok if printed as string and allows to explode to handle values separately
+                    $id3tags[$key] = implode(' || ', $valuearr);
+                    //if original value is a url add it to array
+                    if(filter_var($id3tags[$key], FILTER_VALIDATE_URL)) $urls[] = $id3tags[$key]; 
+                }
             }
         }
         $id3tags['urls'] = $urls;
@@ -237,7 +239,7 @@ class XbmusicHelper extends ComponentHelper
 	        $albcnt = substr_count($albumstr,'||') + 1;
 	        if ($albcnt > 1) {
 	            $ilogmsg .= XBWARN.Xbtext::_('XBMUSIC_ALBUM_MULTI_TITLE',XBNL + XBTRL);
-	            $ilogmsg .= XBWARN.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
+//	            $ilogmsg .= XBWARN.'<ul><li>'.str_replace(' || ','</li><li>'.$albumstr).'</li></ul>'."\n";
 	            $albumstr = trim(explode('||', $albumstr)[0]);
 	        }
 	        
@@ -547,8 +549,8 @@ class XbmusicHelper extends ComponentHelper
 	            $imgok = file_put_contents($imgpathfile, $imgdata['data']);
 	        }
 	    } //endif artfile !exists
+        unset($imgdata['data']);
 	    if ($imgok) {
-	        unset($imgdata['data']);
 	        $imgdata['imgurl'] = $imgurl;
 	        $imgdata = array_merge($imgdata, self::getImageInfo($imgdata));
 	        if ($loglevel==4) $flogmsg .= XBINFO.Text::_('XBMUSIC_ARTWORK_CREATED').Xbtext::_($xbfilename,XBSP1 + XBDQ + XBNL);

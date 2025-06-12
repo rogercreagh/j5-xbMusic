@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.52.5 31st May 2025
+ * @version 0.0.53.1 12th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -107,7 +107,6 @@ class TrackModel extends AdminModel {
         $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);
         $params = ComponentHelper::getParams('com_xbmusic');
         $loglevel = $params->get('loglevel',3);
-        $enditem = " -------------------------- \n";
         $newmsg = Text::_('XBMUSIC_NEW_ITEMS_CREATED').':<br />';
         $newdata = []; //only one track per file
         $ilogmsg = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
@@ -123,7 +122,7 @@ class TrackModel extends AdminModel {
 // 1. check if filepathname already in database, if it exists already then exit
             if ( $tid = XbcommonHelper::checkValueExists($filepathname, '#__xbmusic_tracks', 'filepathname')) {
                 $msg = Text::_('XBMUSIC_TRACK_IN_DB').Xbtext::_($tid,XBSP1 + XBDQ);
-                $ilogmsg .= XBERR.$msg.$enditem;
+                $ilogmsg .= XBERR.$msg.XBENDITEM;
                 $app->enqueueMessage(trim($msg),'Error');
                 XbmusicHelper::writelog($ilogmsg);
                 return false;
@@ -149,7 +148,7 @@ class TrackModel extends AdminModel {
         $filedata = XbmusicHelper::getFileId3($data['filepathname']);
         if (!isset($filedata['id3tags']['title'])) { //could add any other required elements to the isset() function
             $msg = Xbtext::_('XBMUSIC_NO_ID3_TITLE',XBNL + XBTRL);
-            $ilogmsg .= XBERR.$msg.$enditem;
+            $ilogmsg .= XBERR.$msg.XBENDITEM;
             $app->enqueueMessage(trim($msg),'Error');
             XbmusicHelper::writelog($ilogmsg);
             return false;
@@ -164,7 +163,7 @@ class TrackModel extends AdminModel {
             $trackdata['filename'] = $fpathinfo['basename']; // TODO this is potentislly redundasnt
             $trackdata['foldername'] = $data['foldername'];
             $trackdata['selectedfiles'] = $data['selectedfiles'];
-            // get genres list, catids are defined above in parseFilesMp3()           
+            // get genres list, catids are defined above in id3datatoitems()           
             $defcats = XbmusicHelper::getDefaultItemCats();
             
             
@@ -185,41 +184,7 @@ class TrackModel extends AdminModel {
             }
             
             $optalbsong = $params->get('genrealbsong',0);
-//             $optcattag = ($optimpcat == 1) ? $params->get('genrecattag1',2) : $params->get('genrecattag',2);
-//             //default categories for albums, artists and songs
-//             $uncatid = XbcommonHelper::getCatByAlias('uncategorised');
-//             $albumcatid = $params->get('defcat_album',$uncatid);
-//             $artistcatid = $params->get('defcat_artist',$uncatid);
-//             $songcatid = $params->get('defcat_song',$uncatid);
-//             $trackcatid = $params->get('defcat_track',$uncatid);
-//             //track category may be overriden by genre (tracks-genres-genre) on per item basis
-//             if ($optimpcat == 1) {
-//                 //we are going to change the defaults to a day category under \imports
-//                 $daycatid = 0;
-//                 $daycattitle = date('Y-m-d');
-//                 $impcatdata = array('title'=>'Imports', 'alias'=>'imports', 'description'=>Text::_('XBMUSIC_IMPCAT_DESC'));
-//                 $daycatparent = XbcommonHelper::getCreateCat($impcatdata);
-//                 $daycatdata = array('title'=>$daycattitle, 'alias'=>$daycattitle, 'parent_id'=>$daycatparent,'description'=>'items inported on '.date('D jS M Y'));
-//                 $daycatid = XbcommonHelper::getcreateCat($daycatdata, true)->id;
-//                 if ($daycatid > 0) {
-//                     $albumcatid = $daycatid;
-//                     $artistcatid = $daycatid;
-//                     $songcatid = $daycatid;
-//                     $trackcatid = $daycatid;
-//                 }
-//             } else { //endif impcat=1
-//                 //we might use genre for track category (optcattag) 
-//                 if (($optcattag & 1) && (!empty($genreids))) { //cat or both cat&tag
-//                     //we will be creating genre categories under tracks since they only apply to tracks
-//                     $genrecatparent = ($params->get('rootcat_album')==0) ? $params->get('defcat_track',0) : $params->get('rootcat_album',0);
-//                     if ($genrecatparent=0) {
-//                         $genrecatparent = XbcommonHelper::getcreateCat(array('title'=>'MusicGenres'));
-//                     }
-//                     $this->trackcatid = XbcommonHelper::getCreateCat(array( 
-//                         'title'=>$id3data['genres'][0]['title'],
-//                         'parent_id'=>$genrecatparent),true)>id; 
-//                 }                
-//             } //endif impcat
+
             $trackdata['catid'] = $defcats['track'];
             if ($optcattag > 1) $trackdata['tags'] = $genreids;           
             //well be setting the album & song genre tags when we get there
@@ -242,23 +207,12 @@ class TrackModel extends AdminModel {
                 }
             }
             $trackdata['songdata'] = $id3data['songdata'];
-            //songlinks will bee generating on save and adding to artist album and track
+            //songlinks will be generated on save and addedto artist album and track
 
 // get artist details and save in trackdata            
             if (isset($id3data['artistdata'])) {
                 foreach ($id3data['artistdata'] as &$artist) {
                     $artist['catid'] = $defcats['artist'];
-                    //we are assuming any url is artist related -?should we also add to track and album links?
-//                     if (isset($id3data['url'])) {    
-//                         $artist['url'] = $id3data['url'];
-//  //                       if (array_search($id3data['url'], array_column($artist['ext_links'], 'link_url'))===false) {
-// //                            $artist['ext_links']['ext_links0']= array('link_text'=>basename($trackdata['url']),
-//  //                               'link_url'=>$trackdata['url'],
-//                                 //'link_desc'=>Text::sprintf('XBMUSIC_LINK_FOUND_IN_ID3', $trackdata['title'])
-// //                            );
-                            
-// //                        }
-//                     }
                 }
                 $trackdata['artists'] = $id3data['artistdata'];//
             } 
@@ -274,6 +228,7 @@ class TrackModel extends AdminModel {
                 }
                 if (isset($trackdata['sortartist'])) $imgfilename .= '_'.XbcommonHelper::makeAlias($trackdata['sortartist']);
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
+                unset($imgdata['data']);
                 if ($imgurl !== false) {
                     $imgdata['imagetitle'] = $imgdata['picturetype'];
                     $imgdata['imagedesc'] = $imgdata['description'];
@@ -307,7 +262,6 @@ class TrackModel extends AdminModel {
                             
     } //end loadId3()
     
- 
     protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
             return false;

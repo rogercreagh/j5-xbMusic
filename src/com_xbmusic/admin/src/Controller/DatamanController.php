@@ -32,7 +32,7 @@ class DatamanController extends FormController
              $files = $folder;
          }
         $wynik = $model->parseFilesMp3($files, $post['impcat']); 
-        Factory::getApplication()->enqueueMessage($wynik);
+//        Factory::getApplication()->enqueueMessage($wynik);
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
         return $wynik;

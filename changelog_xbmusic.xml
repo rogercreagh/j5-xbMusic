@@ -2,7 +2,7 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.53.0</version>
+		<version>0.0.53.1</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.53.0</h3> Updated 12th June 2025]]></item>
 			<item>Dataman Import from ID3 will now recurse 2 folders deep and 4 folders wide at each levels</item>
@@ -13,7 +13,9 @@
 			<item>Dataman ID3 import now handles up to 50 total files across 6 levels of subfolder</item>
 		</change>
 		<fix>
-			<item>tba</item>
+			<item>Artists list was picking up album tags not artists</item>
+			<item>If individual files selected for Dataman import the last one would be missed</item>
+			<item>Memory leak in Dataman parsing files plugged</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>

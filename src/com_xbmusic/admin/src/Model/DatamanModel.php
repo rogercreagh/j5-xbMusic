@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.53.0 12th June 2025
+ * @version 0.0.53.1 12th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -118,8 +118,8 @@ class DatamanModel extends AdminModel {
             }
         } elseif (is_array($files)) {
             //we've got a list of files, make the paths complete
-            foreach ($files as &$file) {
-                $file = $basemusicfolder.$file;
+            foreach ($files as $key=>$file) {
+                $files[$key] = $basemusicfolder.$file;
             }
         } else {
             // not a string and not an array - invalid
@@ -168,7 +168,7 @@ class DatamanModel extends AdminModel {
         //            Factory::getApplication()->enqueueMessage('in getSubfolderList level: '.$level.' maxfolders: '.$maxitems.' itemcnt: '.$itemcnt.'- folder: '.$folder);
         $level ++;
         if ($level == $maxlevels) {
-            Factory::getApplication()->enqueueMessage('Maximum depth reched, will not check subfolders');
+            Factory::getApplication()->enqueueMessage('Maximum depth reached, will not check subfolders');
         }
         $subfolderlist = [];
         
@@ -210,6 +210,7 @@ class DatamanModel extends AdminModel {
         //we'll need the params for category allocation and handling genres and image files
         // The track is new so can use model with song and artist lists
         // album, song and artist may not be new in which case need to append links not in model
+        $app->enqueueMessage(basename($filepathname).' mem1: '.memory_get_usage());
         $params = ComponentHelper::getParams('com_xbmusic');
         $urlhandling = $params->get('urlhandling',[]);
         $dotrackurl = (key_exists(0, $urlhandling)) ? true : false;
@@ -259,6 +260,8 @@ class DatamanModel extends AdminModel {
 //4. get the basic trackdata from id3
         $id3data = XbmusicHelper::id3dataToItems($filedata['id3tags'],$ilogmsg);
         if (isset($id3data['trackdata'])) {
+            
+ //           $trackdata = $this->parseTrackdata($id3data['trackdata']);
             $genreids = [];
             $trackdata = $id3data['trackdata'];
             $trackdata['filepathname'] = $filepathname;
@@ -404,9 +407,17 @@ class DatamanModel extends AdminModel {
                     $imgfilename .= 'singles/'.$trackdata['alias'];
                     if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
                 }
-                $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
+                $imgext = XbcommonHelper::imageMimeToExt($imgdata['image_mime']);
+//                $imgfilename = $imgfilename.'.'.$imgext;
+                $test = JPATH_ROOT.$imgfilename.'.'.$imgext;
+                if (file_exists($test)) {
+                    $imgurl = Uri::root().ltrim($imgfilename,'/');
+                } else {
+                    $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);                  
+                }
+                $app->enqueueMessage('img: '.$test.'<br />'.$imgurl);
+                unset($imgdata['data']);
                 if ($imgurl !== false) {
-                    unset($imgdata['data']);
                     $imgdata['imagetitle'] = $imgdata['picturetype'];
                     $imgdata['imagedesc'] = $imgdata['description'];
                     $trackdata['imgurl'] = $imgurl;
@@ -422,9 +433,11 @@ class DatamanModel extends AdminModel {
             if (isset($id3data['albumdata'])) {
                 $albumdata = $id3data['albumdata'];
                 $albumdata['catid'] = $this->defcats['album'];                
-                if (isset($imgdata)) $albumdata['imageinfo'] = $imgdata;                   
+                if ($imgurl != false) {
+                    $albumdata['imgurl'] = $imgurl;
+                    if (isset($imgdata)) $albumdata['imageinfo'] = $imgdata;                   
+                }
                 if ($optalbsong > 1) $albumdata['tags'] = $genreids;
-                if ($imgurl != false) $albumdata['imgurl'] = $imgurl;
                 $albumdata['id'] = XbmusicHelper::createMusicItem($albumdata, 'album');
                 if ($albumdata['id']===false) {
                     $msg = Text::_('XBMUSIC_ALBUM_SAVE_FAILED').Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
@@ -493,9 +506,31 @@ class DatamanModel extends AdminModel {
             }
              
         } //end if iset id3data[trackdata]
+        $app->enqueueMessage(basename($filepathname).' mem2: '.memory_get_usage());
         return $ilogmsg;
     } //end parseID3()
         
+    private function parseTrackdata($id3trackdata) {
+        
+    }
+    
+    private function parseAlbumdata($id3albumdata) {
+        
+    }
+    
+    private function parseArtistdata($id3artistdata) {
+        
+    }
+    
+    private function parseSongdata($id3songdata) {
+        
+    }
+    
+    private function createImageFile($id3imgdata) {
+        
+    }
+    
+    
     /************ AZURACAST FUNCTIONS ************/
     
     /**

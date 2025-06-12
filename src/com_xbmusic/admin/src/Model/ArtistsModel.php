@@ -298,7 +298,7 @@ class ArtistsModel extends ListModel {
                 $item->albums = XbmusicHelper::getArtistAlbums($item->id);
                 $item->songs = XbmusicHelper::getArtistSongs($item->id);
                 
-                $item->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $item->id);     
+                $item->tags = $tagsHelper->getItemTags('com_xbmusic.artist' , $item->id);     
                 
             } //end foreach
         } //endif items
