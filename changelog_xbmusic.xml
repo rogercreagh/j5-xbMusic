@@ -4,13 +4,13 @@
 		<type>component</type>
 		<version>0.0.53.0</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.53.0</h3> Updated 7th June 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.53.0</h3> Updated 12th June 2025]]></item>
 			<item>Dataman Import from ID3 will now recurse 2 folders deep and 4 folders wide at each levels</item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>Dataman ID3 import now handles up to 5 subfolders at 3 levels</item>
+			<item>Dataman ID3 import now handles up to 50 total files across 6 levels of subfolder</item>
 		</change>
 		<fix>
 			<item>tba</item>
