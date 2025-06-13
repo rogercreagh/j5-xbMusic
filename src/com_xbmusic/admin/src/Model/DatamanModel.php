@@ -210,7 +210,6 @@ class DatamanModel extends AdminModel {
         //we'll need the params for category allocation and handling genres and image files
         // The track is new so can use model with song and artist lists
         // album, song and artist may not be new in which case need to append links not in model
-        $app->enqueueMessage(basename($filepathname).' mem1: '.memory_get_usage());
         $params = ComponentHelper::getParams('com_xbmusic');
         $urlhandling = $params->get('urlhandling',[]);
         $dotrackurl = (key_exists(0, $urlhandling)) ? true : false;
@@ -506,7 +505,6 @@ class DatamanModel extends AdminModel {
             }
              
         } //end if iset id3data[trackdata]
-        $app->enqueueMessage(basename($filepathname).' mem2: '.memory_get_usage());
         return $ilogmsg;
     } //end parseID3()
         

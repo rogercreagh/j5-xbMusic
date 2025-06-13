@@ -2,9 +2,9 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.53.1</version>
+		<version>0.0.53.2</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.53.1</h3> Updated 12th June 2025]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.53.2</h3> Updated 13th June 2025]]></item>
 			<item>Dataman Import from ID3 from multiple sub-folders</item>
 		</addition>
 		<remove>
