@@ -38,6 +38,9 @@ $wa->addInlineScript("window.onload = function() {
     }
 };");
 **/
+Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
+		document.getElementById(targ).style.display = "block";
+	}');
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -59,6 +62,14 @@ $wa->addInlineScript("window.onload = function() {
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />
 
         <h3>xbMusic Data Manager</h3>
+    	<div id="waiter" class="xbbox alert-info" style="display:none;">
+          <table style="width:100%">
+              <tr>
+                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
+                  <td style="vertical-align:middle;"><b><?php echo Text::_('XB_WAITING_REPLY'); ?></b> </td>
+              </tr>
+          </table>
+    	</div>
 
 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
