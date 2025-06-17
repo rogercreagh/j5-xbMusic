@@ -1,0 +1,2 @@
+ALTER TABLE `#__xbmusic_azstations` CHANGE `az_mediapath` `mediapath` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'media path within /xbmusic';
+ALTER TABLE `#__xbmusic_azstations` ADD `ext_links` MEDIUMTEXT NULL AFTER `description`;

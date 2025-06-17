@@ -29,6 +29,9 @@ $wa->useScript('keepalive')
 ->useScript('xbmusic.showdown')
 ->useScript('joomla.dialog');
 
+$wa->addInlineScript("function pleaseWait(targ) {
+		document.getElementById(targ).style.display = 'block';
+	}");
 /**
 $wa->addInlineScript("window.onload = function() {
     var selfolder = sessionStorage.getItem('selfolder');
@@ -38,9 +41,9 @@ $wa->addInlineScript("window.onload = function() {
     }
 };");
 **/
-Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
-		document.getElementById(targ).style.display = "block";
-	}');
+//Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
+//		document.getElementById(targ).style.display = "block";
+//	}');
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -62,14 +65,6 @@ Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />
 
         <h3>xbMusic Data Manager</h3>
-    	<div id="waiter" class="xbbox alert-info" style="display:none;">
-          <table style="width:100%">
-              <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><?php echo Text::_('XB_WAITING_REPLY'); ?></b> </td>
-              </tr>
-          </table>
-    	</div>
 
 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
@@ -99,6 +94,14 @@ Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
        </div>
 	</div>
 	<hr />
+    	<div id="waiter" class="xbbox alert-info" style="display:none;">
+          <table style="width:100%">
+              <tr>
+                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
+                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_PARSE'); ?></b> </td>
+              </tr>
+          </table>
+    	</div>
 	<div class="row">
 		<div class="col-md-8 form-vertical">
          	<?php echo $this->form->renderField('impcat'); ?>
@@ -108,7 +111,7 @@ Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
 		<div class="col-md-4">
 	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
 	    	  $pophead = 'Confirm Import from MP3'; 
-	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3');"; 
+	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3','waiter');"; 
 	    	  ?>
 	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
         		onclick="<?php echo $confirm; ?>" >

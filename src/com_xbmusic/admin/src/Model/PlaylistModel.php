@@ -410,7 +410,7 @@ class PlaylistModel extends AdminModel {
             $id = $this->getState('playlist.id');
             $this->deleteSchedules($id);
             $this->createSchedules($id, $azpldata);
-            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_IMPORT_OK'.$id),'Success');
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_IMPORT_OK').$id,'Success');
             return $id;
         } else {
             Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');

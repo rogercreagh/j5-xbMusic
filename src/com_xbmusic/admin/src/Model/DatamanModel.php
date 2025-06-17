@@ -63,7 +63,7 @@ class DatamanModel extends AdminModel {
         $maxitems = 50;
         $maxlevels = 6;
         $itemcnt = 0;
-        $app =Factory::getApplication();
+        $app = Factory::getApplication();
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
         $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
@@ -332,8 +332,8 @@ class DatamanModel extends AdminModel {
                         $ilogmsg = XBWARN.$msg;
                         $app->enqueueMessage(trim($msg),'Warning');
                         $song['id'] = $song['id'] * -1;
-                        if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
-                        if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('XBMUSIC_GENRES_TO_SONG',XBSP3 + XBTRL).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
+ //                       if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
+ //                       if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('XBMUSIC_GENRES_TO_SONG',XBSP3 + XBTRL).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
                     }
                     if ($song['id']>0) {
                         $link = array('song_id'=>$song['id']);
@@ -414,7 +414,7 @@ class DatamanModel extends AdminModel {
                 } else {
                     $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);                  
                 }
-                $app->enqueueMessage('img: '.$test.'<br />'.$imgurl);
+//                $app->enqueueMessage('img: '.$test.'<br />'.$imgurl);
                 unset($imgdata['data']);
                 if ($imgurl !== false) {
                     $imgdata['imagetitle'] = $imgdata['picturetype'];
@@ -458,8 +458,8 @@ class DatamanModel extends AdminModel {
                     }
                 }
                 if ($optalbsong > 1) {
-                    $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
-                    if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('XBMUSIC_GENRES_TO_ALBUM',XBSP3 + XBTRL).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBDQ + XBNL);
+//                    $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.album', $albumdata['id'], $genreids);
+//                   if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('XBMUSIC_GENRES_TO_ALBUM',XBSP3 + XBTRL).$albumdata['id'].': '.Xbtext::_($albumdata['title'],XBDQ + XBNL);
                 }
              }
            

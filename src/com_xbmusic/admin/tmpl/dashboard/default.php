@@ -204,9 +204,9 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						</tr>
 					</table>
 				</div>
-<?php if ($this->azuracast == 1) : ?>
 				<div class="xbbox gradpurple">
 					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=dataman"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+                <?php if ($this->azuracast == 1) : ?>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>
 						<?php if(count($this->stations)>1) : ?>
@@ -240,9 +240,11 @@ HTMLHelper::_('formbehavior.chosen', 'select');
  					<?php else : ?>
                   		<p><i><?php echo Text::_('No stations have been saved yet. Use Dataman - Azuracast tab to fetch available stations'); ?></i>
 					<?php endif; ?>
-
+				<?php else: ?>
+					<p class="xbnote">Azuracast connection not enabled in <a href="index.php?option=com_config&view=component&component=com_xbmusic" >options</a> General tab</p>
+				<?php endif; ?>
 				</div>
-<?php endif; ?>
+				
 				<div class="xbbox gradcat">
 					<h3 class="xbmb20"><i class='fas fa-folder-tree' ></i> <a href="index.php?option=com_xbmusic&view=catlist"><?php echo Text::_('XB_CATEGORIES'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></span>

@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.50.7 26th April 2025
+# sql installation file for component xbMusic 0.0.54.1 16th June 2025
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -37,6 +37,15 @@ VALUES
 	'{"common": {"core_content_item_id": "id", "core_title": "title", "core_state": "status", "core_alias": "alias", "core_body": "description",  "core_catid": "catid" }}',
 	'XbMusicHelperRoute::getSongRoute',	 
 	'{"formFile":"administrator\/components\/com_xbmusic\/forms\\/song.xml", "hideFields":["checked_out","checked_out_time"], "ignoreChanges":["checked_out", "checked_out_time"], "convertToInt":["ordering"], "displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, 			{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"}, 			{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ] }'
+	),
+
+	('XbMusic Station', 
+	'com_xbmusic.station', 
+	'{"special":{"dbtable":"#__xbmusic_azstations","key":"id","type":"XbmusicTable","prefix":"Joomla\\Component\\Xbmusic\\Administrator\\Table\\","config":"array()"},	    "common":{"dbtable":"#__ucm_content","key":"ucm_id","type":"Corecontent","prefix":"Joomla\\CMS\\Table\\","config":"array()"}}',
+	 '',
+	'{"common": {"core_content_item_id": "id", "core_title": "title", "core_state": "status", "core_alias": "alias", "core_body": "description",  "core_catid": "catid" }}',
+	'XbMusicHelperRoute::getStationRoute',	 
+	'{"formFile":"administrator\/components\/com_xbmusic\/forms\\/station.xml", "hideFields":["checked_out","checked_out_time"], "ignoreChanges":["checked_out", "checked_out_time"], "convertToInt":["ordering"], "displayLookup":[{"sourceColumn":"catid","targetTable":"#__categories","targetColumn":"id","displayColumn":"title"}, {"sourceColumn":"created_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"}, 			{"sourceColumn":"access","targetTable":"#__viewlevels","targetColumn":"id","displayColumn":"title"}, 			{"sourceColumn":"modified_by","targetTable":"#__users","targetColumn":"id","displayColumn":"name"} ] }'
 	),
 
 	('XbMusic Track', 
@@ -231,12 +240,13 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `az_info` mediumtext,
   `az_apikey` varchar(80),
   `az_apiname` varchar(80),
-  `az_url` varchar(190) COMMENT 'base url only',
-  `az_mediapath` varchar(190),
+  `az_url` varchar(190) COMMENT 'server base url',
+  `mediapath` varchar(190) COMMENT 'full local path to media folder',
   `az_stream` varchar(190) NOT NULL DEFAULT '',
   `website` varchar(190) NOT NULL DEFAULT '',
   `az_player` varchar(190) NOT NULL DEFAULT '',
   `description` mediumtext,
+  `ext_links` MEDIUMTEXT NULL
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '1',
   `status` tinyint(3) NOT NULL DEFAULT '1',
