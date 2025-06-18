@@ -11,6 +11,8 @@
 		</remove>
 		<change>
 			<item>Please wait graphic for long processes (eg big imports)</item>
+			<item>dB change: #__xbmusic_azstations change name az_mediapath to mediapath</item>
+			<item>dB change: #__xbmusic_azstations add column ext_links</item>
 		</change>
 		<fix>
 			<item>Spurious alerts for Dataman Id3 import removed</item>
