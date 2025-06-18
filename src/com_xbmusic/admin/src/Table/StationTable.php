@@ -38,7 +38,7 @@ class StationTable extends Table implements VersionableTableInterface, TaggableT
     {
         $this->typeAlias = 'com_xbmusic.station';
         
-        parent::__construct('#__xbmusic_stations', 'id', $db, $dispatcher);
+        parent::__construct('#__xbmusic_azstations', 'id', $db, $dispatcher);
         
         $this->created = Factory::getDate()->toSql();
         $this->setColumnAlias('published', 'status');

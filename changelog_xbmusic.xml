@@ -2,18 +2,18 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.54.x</version>
+		<version>0.0.54.2</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.54.1</h3> Updated 13th June 2025]]></item>
-			<item>Please wait graphic for long processes (eg big imports)</item>
+			<item><![CDATA[<h3>Alpha Release v0.0.54.2</h3> Updated 18th June 2025]]></item>
+			<item>Station edit view linked from Dataman Azuracast tab</item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>tab</item>
+			<item>Please wait graphic for long processes (eg big imports)</item>
 		</change>
 		<fix>
-			<item>Spurious alerts for Datam Id3 import</item>
+			<item>Spurious alerts for Dataman Id3 import removed</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>

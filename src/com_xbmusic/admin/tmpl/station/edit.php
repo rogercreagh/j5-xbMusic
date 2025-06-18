@@ -117,17 +117,47 @@ $item = $this->item;
      <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', Text::_('Azuracast')); ?>
-	<div class="form-horizontal">
-		<?php echo $this->form->renderField('az_url');?>
-		<?php echo $this->form->renderField('az_id');?>
-		<?php echo $this->form->renderField('az_apikey');?>
-		<?php echo $this->form->renderField('az_apiname');?>
-		<?php echo $this->form->renderField('az_stream');?>
-		<?php echo $this->form->renderField('az_player');?>
-		<?php echo $this->form->renderField('website');?>
-		<?php echo $this->form->renderField('webplayer');?>
-		<?php echo $this->form->renderField('mediapath');?>
-		<?php echo $this->form->renderField('az_info');?>
+	<div class="form-vertical">
+		<div class="row">
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_url');?>
+			</div>
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_id');?>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_apikey');?>
+			</div>
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_apiname');?>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_stream');?>
+			</div>
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_player');?>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('website');?>
+			</div>
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('webplayer');?>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('mediapath');?>
+			</div>
+			<div class="col-12 col-md-6 ">
+        		<?php echo $this->form->renderField('az_info');?>
+			</div>
+		</div>
 		
 	</div>
 

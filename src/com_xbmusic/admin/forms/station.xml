@@ -67,12 +67,13 @@
 		name="links">
 		
 		<field name="stationlinksnote" type="note"
-			label="Links to Playlists and External Links"
-			description="A playlist can only belong to one station, but a station may have many playlists. Below the playlists currently in the database for this station, and also any other playlists that are on the Azuracast server but not yet included here."
+			label="XBMUSIC_STATION_LINKS_LBL"
+			description="XBMUSIC_STATION_LINKS_NOTE"
 		/>
 			
 		<field name="ext_links" type="subform" 
-			label="External Links" description="Links to associated information for the station"
+			label="External Links" 
+			description="Links to associated information for the station"
 			min="0" max="10" multiple="true"
 			buttons= "add,remove,move"
 			layout="joomla.form.field.subform.repeatable-table"
@@ -100,18 +101,20 @@
 			name="az_info" type="textarea"
 			label="Az Info"
 			description="raw info from api get station request"
-			class="span8" size="40" rows="3"
-			maxlength="255"
+			readonly="true"
+			class="readonly span8" size="40" rows="8"
+			maxlength="2000"
 		/>
 
 		<field name="az_apikey" type="text"
-			label="API Key" descripition="api key used to access azuracast"
-			readonly="true"
+			label="API Key" 
+			descripition="api key used to access azuracast"
+			size="60" maxlength="80"
 		/>
 			
 		<field name="az_apiname" type="text"
 			label="API username" descripition="API username used for access"
-			readonly="true"
+			size="20" maxlength="40"
 		/>
 			
 		<field name="az_stream" type="text"
@@ -121,20 +124,24 @@
 			
 		<field name="az_player" type="text"
 			label="AZ Player" descripition="Server public player page - includes play/pause and 5 song history. Not dependent on external website"
+			readonly="true"
 		/>
 		
-		<field name="website" type="text"
-			label="Station Website" descripition="Home page for station website	`"			
+		<field name="website" type="url"
+			label="Station Website" descripition="Home page for station website"
+			maxlength="120"			
 		/>
 			
-		<field name="webplayer" type="text"
+		<field name="webplayer" type="url"
 			label="Website player" descripition="URL for stream player embedded in webpage"
-			readonly="true"
+			maxlength="120"
+			hint="https://"
 		/>
 				
 		<field name="mediapath" type="text"
-			label="Media location" descripition="Full path on this server to station media folder (may be copy or symlink to shared storage)"
-			readonly="true"
+			label="Media location" descripition="Path from JPATH_ROOT/xbmusic to station media folder (may be copy or symlink to shared storage)"
+			hint="stationname/media"
+			size="40" maxlength="120"
 		/>
 			
 	</fieldset>

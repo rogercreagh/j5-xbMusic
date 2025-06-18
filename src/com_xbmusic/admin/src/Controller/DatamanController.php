@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.53.0 9th June 2025
+ * @version 0.0.54.1 17th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -80,14 +80,24 @@ class DatamanController extends FormController
             $wynick = $model->deleteDbStation($post['dbstid']);
             if ($wynick === false) {
                 Factory::getApplication()->enqueueMessage('Delete failed');
-            }        
+            }
         }
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
         
     }
     
-//     function importazstations() {
+    function editstation() {
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        if ($post['dbstid']>0) {
+            $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$post['dbstid']);
+            $this->setRedirect($redirectTo );
+        }
+        
+    }
+    
+    //     function importazstations() {
 //         $model = $this->getModel('dataman');
 //         $wynick = $model->importAzStations();
 //         if (isset($wynick->code)) {

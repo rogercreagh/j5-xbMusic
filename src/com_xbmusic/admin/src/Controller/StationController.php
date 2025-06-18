@@ -34,6 +34,18 @@ class StationController extends FormController {
         }
     }
 
+    public function save($key = null, $urlVar = null) {
+        $return = parent::save($key, $urlVar);
+        $this->setRedirect('index.php?option=com_xbmusic&view=dataman#azuracast');
+        return $return;
+    }
+    
+    public function cancel($key = null) {
+        $return = parent::cancel($key);
+        $this->setRedirect('index.php?option=com_xbmusic&view=dataman#azuracast');
+        return $return;
+    }
+    
     protected function allowEdit($data = [], $key = 'id') {
         
         $recordId = (int) isset($data[$key]) ? $data[$key] : 0;
@@ -70,7 +82,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->checkin($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
     }
     
@@ -93,7 +105,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
     }
     
@@ -102,7 +114,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,0);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
     }
     
@@ -111,7 +123,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo);
     }
     
@@ -120,7 +132,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->delete($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
     }
     
@@ -129,7 +141,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,-2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=stations');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
     }
     

@@ -220,6 +220,7 @@ $wa->addInlineScript("window.onload = function() {
 <li></li>
 </ol>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
+			
 <?php if ($this->azuracast == 1) : ?>
 	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
         <p class="xbinfo">
@@ -239,6 +240,12 @@ $wa->addInlineScript("window.onload = function() {
 						<details>
 							<summary>id: <?php echo $station['id']; ?> <span class="xbr11"> <?php echo $station['title']; ?></span>
 								<div class="pull-right">
+									<button id="editst<?php echo $station['id']; ?>" 
+									class="btn btn-sm btn-primary" type="button"
+        							onclick="document.getElementById('jform_dbstid').value=
+        							 <?php echo $station['id'];?>;Joomla.submitbutton('dataman.editstation');" >
+									<i class="icon-edit icon-white"></i> &nbsp;<?php echo Text::_('XB_EDIT'); ?>
+									</button>
 									<button id="delst<?php echo $station['id']; ?>" 
 									class="btn btn-sm btn-danger" type="button"
         							onclick="document.getElementById('jform_dbstid').value=
@@ -283,18 +290,31 @@ $wa->addInlineScript("window.onload = function() {
         				<br /><?php echo Text::_('XBMUSIC_BUTTONS_TO_IMPORT'); ?> 
             	    	<?php $pophead = "'".Text::_('XBMUSIC_CONFIRM_AZIMPORT')."'"; ?>
             			<?php foreach($this->azstations as $station) : ?>
-            				<?php $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$station->name,$this->azurl)."'";
-            				    $confirm = "doConfirm(".$popbody.",".$pophead.",'dataman.importazstation');"; ?>
+							<?php if (in_array($this->azurl.'-'.$station->id, array_column($this->xbstations, "azurlid"))) {
+                                $btnclass = 'btn-warning';
+                                $popbody = "'".Text::sprintf('XBMUSIC_RELOAD_FROM',$station->name,$this->azurl)."'"; 
+                                $btntext = Text::_('XB_RELOAD');
+                            } else {
+                                $btnclass = 'btn-info';
+                                $btntext = Text::_('XB_IMPORT');
+                                $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$station->name,$this->azurl)."'";
+                            } 
+                                $confirm = "doConfirm(".$popbody.",".$pophead.",'dataman.importazstation');"; 
+                            ?>  								
             				<details>
     							<summary><i>AzID</i>: <?php echo $station->id; ?> 
     								<span class="xbr11"> <?php echo $station->name; ?></span>
     								<div class="pull-right">
+    							<?php if (!in_array($this->azurl.'-'.$station->id, array_column($this->xbstations, "azurlid"))) : ?>  								
     									<button id="impaz<?php echo $station->id; ?>" 
-    									class="btn btn-sm btn-warning" type="button"
-            							onclick="document.getElementById('jform_loadazid').value=
-            							 <?php echo $station->id.';'.$confirm; ?>;" >
-    									<i class="icon-download"></i> <?php echo Text::_('XB_IMPORT'); ?>
+        									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
+                							onclick="document.getElementById('jform_loadazid').value=
+                							 <?php echo $station->id.';'.$confirm; ?>;" >
+        									<i class="icon-download"></i> <?php echo $btntext; ?>
 										</button>
+								<?php else: ?>
+									<p class="xbit">Station Already Imported"</p>
+								<?php endif; ?>
     								</div>
     							</summary>
     							<i>AzURL</i>: <a href="<?php echo $this->azurl; ?>" target="_blank">

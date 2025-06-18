@@ -205,7 +205,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 					</table>
 				</div>
 				<div class="xbbox gradpurple">
-					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=dataman"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=dataman#azuracast"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
                 <?php if ($this->azuracast == 1) : ?>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>

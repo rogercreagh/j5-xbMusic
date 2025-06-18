@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.53.1 12th June 2025
+ * @version 0.0.54.1 17th June 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -925,7 +925,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->select('*');
 	    $query->from('#__xbmusic_azstations');
 	    $db->setQuery($query);
-	    $dbstations = $db->loadAssocList();	
+	    $dbstations = $db->loadAssocList('id');	
 	    if ($dbstations) {
 	        foreach ($dbstations AS &$station) {
 	            $query->clear();
@@ -937,6 +937,8 @@ class XbmusicHelper extends ComponentHelper
 	            $station['plcnt'] = $cnts['plcnt'];
 	            $station['schlists'] = $cnts['schlists'];
 	            $station['schtot'] = $cnts['schtot'];
+	            //create a unique identifier for server + station id 
+	            $station['azurlid'] = $station['az_url'].'-'.$station['az_id'];
 	        }
 	    }
 	    if (!is_array($dbstations)) $dbstations = [];
