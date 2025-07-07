@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/Table.php
- * @version 0.0.54.1 16th June 2025
+ * @version 0.0.55.1 21ST June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -57,6 +57,8 @@ class StationTable extends Table implements VersionableTableInterface, TaggableT
         // Set name
         $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
  
+        $this->az_apikey = str_replace(' ', '', $this->az_apikey);
+        
         //json encode ext_links if set
         if (is_array($this->ext_links)) {
             $this->ext_links = json_encode($this->ext_links);

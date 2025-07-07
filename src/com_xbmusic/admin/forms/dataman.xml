@@ -59,6 +59,35 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			default=""
 			useglobal="true"
 		>
+		<field 
+			name="tracktags" type="tag"
+			label="Track Tags"
+			multiple="true" mode="ajax"
+			custom="deny"
+			class="xbtags"
+		/>
+		<field 
+			name="artisttags" type="tag"
+			label="Artist Tags"
+			multiple="true" mode="ajax"
+			custom="deny"
+			class="xbtags"
+		/>
+		<field 
+			name="albumtags" type="tag"
+			label="Album Tags"
+			multiple="true" mode="ajax"
+			custom="deny"
+			class="xbtags"
+		/>
+		<field 
+			name="songtags" type="tag"
+			label="Song Tags"
+			multiple="true" mode="ajax"
+			custom="deny"
+			class="xbtags"
+		/>
+		
 			<option value="0">Leave</option>
 			<option value="1">Remove</option>
 		</field>
@@ -66,7 +95,7 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
         	default="0" 
         	label="Select log to view" 
         	description="Log files are named 'import_YYYY-MM-DD.log'" 
-        	directory="xbmusic-logs" 
+        	directory="xbmusic-data/logs" 
         	filter="\.mp3" 
         	exclude="false" stripext="false"
         	hide_none="true" hide_default="true"

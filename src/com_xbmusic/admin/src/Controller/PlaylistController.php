@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.42.6 24th March 2025
+ * @version 0.0.55.1 28th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -18,6 +18,7 @@ use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class PlaylistController extends FormController {
     
@@ -92,6 +93,31 @@ class PlaylistController extends FormController {
         //if (!($wynik>0)) $wynik = $data['id'];
         $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
         $this->setRedirect($redirectTo );
+    }
+    
+    public function clearlist() {
+       $jip = $this->app->getInput();
+       $id = $jip->get('id',0);
+       if ($id>0) {
+           $wynik = XbmusicHelper::clearPlaylistTracks($id);           
+       } else {
+           Factory::getApplication()->enqueueMessage('Please save playlist before loading remote track list','Warning');
+       }
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function importm3u() {
+        $jip = $this->app->getInput();
+        $id = $jip->get('id',0);
+        if ($id>0) {
+            $data = $jip->get('jform',null,null); 
+            $model = $this->getModel('playlist');
+            $wynik = $model->getPlaylistM3u($data);
+        }
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+        
     }
     
     public function publish() {

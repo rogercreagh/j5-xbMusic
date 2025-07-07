@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Controller/AjaxController.php
- * @version 0.0.42.3 17th March 2025
+ * @version 0.0.55.2 28th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,6 +17,8 @@ use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Response\JsonResponse;
 use \stdClass;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
 class AjaxController extends BaseController
 {
@@ -24,7 +26,7 @@ class AjaxController extends BaseController
     {
         // if you're using Joomla MVC then the Application instance is passed into the BaseController constructor
         // and stored as an instance variable $app which can be used your component Controllers
-        $input = $this->app->input; 
+        $input = $this->app->getInput(); 
 
         $dbstid = $input->get("dbstid", 0);
         
@@ -42,15 +44,27 @@ class AjaxController extends BaseController
             $playlists = $api->azPlaylists();
             //$this->app->enqueueMessage('<pre>'.print_r($playlists,true).'</pre>');
             if (isset($playlists->code)) {
-                $this->app->enqueueMessage(Text::_('XBMUSIC_AZURACAST_ERROR').
-                    ' '.$this->$playlists->code.'<br/>'.$playlists->formatted_message.
-                    '<br />'.Text::_('XBMUSIC_CHECK_TRY_LATER'),'warning');
+                $msg = 'Error from API: '.$playlists->code.' - '.$playlists->formatted_message;
+                if ($playlists->type == 'NotLoggedInException') $msg .= '. Possibly caused by invalid APIkey';
+                try {
+                    
+                $this->app->enqueuemessage($msg,'Warning');
+                echo new JsonResponse('',$msg, true);
+                }
+                catch(\Exception $e)
+                {
+                    echo new JsonResponse($e);
+                }
+                return false;
             } else {
                 //$options = [];
                 foreach ($playlists as $plist) {
                     $item = new stdClass();
                     $item->value =  $plist->id;
                     $item->text = $plist->name;
+                    //check if playlist is already imported
+                    if (XbcommonHelper::getItem('#__xbmusic_playlists', 'az_id', $item->value, 'az_dbstid = '.$dbstid)) 
+                        $item->value = -1;
                     $options[] = $item;
                 }
                 //$options = array_merge($options, $result);
@@ -59,19 +73,23 @@ class AjaxController extends BaseController
         
         $result='<div class="control-group">'.
             '<div class="control-label"><label id="jform_azplaylist-lbl" for="jform_azplaylist">'.
-            'Azuracast Playlist</label></div>'.
+            Text::_('XBMUSIC_AZURACAST_PLAYLIST').
+            '</label></div>'.
             '<div class="controls has-success">'.
             '<select id="jform_azplaylist" name="jform[azplaylist]" class="form-select valid form-control-success" '.
             'aria-describedby="jform_azplaylist-desc" aria-invalid="false" onChange="loadplaylist(this.value);">';
         foreach ($options as $option) {
-            $result.='<option value="'.$option->value.'">'.$option->text.'</option>';
+            $result.='<option value="'.$option->value.'"';
+            if ($option->value == -1) $result .= ' disabled="true"';
+            $result .= '>'.$option->text.'</option>';
         }
         $result .= '</select><div id="jform_azplaylist-desc" class="hide-aware-inline-help d-none">'.
-            '<small class="form-text">Azuracast Playlist to be linked to this one</small>'.
+            '<small class="form-text">'.
+            Text::_('XBMUSIC_AZURACAST_PLAYLIST_SELECT_LINK').'</small>'.
             '</div></div></div>';
         try
         {
-            $this->app->enqueueMessage('Azuracast Playlists Loaded Ok','success');
+            $this->app->enqueueMessage(Text::_('XBMUSIC_AZURACAST_PLAYLISTS_LOADED'),'success');
             echo new JsonResponse($result,"");
         }
         catch(\Exception $e)

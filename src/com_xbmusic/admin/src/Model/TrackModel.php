@@ -227,6 +227,8 @@ class TrackModel extends AdminModel {
                     $imgfilename .= 'singles/'.$trackdata['alias'];
                 }
                 if (isset($trackdata['sortartist'])) $imgfilename .= '_'.XbcommonHelper::makeAlias($trackdata['sortartist']);
+                $imgext = XbcommonHelper::imageMimeToExt($imgdata['image_mime']);
+                $imgfilename = $imgfilename.'.'.$imgext;
                 $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);
                 unset($imgdata['data']);
                 if ($imgurl !== false) {

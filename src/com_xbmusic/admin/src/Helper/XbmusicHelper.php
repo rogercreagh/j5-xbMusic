@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbmusicHelper.php
- * @version 0.0.54.1 17th June 2025
+ * @version 0.0.55.2 28th June 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -491,6 +491,8 @@ class XbmusicHelper extends ComponentHelper
         }	    
 	    return false;
 	}
+
+	/************ IMAGE FUNCTIONS **************/
 	
 	/**
 	 * @name createImageFile()
@@ -515,9 +517,10 @@ class XbmusicHelper extends ComponentHelper
 	           return false;
 	        }
 	    }
-	    $imgext = XbcommonHelper::imageMimeToExt($imgdata['image_mime']);
-	    $imgfilename = $imgfilename.'.'.$imgext;
-	    $xbfilename = $folder.'/'.pathinfo($imgfilename, PATHINFO_BASENAME);
+//	    $imgext = XbcommonHelper::imageMimeToExt($imgdata['image_mime']);
+	    $parts = pathinfo($imgfilename);
+//	    $imgfilename = $imgfilename.'.'.$imgext;
+	    $xbfilename = $folder.'/'.$parts['basename'];
 	    $imgpathfile = JPATH_ROOT.$imgfilename;
 	    $imgurl = Uri::root().ltrim($imgfilename,'/');
 	    $imgok = false;
@@ -531,7 +534,7 @@ class XbmusicHelper extends ComponentHelper
 	            //need to resize image
 	            $image = imagecreatefromstring($imgdata['data']);
 	            $newimage = imagescale($image, $maxpx);
-	            switch ($imgext) {
+	            switch ($parts['extension']) {
 	                case 'jpg':
 	                    $imgok = imagejpeg($newimage, $imgpathfile);
 	                    break;
@@ -609,6 +612,8 @@ class XbmusicHelper extends ComponentHelper
 	    if ($optcase == 1) $genrename = ucfirst($genrename);
 	    return $genrename;	    
 	} // end normaliseGenrename()
+
+	/*************  ************/
 	
 	/**
 	 * @name createGenres()
@@ -787,11 +792,49 @@ class XbmusicHelper extends ComponentHelper
 	    
 	} // end getTagItemCnts()
 
-	/************ LOGGING FUNCTIONS ************/
+	/**
+	 * @name getPlaylistTrackList()
+	 * @desc return array of 
+	 * @param int $id
+	 * @return Exception|boolean
+	 */
+	public static function getPlaylistTrackTitles(int $id) {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('t.id AS track_id, t.title AS title, t.sortartist AS artist')->from($db->qn('#__xbmusic_tracks').' AS t');
+	    $query->join('LEFT',$db->qn('#__xbmusic_trackplaylist').' AS b', 'b.track_id = t.id');
+	    $query->where($db->qn('playlist_id').' = '.$db->q($id));
+	    try {
+	        $db->setQuery($query);
+	        $res = $db->loadAssocList();
+	    } catch (Exception $e) {
+	        Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+	        return $e;
+	    }
+	    return $res;
+	}
+	
+	public static function clearPlaylistTracks($id) {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->delete($db->qn('#__xbmusic_trackplaylist'));
+        $query->where($db->qn('playlist_id').' = '.$db->q($id));
+        try {
+            $db->setQuery($query);
+            $db->execute();
+            $cnt = $db->getAffectedRows();
+            Factory::getApplication()->enqueueMessage($cnt.Text::sprintf('XBMUSIC_ROWS_DELETED', $cnt));
+        } catch (Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return $e;
+        }	    
+	}
+	
+/************ LOGGING FUNCTIONS ************/
 	
 	public static function getLastImportLog() {
 	    $file = null;
-	    foreach(new \DirectoryIterator(JPATH_ROOT.'/xbmusic-logs') as $item) {
+	    foreach(new \DirectoryIterator(JPATH_ROOT.'/xbmusic-data/logs') as $item) {
 	        if ($item->isFile() && (empty($file) || $item->getMTime() > $file->getMTime())) {
 	            $file = clone $item;
 	        }
@@ -805,17 +848,17 @@ class XbmusicHelper extends ComponentHelper
 	
 	public static function writelog(string $logstr, $filename = '') {
 	    if ($filename == '') {
-	        $filename = 'import_'.date('Y-m-d').'.log';
+	        $filename = 'trks_import_'.date('Y-m-d').'.log';
 	    }
 	    $logstr .= self::readlog($filename);
-	    $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+	    $pathname = JPATH_ROOT.'/xbmusic-data/logs/'.$filename;
 	    $f = fopen($pathname, 'w');
 	    fwrite($f, $logstr);
 	    fclose($f);
 	}
 	
 	public static function readlog(string $filename, $filter ='') {
-	    $pathname = JPATH_ROOT.'/xbmusic-logs/'.$filename;
+	    $pathname = JPATH_ROOT.'/xbmusic-data/logs/'.$filename;
 	    if (file_exists($pathname)) {
     	    if ($filter == '') return file_get_contents($pathname);
             $logstr = '';
@@ -911,7 +954,7 @@ class XbmusicHelper extends ComponentHelper
 	    
 	}
 	
-	/************ AZURACAST STATION FUNCTIONS ************/
+	/************ DB AZURACAST STATION FUNCTIONS ************/
 	
 	/**
 	 * @name getStations()
@@ -1016,6 +1059,6 @@ class XbmusicHelper extends ComponentHelper
 	        return 0;
 	    }	    
 	}
-	
+		
 } //end xbmusicHelper
 

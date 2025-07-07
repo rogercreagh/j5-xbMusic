@@ -109,6 +109,12 @@ $wa->addInlineScript("window.onload = function() {
          	<?php echo $this->form->renderField('nobrackets'); ?>
 		</div>
 		<div class="col-md-4">
+			<p>Additional tags to add to all imported items</p>
+         	<?php echo $this->form->renderField('tracktags'); ?>
+         	<?php echo $this->form->renderField('albumtags'); ?>
+         	<?php echo $this->form->renderField('artisttags'); ?>
+         	<?php echo $this->form->renderField('songtags'); ?>
+			
 	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
 	    	  $pophead = 'Confirm Import from MP3'; 
 	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3','waiter');"; 

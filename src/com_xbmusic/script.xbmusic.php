@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.42.0 11th March 2025
+ * @version 0.0.55.4 3rd July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -83,12 +83,12 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 }
             }
             if ($params->get('savelogs',1)==0) {
-                $dest='/xbmusic-logs';
+                $dest='/xbmusic-data/logs';
                 if (is_dir(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
-                        $message .= ' ...<code>/xbmusic-logs</code> folder deleted';
+                        $message .= ' ...<code>/xbmusic-data/logs</code> folder deleted';
                     } else {
-                        $err = 'Problem deleting xbMusic Logs folder <code>/xbmusic-logs</code> - please check';
+                        $err = 'Problem deleting xbMusic Logs folder <code>/xbmusic-data/logs</code> - please check';
                         $app->enqueueMessage($err,'Error');
                     }
                 }
@@ -117,6 +117,31 @@ class Com_xbmusicInstallerScript extends InstallerScript
     }
     
     function update($parent) {
+        $app = Factory::getApplication();
+        $message = '';
+        if (is_dir(JPATH_ROOT.'xbmusic-logs')) {
+            if (Folder::delete(JPATH_ROOT.'xbmusic-logs')){
+                $message .= ' ...<code>/xbmusic-logs</code> folder deleted';
+            } else {
+                $err = 'Problem deleting old xbMusic Logs folder <code>/xbmusic-logs</code> - please check';
+                $app->enqueueMessage($err,'Error');
+            }
+        }
+        if (!file_exists(JPATH_ROOT.'/xbmusic-data/logs')) {
+            mkdir(JPATH_ROOT.'/xbmusic-data/logs',0775,true);
+            $message .= 'Log files folder <code>/xbmusic-logs/</code> created.<br />';
+        } else{
+            $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
+        }
+        if (!file_exists(JPATH_ROOT.'/xbmusic-data/m3u')) {
+            mkdir(JPATH_ROOT.'/xbmusic-data/m3u',0775,true);
+            $message .= 'Playlist m3u files folder <code>/xbmusic-data/m3u/</code> created.<br />';
+        } else{
+            $message .= 'Playlist m3u files folder <code>/xbmusic-data/m3u/</code> already exists.<br />';
+        }
+              
+        if ($message !='') $app->enqueueMessage($message,'Info');
+        
     }
     
     function postflight($type, $parent) {
@@ -209,11 +234,17 @@ class Com_xbmusicInstallerScript extends InstallerScript
             } else{
                 $message .= 'Music files folder <code>/xbmusic/</code> already exists.<br />';
             }
-            if (!file_exists(JPATH_ROOT.'/xbmusic-logs')) {
-                mkdir(JPATH_ROOT.'/xbmusic-logs',0775);
+            if (!file_exists(JPATH_ROOT.'/xbmusic-data/logs')) {
+                mkdir(JPATH_ROOT.'/xbmusic-data/logs',0775,true);
                 $message .= 'Log files folder <code>/xbmusic-logs/</code> created.<br />';
             } else{
                 $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
+            }
+            if (!file_exists(JPATH_ROOT.'/xbmusic-data/m3u')) {
+                mkdir(JPATH_ROOT.'/xbmusic-data/m3u',0775,true);
+                $message .= 'Playlist m3u files folder <code>/xbmusic-data/m3u/</code> created.<br />';
+            } else{
+                $message .= 'Playlist m3u files folder <code>/xbmusic-data/m3u/</code> already exists.<br />';
             }
             
             Factory::getApplication()->enqueueMessage($message,'Info');

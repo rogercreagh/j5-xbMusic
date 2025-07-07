@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.42.6 23rd March 2025
+ * @version 0.0.55.2 28th June 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -110,6 +110,8 @@ class HtmlView extends BaseHtmlView {
         if ($this->item->az_dbstid > 0) {
             $this->station = XbmusicHelper::getDbStation($this->item->az_dbstid);
         }
+        if ($this->item->id > 0) $this->tracks = XbmusicHelper::getPlaylistTrackTitles($this->item->id);
+        
             // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);

@@ -114,8 +114,7 @@
 		<field name="az_order" type="radio"
 			label="List Ordering"
 			description="'Shuffled' : The full playlist is shuffled and then played through in the shuffled order. 'Random' : A completely random track is picked for playback every time the queue is populated. 'Sequential' : The order of the playlist is manually specified and followed by the AutoDJ."	
-			class="btn-group"
-				
+			class="btn-group"				
 		>
 			<option value="shuffle">Shuffle</option>
 			<option value="random">Random</option>
@@ -275,7 +274,40 @@
 				/>
 				<field name="oldorder" type="hidden" default="0" />
 			</form>
-		</field>			
+		</field>		
+		
+		<field name="allowdupes" type="radio"
+			label="Allow Duplicates"
+			description="Allow duplicate tracks in the list. Only appropriate if List Ordering is Sequential"
+			class="btn-group btn-group-yesno btn-small"
+			default="1"
+			showon="az_order:sequential"
+		>
+			<option value="0">No</option>
+			<option value="1">Yes</option>
+		</field>	
+			
+		<field name="ignoremissing" type="radio"
+			label="Ignore Missing Files"
+			description="If file is list does not exist in /xbmusic then either ignore it or abort the import"
+			class="btn-group btn-group-yesno btn-small"
+			default="1"
+			showon="az_order:sequential"
+		>
+			<option value="0">Abort</option>
+			<option value="1">Ignore</option>
+		</field>	
+			
+		<field name="createtrks" type="radio"
+			label="Create Missing Tracks"
+			description="If file exists in /xbmusic but no corresponding track in database then create or ignore"
+			class="btn-group btn-group-yesno btn-small"
+			default="0"
+			showon="az_order:sequential"
+		>
+			<option value="0">Ignore</option>
+			<option value="1">Create</option>
+		</field>	
 			
 	</fieldset>
 	

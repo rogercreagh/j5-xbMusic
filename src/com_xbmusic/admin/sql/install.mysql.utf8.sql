@@ -246,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `website` varchar(190) NOT NULL DEFAULT '',
   `az_player` varchar(190) NOT NULL DEFAULT '',
   `description` mediumtext,
-  `ext_links` MEDIUMTEXT NULL
+  `ext_links` MEDIUMTEXT NULL,
   `catid` int(10) NOT NULL  DEFAULT '0',
   `access` int(10) NOT NULL  DEFAULT '1',
   `status` tinyint(3) NOT NULL DEFAULT '1',

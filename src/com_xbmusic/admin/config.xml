@@ -47,7 +47,7 @@
         
         <field name="az_apikey" type="text"
         	label="Azuracast API Key"
-        	description="Enter a default api key as generated on Azuracast, this will be saved with the station"
+        	description="Enter a default api key as generated on Azuracast, this will be saved with the station. No spaces."
 			size="50"
 			hint="1234567890123456:12345678901234567890123456789012"
 			showon="azuracast:1"
@@ -158,11 +158,11 @@
 		description="XBMUSIC_CONFIG_ID3_SET_DESC"
 	>
 		<field name ="id3note" type="note"
-			description="ID3 data can be read from the MP3 file when creating new tracks and used for the basic track data. A Song item will also be created based on the ID3 track title, and Album and Artist items may also be created if they are present in the ID3. The options below will be used both when creating new individual tracks from a file, and when bulk importing using the Data Manager view. The Category option can be overidden during datamanger import."
+			description="ID3 data can be read from the MP3 file when creating new tracks and used for the basic track data. A Song item will also be created based on the ID3 track title, and Album and Artist items may also be created if they are present in the ID3. The options below will be used both when creating new individual tracks from a file, and when bulk importing using the Data Manager view. The Category option can be overidden during bulk import."
 		/>
 		<field name="loglevel" type="list"
-			label="Log Level"
-			description="Chose level of detail to be saved to log when reading data from ID3 and saving. When doing bulk imports the log enables you to correct any problems or errors recorded"
+			label="Display Log Level"
+			description="Chose level of detail to be displayed from the logs"
 			default="3"
 			>
 				<option value="0">No logging</option>
@@ -173,7 +173,7 @@
 		</field>
 		
 		<field name="impcat" type="radio"
-			label="Import Category"
+			label="Track Import Category"
 			description="This will override the options for all items to create a category based on import date when importing from track file ID3 data"
 			class="btn-group "
  			default="1"

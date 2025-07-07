@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.53.1 12th June 2025
+ * @version 0.0.55.4 6th July 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -52,7 +52,7 @@ class DatamanModel extends AdminModel {
     /**
      * @name parseFilesMp3()
      * @desc takes either a folder path or a set of file pathnames and parses the files ID3 data
-     * prepends the logging infomation to a log file with current date in /xbmusic-logs/
+     * prepends the logging infomation to a log file with current date in /xbmusic-data/logs/
      * @param string|array $files - if a string it is assumed to be a folder 
      * @param int $cattype
      * @return boolean
@@ -407,13 +407,13 @@ class DatamanModel extends AdminModel {
                     if (isset($trackdata['sortartist'])) $imgfilename .= '_'.$trackdata['sortartist'];
                 }
                 $imgext = XbcommonHelper::imageMimeToExt($imgdata['image_mime']);
-//                $imgfilename = $imgfilename.'.'.$imgext;
-                $test = JPATH_ROOT.$imgfilename.'.'.$imgext;
-                if (file_exists($test)) {
-                    $imgurl = Uri::root().ltrim($imgfilename,'/');
-                } else {
+                $imgfilename = $imgfilename.'.'.$imgext;
+                $test = JPATH_ROOT.$imgfilename;
+//                if (file_exists($test)) {
+//                    $imgurl = Uri::root().ltrim($imgfilename,'/');
+//                } else {
                     $imgurl = XbmusicHelper::createImageFile($imgdata, $imgfilename, $ilogmsg);                  
-                }
+//                }
 //                $app->enqueueMessage('img: '.$test.'<br />'.$imgurl);
                 unset($imgdata['data']);
                 if ($imgurl !== false) {

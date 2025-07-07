@@ -220,7 +220,7 @@ if (strpos($listOrder, 'modified') !== false) {
 				                <span class="xbnit"><?php echo $item->artists[0]['artistrole']; ?></span>
 							<?php elseif(count($item->artists)>1) : ?>
 								<details>
-									<summary><?php echo Text::sprintf('%s XBMUSIC_ARTISTS_ALBUM',count($item->artists)); ?></summary>
+									<summary><?php echo Text::sprintf('XBMUSIC_ARTISTS_ALBUM',count($item->artists)); ?></summary>
 									<ul style="margin:5px;">
 									<?php foreach ($item->artists as $artist) : ?>
 										<li>

@@ -14,8 +14,11 @@ audio {
 	border-radius: 20px;
 }
 
-
 /*--------------------------------*/
+
+/* small radio buttons use btn-small */
+.control-group  .btn-small > label {font-size:0.9rem; padding:4px 12px;}
+
 
 /* the preview eye button */
 #xbcomponent .icon-eye {

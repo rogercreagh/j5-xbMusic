@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.50.2 3rd April 2025
+ * @version 0.0.55.4 6th July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -38,6 +38,8 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
 //$params->merge(new Registry($this->item->attribs));
+
+$trackelink='index.php?option=com_xbmusic&task=track.edit&id=';
 
 $input = Factory::getApplication()->getInput();
 
@@ -93,28 +95,16 @@ $input = Factory::getApplication()->getInput();
     				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
     				at <code><?php echo $this->az_url; ?></code> <?php echo Text::_('XBMUSIC_OPTIONS_LINK'); ?></p>
 				<?php elseif ($this->item->az_id > 0) : ?>
-        			<div class="col-md-6">
-    					<p><i><?php echo Text::_('XBMUSIC_AZURACAST_STATION'); ?></i> : 
-    						<?php echo $this->station['title'].' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
-        				<br /><i><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST'); ?></i> : #
-        					<?php echo $this->item->az_id.' - '.$this->item->az_name; ?>
+					<hr />
+    				<p><i><?php echo Text::_('XBMUSIC_AZURACAST_STATION'); ?></i> : 
+    					<b><?php echo $this->station['title']; ?></b>
+    					<?php echo ' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
+        				<span class="xbpl50"><i><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST'); ?></i> : #
+        					<?php echo $this->item->az_id; ?> - <b><?php echo $this->item->az_name; ?></b></span>
         				</p>
-        			</div>
-        			<div class="col-md-6">
-            	    	<?php $popbody = "'Unlink playlist id:'+document.getElementById('jform_az_id').value+' from Azuracast'"; 
-            	    	  $pophead = 'Confirm Unlink Playlist from Azuracast'; 
-            	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.unlinkplaylist');"; 
-            	    	  ?>                
-            	    	 <p><button id="reload" class="btn btn-danger btn-sm icon-white" type="button" 
-                    		onclick="<?php echo $confirm; ?>" >
-            					<i class="fas fa-link-slash"></i> &nbsp; 
-                    			<?php echo Text::_('XBMUSIC_UNLINK_AZURACAST'); ?>
-                    		</button>        		
-            			</p>
-        			</div>				
 				<?php else : ?>
         			<div class="col-md-6" id="loadstations" >
-        				<p><?php echo Text::_('XMMUSIC_TO_IMPORT_PLAYLIST'); ?>
+        				<p><?php echo Text::_('XBMUSIC_TO_IMPORT_PLAYLIST'); ?>
         					<br /><?php echo $this->form->renderField('azstation'); ?>
         					<br /><?php echo Text::_('XBMUSIC_IF_STATION_NOT_LISTED')?>
         				</p>
@@ -125,18 +115,32 @@ $input = Factory::getApplication()->getInput();
         			</div>				    				   
          		<?php endif; ?>
             </div>
-			<?php if (isset($this->station)) : ?>
-    		<?php endif; ?>
     				   		
     	<?php endif; ?>
-		<?php echo $this->form->renderField('az_dbstid'); ?>
-		<?php echo $this->form->renderField('az_id'); ?>    	<hr />
+    	<!-- hidden fields -->
+    	<?php echo $this->form->renderField('az_dbstid'); ?>		
+		<?php echo $this->form->renderField('az_id'); ?>  
+		
+		 
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
     	<?php if(($this->azuracast == 1) && ($this->item->az_dbstid) > 0) : ?>
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
+	        
+            	    	<?php $popbody = "'Unlink playlist id:'+document.getElementById('jform_az_id').value+' from Azuracast'"; 
+            	    	  $pophead = 'Confirm Unlink Playlist from Azuracast'; 
+            	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.unlinkplaylist');"; 
+            	    	  ?>                
+            	    	 <p><button id="unlink" class="btn btn-danger btn-sm icon-white" type="button" 
+                    		onclick="<?php echo $confirm; ?>" >
+            					<i class="fas fa-link-slash"></i> &nbsp; 
+                    			<?php echo Text::_('XBMUSIC_AZURACAST_UNLINK'); ?>
+                    		</button> 
+                    		<span class="xbpl50">><i><?php echo Text::_('XBMUSIC_AZURACAST_UNLINK_PLAYLIST'); ?></i>       		
+                    		</span>
+            			</p>
 	        
 	        	<h4><?php echo Text::_('XBMUSIC_AZURACAST_VALUES'); ?></h4>
 	    		<div class="row">
@@ -175,7 +179,7 @@ $input = Factory::getApplication()->getInput();
                         	    	      $pophead = 'Confirm Put changes to Azuracast'; 
                         	    	      $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.putplaylist');"; 
                         	    	  ?>                
-                        	    	 <p><button id="reload" class="btn btn-warning" type="button" 
+                        	    	 <p><button id="writeaz" class="btn btn-warning" type="button" 
                                 		onclick="<?php echo $confirm; ?>" >
                         					<i class="icon-upload icon-white"></i> 
                                 			<?php echo Text::_('XBMUSIC_AZURACAST_PUT'); ?>
@@ -275,16 +279,69 @@ $input = Factory::getApplication()->getInput();
     		</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
          
-		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('XBMUSIC_TRACKS').' &amp;'.Text::_('XB_LINKS')); ?>
-		<div class="row form-vertical">
-    		<div class="col-12 col-md-3">
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('XBMUSIC_TRACKS').' &amp; '.Text::_('XB_LINKS')); ?>
+		<div class="row">
+			<div class="col12 col-md-4">
+				<h4>Clear Track List</h4>
+    	    	<?php $popbody = "'Clear all tracks from playlist'"; 
+    	    	  $pophead = 'Confirm empty tracklist'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.clearlist');"; 
+    	    	  ?>                
+    	    	 <p><button id="clearlist" class="btn btn-danger btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-link"></i> &nbsp; 
+            			<?php echo Text::_('Clear List'); ?>
+            		</button>        		
+    			</p>
+			</div>
+			<div class="col12 col-md-4">
+				<h4>Load tracklist from station</h4>
+    	    	<?php $popbody = "'Load tracklist from Station'"; 
+    	    	  $pophead = 'Confirm load tracklist from Azuracast'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.importm3u');"; 
+    	    	  ?>                
+    	    	 <p><button id="loadm3u" class="btn btn-warning btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-link"></i> &nbsp; 
+            			<?php echo Text::_('Load List'); ?>
+            		</button>        		
+    			</p>
+				
+			</div>
+			<div class="col12 col-md-4">
+			<h4>Load teacklist from .m3u playlist file</h4>
+    	    	<?php $popbody = "'Select file to load'"; 
+    	    	  $pophead = 'Confirm load tracklist from m3u file'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadm3ufile');"; 
+    	    	  ?>                
+    	    	 <p><button id="loadm3ufile" class="btn btn-warning btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-file"></i> &nbsp; 
+            			<?php echo Text::_('Load File'); ?>
+            		</button>        		
+    			</p>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col12 col-md-4">
+			</div>
+			<div class="col12 col-md-8">
+    			<hr />
+    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('ignoremissing'); ?></div>
+    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('createtrks'); ?></div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+    		<div class="col-12 col-md-3 form-vertical">
      			<h4><?php echo Text::_('XBMUSIC_LINKS_TO_TRACKS')?></h4>
-       			<?php if (isset($item->tracks)) : ?>  			
+       			<?php if (isset($this->tracks)) : ?>  			
         		<ul>
-        			<?php foreach ($item->tracks as $listitem) : ?>
-        				<li>
+        			<?php foreach ($this->tracks as $listitem) : ?>
+        				<li>[<?php echo $listitem['track_id'];?>] 
         					<a href="<?php echo $trackelink.$listitem['track_id'];?>">
-        						<?php echo $listitem['title']; ?></a> [<?php echo $listitem['artist']; ?>]        			
+        						<?php echo $listitem['title']; ?></a><br /><span class="xbit xbpl20">
+        						<?php echo $listitem['artist']; ?></span>        			
             			</li>
         			<?php endforeach; ?>
         		</ul>
@@ -293,7 +350,14 @@ $input = Factory::getApplication()->getInput();
         		<?php endif; ?>
 			</div>
     		<div class="col-12 col-md-9">
-	       		<div class="xbmh800 xbyscroll">
+				<p>Use the 
+					<a href="index.php?option=com_xbmusic&view=playlisttracks&id=<?php echo $this->item->id; ?>">
+						Playlist Tracks</a> view to see track details and batch remove.
+				</p>
+    			<div class="row">
+    				<?php echo $this->form->renderField('allowdupes'); ?>
+    			</div>
+	       		<div class="xbmh800 xbyscroll form-vertical">
 					<?php echo $this->form->renderField('tracklist'); ?>
 				</div>
     		</div>

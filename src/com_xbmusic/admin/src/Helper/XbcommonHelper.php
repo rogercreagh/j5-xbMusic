@@ -521,7 +521,7 @@ class XbcommonHelper extends ComponentHelper {
      * $param boolean $retarray - true to return assoc array otherwise returns object
      * @return object|array|NULL
      */
-    public static function getItem(string $table, string $val, $col ='id', $where = '',$retarray = false) {
+    public static function getItem(string $table, $col, string $val, $where = '',$retarray = false) {
         $db = Factory::getDbo();
         //$db = Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
