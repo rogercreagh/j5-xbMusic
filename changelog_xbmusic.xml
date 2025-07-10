@@ -2,18 +2,20 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.55.0</version>
+		<version>0.0.55.6</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.55.0</h3> Updated 18th June 2025]]></item>
-			<item>Dataman M3U Playlist Import</item>
+			<item><![CDATA[<h3>Alpha Release v0.0.55.6</h3> Updated 9th July 2025]]></item>
+			<item>Dataman PlaylistTracks Import from Azuracast</item>
+			<item><![CDATA[new folder <code>/xbmusic-data/m3u</code> to hold playlist M3U format files for import/export]]></item>
+			<item>Tracks list play button against each track to listen to track</item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>tab</item>
+			<item><![CDATA[<code>/xbmusic-logs</code> folder replaced by <code>/xbmusic-data/logs</code>]]></item>
 		</change>
 		<fix>
-			<item>tab</item>
+			<item>FIXED dataman import id3 not saving image file extension</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>
