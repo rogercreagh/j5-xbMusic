@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.55.4 6th July 2025
+ * @version 0.0.55.5 8th July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -351,32 +351,33 @@ class PlaylistModel extends AdminModel {
     public function getPlaylistM3u($data) {
         $app = Factory::getApplication();
         if (($data['az_id'] > 0) && ($data['az_dbstid']>0)){
+            $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['az_dbstid']);
+            if (empty($stmedia)) {
+                $errstr = 'Station media path not set. Unable to assign tracks to list. Please visit <a href="index.php?option=com_xbmusic&task=station.edit&id='.$data['az_dbstid'].'" >Edit Station</a> page and enter media path';
+                $app->enqueueMessage($errstr,'Error');
+                return false;
+            }
             $api = new AzApi($data['az_dbstid']);
-            $result = true; //$api->azPlaylistM3u($data['az_id']);
+            $result = $api->getAzPlaylistM3u($data['az_id']);
             if ($result == true) {
-                $logfilename = 'playlistm3u_import_'.date('Y-m-d').'.log';
+                $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['az_dbstid']);
+                $logfilename = 'playlistm3u_import_'.date('Y-m-d-Hi').'.log';
                 $loghead = '[IMPORT M3U]Importing M3U file for Playlist '.$data['title']."\n";
  //               XbmusicHelper::writelog(XBENDLOG, $logfilename);
-                // $tmpfile = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d').".m3u";
-                $tmpfile = JPATH_ROOT."/xbmusic-data/today".".m3u";
+                $tmpfile = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d-Hi').".m3u";
+                //$tmpfile = JPATH_ROOT."/xbmusic-data/today".".m3u";
                 if (file_exists($tmpfile)) {
                     $newtrks = $this->getM3uTracks($tmpfile, $data, $logfilename);
                     if (!empty($newtrks)) {
-                        // rename($tmpfile, JPATH_ROOT."/xbmusic-data/m3u/".$data['alias'].'_'.date('Y-m-d').".m3u");
+                        rename($tmpfile, JPATH_ROOT."/xbmusic-data/m3u/".$stalias.'-'.$data['alias'].'_'.date('Y-m-d').".m3u");
                         //need to merge newtrks with existing
                         if (!empty($data['tracklist'])) $newtrks = array_merge($data['tracklist'],$newtrks);
                         $this->storePlaylistTracks($data['id'], $newtrks);
-//                        $app->enqueueMessage(print_r($newtrks,true));
-//                        $app->enqueueMessage(print_r($data['tracklist'],true));
                         
                     }
                 } else {
-                    $app->enqueueMessage('Could not find m3u file '."/xbmusic-data/m3u/".date('Y-m-d').".m3u",'Error');
+                    $app->enqueueMessage('Could not find m3u file '.$tmpfile,'Error');
                 }
-                
-                
-//                $fh = fopen(JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d').".m3u", "r+");                
-//                fclose($fh);
                 XbmusicHelper::writelog($loghead, $logfilename);
             } else {
                 $app->enqueueMessage('API error: '.print_r($result,true),'Error');

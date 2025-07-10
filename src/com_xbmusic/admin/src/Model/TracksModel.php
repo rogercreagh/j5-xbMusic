@@ -116,7 +116,7 @@ class TracksModel extends ListModel {
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.pathname, a.imgurl,'
+                'DISTINCT a.id, a.title, a.alias, a.description, a.filename, a.filepathname, a.imgurl,'
                     .'a.rec_date, a.rel_date, a.sortartist, a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, a.modified, a.ordering, '
                     .'a.note, album.title AS albumtitle, a.album_id AS albumid'

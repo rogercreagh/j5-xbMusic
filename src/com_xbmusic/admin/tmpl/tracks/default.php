@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.30.4 12th February 2025
+ * @version 0.0.55.5 9th July 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -60,10 +60,27 @@ function stopProp(event) {
 	event.stopPropagation();
 }
 </script>
+<script>
+function playAudio(name, filepathname) {
+	var title = document.getElementById("playertitle")
+	title.textContent = name;
+	var audio = document.getElementById("player");
+	audio.src = filepathname;
+	audio.load()
+	audio.play();
+}
+</script>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=tracks'); ?>" method="post" name="adminForm" id="adminForm">
+		<div class="pull-right">
+			<audio id="player" controls style="height:30px;border-radius:12px;"
+				src="<?php echo Uri::root(true).'/xbmusic/'; ?>">
+					<i>Your browser does not support the audio tag.</i>
+			</audio>        		
+            <div id="playertitle" class="pull-left" style="margin:5px 20px 0 0;"></div>
+        </div>
 		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
-		
+		<div class="clearfix"></div>		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>
@@ -190,8 +207,12 @@ function stopProp(event) {
                                 	data-bs-itemtitle="<?php echo $item->title; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
+                                <span class="icon-play xbpl10 xbgreen" 
+                                	onclick="playAudio('<?php echo $item->sortartist.' : '.$item->title; ?>', 
+                                		'<?php echo str_replace(JPATH_ROOT,'',$item->filepathname); ?>');">
+                                </span>
 								<br />
-								<span title="<?php echo $item->pathname; ?>">
+								<span title="<?php echo str_replace(JPATH_ROOT.'xbmusic/','',$item->filepathname); ?>">
 									<code><?php echo $item->filename;?></code>
 								</span>
 								<br />

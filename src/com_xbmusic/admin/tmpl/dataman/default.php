@@ -264,19 +264,25 @@ $wa->addInlineScript("window.onload = function() {
 						    <a href="<?php echo $station['website']; ?>" target="_blank">
 								<?php echo $station['website']; ?></a> 
 							<?php if ($station['az_id']>0 ) : ?>
-							    <p><i>AzID</i>: 
-							    <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
-							    <br />
-								<i>AzURL</i>: 
-								<a href="<?php echo $station['az_url']; ?>" target="_blank">
-                         			<?php echo $station['az_url']; ?></a></p>
-								<i>AzAPI User</i>: 
-								<a href="<?php echo $station['az_apiname']; ?>" target="_blank">
-                         			<?php echo $station['az_apiname']; ?></a></p>
+							    <p>
+							    	<i>AzID</i>: 
+    							    <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
+    							    <br />
+    								<i>AzURL</i>: 
+    								<a href="<?php echo $station['az_url']; ?>" target="_blank">
+                             			<?php echo $station['az_url']; ?></a>
+                             		<br />
+    								<i>AzAPI User</i>: 
+    								<a href="<?php echo $station['az_apiname']; ?>" target="_blank">
+                             			<?php echo $station['az_apiname']; ?></a>
+                         		</p>
+                         		<p><i>Media path under <b>/xbmusic/</b></i> :
+                         			<code><?php echo (empty($station['mediapath'])) ? '<br />REQUIRED : please use Edit button above and enter path to station media': $station['mediapath']; ?></code>
+                         		</p>
 							<?php else : ?>
 						        <span class="xbit"><?php echo Xbtext::_('XBMUSIC_AZURACAST_NO_DETAILS'); ?></span>
 							<?php endif; ?> 
-							<p class="xb09"><?php echo $station['description'];?></p>        
+							<p class="xb09"><i>Azuracast Station Desciption</i> :<br /><?php echo $station['description'];?></p>        
 						</details>
         			    <hr />
         			<?php endforeach; ?>

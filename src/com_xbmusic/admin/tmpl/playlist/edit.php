@@ -309,7 +309,7 @@ $input = Factory::getApplication()->getInput();
 				
 			</div>
 			<div class="col12 col-md-4">
-			<h4>Load teacklist from .m3u playlist file</h4>
+			<h4>Load tracklist from .m3u playlist file</h4>
     	    	<?php $popbody = "'Select file to load'"; 
     	    	  $pophead = 'Confirm load tracklist from m3u file'; 
     	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadm3ufile');"; 

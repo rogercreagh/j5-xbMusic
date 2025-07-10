@@ -280,8 +280,7 @@
 			label="Allow Duplicates"
 			description="Allow duplicate tracks in the list. Only appropriate if List Ordering is Sequential"
 			class="btn-group btn-group-yesno btn-small"
-			default="1"
-			showon="az_order:sequential"
+			default="0"
 		>
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -292,7 +291,6 @@
 			description="If file is list does not exist in /xbmusic then either ignore it or abort the import"
 			class="btn-group btn-group-yesno btn-small"
 			default="1"
-			showon="az_order:sequential"
 		>
 			<option value="0">Abort</option>
 			<option value="1">Ignore</option>
@@ -303,7 +301,6 @@
 			description="If file exists in /xbmusic but no corresponding track in database then create or ignore"
 			class="btn-group btn-group-yesno btn-small"
 			default="0"
-			showon="az_order:sequential"
 		>
 			<option value="0">Ignore</option>
 			<option value="1">Create</option>

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.55.1 21st June 2025
+ * @version 0.0.55.5 8th July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -156,7 +156,7 @@ class AzApi {
     private function azApiDownloadPlaylist(string $url, string $bodytext = '') {
         $ok = false;
         $cnt = 0;
-        $fpathname = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d').".m3u";
+        $fpathname = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d-Hi').".m3u";
         $fh = fopen($fpathname, "w+");
         while (!$ok) {
             $ch = curl_init();
