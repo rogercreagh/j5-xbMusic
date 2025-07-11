@@ -62,6 +62,8 @@ function stopProp(event) {
 </script>
 <script>
 function playAudio(name, filepathname) {
+	name = decodeURIComponent(name);
+	filepathname = decodeURIComponent(filepathname);
 	var title = document.getElementById("playertitle")
 	title.textContent = name;
 	var audio = document.getElementById("player");
@@ -208,8 +210,8 @@ function playAudio(name, filepathname) {
           							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
                                 	><span class="icon-eye xbpl10"></span></span>
                                 <span class="icon-play xbpl10 xbgreen" 
-                                	onclick="playAudio('<?php echo $item->sortartist.' : '.$item->title; ?>', 
-                                		'<?php echo str_replace(JPATH_ROOT,'',$item->filepathname); ?>');">
+                                	onclick='playAudio("<?php echo rawurlencode($item->sortartist.' : '.$item->title); ?>", 
+                                	"<?php echo rawurlencode(str_replace(JPATH_ROOT,'',$item->filepathname)); ?>");'>
                                 </span>
 								<br />
 								<span title="<?php echo str_replace(JPATH_ROOT.'xbmusic/','',$item->filepathname); ?>">
