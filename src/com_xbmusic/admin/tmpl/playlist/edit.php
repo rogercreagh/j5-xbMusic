@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.55.4 6th July 2025
+ * @version 0.0.56.1 19th July 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -71,7 +71,7 @@ $input = Factory::getApplication()->getInput();
 
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
-    	method="post" name="adminForm" id="item-form" class="form-validate" >
+    	method="post" name="adminForm" id="item-form" class="form-validate" enctype="multipart/form-data" >
     	<div class="row form-vertical">
     		<div class="col-md-10">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
@@ -100,7 +100,18 @@ $input = Factory::getApplication()->getInput();
     					<b><?php echo $this->station['title']; ?></b>
     					<?php echo ' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
         				<span class="xbpl50"><i><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST'); ?></i> : #
-        					<?php echo $this->item->az_id; ?> - <b><?php echo $this->item->az_name; ?></b></span>
+        					<?php echo $this->item->az_id; ?> - <b><?php echo $this->item->az_name; ?></b>
+        				</span>
+        				<span class="xbpl50"><i><?php echo Text::_('XB_ORDERING'); ?></i> :
+        					<?php echo ucfirst($this->item->az_order); ?>
+        				</span>
+        				<span class="xbpl50"><i><?php echo Text::_('XB_TYPE'); ?></i> :
+        					<?php if ($this->item->az_type < 2) {
+        					    echo Text::_('XBMUSIC_AZTYPE'.$this->item->az_type); 
+        					} else {
+        					    echo Text::sprintf('XBMUSIC_AZTYPE'.$this->item->az_type, $this->item->az_cntper);
+        					} ?>
+        				</span>
         				</p>
 				<?php else : ?>
         			<div class="col-md-6" id="loadstations" >
@@ -282,37 +293,24 @@ $input = Factory::getApplication()->getInput();
 		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('XBMUSIC_TRACKS').' &amp; '.Text::_('XB_LINKS')); ?>
 		<div class="row">
 			<div class="col12 col-md-4">
-				<h4>Clear Track List</h4>
-    	    	<?php $popbody = "'Clear all tracks from playlist'"; 
-    	    	  $pophead = 'Confirm empty tracklist'; 
-    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.clearlist');"; 
-    	    	  ?>                
-    	    	 <p><button id="clearlist" class="btn btn-danger btn-sm icon-white" type="button" 
-            		onclick="<?php echo $confirm; ?>" >
-    					<i class="fas fa-link"></i> &nbsp; 
-            			<?php echo Text::_('Clear List'); ?>
-            		</button>        		
-    			</p>
-			</div>
-			<div class="col12 col-md-4">
-				<h4>Load tracklist from station</h4>
-    	    	<?php $popbody = "'Load tracklist from Station'"; 
-    	    	  $pophead = 'Confirm load tracklist from Azuracast'; 
-    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.importm3u');"; 
+				<h4>Load tracklist from <?php echo $this->station['title']; ?></h4>
+    	    	<?php $popbody = "'Download tracklist from Station'"; 
+    	    	  $pophead = 'Confirm downloadload tracklist from Azuracast'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.importtrklistaz');"; 
     	    	  ?>                
     	    	 <p><button id="loadm3u" class="btn btn-warning btn-sm icon-white" type="button" 
             		onclick="<?php echo $confirm; ?>" >
     					<i class="fas fa-link"></i> &nbsp; 
-            			<?php echo Text::_('Load List'); ?>
+            			<?php echo Text::_('Download List'); ?>
             		</button>        		
     			</p>
 				
 			</div>
 			<div class="col12 col-md-4">
-			<h4>Load tracklist from .m3u playlist file</h4>
+				<h4>Load tracklist from .m3u playlist file</h4>
     	    	<?php $popbody = "'Select file to load'"; 
     	    	  $pophead = 'Confirm load tracklist from m3u file'; 
-    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadm3ufile');"; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadtrklistm3u');"; 
     	    	  ?>                
     	    	 <p><button id="loadm3ufile" class="btn btn-warning btn-sm icon-white" type="button" 
             		onclick="<?php echo $confirm; ?>" >
@@ -321,14 +319,48 @@ $input = Factory::getApplication()->getInput();
             		</button>        		
     			</p>
 			</div>
+			<div class="col12 col-md-4">
+				<p><?php echo Text::_('XBMUSIC_PLAYLIST_LOAD_OPTS')?></p>
+    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('ignoremissing'); ?></div>
+    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('createtrks'); ?></div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col12 col-md-6">
+				<h4>Upload tracklist to Azuracast</h4>
+    	    	<?php $popbody = "'Upload tracklist to Station'"; 
+    	    	  $pophead = 'Confirm upload tracklist to Azuracast'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.exporttrklistaz');"; 
+    	    	  ?>                
+    	    	 <p><button id="uploadm3u" class="btn btn-warning btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-file-arrow-up"></i> &nbsp; 
+            			<?php echo Text::_('Upload List'); ?>
+            		</button>        		
+    			</p>
+    			<?php echo $this->form->renderfield('import_filem3u')?>
+			</div>
+			<div class="col12 col-md-4">
+				<h4>Save tracklist to M3U file</h4>
+    	    	<?php $popbody = "'Save tracklist to M3U file'"; 
+    	    	  $pophead = 'Confirm save tracklist as M3U'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.savetrklistm3u');"; 
+    	    	  ?>                
+    	    	 <p><button id="savem3u" class="btn btn-warning btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-file-export"></i> &nbsp; 
+            			<?php echo Text::_('Export List'); ?>
+            		</button>        		
+    			</p>
+					<?php echo $this->form->renderField('dl_file'); ?>
+			</div>
 		</div>
 		<div class="row">
 			<div class="col12 col-md-4">
 			</div>
 			<div class="col12 col-md-8">
-    			<hr />
-    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('ignoremissing'); ?></div>
-    			<div class="pull-left xbmr50"><?php echo $this->form->renderField('createtrks'); ?></div>
+    			<div class="pull-left xbmr50"></div>
 			</div>
 		</div>
 		<hr />
@@ -345,6 +377,18 @@ $input = Factory::getApplication()->getInput();
             			</li>
         			<?php endforeach; ?>
         		</ul>
+        		<h4>Clear Track List</h4>
+    	    	<?php $popbody = "'Clear all tracks from playlist - Are you sure?'"; 
+    	    	  $pophead = 'Confirm empty tracklist'; 
+    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.clearlist');"; 
+    	    	  ?>                
+    	    	 <p><button id="clearlist" class="btn btn-danger btn-sm icon-white" type="button" 
+            		onclick="<?php echo $confirm; ?>" >
+    					<i class="fas fa-link"></i> &nbsp; 
+            			<?php echo Text::_('Clear List'); ?>
+            		</button>        		
+    			</p>
+        		
         		<?php else : ?>
             		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
         		<?php endif; ?>

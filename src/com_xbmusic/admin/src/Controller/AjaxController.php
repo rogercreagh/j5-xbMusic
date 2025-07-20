@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Controller/AjaxController.php
- * @version 0.0.55.2 28th June 2025
+ * @version 0.0.56.0 17th July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -63,7 +63,7 @@ class AjaxController extends BaseController
                     $item->value =  $plist->id;
                     $item->text = $plist->name;
                     //check if playlist is already imported
-                    if (XbcommonHelper::getItem('#__xbmusic_playlists', 'az_id', $item->value, 'az_dbstid = '.$dbstid)) 
+                    if (XbcommonHelper::getItem('#__xbmusic_playlists', $item->value, 'az_id', 'az_dbstid = '.$dbstid)) 
                         $item->value = -1;
                     $options[] = $item;
                 }

@@ -104,7 +104,7 @@
 		</field>
 		
 		<field name="az_cntper" type="number"
-			label="Interval"
+			label="Value for 'N'"
 			description="the number of songs (N Songs) or minutes (N Minutes) to repeat the playlist, or the minutes past every hour (Hourly)"
 			min="0" max="59" step="1"
 			default="0"
@@ -281,6 +281,7 @@
 			description="Allow duplicate tracks in the list. Only appropriate if List Ordering is Sequential"
 			class="btn-group btn-group-yesno btn-small"
 			default="0"
+			showon="az-order:sequential"
 		>
 			<option value="0">No</option>
 			<option value="1">Yes</option>
@@ -306,6 +307,22 @@
 			<option value="1">Create</option>
 		</field>	
 			
+		<field name="import_filem3u"
+			type="file" accept=".m3u"
+			label="XBFILMS_IMPFILE_LABEL"
+			description="XBFILMS_IMPFILE_DESC"
+		/>
+		
+		<field name="dl_file" type="radio"
+			label="Download after saving"
+			description="After saving M3U on server download to client"
+			class="btn-group btn-group-yesno btn-small"
+			default="0"
+		>
+			<option value="0">Save Only</option>
+			<option value="1">Save &amp; Download</option>
+		</field>
+				
 	</fieldset>
 	
 <!-- Standard joomla -->

@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.52.0 8th May 2025
+ * @version 0.0.56.0 17th July 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -521,7 +521,7 @@ class XbcommonHelper extends ComponentHelper {
      * $param boolean $retarray - true to return assoc array otherwise returns object
      * @return object|array|NULL
      */
-    public static function getItem(string $table, $col, string $val, $where = '',$retarray = false) {
+    public static function getItem(string $table, string $val, $col = 'id', $where = '',$retarray = false) {
         $db = Factory::getDbo();
         //$db = Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);

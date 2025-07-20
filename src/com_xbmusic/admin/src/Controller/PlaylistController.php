@@ -107,17 +107,52 @@ class PlaylistController extends FormController {
         $this->setRedirect($redirectTo );
     }
     
-    public function importm3u() {
+    public function importtrklistaz() {
         $jip = $this->app->getInput();
         $id = $jip->get('id',0);
         if ($id>0) {
-            $data = $jip->get('jform',null,null); 
+            $data = $jip->get('jform',null,null);
             $model = $this->getModel('playlist');
-            $wynik = $model->getPlaylistM3u($data);
+            $wynik = $model->importTrklistAz($data);
         }
         $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
         $this->setRedirect($redirectTo );
-        
+    }
+    
+    public function loadtrklistm3u() {
+        $jip = $this->app->getInput();
+        $id = $jip->get('id',0);
+        if ($id>0) {
+            $data = $jip->get('jform',null,null);
+            $model = $this->getModel('playlist');
+            $wynik = $model->loadTrklistM3u($data);
+        }
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function exporttrklistaz() {
+        $jip = $this->app->getInput();
+        $id = $jip->get('id',0);
+        if ($id>0) {
+            $data = $jip->get('jform',null,null);
+            $model = $this->getModel('playlist');
+            $wynik = $model->exportTrklistAz($data);
+        }
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
+    }
+    
+    public function savetrklistm3u() {
+        $jip = $this->app->getInput();
+        $id = $jip->get('id',0);
+        if ($id>0) {
+            $data = $jip->get('jform',null,null);
+            $model = $this->getModel('playlist');
+            $wynik = $model->saveTrklistM3u($data);
+        }
+        $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$id);
+        $this->setRedirect($redirectTo );
     }
     
     public function publish() {

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.55.5 8th July 2025
+ * @version 0.0.56.1 18th July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -348,7 +348,7 @@ class PlaylistModel extends AdminModel {
         }
     }
 
-    public function getPlaylistM3u($data) {
+    public function importTrklistAz($data) {
         $app = Factory::getApplication();
         if (($data['az_id'] > 0) && ($data['az_dbstid']>0)){
             $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['az_dbstid']);
@@ -385,6 +385,88 @@ class PlaylistModel extends AdminModel {
         } else {
             $app->enqueueMessage('Station or Playlist ID invalid. St:'.$data['az_dbstid']. 'Pl:'.$data['az_id'],'Warning');           
         }
+    }
+    
+    public function loadTrklistM3u($data) {
+        $app = Factory::getApplication();
+        $app->enqueueMessage('loadTrkListM3u() not written yet','Warning');
+        return false;
+    }
+    
+    public function exportTrklistAz($data) {
+        $app = Factory::getApplication();
+        $app->enqueueMessage('exportTrkListAz() not written yet','Warning');
+        /**
+         * get tracklist pathnames
+         */
+        return false;
+    }
+    
+    public function saveTrkListM3u($data) {
+        $app = Factory::getApplication();
+        $mediapath = JPATH_ROOT.'/xbmusic/';
+        $stalias = '';
+        if (($data['az_id'] > 0) && ($data['az_dbstid']>0)){
+            $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['az_dbstid']);
+            If ($station) {
+                $mediapath .= $station->mediapath;
+                $stalias = $station->alias."-";
+            }
+            if (empty($station->mediapath)) {
+                $warnstr = 'Station media path not set, using JPATH_ROOT/xbmusic/ as the base folder';
+                $app->enqueueMessage($warnstr,'Warning');
+            }            
+        } else {
+            $warnstr = 'Station not set, using JPATH_ROOT/xbmusic/ as the base folder';
+            $app->enqueueMessage($warnstr,'Warning');
+        }
+        $expfname = JPATH_ROOT."/xbmusic-data/m3u/".$stalias.$data['alias'].date('Y-m-d').".m3u";
+        $n = 0;
+        $parts = pathinfo($expfname);
+        $tname = $parts['filename'];
+        while (file_exists($parts['dirname'].'/'.$tname.'.'.$parts['extension'])) {
+            $n ++;
+            $tname = $parts['filename']."_";
+            $tname .= ($n<10) ? '0' : '';
+            $tname .= $n;
+        }
+        $expfname = $parts['dirname'].'/'.$tname.'.'.$parts['extension'];
+        $explocalname = '/xbmusic-data/m3u/'.$tname.'.'.$parts['extension'];
+        $f = fopen($expfname, 'w');
+        foreach ($data['tracklist'] as $listrow) {
+            $trackpath = XbcommonHelper::getItemValue('#__xbmusic_tracks','filepathname',$listrow['track_id']);
+            $m3uline = str_replace($mediapath, '', $trackpath);
+            if (!fwrite($f, $m3uline ."\n")) {
+                $app->enqueueMessage('Error writing '.$m3uline.' to '.$explocalname,'Error');
+                return false;           
+            }
+        }
+        if (fclose($f)) {
+            $app->enqueueMessage($explocalname.' saved ok','Success');
+        } else {
+            $app->enqueueMessage('Error closing '.$explocalname,'Error');
+            return false;
+        }
+        $download = $data['dl_file'];
+        if ($download) {
+            if (file_exists($expfname)) {
+                // Set headers to force download
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="' . basename($expfname) . '"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($expfname));
+                readfile($expfname);
+                exit;
+            } else {
+                //this would be pretty odd since we only just created it successfully!
+                $app->enqueueMessage($explocalname.' file not found, could not download','Error');
+                return false;
+            }            
+        }
+        return true;
     }
     
     public function getM3uTracks(string $m3ufile, array $data, string $logfilename) {
@@ -440,13 +522,13 @@ class PlaylistModel extends AdminModel {
         foreach ($filelist as $file) {  
             //first we'll check if the track needs importing
             
-            $trk = XbcommonHelper::getItem('#__xbmusic_tracks','filepathname',$mediapath.$file);
+            $trk = XbcommonHelper::getItem('#__xbmusic_tracks',$mediapath.$file,'filepathname');
             if (is_null($trk)) {
                 if ($createtracks) {
                     $file = array($stmedia.$file);
                     $dmmodel = $this->getMVCFactory()->createModel('Dataman'); 
                     $dmmodel->parseFilesMp3($file, '');
-                    $trk = XbcommonHelper::getItem('#__xbmusic_tracks','filepathname',$mediapath.$file);
+                    $trk = XbcommonHelper::getItem('#__xbmusic_tracks',$mediapath.$file,'filepathname');
                 } else {
                     $warnstr .= 'Ignoring '.$file.' not in database.<br />';
                     $logstr .= XBWARN.'Ignoring '.$file.' not in database.'."\n";                    
@@ -468,8 +550,7 @@ class PlaylistModel extends AdminModel {
         XbmusicHelper::writelog($logstr.XBENDLOG, $logfilename);
         $app->enqueueMessage($msgstr,'Info');
         if ($warnstr != '') $app->enqueueMessage($warnstr,'Warning');
-        return $newtrks;
-        
+        return $newtrks;        
     }
     
     public function loadPlaylist($dbdata) {
