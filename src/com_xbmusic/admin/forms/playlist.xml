@@ -151,6 +151,8 @@
 			size="10" default="0"			 
 		/>
 	</fieldset>
+	
+<!-- schedules -->	
 	<fieldset name="azschedules" >
 		<field name="schedulelist" type="subform"
 			label="Schedule Items"
@@ -305,12 +307,36 @@
 		>
 			<option value="0">Ignore</option>
 			<option value="1">Create</option>
+		</field>
+		
+		<field name="local_remote" type="radio"
+			label="local/remote"
+			description="load file from local client system or from /xbmusic-data/m3u/ on server"
+			class="btn-group btn-group-yesno btn-small btn-nolabel"
+			default="0"
+		>
+			<option value="0">Upload</option>
+			<option value="1">Server</option>
 		</field>	
 			
-		<field name="import_filem3u"
+		<field name="upload_filem3u"
 			type="file" accept=".m3u"
-			label="XBFILMS_IMPFILE_LABEL"
-			description="XBFILMS_IMPFILE_DESC"
+			label="Upload file"
+			class="btn-small btn-nolabel"
+			showon="local_remote:0"
+			description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
+		/>
+		
+		<field name="local_filem3u"
+			type="filelist" 
+			label="Select file"
+			description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
+			directory="/xbmusic-data/m3u/"
+			default=""
+			hide_none="true" hide_default="true"
+			filter="\.m3u"
+			showon="local_remote:1"
+			class="filelist-small"
 		/>
 		
 		<field name="dl_file" type="radio"

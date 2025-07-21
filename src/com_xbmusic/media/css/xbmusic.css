@@ -1,7 +1,7 @@
 /*******
  * @package xbMusic
  * @filesource media/css/xbmusic.css
- * @version 0.0.51.4 19th April 2025
+ * @version 0.0.56.1 21st July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -16,8 +16,26 @@ audio {
 
 /*--------------------------------*/
 
-/* small radio buttons use btn-small */
-.control-group  .btn-small > label {font-size:0.9rem; padding:4px 12px;}
+/* small radio buttons and file input use btn-small */
+.control-group  .btn-small > label, 
+.control-group input.btn-small {font-size:0.9rem; padding:4px 12px;}
+
+/* hide label for btn group class btn-nolabel */
+.control-label:has(+ .controls > .btn-nolabel) {display:none;}
+
+/* hide the label for file input control class btn-small */
+.control-label:has(+ .controls div.btn-nolabel) {display:none;} 
+
+/* reduce font-size and line break for text under input control */
+.controls:has(input.btn-small) {font-size:0.9rem; line-height:0.95rem;}
+
+/* unset the width for label if class btn-small or filelist-small */
+.control-label:has(+ .controls > fieldset .btn-small), 
+.control-label:has(+ .controls select.filelist-small) {width:unset;}
+
+/* reduce size of filelist select option text */
+select.filelist-small {-webkit-appearance: none; font-size:0.9rem; padding:4px 12px;}
+
 
 
 /* the preview eye button */

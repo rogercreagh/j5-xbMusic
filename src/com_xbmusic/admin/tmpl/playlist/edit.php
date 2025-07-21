@@ -307,12 +307,15 @@ $input = Factory::getApplication()->getInput();
 				
 			</div>
 			<div class="col12 col-md-4">
-				<h4>Load tracklist from .m3u playlist file</h4>
+				<div class="pull-left xbmr50"><h4 class="xbmt5">Load tracklist from .m3u playlist file</h4></div>
+    			<?php echo $this->form->renderfield('local_remote')?>
+    			<?php echo $this->form->renderfield('upload_filem3u')?>
+    			<?php echo $this->form->renderfield('local_filem3u')?>
     	    	<?php $popbody = "'Select file to load'"; 
     	    	  $pophead = 'Confirm load tracklist from m3u file'; 
     	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadtrklistm3u');"; 
     	    	  ?>                
-    	    	 <p><button id="loadm3ufile" class="btn btn-warning btn-sm icon-white" type="button" 
+    	    	 <p class="xbtr xbpr20"><button id="loadm3ufile" class="btn btn-warning btn-sm icon-white" type="button" 
             		onclick="<?php echo $confirm; ?>" >
     					<i class="fas fa-file"></i> &nbsp; 
             			<?php echo Text::_('Load File'); ?>
@@ -320,15 +323,15 @@ $input = Factory::getApplication()->getInput();
     			</p>
 			</div>
 			<div class="col12 col-md-4">
-				<p><?php echo Text::_('XBMUSIC_PLAYLIST_LOAD_OPTS')?></p>
+				<p><b><i><?php echo Text::_('XBMUSIC_PLAYLIST_LOAD_OPTS')?></i></b></p>
     			<div class="pull-left xbmr50"><?php echo $this->form->renderField('ignoremissing'); ?></div>
     			<div class="pull-left xbmr50"><?php echo $this->form->renderField('createtrks'); ?></div>
 			</div>
 		</div>
 		<hr />
 		<div class="row">
-			<div class="col12 col-md-6">
-				<h4>Upload tracklist to Azuracast</h4>
+			<div class="col12 col-md-4">
+				<h4>Upload tracklist to  <?php echo $this->station['title']; ?></h4>
     	    	<?php $popbody = "'Upload tracklist to Station'"; 
     	    	  $pophead = 'Confirm upload tracklist to Azuracast'; 
     	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.exporttrklistaz');"; 
@@ -339,28 +342,22 @@ $input = Factory::getApplication()->getInput();
             			<?php echo Text::_('Upload List'); ?>
             		</button>        		
     			</p>
-    			<?php echo $this->form->renderfield('import_filem3u')?>
-			</div>
-			<div class="col12 col-md-4">
-				<h4>Save tracklist to M3U file</h4>
-    	    	<?php $popbody = "'Save tracklist to M3U file'"; 
-    	    	  $pophead = 'Confirm save tracklist as M3U'; 
-    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.savetrklistm3u');"; 
-    	    	  ?>                
-    	    	 <p><button id="savem3u" class="btn btn-warning btn-sm icon-white" type="button" 
-            		onclick="<?php echo $confirm; ?>" >
-    					<i class="fas fa-file-export"></i> &nbsp; 
-            			<?php echo Text::_('Export List'); ?>
-            		</button>        		
-    			</p>
-					<?php echo $this->form->renderField('dl_file'); ?>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col12 col-md-4">
 			</div>
 			<div class="col12 col-md-8">
-    			<div class="pull-left xbmr50"></div>
+				<h4>Save tracklist to M3U file</h4>
+				<div class="pull-left xbmr50">
+        	    	<?php $popbody = "'Save tracklist to M3U file'"; 
+        	    	  $pophead = 'Confirm save tracklist as M3U'; 
+        	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.savetrklistm3u');"; 
+        	    	  ?>                
+        	    	 <p><button id="savem3u" class="btn btn-warning btn-sm icon-white" type="button" 
+                		onclick="<?php echo $confirm; ?>" >
+        					<i class="fas fa-file-export"></i> &nbsp; 
+                			<?php echo Text::_('Export List'); ?>
+                		</button>        		
+        			</p>
+        		</div>
+				<?php echo $this->form->renderField('dl_file'); ?>
 			</div>
 		</div>
 		<hr />
@@ -394,13 +391,17 @@ $input = Factory::getApplication()->getInput();
         		<?php endif; ?>
 			</div>
     		<div class="col-12 col-md-9">
+    			<?php if ($this->item->az_order == 'sequential') : ?>
+					<div class="pull-left xbmr50">
+						<?php echo $this->form->renderField('allowdupes'); ?>
+					</div>
+				<?php endif; ?>
 				<p>Use the 
 					<a href="index.php?option=com_xbmusic&view=playlisttracks&id=<?php echo $this->item->id; ?>">
-						Playlist Tracks</a> view to see track details and batch remove.
+						Playlist Tracks</a> 
+					view for track details and batch remove.
 				</p>
-    			<div class="row">
-    				<?php echo $this->form->renderField('allowdupes'); ?>
-    			</div>
+				<div class="clearfix"></div>
 	       		<div class="xbmh800 xbyscroll form-vertical">
 					<?php echo $this->form->renderField('tracklist'); ?>
 				</div>

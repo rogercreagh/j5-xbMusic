@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.56.1 18th July 2025
+ * @version 0.0.56.1 21st July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,13 +19,14 @@ use Joomla\CMS\Form\Form;
 use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
+use Joomla\Filesystem\File;
 use Joomla\Filter\OutputFilter;
 use Joomla\Registry\Registry;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
-use Webauthn\MetadataService\Event\NullEventDispatcher;
+//use Webauthn\MetadataService\Event\NullEventDispatcher;
 
 class PlaylistModel extends AdminModel {
   
@@ -362,7 +363,7 @@ class PlaylistModel extends AdminModel {
             if ($result == true) {
                 $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['az_dbstid']);
                 $logfilename = 'playlistm3u_import_'.date('Y-m-d-Hi').'.log';
-                $loghead = '[IMPORT M3U]Importing M3U file for Playlist '.$data['title']."\n";
+                $loghead = '[IMPORT M3U]Importing M3U file from Azuracast for Playlist '.$data['title']."\n";
  //               XbmusicHelper::writelog(XBENDLOG, $logfilename);
                 $tmpfile = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d-Hi').".m3u";
                 //$tmpfile = JPATH_ROOT."/xbmusic-data/today".".m3u";
@@ -389,8 +390,38 @@ class PlaylistModel extends AdminModel {
     
     public function loadTrklistM3u($data) {
         $app = Factory::getApplication();
-        $app->enqueueMessage('loadTrkListM3u() not written yet','Warning');
-        return false;
+        $path = JPATH_ROOT. "/xbmusic-data/m3u/";
+        $source = '';
+        if ($data['local_remote'] == 0) {
+            $source = 'client upload';
+            //get uploaded file
+            $file = $app->getInput()->files->get('jform')['upload_filem3u'];
+            $fname = File::makeSafe($file['name']);
+            $src = $file['tmp_name'];
+            $dest = $path . $fname;
+            File::upload($src, $dest);
+        } else {
+            $source = '/xbmusic-data/m3u/';
+            $fname = $data['local_filem3u'];
+        }
+        $app->enqueueMessage('fname '.$fname);
+        $logfilename = 'playlistm3u_import_'.date('Y-m-d-Hi').'.log';
+        $loghead = '[IMPORT M3U]Importing M3U file from '.$source.' for Playlist '.$data['title']."\n";
+        $loghead .= XBINFO.'File: '.$fname."\n";
+        if (file_exists($path.$fname)) {
+            $newtrks = $this->getM3uTracks($path.$fname, $data, $logfilename);
+            if (!empty($newtrks)) {
+//                rename($fname, JPATH_ROOT."/xbmusic-data/m3u/".$stalias.'-'.$data['alias'].'_'.date('Y-m-d').".m3u");
+                //need to merge newtrks with existing
+                if (!empty($data['tracklist'])) $newtrks = array_merge($data['tracklist'],$newtrks);
+                $this->storePlaylistTracks($data['id'], $newtrks);
+                
+            }
+        } else {
+            $app->enqueueMessage('Could not find m3u file '.$path.$fname,'Error');
+        }
+        XbmusicHelper::writelog($loghead, $logfilename);                
+        return true;
     }
     
     public function exportTrklistAz($data) {
@@ -476,7 +507,7 @@ class PlaylistModel extends AdminModel {
 //        $logfilename = 'playlistm3u_import_'.date('Y-m-d').'.log';
         $filelist = [];
         $ignoremissing = $data['ignoremissing']; //data['ignoremissing']
-        $dupesok = $data['allowdupes'];
+        $dupesok = ($data['az_order'] == 1                                                                          ) ? $data['allowdupes'] : 0;
         $createtracks = $data['createtrks'];
         $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['az_dbstid']);
         $mediapath = JPATH_ROOT.'/xbmusic/'.$stmedia;

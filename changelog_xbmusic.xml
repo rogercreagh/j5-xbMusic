@@ -2,20 +2,20 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.56.0</version>
+		<version>0.0.56.1</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.56.0</h3> Updated 9th July 2025]]></item>
-			<item>Dataman PlaylistTracks Export to M3U file</item>
-			<item>x</item>
+			<item><![CDATA[<h3>Alpha Release v0.0.56.1</h3> Updated 21st July 2025]]></item>
+			<item>Playlist Tracklist save to M3U file</item>
+			<item>Playlist Tracklist load M3U file via client upload or already in /xbmusic-data/m3u/</item>
 			<item>y</item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>z></item>
+			<item>Improved layout on Playlist edit</item>
 		</change>
 		<fix>
-			<item>FIXED </item>
+			<item>various minor bugs fixed</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>
