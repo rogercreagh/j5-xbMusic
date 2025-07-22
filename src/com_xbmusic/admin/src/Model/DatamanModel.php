@@ -26,6 +26,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
+use Joomla\CMS\Filesystem\Folder;
 
 class DatamanModel extends AdminModel {
 
@@ -759,7 +760,16 @@ class DatamanModel extends AdminModel {
        
     public function newsymlink($targ, $name) {
         $res = false;
-        $mtype = 'Warning';
+        $targ = rtrim($targ,"/ ");
+        $name = trim($name,"/ ");
+        $mtype = 'Warning'; 
+        $linkpath = pathinfo(JPATH_ROOT.'/xbmusic/'.$name, PATHINFO_DIRNAME);
+        if (!is_dir($linkpath)) {
+            if (!mkdir($linkpath)) {
+                Factory::getApplication()->enqueueMessage( 'Error creating '.$linkpath,'Error');
+                return false;
+            }
+        } 
         $linkname = JPATH_ROOT.'/xbmusic/'.$name;
         $msg = '/xbmusic/<b>'.$name.'</b> -> '.$targ.'<br />';
         if (file_exists($targ)) {;
@@ -770,7 +780,7 @@ class DatamanModel extends AdminModel {
                         $msg .= Text::_('XBMUSIC_LINK_CREATED');
                         $mtype = 'Success';
                     } else {
-                        $msg .= Text::_('XBMUSIC_ERROR_LINKING');                   
+                        $msg .= Text::_('XBMUSIC_ERROR_LINKING').' '.$targ.' to '.$linkname;                   
                     }
                 } else {
                     $msg .= Text::_('XBMUSIC_LINK_EXISTS');

@@ -119,8 +119,8 @@
 		</field>			
 
   		<field name="savelogs" type="radio"
-			label="Keep Log files"
-			description="Option to keep the log files in /xbmusic_logs when uninstalling the xbMusic component."
+			label="Keep Logs and Data files"
+			description="Option to keep the log files and data files in /xbmusic-data when uninstalling the xbMusic component."
  			class="btn-group btn-group-yesno"
 			default="0"
 			showon="devmode:1[AND]savedata:0"

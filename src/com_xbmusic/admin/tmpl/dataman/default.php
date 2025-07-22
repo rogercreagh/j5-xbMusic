@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.53.0 5th June 2025
+ * @version 0.0.57.0 22nd July 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -388,7 +388,7 @@ $wa->addInlineScript("window.onload = function() {
                    				onclick="document.getElementById('rem_name').value='<?php echo $link['name']; ?>';
                    					doConfirm('<?php echo $popbody; ?>',
                    					'<?php echo $pophead; ?>',
-                   					'remsymlink');" >
+                   					'dataman.remsymlink');" >
         						<i class="icon-link icon-white"></i> <?php echo Text::_('XBMUSIC_REMOVE_LINK'); ?>
         					</button>
         				</td>
@@ -403,7 +403,7 @@ $wa->addInlineScript("window.onload = function() {
         	<?php $pophead = 'Confirm Create SymLink in /xbmusic/'; 
         	   $confirm = "doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value+
         			'<br /><i>as</i> <b>'+document.getElementById('jform_link_name').value+'</b>',
-                    '".$pophead."','makesymlink');";
+                    '".$pophead."','dataman.makesymlink');";
         	?>
 	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
         		onclick="<?php echo $confirm; ?>" >

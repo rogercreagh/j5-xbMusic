@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.55.4 3rd July 2025
+ * @version 0.0.57.0 22nd July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -58,60 +58,66 @@ class Com_xbmusicInstallerScript extends InstallerScript
         $savedata = $params->get('savedata',0);
         if ($savedata == 0) {  //we are deleting data and images          
             if ($this->uninstallData()) {
-                $message .= ' ...xbMusic data tables deleted';
+                $message .= ' ...xbMusic data tables deleted<br />';
             }
             if ($params->get('savemusic',1)==0) { 
                 //need to first unlink any symlinked external folders or folder::delete fails
                 $res = $this->remSymlinks('');
-                if (!empty($res)) $message .= 'Symlinks removed: '.implode(', ', $res).',br />';
+                if (!empty($res)) $message .= 'Symlinks removed: <code>'.implode(', ', $res).'</code><br />';
                 if (Folder::delete(JPATH_ROOT.'/xbmusic')){
-                    $message .= ' ...<code>/xbmusic</code> folder and files deleted. NB SymLink targets have not been deleted';
+                    $message .= ' ...<code>/xbmusic</code> folder and files deleted. NB SymLink targets have not been touched<br />';
                 } else {
                     $err = 'Problem deleting <code>/xbmusic</code> - please check';
                     $app->enqueueMessage($err,'Error');
                 }
+            } else {
+                $message .= '<b>/xbMusic files <code>/xbmusic</code> has NOT been deleted.<br />';
             }
+            
             if ($params->get('saveimages',1)==0) {
                 $dest='/images/xbmusic';
                 if (is_dir(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
-                        $message .= ' ...images <code>/images/xbmusic</code> folder deleted';
+                        $message .= ' ...images <code>/images/xbmusic</code> folder deleted<br />';
                     } else {
                         $err = 'Problem deleting xbMusic images folder <code>/images/music</code> - please check in Media manager';
                         $app->enqueueMessage($err,'Error');
                     }
                 }
+            } else {
+                $message .= '<b>/xbMusic image files <code>/images/xbmusic</code>> have NOT been deleted.<br />';
             }
+            
             if ($params->get('savelogs',1)==0) {
-                $dest='/xbmusic-data/logs';
+                $dest='/xbmusic-data';
                 if (is_dir(JPATH_ROOT.$dest)) {
                     if (Folder::delete(JPATH_ROOT.$dest)){
-                        $message .= ' ...<code>/xbmusic-data/logs</code> folder deleted';
+                        $message .= ' ...<code>/xbmusic-data</code> folder deleted<br />';
                     } else {
-                        $err = 'Problem deleting xbMusic Logs folder <code>/xbmusic-data/logs</code> - please check';
+                        $err = 'Problem deleting xbMusic Data folder <code>/xbmusic-data</code> - please check';
                         $app->enqueueMessage($err,'Error');
                     }
                 }
             } else {
-                $message .= '<br /><b>/xbMusic files (images, music and logs) have NOT been deleted.';
+                $message .= '<b><code>/xbmusic-data</code> files (logs &amp; playlists) have NOT been deleted.<br />';
             }
-            
+            $message .= 'NB Any tags created by xbMusic have <b>NOT</b> been removed as they may have been used by other components. This will include all tags under "Music Genres" and "Locations" as well as any others. Remove manually if no longer required.<br />';
         } else {
-            $message .= ' xbMusic data tables and files have <b>NOT</b> been deleted. CATEGORIES may be recovered on re-install, but TAG links will be lost although tags themselves have not been deleted.';
-            $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
-            $app->enqueueMessage($mess,'warning');                
-            $db = Factory::getDbo();
-            $query = $db->getQuery(true);
-            $query->update('#__categories')
-                ->set('extension='.$db->q('Xcom_xbmusicX'))
-                ->where('extension='.$db->q('com_xbmusic'));
-            $db->setQuery($query);
-            $db->execute();
-            $cnt = $db->getAffectedRows();
+            $message .= ' xbMusic data tables and files have <b>NOT</b> been deleted.<br />';
+//             $mess = $this->createCategories(array(array('title'=>'params','desc'=>json_encode($params))));
+//             $app->enqueueMessage($mess,'warning');                
+//             $db = Factory::getDbo();
+//             $query = $db->getQuery(true);
+//             $query->update('#__categories')
+//                 ->set('extension='.$db->q('Xcom_xbmusicX'))
+//                 ->where('extension='.$db->q('com_xbmusic'));
+//             $db->setQuery($query);
+//             $db->execute();
+//             $cnt = $db->getAffectedRows();
             
-            if ($cnt>0) {
-                $message .= $cnt.' xbMusic categories.extension renamed as "<b>X</b>com_xbmusic<b>X</b>". They will be recovered on reinstall with original ids.';
-            }
+//             if ($cnt>0) {
+//                 $message .= $cnt.' xbMusic categories.extension renamed as "<b>X</b>com_xbmusic<b>X</b>".';
+//             }
         }
         $app->enqueueMessage($message,'Info');
     }
@@ -119,19 +125,11 @@ class Com_xbmusicInstallerScript extends InstallerScript
     function update($parent) {
         $app = Factory::getApplication();
         $message = '';
-        if (is_dir(JPATH_ROOT.'xbmusic-logs')) {
-            if (Folder::delete(JPATH_ROOT.'xbmusic-logs')){
-                $message .= ' ...<code>/xbmusic-logs</code> folder deleted';
-            } else {
-                $err = 'Problem deleting old xbMusic Logs folder <code>/xbmusic-logs</code> - please check';
-                $app->enqueueMessage($err,'Error');
-            }
-        }
         if (!file_exists(JPATH_ROOT.'/xbmusic-data/logs')) {
             mkdir(JPATH_ROOT.'/xbmusic-data/logs',0775,true);
-            $message .= 'Log files folder <code>/xbmusic-logs/</code> created.<br />';
+            $message .= 'Log &amp; data files folder <code>/xbmusic-data/</code> created.<br />';
         } else{
-            $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
+            $message .= 'Log &amp; data files folder <code>/xbmusic-data/</code> already exists.<br />';
         }
         if (!file_exists(JPATH_ROOT.'/xbmusic-data/m3u')) {
             mkdir(JPATH_ROOT.'/xbmusic-data/m3u',0775,true);
@@ -236,9 +234,9 @@ class Com_xbmusicInstallerScript extends InstallerScript
             }
             if (!file_exists(JPATH_ROOT.'/xbmusic-data/logs')) {
                 mkdir(JPATH_ROOT.'/xbmusic-data/logs',0775,true);
-                $message .= 'Log files folder <code>/xbmusic-logs/</code> created.<br />';
+                $message .= 'Log files folder <code>/xbmusic-data/logs/</code> created.<br />';
             } else{
-                $message .= 'Log files folder <code>/xbmusic-logs/</code> already exists.<br />';
+                $message .= 'Log files folder <code>/xbmusic-data/logs/</code> already exists.<br />';
             }
             if (!file_exists(JPATH_ROOT.'/xbmusic-data/m3u')) {
                 mkdir(JPATH_ROOT.'/xbmusic-data/m3u',0775,true);
