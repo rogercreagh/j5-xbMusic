@@ -737,24 +737,24 @@ class DatamanModel extends AdminModel {
 //     }
     
    
-    public function getAzStations() {
-        $api = new AzApi();
-        return $api->azStations();
-    }
+//     public function getAzStations() {
+//         $api = new AzApi();
+//         return $api->azStations();
+//     }
     
-    public function azPlaylists(int $stid) {
-        $api = new AzApi();
-        return $api->azPlaylists($stid);
-    }
+//     public function azPlaylists(int $stid) {
+//         $api = new AzApi();
+//         return $api->azPlaylists($stid);
+//     }
     
-    public function azPlaylistPls(int $stid, int $plid) {
-        $api = new AzApi();
-        return $api->azPlaylistPls($stid, $plid);
-    }
+//     public function azPlaylistPls(int $stid, int $plid) {
+//         $api = new AzApi();
+//         return $api->azPlaylistPls($stid, $plid);
+//     }
     
-    public function getAzuracast() {
+//     public function getAzuracast() {
         
-    }
+//     }
     
     /************ FILES FUNCTIONS ************/
        

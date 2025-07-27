@@ -2,7 +2,8 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.56.1 21st July 2025
+ * @version 0.0.57.1 26ths
+ *  July 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -426,14 +427,21 @@ class PlaylistModel extends AdminModel {
     
     public function exportTrklistAz($data) {
         $app = Factory::getApplication();
-        $app->enqueueMessage('exportTrkListAz() not written yet','Warning');
-        /**
-         * get tracklist pathnames
-         */
-        return false;
+        $filename = $this->saveTrkListM3u($data, false);
+        if ($filename != '') {
+            $api = new AzApi($data['az_dbstid']);
+            $result = $api->putAzPlaylistM3u($data['az_id'],$filename);
+            if ($result == true) {
+                $app->enqueueMessage('M3u playlist upload okay','Success');
+            } else {
+                $app->enqueueMessage('API error: '.print_r($result,true),'Error');
+                return false;
+            }
+        }                
+        return true;
     }
     
-    public function saveTrkListM3u($data) {
+    public function saveTrkListM3u($data, $dl = true) {
         $app = Factory::getApplication();
         $mediapath = JPATH_ROOT.'/xbmusic/';
         $stalias = '';
@@ -478,8 +486,8 @@ class PlaylistModel extends AdminModel {
             $app->enqueueMessage('Error closing '.$explocalname,'Error');
             return false;
         }
-        $download = $data['dl_file'];
-        if ($download) {
+        //$download = $data['dl_file'];
+        if ($dl && $data['dl_file']) {
             if (file_exists($expfname)) {
                 // Set headers to force download
                 header('Content-Description: File Transfer');
@@ -497,7 +505,7 @@ class PlaylistModel extends AdminModel {
                 return false;
             }            
         }
-        return true;
+        return $expfname;
     }
     
     public function getM3uTracks(string $m3ufile, array $data, string $logfilename) {
