@@ -2,6 +2,35 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.58.0</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.58.0</h3> Updated 5th August 2025]]></item>
+			<item>dbChange - allow dupes</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Improved error checking on creating symlinks</item>
+		</change>
+		<fix>
+			<item>bug in creating symlinks</item>
+			<item>bug in removing data files on uninstall</item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item>Front end views not available</item>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.57.1</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.57.1</h3> Updated 27th July 2025]]></item>
