@@ -14,7 +14,7 @@
         <tags>
           <tag>alpha</tag>
         </tags>
-        <sha256>756d157f393f853bbb4d2d3524722b05c7d1987a45b83577dce98bdc0fa6e3bd</sha256>
+        <sha256>142e029df736455afd37334cd3bade4e363efc43b49ce76418f9fca9909427c0</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
