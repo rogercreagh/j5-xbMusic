@@ -5,16 +5,13 @@
 		<version>0.0.58.0</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.58.0</h3> Updated 5th August 2025]]></item>
-			<item>dbChange - allow dupes</item>
+			<item>dbChange - added allowdupes column in #__xbmusic_playlists </item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>Improved error checking on creating symlinks</item>
 		</change>
 		<fix>
-			<item>bug in creating symlinks</item>
-			<item>bug in removing data files on uninstall</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>

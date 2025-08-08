@@ -129,6 +129,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `alias` varchar(190) NOT NULL DEFAULT '',
   `scheduledcnt` int(10) unsigned NOT NULL DEFAULT '0',
   `publicschd` int(1) unsigned NOT NULL DEFAULT '1',
+  `allowdupes` int(1) unsigned NOT NULL DEFAULT '0',
   `az_id` int(10) unsigned NOT NULL Default '0',
   `az_name` varchar(20),
   `az_dbstid` int(10) unsigned NOT NULL Default '0',

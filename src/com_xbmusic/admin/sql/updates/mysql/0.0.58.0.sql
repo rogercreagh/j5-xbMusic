@@ -1,0 +1,1 @@
+ALTER TABLE `#__xbmusic_playlists` ADD `allowdupes` INT(1) unsigned NOT NULL DEFAULT AFTER `publicschd`;
