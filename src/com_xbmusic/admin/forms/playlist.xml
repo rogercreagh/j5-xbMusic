@@ -289,66 +289,48 @@
 			<option value="1">Yes</option>
 		</field>	
 			
-		<field name="ignoremissing" type="radio"
-			label="Ignore Missing Files"
-			description="If file is list does not exist in /xbmusic then either ignore it or abort the import"
-			class="btn-group btn-group-yesno btn-small"
-			default="1"
-		>
-			<option value="0">Abort</option>
-			<option value="1">Ignore</option>
-		</field>	
-			
-		<field name="createtrks" type="radio"
-			label="Create Missing Tracks"
-			description="If file exists in /xbmusic but no corresponding track in database then create or ignore"
-			class="btn-group btn-group-yesno btn-small"
-			default="0"
-		>
-			<option value="0">Ignore</option>
-			<option value="1">Create</option>
-		</field>
-		
-		<field name="local_remote" type="radio"
-			label="local/remote"
-			description="load file from local client system or from /xbmusic-data/m3u/ on server"
-			class="btn-group btn-group-yesno btn-small btn-nolabel"
-			default="0"
-		>
-			<option value="0">Upload</option>
-			<option value="1">Server</option>
-		</field>	
-			
-		<field name="upload_filem3u"
-			type="file" accept=".m3u"
-			label="Upload file"
-			class="btn-small btn-nolabel"
-			showon="local_remote:0"
-			description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
-		/>
-		
-		<field name="local_filem3u"
-			type="filelist" 
-			label="Select file"
-			description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
-			directory="/xbmusic-data/m3u/"
-			default=""
-			hide_none="true" hide_default="true"
-			filter="\.m3u"
-			showon="local_remote:1"
-			class="filelist-small"
-		/>
-		
-		<field name="dl_file" type="radio"
-			label="Download after saving"
-			description="After saving M3U on server download to client"
-			class="btn-group btn-group-yesno btn-small"
-			default="0"
-		>
-			<option value="0">Save Only</option>
-			<option value="1">Save &amp; Download</option>
-		</field>
+			<field name="loadsource" type="radio"
+				label="Source for Tracklist"
+				description="Load from file already in xbmusic-data/m3u, or upload from browser, or load from Azuracast"
+				class="btn-group btn-small"
+				default="1"
+			>
+				<option value="0" onchange="setimpbtn('0');">Data Folder</option>
+				<option value="1" onchange="setimpbtn('1');">Upload</option>
+				<option value="2" onchange="setimpbtn('2');">Azuracast</option>
+			</field>	
 				
+			<field name="savedest" type="radio"
+				label="Source for Tracklist"
+				description="Load from file already in xbmusic-data/m3u, or upload from browser, or load from Azuracast"
+				class="btn-group btn-small"
+				default="1"
+			>
+				<option value="0">Data Folder</option>
+				<option value="1">Download</option>
+				<option value="2">Azuracast</option>
+			</field>	
+				
+			<field name="upload_filem3u"
+				type="file" accept=".m3u"
+				label="Upload file"
+				description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
+				class="btn-small btn-nolabel"
+				showon="loadsource:1"
+			/>
+			
+			<field name="local_filem3u"
+				type="filelist" 
+				label="Select file"
+				description="Import tracklist from .m3u file. Append to existing tracks - use clear first if neessary"
+				directory="/xbmusic-data/m3u/"
+				default=""
+				hide_none="true" hide_default="true"
+				filter="\.m3u"
+				showon="loadsource:0"
+				class="filelist-small"
+			/>
+			
 	</fieldset>
 	
 <!-- Standard joomla -->
@@ -409,5 +391,76 @@
 
 	</fieldset>
 
-
+<!-- Item params -->
+	<fields name="params">
+		<fieldset
+				name="params"
+				label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS"
+		>
+		<!-- tracklist import -->
+			
+			<field name="ignoremissing" type="radio"
+				label="Ignore Missing Files"
+				description="If file is list does not exist in /xbmusic then either ignore it or abort the import"
+				class="btn-group btn-group-yesno btn-small"
+				default="1"
+			>
+				<option value="0">Abort</option>
+				<option value="1">Ignore</option>
+			</field>	
+				
+			<field name="createtrks" type="radio"
+				label="Create Missing Tracks"
+				description="If file exists in /xbmusic but no corresponding track in database then create or ignore"
+				class="btn-group btn-group-yesno btn-small"
+				default="0"
+			>
+				<option value="0">Ignore</option>
+				<option value="1">Create</option>
+			</field>
+		
+			<field name="clearfirst" type="radio"
+				label="Clear or Append"
+				description="Clear any existing tracklist before loading, or append tracklist to existing. Duplicates will be removed unless ListOrder type is Sequential AND AllowDupes is ON"
+				class="btn-group btn-group-yesno btn-small"
+				default="0"
+			>
+				<option value="0">Append</option>
+				<option value="1">Clear</option>
+			</field>	
+				
+			<field name="local_remote" type="radio"
+				label="local/remote"
+				description="load file from local client system or from /xbmusic-data/m3u/ on server"
+				class="btn-group btn-group-yesno btn-small btn-nolabel"
+				default="0"
+			>
+				<option value="0">Upload</option>
+				<option value="1">Server</option>
+			</field>	
+				
+			<field name="dl_file" type="radio"
+				label="Download after saving"
+				description="After saving M3U on server download to client"
+				class="btn-group btn-group-yesno btn-small"
+				default="0"
+			>
+				<option value="0">Save Only</option>
+				<option value="1">Save &amp; Download</option>
+			</field>
+					
+		<!-- tracklist export -->
+			<field name="clearremote" type="radio"
+				label="Clear or Append"
+				description="Clear any existing tracklist before uploading, or append tracklist to existing. WARNING if ListOrder is NOT sequential and Append is selected this may result in undesired duplicate tracks in the Azuracast playlist"
+				class="btn-group btn-group-yesno btn-small"
+				default="0"
+			>
+				<option value="0">Clear</option>
+				<option value="1">Append</option>
+			</field>	
+				
+		</fieldset>
+	</fields>
+	
 </form>

@@ -455,6 +455,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbmh300 {max-height:300px; }
 .xbmh400 {max-height:400px; }
 .xbmh800 {max-height:800px; }
+.xbmh60dvh {max-height:60dvh; }
 
 /* widths */
 .xbw18 {width: 18px; }

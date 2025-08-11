@@ -123,6 +123,10 @@ class PlaylistModel extends AdminModel {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.playlist');  
                 if ($item->az_info) $item->az_info = json_decode($item->az_info);
+//                $registry = new Registry;
+//                $registry->
+//                $params->loadJSON($item->params);
+//                $item->params = $params;
             }
         }        
         return $item;
@@ -271,6 +275,11 @@ class PlaylistModel extends AdminModel {
         // ok ready to save the playlist data
         if (parent::save($data)) {
             if (isset($data['tracklist'])) {
+                //remove dupes
+                //not sequential or allowdupes=faslse
+                if (($data['az_order'] != 'sequential') || ($data['allowdupes'] != 1)) {
+                    $data['tracklist'] = $this->removeDupes($data['tracklist']);                    
+                }
                 $sid = $this->getState('playlist.id');
                 $this->storePlaylistTracks($sid, $data['tracklist']);                
             }
@@ -281,6 +290,21 @@ class PlaylistModel extends AdminModel {
         if ($infomsg != '') $app->enqueueMessage($infomsg, 'Information');
         if ($warnmsg != '') $app->enqueueMessage($warnmsg, 'Warning');        
         return false;
+    }
+    
+    private function removeDupes($list) {
+        $uniqueIds = array_unique(array_column($list, 'track_id'));
+        
+        // Filter the original array to keep only rows with unique category values
+        $filteredList = array_filter($list, function($row) use ($uniqueIds) {
+            return in_array($row['track_id'], $uniqueIds);
+        });
+            
+        // Re-index the array if needed
+        $filteredList = array_values($filteredList);
+            
+        // $filteredArray now contains only one row per unique 'category' value
+        return $filteredList;
     }
     
     protected function preprocessForm(Form $form, $data, $group = 'content') {
@@ -374,6 +398,9 @@ class PlaylistModel extends AdminModel {
                         rename($tmpfile, JPATH_ROOT."/xbmusic-data/m3u/".$stalias.'-'.$data['alias'].'_'.date('Y-m-d').".m3u");
                         //need to merge newtrks with existing
                         if (!empty($data['tracklist'])) $newtrks = array_merge($data['tracklist'],$newtrks);
+                        if (($data['az_order'] != 'sequential') || ($data['allowdupes'] != 1)) {
+                            $newtrks = $this->removeDupes($newtrks);
+                        }                       
                         $this->storePlaylistTracks($data['id'], $newtrks);
                         
                     }
@@ -415,6 +442,9 @@ class PlaylistModel extends AdminModel {
 //                rename($fname, JPATH_ROOT."/xbmusic-data/m3u/".$stalias.'-'.$data['alias'].'_'.date('Y-m-d').".m3u");
                 //need to merge newtrks with existing
                 if (!empty($data['tracklist'])) $newtrks = array_merge($data['tracklist'],$newtrks);
+                if (($data['az_order'] != 'sequential') || ($data['allowdupes'] != 1)) {
+                    $newtrks = $this->removeDupes($newtrks);
+                }
                 $this->storePlaylistTracks($data['id'], $newtrks);
                 
             }

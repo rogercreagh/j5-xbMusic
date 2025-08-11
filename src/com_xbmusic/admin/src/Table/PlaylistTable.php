@@ -124,6 +124,7 @@ class PlaylistTable extends Table implements VersionableTableInterface, Taggable
         if (isset($array['params']) && \is_array($array['params'])) {
             $registry = new Registry($array['params']);
             //check stuff in the params
+            $array['params'] = $registry->toString();
         }
         if (empty($array['modified'])) $array['modified'] = null;
         
