@@ -420,7 +420,7 @@ class PlaylistModel extends AdminModel {
         $app = Factory::getApplication();
         $path = JPATH_ROOT. "/xbmusic-data/m3u/";
         $source = '';
-        if ($data['local_remote'] == 0) {
+        if ($data['loadsource'] == 1) {
             $source = 'client upload';
             //get uploaded file
             $file = $app->getInput()->files->get('jform')['upload_filem3u'];

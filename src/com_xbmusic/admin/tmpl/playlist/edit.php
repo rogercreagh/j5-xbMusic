@@ -52,14 +52,6 @@ $input = Factory::getApplication()->getInput();
 		el.style.display = "none";
 	}
 	
-	function showLoadlistOpts() {
-		var targ = getElementById('loadopts');
-		targ.style.display = 'block';
-	}
-	function showSavelistOpts() {
-		var targ = getElementById('saveopts');
-		targ.style.display = 'block';
-	}
 	function setimpbtn(elval) {
 		var btnloc = document.getElementById('btnloc');
 		var btnaz = document.getElementById('btnaz');
@@ -69,6 +61,17 @@ $input = Factory::getApplication()->getInput();
 		} else {
 			btnaz.style.display = 'none';
 			btnloc.style.display = 'block';
+		}
+	}
+	function setexpbtn(elval) {
+		var btnexploc = document.getElementById('btnexploc');
+		var btnexpaz = document.getElementById('btnexpaz');
+		if (elval == "2") {
+			btnexpaz.style.display = 'block';
+			btnexploc.style.display = 'none';
+		} else {
+			btnexpaz.style.display = 'none';
+			btnexploc.style.display = 'block';
 		}
 	}
 </script>
@@ -326,8 +329,8 @@ $input = Factory::getApplication()->getInput();
                 					<i class="fas fa-link"></i> &nbsp; 
                         			<?php echo Text::_('Import Tracklist'); ?>
                     </button>
-            		<button id="btnloadm3u" class="btn btn-info btn-sm icon-white" type="button" 
-                        		onclick="showSavelistOpts();" >
+            		<button id="btnloadm3u" class="btn btn-success btn-sm icon-white" type="button" 
+                        		onclick="showDiv(document.getElementById('saveopts'));" >
                 					<i class="fas fa-link"></i> &nbsp; 
                         			<?php echo Text::_('Export Tracklist'); ?>
                     </button>				
@@ -335,7 +338,8 @@ $input = Factory::getApplication()->getInput();
 			</div>
     		<div id="loadopts" class="xbbox" style="margin:10px; display:none;">
  				<div class="pull-right">
-					<button type="button" aria-label="Close" class="button-close btn-close" onclick="hideDiv(document.getElementById('loadopts'));"></button>
+					<button type="button" aria-label="Close" class="button-close btn-close" 
+						onclick="hideDiv(document.getElementById('loadopts'));"></button>
 				</div>			
     			<div class="row">
         			<div class="col12 col-md-4 form-vertical">
@@ -357,70 +361,77 @@ $input = Factory::getApplication()->getInput();
         			</div>
         			<div class="col12 col-md-6">
         				<div id="btnaz" style="display:none;">
-            				<p>Load tracklist from <?php echo $this->station['title']; ?>
-                	    	<?php $popbody = "'Download tracklist from ".$this->station['title']."'"; 
-                	    	  $pophead = 'Confirm downloadload tracklist from Azuracast'; 
-                	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.importtrklistaz');"; 
-                	    	  ?>                
-                	    	 <button id="loadm3u" class="btn btn-secondary btn-sm icon-white" type="button" 
-                        		onclick="<?php echo $confirm; ?>" >
-                					<i class="fas fa-link"></i> &nbsp; 
-                        			<?php echo Text::_('Import from Azuracast'); ?>
-                        	</button>    
-                        	</p>    		              			
+                            <div class="pull-right">
+                				<b>Load tracklist from <?php echo $this->station['title']; ?></b>
+                    	    	<?php $popbody = "'Import playlist tracklist from ".$this->station['title']."'"; 
+                    	    	  $pophead = 'Confirm downloadload tracklist from Azuracast'; 
+                    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.importtrklistaz');"; 
+                    	    	  ?>                
+                    	    	 <button id="loadm3u" class="btn btn-secondary btn-sm icon-white xbml20 xbmr50" 
+                    	    	 	type="button" onclick="<?php echo $confirm; ?>" >
+                    					<i class="fas fa-link"></i> &nbsp; 
+                            			<?php echo Text::_('Import from Azuracast'); ?>
+                            	</button>    
+                        	</div>    		              			
             			</div>    				
          				<div id="btnloc" style="display:block;">
-            				<h4 class="xbmt5">Load tracklist from .m3u playlist file</h4>
-                	    	<?php $popbody = "'Select file to load'"; 
-                	    	  $pophead = 'Confirm load tracklist from m3u file'; 
-                	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadtrklistm3u');"; 
-                	    	  ?>                
-                	    	 <button id="loadm3ufile" class="btn btn-secodary btn-sm icon-white" type="button" 
-                        		onclick="<?php echo $confirm; ?>" >
-                					<i class="fas fa-file"></i> &nbsp; 
-                        			<?php echo Text::_('Import from File'); ?>
-                        	</button>        			
+                            <div class="pull-right">
+                				<b>Load tracklist from .m3u playlist file</b>
+                    	    	<?php $popbody = "'Import playlist track list from file'"; 
+                    	    	  $pophead = 'Confirm load tracklist from m3u file'; 
+                    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadtrklistm3u');"; 
+                    	    	  ?>                
+                    	    	 <button id="loadm3ufile" class="btn btn-secondary btn-sm icon-white xbml20 xbmr50" 
+                    	    	 	type="button" onclick="<?php echo $confirm; ?>" >
+                    					<i class="fas fa-file"></i> &nbsp; 
+                            			<?php echo Text::_('Import from File'); ?>
+                            	</button>  
+                        	</div>      			
         				</div>
         			</div>
         		</div>
         	</div>
     		<div id="saveopts" class="xbbox" style="margin:10px; display:none;">
 				<div class="pull-right">
-					<button type="button" aria-label="Close" class="button-close btn-close" onclick="hideDiv(document.getElementById('saveopts'))"></button>
+					<button type="button" aria-label="Close" class="button-close btn-close" 
+						onclick="hideDiv(document.getElementById('saveopts'))"></button>
 				</div>			
-
         		<div class="row">
-        			<div class="col12 col-md-4">
-        				<h4>Upload tracklist to  <?php echo $this->station['title']; ?></h4>
-        				<div class="pull-left xbmr50">
-                	    	<?php $popbody = "'Upload tracklist to Station'"; 
-                	    	  $pophead = 'Confirm upload tracklist to Azuracast'; 
-                	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.exporttrklistaz');"; 
-                	    	  ?>                
-                	    	 <p><button id="uploadm3u" class="btn btn-warning btn-sm icon-white" type="button" 
-                        		onclick="<?php echo $confirm; ?>" >
-                					<i class="fas fa-file-arrow-up"></i> &nbsp; 
-                        			<?php echo Text::_('Upload to Azuracast'); ?>
-                        		</button>        		
-                			</p>
+        			<div class="col12 col-md-4 form-vertical">
+        				<?php echo $this->form->renderField('savedest'); ?>
+        			</div>
+         			<div class="col12 col-md-4 form-vertical">
+         				<?php echo $this->form->renderField('clearremote','params'); ?>
+         			</div>
+         			<div class="col12 col-md-4 form-vertical">
+						<div id="btnexpaz" style="display:none;">
+                        	<div class="pull-right">
+            					<b>Upload tracklist to  <?php echo $this->station['title']; ?></b>
+                    	    	<?php $popbody = "'Upload tracklist to ".$this->station['title']."'"; 
+                    	    	  $pophead = 'Confirm upload tracklist to Azuracast'; 
+                    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.exporttrklistaz');"; 
+                    	    	  ?>                
+                    	    	 <button id="uploadm3u" class="btn btn-success btn-sm icon-white xbml20 xbmr50" 
+                    	    	 	type="button" onclick="<?php echo $confirm; ?>" >
+                    					<i class="fas fa-file-arrow-up"></i> &nbsp; 
+                            			<?php echo Text::_('Upload to Azuracast'); ?>
+    							</button>        		
+                            </div>
+                        </div>
+						<div id="btnexploc" style="display:block;">
+            				<div class="pull-right">
+            					<b>Save tracklist to M3U file</b>
+                    	    	<?php $popbody = "'Export tracklist to M3U file'"; 
+                    	    	  $pophead = 'Confirm save tracklist as M3U'; 
+                    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.savetrklistm3u');"; 
+                    	    	  ?>                
+                    	    	 <button id="savem3u" class="btn btn-success btn-sm icon-white xbml20 xbmr50" 
+                    	    	 	type="button" onclick="<?php echo $confirm; ?>" >
+                    					<i class="fas fa-file-export"></i> &nbsp; 
+                            			<?php echo Text::_('Save to File'); ?>
+                            	</button>        		
+                			</div>
             			</div>
-        				<?php echo $this->form->renderField('clearremote'); ?>
-                	</div>
-        			<div class="col12 col-md-8">
-        				<h4>Save tracklist to M3U file</h4>
-        				<div class="pull-left xbmr50">
-                	    	<?php $popbody = "'Save tracklist to M3U file'"; 
-                	    	  $pophead = 'Confirm save tracklist as M3U'; 
-                	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.savetrklistm3u');"; 
-                	    	  ?>                
-                	    	 <p><button id="savem3u" class="btn btn-warning btn-sm icon-white" type="button" 
-                        		onclick="<?php echo $confirm; ?>" >
-                					<i class="fas fa-file-export"></i> &nbsp; 
-                        			<?php echo Text::_('Save to File'); ?>
-                        		</button>        		
-                			</p>
-                		</div>
-        				<?php echo $this->form->renderField('dl_file'); ?>
         			</div>
         		</div>
         	</div>

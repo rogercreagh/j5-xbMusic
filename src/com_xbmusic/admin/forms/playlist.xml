@@ -301,14 +301,14 @@
 			</field>	
 				
 			<field name="savedest" type="radio"
-				label="Source for Tracklist"
+				label="Destination for Tracklist"
 				description="Load from file already in xbmusic-data/m3u, or upload from browser, or load from Azuracast"
 				class="btn-group btn-small"
 				default="1"
 			>
-				<option value="0">Data Folder</option>
-				<option value="1">Download</option>
-				<option value="2">Azuracast</option>
+				<option value="0" onchange="setexpbtn('0');">Data Folder</option>
+				<option value="1" onchange="setexpbtn('1');">Download</option>
+				<option value="2" onchange="setexpbtn('2');">Azuracast</option>
 			</field>	
 				
 			<field name="upload_filem3u"
@@ -429,25 +429,6 @@
 				<option value="1">Clear</option>
 			</field>	
 				
-			<field name="local_remote" type="radio"
-				label="local/remote"
-				description="load file from local client system or from /xbmusic-data/m3u/ on server"
-				class="btn-group btn-group-yesno btn-small btn-nolabel"
-				default="0"
-			>
-				<option value="0">Upload</option>
-				<option value="1">Server</option>
-			</field>	
-				
-			<field name="dl_file" type="radio"
-				label="Download after saving"
-				description="After saving M3U on server download to client"
-				class="btn-group btn-group-yesno btn-small"
-				default="0"
-			>
-				<option value="0">Save Only</option>
-				<option value="1">Save &amp; Download</option>
-			</field>
 					
 		<!-- tracklist export -->
 			<field name="clearremote" type="radio"
