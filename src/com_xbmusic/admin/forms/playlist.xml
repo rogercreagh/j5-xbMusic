@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Playlist Form file v0.0.50.2 4th April 2025 -->
+<!-- xbMusic Playlist Form file v0.0.58.3 3rd October 2025 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
@@ -9,9 +9,16 @@
 	<fieldset name="general" addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 	>
 		<field name="id" type="number" 
-			label="JGLOBAL_FIELD_ID_LABEL"
+			label="Joomla ID"
 			description="JGLOBAL_FIELD_ID_DESC" 
-			class="readonly" readonly="true"
+			class="xbfix120 readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+
+		<field name="az_id" type="number" 
+			label="Azuracast ID"
+			description="This is the internal Azuracast ID" 
+			class="xbfix120 readonly" readonly="true"
 			size="10" default="0"			 
 		/>
 
@@ -29,7 +36,7 @@
 			size="40" 
 		/>
 		
-		<field name="scheduledcnt" type ="number"
+		<field name="scheduledcnt" type ="hidden"
 			label="No of schedule times"
 			description="number of scheduled times for this playlist"
 			class="xbwi125"
@@ -41,7 +48,7 @@
 		<field name="publicschd" type="radio"
 			label="Show Public"
 			description="Choose whether to hide this playlists's schedules times from the public schedule. Useful for short promo playlists and generic all day playlists that may be interrupted by scheduled programme segments."
-			class="btn-group btn-group-yesno"
+			class="btn-group btn-group-yesno btn-small"
 			default="1"
 			showon="scheduledcnt!:0"
 		>
@@ -72,9 +79,6 @@
 			default=""
 		/>
 
-		<field name="az_id" type="hidden"
-			default=""
-		/>
 		
 	</fieldset>
 	
@@ -158,41 +162,33 @@
 			label="Schedule Items"
 			description="Scheduled play time for this playlist"			
 			multiple="true" min= "0" max= "2000"
-			buttons="add,remove"
+			buttons="none"
 			layout="joomla.form.field.subform.repeatable-table"
 			class="xbsubformcompact"
 			groupByFieldset="false" 
 		>
 			<form>
-				<field name="id" type="number" label="Id" readonly="true">
+				<field name="id" type="number" label="jId" readonly="true">
 				</field>
 				<field name="az_id" type="number" label="AzId" readonly="true">
 				</field>
-				<field name="az_starttime" type="time" label="Start"
+				<field name="az_starttime" type="time" label="Start" readonly="true"
 				/>
-				<field name="az_endtime" type="time" label="End"
+				<field name="az_endtime" type="time" label="End" readonly="true"
 				/>
-				<field name="az_startdate" type="calendar" label="From date"
+				<field name="az_startdate" type="calendar" label="From date" readonly="true"
 				/>
-				<field name="az_enddate" type="calendar" label="End date"
+				<field name="az_enddate" type="calendar" label="End date" readonly="true"
                   showtime="false"
 				/>
-				<field name="az_days" type="text" label="Days of Week" 
-                  showtime="false"
+				<field name="az_days" type="text" label="Days of Week" readonly="true"
 				/>
-				<field name="az_loop" type="radio" label="Loop"
+				<field name="az_loop" type="radio" label="Loop" readonly="true"
+				  layout="joomla.form.field.radio.switcher"
                   class="btn-group btn-group-sm">
-                  <option value="1">Once</option>
-                  <option value="0">Timed</option>
+                  <option value="1">Loop Once</option>
+                  <option value="0">Fill Timeslot</option>
                 </field>
-				<field name="showpublic" type="radio"
-					label="Show Public"
-					class="btn-group btn-group-yesno btn-group-sm"
-					default="1"
-				>
-					<option value="0">Hide</option>
-					<option value="1">Show</option>
-				</field>
 
 			</form>
 		</field>			
@@ -421,7 +417,7 @@
 		
 			<field name="clearfirst" type="radio"
 				label="Clear or Append"
-				description="Clear any existing tracklist before loading, or append tracklist to existing. Duplicates will be removed unless ListOrder type is Sequential AND AllowDupes is ON"
+				description="Clear any existing tracklist before loading, or append new tracklist to existing."
 				class="btn-group btn-group-yesno btn-small"
 				default="0"
 			>
@@ -432,8 +428,8 @@
 					
 		<!-- tracklist export -->
 			<field name="clearremote" type="radio"
-				label="Clear or Append"
-				description="Clear any existing tracklist before uploading, or append tracklist to existing. WARNING if ListOrder is NOT sequential and Append is selected this may result in undesired duplicate tracks in the Azuracast playlist"
+				label="Clear Azuracast first or Append"
+				description="Clear existing tracklist on Azuracast before uploading, or append tracklist to existing. "
 				class="btn-group btn-group-yesno btn-small"
 				default="0"
 			>

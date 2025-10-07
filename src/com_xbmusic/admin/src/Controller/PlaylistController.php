@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.55.1 28th June 2025
+ * @version 0.0.58.3 3rd October 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -51,6 +51,8 @@ class PlaylistController extends FormController {
     public function loadplaylist() {
         $jip =  Factory::getApplication()->getInput();
         $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        if (empty($data['azstation'])) $data['azstation'] = $data['az_dbstid'];
+        if (empty($data['azplaylist'])) $data['azplaylist'] = $data['az_id'];
         //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
         $model = $this->getModel('playlist');
         $wynik = $model->loadPlaylist($data);

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.57.1 26th July 2025
+ * @version 0.0.58.1 14th August 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -83,13 +83,13 @@ class AzApi {
     public function azStations() {
         $url=$this->apiurl.'/stations';
         $result = $this->azApiGet($url);
-        return json_decode($result);
+        return $result;
     }
     
     public function azStation(int $azstid) {
         $url=$this->apiurl.'/station/'.$azstid;
         $result = $this->azApiGet($url);
-        return json_decode($result);
+        return $result;
     }
     
     public function azPlaylists() {
@@ -97,7 +97,7 @@ class AzApi {
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
         $url=$this->apiurl.'/station/'.$this->azstid.'/playlists';
         $result = $this->azApiGet($url);
-        return json_decode($result);
+        return $result;
     }
     
     public function azPlaylist(int $azplid) {
@@ -105,31 +105,40 @@ class AzApi {
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
         $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid;
         $result = $this->azApiGet($url);
-        return json_decode($result);
+        return $result;
     }
        
-    public function getAzPlaylistM3u(int $azplid) {
+    public function getAzPlaylistM3u(int $azplid, string $m3ufpathname) {
         if ($this->azstid == 0)
-                return (object) ['code' => true, 'msg'=>'Station ID not set'];
-            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/m3u';
-            $result = $this->azApiDownloadPlaylist($url);
-            return $result;
+            return (object) ['code' => true, 'msg'=>'Station ID not set'];
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/m3u';
+        $result = $this->azApiDownloadPlaylist($url, $m3ufpathname);
+        return $result;
     }
     
     public function putAzPlaylist(int $azplid, string $jsondata) {
         if ($this->azstid == 0)
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
-            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid;
-            $result = $this->azApiPut($url, $jsondata);
-            return $result;
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid;
+        $result = $this->azApiPut($url, $jsondata);
+        return $result;
     }
     
     public function putAzPlaylistM3u(int $azplid, string $m3ufilename) {
         if ($this->azstid == 0)
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
-            $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/import';
-            $result = $this->azApiPutM3u($url, $m3ufilename);
-            return $result;
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/import';
+        $result = $this->azApiPutM3u($url, $m3ufilename);
+        return $result;
+    }
+    
+    public function clearAzPlaylistTracks(int $azplid) {
+        if ($this->azstid == 0)
+            return (object) ['code' => true, 'msg'=>'Station ID not set'];
+        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/empty';
+        $result = $this->azApiDel($url);
+        return $result;
+        
     }
     
     private function azApiGet($url, string $bodytext = '') {
@@ -166,11 +175,11 @@ class AzApi {
      * @param string $bodytext
      * @return mixed
      */
-    private function azApiDownloadPlaylist(string $url, string $bodytext = '') {
+    private function azApiDownloadPlaylist(string $url, string $m3ufpathname) {
         $ok = false;
         $cnt = 0;
-        $fpathname = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d-Hi').".m3u";
-        $fh = fopen($fpathname, "w+");
+ //       $fpathname = JPATH_ROOT."/xbmusic-data/m3u/".date('Y-m-d-Hi').".m3u";
+        $fh = fopen($m3ufpathname, "w+");
         while (!$ok) {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/octet-stream' , $this->authorization ));
@@ -193,7 +202,7 @@ class AzApi {
             }
         }
         fclose($fh);
-        chmod($fpathname, 0775);
+        chmod($m3ufpathname, 0775);
         return $result;       //check for other error codes on return to calling function
     }
     
@@ -256,6 +265,33 @@ class AzApi {
             }
         }
         return $result;       //check for other error codes on return to calling function
+    }
+    
+    private function azApiDel($url) {
+        $ok = false;
+        $cnt = 0;
+        while (!$ok) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json' , $this->authorization ));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            $result = curl_exec($ch);
+            curl_close($ch);
+            $result = json_decode($result);
+            if (isset($result->code) && ($result->code == 429)) {
+                //we have an api overload so wait 2 secs for a max of 2 times
+                if ($cnt >1) {
+                    $ok = true;
+                } else {
+                    sleep(2);
+                    $cnt ++;
+                }
+            } else {
+                $ok = true;
+            }
+        }
+        return $result;       //check for other error codes on return to calling function        
     }
     
 }

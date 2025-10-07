@@ -170,7 +170,7 @@ ORDER BY ordering ASC
     public function getItems() {
         $items  = parent::getItems();
 
-        
+        //get playlist data
         return $items;
         
     } // end getItems

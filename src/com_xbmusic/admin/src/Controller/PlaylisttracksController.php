@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylisttracksController.php
- * @version 0.0.13.3 8th September 2024
+ * @version 0.0.58.2 1st September 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -24,6 +24,11 @@ class PlaylisttracksController extends AdminController {
         return parent::getModel($name, $prefix, $config);
     }
      
+    public function edit() {
+        $id = $this->input->getArray()['id'];
+        $this->setRedirect('index.php?option=com_xbmusic&task=playlist.edit&id='.$id);
+    }
+    
     public function toTop() {
         $pks   = (array) $this->input->post->get('cid', [], 'int');
         $model = $this->getModel();

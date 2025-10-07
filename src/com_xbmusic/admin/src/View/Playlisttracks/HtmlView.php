@@ -47,6 +47,7 @@ class HtmlView extends BaseHtmlView {
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
 
+        //get playlist data
         $this->id = $this->state->get('id',0);
         $this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_playlists', 'title', $this->id) : 'xxx';
                 
@@ -66,6 +67,7 @@ class HtmlView extends BaseHtmlView {
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         
+        $toolbar->edit('playlist.edit','Edit Playlist' );
         $toolbar->cancel('dashboard.toPlaylists','XBMUSIC_BACK_PLAYLISTS')->icon('fas fa-headphones');
         //ToolbarHelper::editList('playlisttracks.remove','XBMUSIC_BATCH_REMOVE');
 

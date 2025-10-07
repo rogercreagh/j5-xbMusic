@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>9th August 2025</creationDate>
-	<version>0.0.58.1</version>
+	<creationDate>3rd October 2025</creationDate>
+	<version>0.0.58.3</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -124,6 +124,14 @@
 		
 	</administration>
 
+<!-- 
+	<files folder="site">
+		<folder>forms</folder>
+		<folder>src</folder>
+		<folder>tmpl</folder>
+	</files>
+ -->
+    
     <changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 
 	<updateservers>

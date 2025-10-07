@@ -164,6 +164,7 @@ class HtmlView extends BaseHtmlView {
         $toolbar->cancel('playlist.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
         $toolbar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
+        $toolbar->standardButton('playlisttracksview', 'Tracks List', 'dashboard.toPlaylisttracks')->icon('fas fa-headphones') ;
         $toolbar->inlinehelp();
         $toolbar->help('Playlist: Edit',false,'https://crosborne.uk/xbmusic/doc#playlistedit');
         

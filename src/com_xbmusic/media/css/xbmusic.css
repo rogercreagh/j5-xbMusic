@@ -36,6 +36,9 @@ audio {
 /* reduce size of filelist select option text */
 select.filelist-small {-webkit-appearance: none; font-size:0.9rem; padding:4px 12px;}
 
+/* reduce width of control input to 120px */
+.xbfix120 {width:120px !important; }
+
 
 
 /* the preview eye button */

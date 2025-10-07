@@ -36,9 +36,13 @@ class DashboardController extends AdminController
         $this->setRedirect('index.php?option=com_xbmusic&view=playlists');
     }
     public function toPlaylisttracks() {
-        $jip =  Factory::getApplication()->input;
-        $pid =  $jip->get('cid');
-        $this->setRedirect('index.php?option=com_xbmusic&view=playlisttracks&id='.$pid[0]);
+        $jip =  $this->input;
+        if ($jip->exists('cid')) {
+            $id =  $jip->get('cid')[0];
+        } else {
+            $id = $this->input->getArray()['id'];
+        }
+        if ($id > 0) $this->setRedirect('index.php?option=com_xbmusic&view=playlisttracks&id='.$id);
     }
     public function toSchedule() {
         $this->setRedirect('index.php?option=com_xbmusic&view=schedule');

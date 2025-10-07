@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlist/edit.php
- * @version 0.0.56.1 19th July 2025
+ * @version 0.0.58.3 3rd October 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -66,12 +66,16 @@ $input = Factory::getApplication()->getInput();
 	function setexpbtn(elval) {
 		var btnexploc = document.getElementById('btnexploc');
 		var btnexpaz = document.getElementById('btnexpaz');
+		var clearrem = document.getElementById('clearrem');
 		if (elval == "2") {
 			btnexpaz.style.display = 'block';
 			btnexploc.style.display = 'none';
+			clearrem.style.display = "block";
+			
 		} else {
 			btnexpaz.style.display = 'none';
 			btnexploc.style.display = 'block';
+			clearrem.style.display = "none";
 		}
 	}
 </script>
@@ -104,20 +108,19 @@ $input = Factory::getApplication()->getInput();
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlist&layout=edit&id='. (int) $this->item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" enctype="multipart/form-data" >
     	<div class="row form-vertical">
-    		<div class="col-md-10">
+    		<div class="col-md-8">
             	<?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
     		</div>
-    		<div class="col-md-2">
-    			<?php echo $this->form->renderField('id'); ?> 
+    		<div class="col-md-1">
     		</div>
-    	</div>
-    	<div class="row">
-    		<div class="col-md-12">
-    			<div style="max-width:500px; float:left; margin-right:50px;">
-    				<?php echo $this->form->renderField('scheduledcnt'); ?>     			
-				</div>
-    			<?php echo $this->form->renderField('publicschd'); ?>     			
-    		</div>
+    		<div class="col-md-3">
+                <div class="pull-left xbmr50" style="width:130px;">
+    			  <?php echo $this->form->renderField('id'); ?> 
+                </div>
+                <div class="pull-left" style="width:130px;">
+    			  <?php echo $this->form->renderField('az_id'); ?>
+                </div>
+            </div>
     	</div>
     	<?php if ($this->azuracast == 1) : ?>
     		<div class="row">
@@ -143,7 +146,36 @@ $input = Factory::getApplication()->getInput();
         					    echo Text::sprintf('XBMUSIC_AZTYPE'.$this->item->az_type, $this->item->az_cntper);
         					} ?>
         				</span>
-        				</p>
+        				<span class="xbpl50"><i><?php echo Text::_('XB_WEIGHT'); ?></i> :
+        					<?php 
+        					    echo $this->item->az_info->weight; 
+        					 ?>
+        				</span>
+        			</p>
+            	</div>
+                	<?php if($this->item->scheduledcnt > 0) :?>
+                    	<div class="row">
+                    		<div class="col-md-9">
+                    			<div style="max-width:500px; float:left; margin-right:50px;">
+        		             		<i><?php echo Xbtext::_('XBMUSIC_SHD_TIMES',XBUC1 + XBTRL); ?></i> :
+        		            		<?php echo $this->item->scheduledcnt; ?>          				     			
+                				</div>
+                    			<?php echo $this->form->renderField('publicschd'); ?>     			
+                    		</div>
+                    		<div class="col-md-3">
+                				<b>Reload Playlist <?php echo $this->station['title']; ?></b>
+                    	    	<?php $popbody = "'Reload playlist from ".$this->station['title']."'"; 
+                    	    	  $pophead = 'Confirm reload from Azuracast'; 
+                    	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.loadplaylist');"; 
+                    	    	  ?>                
+                    	    	 <button id="loadm3u" class="btn btn-secondary btn-sm icon-white xbml20 xbmr50" 
+                    	    	 	type="button" onclick="<?php echo $confirm; ?>" >
+                    					<i class="fas fa-link"></i> &nbsp; 
+                            			<?php echo Text::_('Reload from Azuracast'); ?>
+                            	</button>    
+                    			
+                    		</div>
+                	<?php endif; ?>
 				<?php else : ?>
         			<div class="col-md-6" id="loadstations" >
         				<p><?php echo Text::_('XBMUSIC_TO_IMPORT_PLAYLIST'); ?>
@@ -160,8 +192,7 @@ $input = Factory::getApplication()->getInput();
     				   		
     	<?php endif; ?>
     	<!-- hidden fields -->
-    	<?php echo $this->form->renderField('az_dbstid'); ?>		
-		<?php echo $this->form->renderField('az_id'); ?>  
+    	<?php echo $this->form->renderField('az_dbstid'); ?>	  
 		
 		 
      <div class="main-card">
@@ -180,7 +211,7 @@ $input = Factory::getApplication()->getInput();
             					<i class="fas fa-link-slash"></i> &nbsp; 
                     			<?php echo Text::_('XBMUSIC_AZURACAST_UNLINK'); ?>
                     		</button> 
-                    		<span class="xbpl50">><i><?php echo Text::_('XBMUSIC_AZURACAST_UNLINK_PLAYLIST'); ?></i>       		
+                    		<span class="xbpl50"><i><?php echo Text::_('XBMUSIC_AZURACAST_UNLINK_PLAYLIST'); ?></i>       		
                     		</span>
             			</p>
 	        
@@ -244,10 +275,11 @@ $input = Factory::getApplication()->getInput();
                             		<?php endforeach; ?>        
         						</dl>
 								<dl class="xbdl">
-                                	<dt>Schedule Items</dt><dd><?php echo $this->item->scheduledcnt; ?></dd>
+                                	<dt>Scheduled Times</dt><dd><?php echo $this->item->scheduledcnt; ?></dd>
                                 </dl>
 								<?php echo $this->form->renderField('scheduledcnt') ;?>        						
         					</fieldset>
+        					
         					<p class="info"><?php echo Text::_('XBMUSIC_CHECK_SCHEDULES_TAB'); ?></p>
     					<?php else : ?>
     						<p class="xbit"><?php echo Text::_('Azuracast Info Missing'); ?></p>
@@ -269,6 +301,7 @@ $input = Factory::getApplication()->getInput();
     	<?php if($this->item->scheduledcnt > 0) : ?>
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'schedule', 'Schedule'); ?>
+	        	<p class="xbit">NB Currently changes can only be made to the schedule items in Azuracast</p>
 	        	<?php echo $this->form->renderField('schedulelist'); ?>
  			<?php echo HTMLHelper::_('uitab.endTab'); ?>
         
@@ -322,6 +355,7 @@ $input = Factory::getApplication()->getInput();
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
          
 		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'tracks', Text::_('XBMUSIC_TRACKS').' &amp; '.Text::_('XB_LINKS')); ?>
+		
 			<div class="row">
 				<div class="col12">
             		<button id="btnloadm3u" class="btn btn-info btn-sm icon-white xbmr50" type="button" 
@@ -401,9 +435,12 @@ $input = Factory::getApplication()->getInput();
         				<?php echo $this->form->renderField('savedest'); ?>
         			</div>
          			<div class="col12 col-md-4 form-vertical">
-         				<?php echo $this->form->renderField('clearremote','params'); ?>
+             			<div id="clearrem" style="display:none;">
+             				<?php echo $this->form->renderField('clearremote','params'); ?>
+             			</div>
          			</div>
          			<div class="col12 col-md-4 form-vertical">
+         				<p> </p>
 						<div id="btnexpaz" style="display:none;">
                         	<div class="pull-right">
             					<b>Upload tracklist to  <?php echo $this->station['title']; ?></b>
