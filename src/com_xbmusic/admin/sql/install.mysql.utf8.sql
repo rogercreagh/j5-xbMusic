@@ -130,9 +130,9 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_playlists` (
   `scheduledcnt` int(10) unsigned NOT NULL DEFAULT '0',
   `publicschd` int(1) unsigned NOT NULL DEFAULT '1',
   `allowdupes` int(1) unsigned NOT NULL DEFAULT '0',
-  `az_id` int(10) unsigned NOT NULL Default '0',
+  `az_plid` int(10) unsigned NOT NULL Default '0',
   `az_name` varchar(20),
-  `az_dbstid` int(10) unsigned NOT NULL Default '0',
+  `db_stid` int(10) unsigned NOT NULL Default '0',
   `az_info` mediumtext,
   `az_type` tinyint(3),
   `az_cntper` tinyint(3) unsigned,
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(190) NOT NULL,
   `alias` varchar(190) NOT NULL,
-  `az_id` int(10) unsigned NOT NULL Default '0',
+  `az_trid` int(10) unsigned NOT NULL Default '0',
   `az_stid` int(10) unsigned NOT NULL Default '0',
   `az_info` mediumtext,
   `description` mediumtext,
@@ -237,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(190) NOT NULL,
   `alias` varchar(190) NOT NULL,
-  `az_id` int(10) unsigned NOT NULL Default '0',
+  `az_stid` int(10) unsigned NOT NULL Default '0',
   `az_info` mediumtext,
   `az_apikey` varchar(80),
   `az_apiname` varchar(80),
@@ -263,13 +263,13 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `params` mediumtext NOT NULL DEFAULT '',
   `note` mediumtext,
   PRIMARY KEY (`id`),
-  UNIQUE `stidx` (`az_id`, `az_url`)
+  UNIQUE `stidx` (`az_stid`, `az_url`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
   `dbplid` int(10) unsigned NOT NULL Default '0',
-  `az_id` int(10) unsigned NOT NULL Default '0',
+  `az_shid` int(10) unsigned NOT NULL Default '0',
   `az_starttime` time,
   `az_endtime` time,
   `az_startdate` date,

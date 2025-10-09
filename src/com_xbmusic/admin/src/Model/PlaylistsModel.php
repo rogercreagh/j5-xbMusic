@@ -114,7 +114,7 @@ class PlaylistsModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.title, a.alias, a.description, '
-                    .'a.az_id, a.az_name, a.az_type,'
+                    .'a.az_plid, a.az_name, a.az_type,'
                     .'a.scheduledcnt, publicschd,'
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
@@ -127,7 +127,7 @@ class PlaylistsModel extends ListModel {
         
         // Join azstations
         $query->select('st.title AS azstation' )
-        ->join('LEFT', '#__xbmusic_azstations AS st ON st.id = a.az_dbstid');
+        ->join('LEFT', '#__xbmusic_azstations AS st ON st.id = a.db_stid');
         
         // Join over the users for the checked out user.
         $query->select('uc.name AS editor')

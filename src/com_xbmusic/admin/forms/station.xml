@@ -91,7 +91,7 @@
 			class="readonly" readonly="true"
 		/>
 			
-		<field name="az_id" type="number"
+		<field name="az_stid" type="number"
 			label="Azuracast Id" descripition="ID on the Azuracast server - other stations on different servers may have the same id"
 			class="readonly" readonly="true"
 			size="10" default="0"			 

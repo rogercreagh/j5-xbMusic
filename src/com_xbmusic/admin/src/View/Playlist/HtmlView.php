@@ -45,7 +45,7 @@ class HtmlView extends BaseHtmlView {
             unset($this->item->az_info->backend_options);
         }
         
-        if ($this->item->az_id > 0) {
+        if ($this->item->az_plid > 0) {
             $this->azchanged = true;
             $cntr = 0; 
             switch ($this->item->az_type) {
@@ -107,8 +107,8 @@ class HtmlView extends BaseHtmlView {
         $this->az_apiname = $this->params->get('az_apiname','not set');
         $this->az_url = $this->params->get('az_url','not set');
         $this->stncnt = count(XbmusicHelper::getStations());
-        if ($this->item->az_dbstid > 0) {
-            $this->station = XbmusicHelper::getDbStation($this->item->az_dbstid);
+        if ($this->item->db_stid > 0) {
+            $this->station = XbmusicHelper::getDbStation($this->item->db_stid);
         }
         if ($this->item->id > 0) $this->tracks = XbmusicHelper::getPlaylistTrackTitles($this->item->id);
         

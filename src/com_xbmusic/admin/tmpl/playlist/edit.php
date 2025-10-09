@@ -118,7 +118,7 @@ $input = Factory::getApplication()->getInput();
     			  <?php echo $this->form->renderField('id'); ?> 
                 </div>
                 <div class="pull-left" style="width:130px;">
-    			  <?php echo $this->form->renderField('az_id'); ?>
+    			  <?php echo $this->form->renderField('az_plid'); ?>
                 </div>
             </div>
     	</div>
@@ -128,13 +128,13 @@ $input = Factory::getApplication()->getInput();
     				<p><?php echo Text::_('XBMUSIC_NO_STATIONS_YET'); ?>
     				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
     				at <code><?php echo $this->az_url; ?></code> <?php echo Text::_('XBMUSIC_OPTIONS_LINK'); ?></p>
-				<?php elseif ($this->item->az_id > 0) : ?>
+				<?php elseif ($this->item->az_plid > 0) : ?>
 					<hr />
     				<p><i><?php echo Text::_('XBMUSIC_AZURACAST_STATION'); ?></i> : 
     					<b><?php echo $this->station['title']; ?></b>
-    					<?php echo ' #'.$this->station['az_id'].' at '.$this->station['az_url']; ?>
+    					<?php echo ' #'.$this->station['az_stid'].' at '.$this->station['az_url']; ?>
         				<span class="xbpl50"><i><?php echo Text::_('XBMUSIC_AZURACAST_PLAYLIST'); ?></i> : #
-        					<?php echo $this->item->az_id; ?> - <b><?php echo $this->item->az_name; ?></b>
+        					<?php echo $this->item->az_plid; ?> - <b><?php echo $this->item->az_name; ?></b>
         				</span>
         				<span class="xbpl50"><i><?php echo Text::_('XB_ORDERING'); ?></i> :
         					<?php echo ucfirst($this->item->az_order); ?>
@@ -192,13 +192,13 @@ $input = Factory::getApplication()->getInput();
     				   		
     	<?php endif; ?>
     	<!-- hidden fields -->
-    	<?php echo $this->form->renderField('az_dbstid'); ?>	  
+    	<?php echo $this->form->renderField('db_stid'); ?>	  
 		
 		 
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-    	<?php if(($this->azuracast == 1) && ($this->item->az_dbstid) > 0) : ?>
+    	<?php if(($this->azuracast == 1) && ($this->item->db_stid) > 0) : ?>
 
 	        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'azuracast', 'Azuracast'); ?>
 	        

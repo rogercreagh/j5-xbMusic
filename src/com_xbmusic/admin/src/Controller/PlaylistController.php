@@ -51,8 +51,8 @@ class PlaylistController extends FormController {
     public function loadplaylist() {
         $jip =  Factory::getApplication()->getInput();
         $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
-        if (empty($data['azstation'])) $data['azstation'] = $data['az_dbstid'];
-        if (empty($data['azplaylist'])) $data['azplaylist'] = $data['az_id'];
+        if (empty($data['azstation'])) $data['azstation'] = $data['db_stid'];
+        if (empty($data['azplaylist'])) $data['azplaylist'] = $data['az_plid'];
         //        Factory::getApplication()->enqueueMessage('<pre>'.print_r($data, true).'</pre>','warning');
         $model = $this->getModel('playlist');
         $wynik = $model->loadPlaylist($data);

@@ -974,14 +974,14 @@ class XbmusicHelper extends ComponentHelper
 	            $query->clear();
 	            $query->select('COUNT(id) AS plcnt , SUM(scheduledcnt) AS schtot, COUNT(CASE WHEN scheduledcnt > 0 THEN 1 ELSE NULL END) AS schlists');
 	            $query->from('#__xbmusic_playlists');
-	            $query->where('az_dbstid = '.$db->q($station['id']));
+	            $query->where('db_stid = '.$db->q($station['id']));
 	            $db->setQuery($query);
 	            $cnts = $db->loadAssoc();
 	            $station['plcnt'] = $cnts['plcnt'];
 	            $station['schlists'] = $cnts['schlists'];
 	            $station['schtot'] = $cnts['schtot'];
 	            //create a unique identifier for server + station id 
-	            $station['azurlid'] = $station['az_url'].'-'.$station['az_id'];
+	            $station['azurlid'] = $station['az_url'].'-'.$station['az_stid'];
 	        }
 	    }
 	    if (!is_array($dbstations)) $dbstations = [];
@@ -1007,8 +1007,8 @@ class XbmusicHelper extends ComponentHelper
 	
 	/**
 	 * @name getDbStationAzId()
-	 * @desc given the az_id returns staion details from database
-	 * @param int $azstid - the az_id column value
+	 * @desc given the azstid returns staion details from database
+	 * @param int $azstid - the az_stid column value
 	 * @return mixed|NULL - associative array or null
 	 */
 	public static function getAzStation(int $azstid) {
@@ -1017,7 +1017,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query = $db->getQuery(true);
 	    $query->select('*');
 	    $query->from('#__xbmusic_azstations');
-	    $query->where($db->qn('az_id').' = '. $azstid);
+	    $query->where($db->qn('az_stid').' = '. $azstid);
 	    $db->setQuery($query);
 	    $station = $db->loadAssoc();
 	    return $station;
@@ -1029,13 +1029,13 @@ class XbmusicHelper extends ComponentHelper
      * @param int $azstid
      * @return mixed|NULL
      */
-	public static function getAzstationPlaylists(int $azstid) {
+	public static function getAzstationPlaylists(int $dbstid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('*');
 	    $query->from('#__xbmusic_playlists');
-	    $query->where($db->qn('az_id').' = '. $azstid);
+	    $query->where($db->qn('db_stid').' = '. $dbstid); //?????????
 	    $db->setQuery($query);
 	    return $db->loadAssoc();
 	    

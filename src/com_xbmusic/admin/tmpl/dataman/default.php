@@ -263,10 +263,10 @@ $wa->addInlineScript("window.onload = function() {
 							<br /><i>Website</i>: 
 						    <a href="<?php echo $station['website']; ?>" target="_blank">
 								<?php echo $station['website']; ?></a> 
-							<?php if ($station['az_id']>0 ) : ?>
+							<?php if ($station['az_stid']>0 ) : ?>
 							    <p>
 							    	<i>AzID</i>: 
-    							    <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
+    							    <?php echo $station['az_stid'].' '.$station['az_apiname']; ?>
     							    <br />
     								<i>AzURL</i>: 
     								<a href="<?php echo $station['az_url']; ?>" target="_blank">

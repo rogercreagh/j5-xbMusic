@@ -123,7 +123,7 @@ $item = $this->item;
         		<?php echo $this->form->renderField('az_url');?>
 			</div>
 			<div class="col-12 col-md-6 ">
-        		<?php echo $this->form->renderField('az_id');?>
+        		<?php echo $this->form->renderField('az_stid');?>
 			</div>
 		</div>
 		<div class="row">

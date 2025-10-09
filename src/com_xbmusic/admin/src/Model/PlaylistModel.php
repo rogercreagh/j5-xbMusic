@@ -387,21 +387,21 @@ class PlaylistModel extends AdminModel {
 
     public function importTrklistAz($data) {
         $app = Factory::getApplication();
-        if (($data['az_id'] > 0) && ($data['az_dbstid']>0)){
-            $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['az_dbstid']);
- //           $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['az_dbstid']);
+        if (($data['az_plid'] > 0) && ($data['db_stid']>0)){
+            $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
+ //           $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['db_stid']);
             if (empty($stmedia)) {
-                $errstr = 'Station media path not set. Unable to assign tracks to list. Please visit <a href="index.php?option=com_xbmusic&task=station.edit&id='.$data['az_dbstid'].'" >Edit Station</a> page and enter media path';
+                $errstr = 'Station media path not set. Unable to assign tracks to list. Please visit <a href="index.php?option=com_xbmusic&task=station.edit&id='.$data['db_stid'].'" >Edit Station</a> page and enter media path';
                 $app->enqueueMessage($errstr,'Error');
                 return false;
             }
             
-            $m3ufpathname = $this->makeM3uFilename($data['alias'], $data['az_dbstid'],'import-');
+            $m3ufpathname = $this->makeM3uFilename($data['alias'], $data['db_stid'],'import-');
             
-            $api = new AzApi($data['az_dbstid']);
-            $result = $api->getAzPlaylistM3u($data['az_id'], $m3ufpathname);
+            $api = new AzApi($data['db_stid']);
+            $result = $api->getAzPlaylistM3u($data['az_plid'], $m3ufpathname);
             if ($result == true) {
-                $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['az_dbstid']);
+                $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['db_stid']);
                 $logfilename = 'playlistaz_import_'.$stalias.'_'.$data['alias'].date('Y-m-d-Hi').'.log';
                 $loglines = '';
                 $loghead = '[IMPORT M3U]Importing M3U file from Azuracast for Playlist '.$data['title']."\n";
@@ -423,7 +423,7 @@ class PlaylistModel extends AdminModel {
                 return false;
             }
         } else {
-            $app->enqueueMessage('Station or Playlist ID missing. St:'.$data['az_dbstid']. 'Pl:'.$data['az_id'],'Error');   
+            $app->enqueueMessage('Station or Playlist ID missing. St:'.$data['db_stid']. 'Pl:'.$data['az_plid'],'Error');   
             return false;
         }
     }
@@ -471,7 +471,7 @@ class PlaylistModel extends AdminModel {
      */
     private function cleanTracklist(array &$tracklst, array $data) {
         $app = Factory::getApplication();
-        $stname = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'title', $data['az_dbstid']);
+        $stname = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'title', $data['db_stid']);
         $loglines = '';
         if ((!empty($data['tracklist'])) && ($data['params']['clearfirst'] == 0)) {
             $tracklst = array_merge($data['tracklist'],$tracklst);
@@ -502,9 +502,9 @@ class PlaylistModel extends AdminModel {
         }
         $filename = $this->saveTrkListM3u($data, false);
         if ($filename != '') {
-            $api = new AzApi($data['az_dbstid']);
+            $api = new AzApi($data['db_stid']);
             if ( ($data['params']['clearremote'] == 0)) {
-                $result = $api->clearAzPlaylistTracks($data['az_id']);
+                $result = $api->clearAzPlaylistTracks($data['az_plid']);
                 if ($result == true) {
                     $app->enqueueMessage('Existing tracklist cleared on Azuracast','Success');
                 } else {
@@ -512,7 +512,7 @@ class PlaylistModel extends AdminModel {
                     return false;
                 }
             }
-            $result = $api->putAzPlaylistM3u($data['az_id'],$filename);
+            $result = $api->putAzPlaylistM3u($data['az_plid'],$filename);
             if ($result == true) {
                 $app->enqueueMessage('M3u playlist upload okay','Success');
             } else {
@@ -527,8 +527,8 @@ class PlaylistModel extends AdminModel {
         $app = Factory::getApplication();
         $mediapath = JPATH_ROOT.'/xbmusic/';
         $stalias = '';
-        if (($data['az_id'] > 0) && ($data['az_dbstid']>0)){
-            $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['az_dbstid']);
+        if (($data['az_plid'] > 0) && ($data['db_stid']>0)){
+            $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['db_stid']);
             if ($station) {                
                 $mediapath .= $station->mediapath;
                 $stalias = $station->alias."-";
@@ -630,7 +630,7 @@ class PlaylistModel extends AdminModel {
         $filelist = [];
         $ignoremissing = $data['params']['ignoremissing']; //data['ignoremissing']
         $createtracks = $data['params']['createtrks'];
-        $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['az_dbstid']);
+        $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
         $mediapath = JPATH_ROOT.'/xbmusic/'.$stmedia;
         if ($lines = file($m3ufile)) {
             $msg = 'Missing file ';
@@ -715,9 +715,9 @@ class PlaylistModel extends AdminModel {
         if ($dbdata['title'] == '') $dbdata['title'] = $azpldata->name;
         $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
         $dbdata['alias'] = XbcommonHelper::makeUniqueAlias($dbdata['alias'], '#__xbmusic_playlists');
-        $dbdata['az_id'] = $azpldata->id;
+        $dbdata['az_plid'] = $azpldata->id;
         $dbdata['az_name'] = $azpldata->name;
-        $dbdata['az_dbstid'] = $dbdata['azstation'];
+        $dbdata['db_stid'] = $dbdata['azstation'];
         
         $dbdata['az_info'] = json_encode($azpldata);
         
@@ -771,8 +771,8 @@ class PlaylistModel extends AdminModel {
     }
     
     public function reloadPlaylist($dbdata) {
-        $api = new AzApi($dbdata['az_dbstid']);
-        $azpldata = $api->azPlaylist($dbdata['az_id']);
+        $api = new AzApi($dbdata['db_stid']);
+        $azpldata = $api->azPlaylist($dbdata['az_plid']);
         if (isset($azpldata->code)) {
             Factory::getApplication()->enqueueMessage('reloadPlaylist Azuracast API Error: code '.$azpldata->code.
                 ' - '.$azpldata->type.'<br />'.$azpldata->formatted_message,'Warning');
@@ -781,9 +781,9 @@ class PlaylistModel extends AdminModel {
         $dbdata['modified_by'] = $this->getCurrentUser()->id;
         $dbdata['modified'] = Factory::getDate()->toSql();
         if ($dbdata['alias'] == '') $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
-//         $dbdata['az_id'] = $azpldata->id;
+//         $dbdata['az_plid'] = $azpldata->id;
         $dbdata['az_name'] = $azpldata->name;
-//         $dbdata['az_dbstid'] = $dbdata['azstation'];
+//         $dbdata['db_stid'] = $dbdata['azstation'];
         
         $dbdata['az_info'] = json_encode($azpldata);
         
@@ -863,7 +863,7 @@ class PlaylistModel extends AdminModel {
             $doend = !empty($schd->end_date);
             $query->clear();
             $query->insert($db->qn('#__xbmusic_azschedules'));
-            $columns = 'dbplid, az_id, az_starttime, az_endtime,';
+            $columns = 'dbplid, az_shid, az_starttime, az_endtime,';
             if ($dostart) $columns .= 'az_startdate,';
             if ($doend) $columns .= 'az_enddate,';
             $columns .= 'az_days, az_loop, status, created, created_by, created_by_alias, note';
@@ -928,11 +928,11 @@ class PlaylistModel extends AdminModel {
         $data['is_jingle'] = $dbdata['az_jingle'];
         $data['weight'] = $dbdata['az_weight'];
         
-        /*************** ADD BACK SCHEDULE ITEMS ****************/
+        /*************** ADD BACK SCHEDULE ITEMS HERE****************/
         
         $jsondata = json_encode($data);
-        $api = new AzApi($dbdata['az_dbstid']);
-        $putres = $api->putAzPlaylist($dbdata['az_id'], $jsondata);
+        $api = new AzApi($dbdata['db_stid']);
+        $putres = $api->putAzPlaylist($dbdata['az_plid'], $jsondata);
         if (isset($putres->code)) {
             Factory::getApplication()->enqueueMessage('putPlaylist Azuracast API Error: code '.$putres->code.' - '.$putres->type.
                 '<br />'.$putres->formatted_message,'Warning');
@@ -953,8 +953,8 @@ class PlaylistModel extends AdminModel {
         $dbdata['az_order'] = null;
         $dbdata['az_jingle'] = null;
         $dbdata['az_weight'] = null;
-        $dbdata['az_id'] = 0;
-        $dbdata['az_dbstid'] = 0;
+        $dbdata['az_plid'] = 0;
+        $dbdata['db_stid'] = 0;
         
         $ans = $this->save($dbdata);
         if ($ans) {
@@ -971,7 +971,7 @@ class PlaylistModel extends AdminModel {
         if ($playlist_id <1) $playlist_id = 0;
         $db = $this->getDbo();
         $query = $db->getQuery(true);
-        $query->select('sh.id AS id, sh.az_id AS az_id, sh.dbplid AS dbplid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop');
+        $query->select('sh.id AS id, sh.az_shid AS az_shid, sh.dbplid AS dbplid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop');
         $query->from('#__xbmusic_azschedules AS sh');
         $query->innerjoin('#__xbmusic_playlists AS a ON sh.dbplid= a.id');
         $query->where('sh.dbplid = '.$playlist_id);
@@ -996,7 +996,7 @@ class PlaylistModel extends AdminModel {
         
                 $query = $db->getQuery(true);
                 $query->insert($db->quoteName('#__xbmusic_azschedules'));
-                $query->columns('dbplid, az_id, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop, showpublic, status, created, created_by');
+                $query->columns('dbplid, az_shid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop, showpublic, status, created, created_by');
                 $query->values('');
         foreach ($scheduleList as $schd) {
             $query->clear('values');

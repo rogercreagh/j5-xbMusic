@@ -191,7 +191,7 @@ if (strpos($listOrder, 'modified') !== false) {
 						</td>
 						<?php if($this->azuracast) : ?>
 							<td class="xbmt5 xbmh400 xbyscroll <?php if(!$item->publicschd) echo 'xbdim'; ?>" onclick="stopProp(event);">
-    							<?php if ($item->az_id) : ?>
+    							<?php if ($item->az_plid) : ?>
     								on <?php echo $item->azstation; ?>
     								<?php if ($item->scheduledcnt > 0) : ?>
     									<details>

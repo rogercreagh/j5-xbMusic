@@ -15,7 +15,7 @@
 			size="10" default="0"			 
 		/>
 
-		<field name="az_id" type="number" 
+		<field name="az_plid" type="number" 
 			label="Azuracast ID"
 			description="This is the internal Azuracast ID" 
 			class="xbfix120 readonly" readonly="true"
@@ -75,7 +75,7 @@
 			<option value="0">Select Playlist</option>
 		</field>
 		
-		<field name="az_dbstid" type="hidden"
+		<field name="db_stid" type="hidden"
 			default=""
 		/>
 
@@ -170,7 +170,7 @@
 			<form>
 				<field name="id" type="number" label="jId" readonly="true">
 				</field>
-				<field name="az_id" type="number" label="AzId" readonly="true">
+				<field name="az_shid" type="number" label="AzId" readonly="true">
 				</field>
 				<field name="az_starttime" type="time" label="Start" readonly="true"
 				/>

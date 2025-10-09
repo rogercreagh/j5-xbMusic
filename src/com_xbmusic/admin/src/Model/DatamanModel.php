@@ -568,7 +568,7 @@ class DatamanModel extends AdminModel {
         $query = $db->getQuery(true);
         $query->select('id');
         $query->from('#__xbmusic_azstations');
-        $query->where($db->qn('az_url').' = '.$db->quote($azurl).' AND '.$db->qn('az_id').' = '.$db->q($azstid));
+        $query->where($db->qn('az_url').' = '.$db->quote($azurl).' AND '.$db->qn('az_stid').' = '.$db->q($azstid));
         $db->setQuery($query);
         return $db->loadResult();       
     }
@@ -588,7 +588,7 @@ class DatamanModel extends AdminModel {
         // we need to update title alias apikey apiname azstream website azplayer description az info modified modified_by    
         $db = $this->getDatabase();
         $conditions = array('title='.$db->q($azstation->name), 'alias='.$db->q($azstation->shortcode),
-            'az_id='.$db->q($azstation->id), 'az_apikey='.$db->q($apikey), 'az_apiname='.$db->q($apiname),
+            'az_stid='.$db->q($azstation->id), 'az_apikey='.$db->q($apikey), 'az_apiname='.$db->q($apiname),
             'az_stream='.$db->q($azstation->listen_url), 'website='.$db->q($azstation->url),
             'az_player='.$db->q($azstation->public_player_url), 'description='.$db->q($azstation->description), 
             'az_info='.$db->q(json_encode($azstation)), 
@@ -622,7 +622,7 @@ class DatamanModel extends AdminModel {
         $apiname = $api->getApiname();
         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
 //        XbcommonHelper::getCreateCat($catdata)
-        $colarr = array('id', 'az_id', 'title', 'alias',
+        $colarr = array('id', 'az_stid', 'title', 'alias',
             'az_apikey', 'az_apiname', 'az_url',
             'az_stream','website', 'az_player',
             'catid', 'description', 'az_info',
@@ -675,7 +675,7 @@ class DatamanModel extends AdminModel {
      * @name importAzStations()
      * @desc this will retrieve all stations available using the config api key
      * @desc this may not be the same as the key saved with the station in the database
-     * @desc if the az_url and az_id for a returned station is not already in the database
+     * @desc if the az_url and az_stid for a returned station is not already in the database
      * @desc then a new station will be created
      * @desc existing stations in the database will not be updated
      */
@@ -694,7 +694,7 @@ class DatamanModel extends AdminModel {
 //             //$db = Factory::getContainer()->get(DatabaseInterface::cl
 //             $db = Factory::getDbo();
 //             $query = $db->getQuery(true);
-//             $query->select('az_id');
+//             $query->select('az_stid');
 //             $query->from('#__xbmusic_azstations');
 //             $query->where($db->qn('az_url').' = '.$db->q($azurl));
 //             $db->setQuery($query);
@@ -709,7 +709,7 @@ class DatamanModel extends AdminModel {
 //             } else {
 //                 $missing = $azstations;
 //             }
-//             $colarr = array('id', 'az_id', 'title', 'alias', 
+//             $colarr = array('id', 'az_stid', 'title', 'alias', 
 //                     'az_apikey', 'az_apiname', 'az_url',
 //                     'az_stream','website', 'az_player', 
 //                     'catid', 'description', 'az_info',

@@ -275,8 +275,9 @@
 					hint="Type or click for list" 
 					table="xbmusic_tracksong"
 				>
-                  	<option value="1. Full track"></option>
-					<option value="2. In a medley"></option>
+                  	<option value="1. Track=Song"></option>
+					<option value="2. Song is part of track"></option>
+					<option value="2. Track is part of larger work"></option>
 
                 </field>
 				<field name="note" type="text" label="XB_NOTE" size="50" maxlength="190"

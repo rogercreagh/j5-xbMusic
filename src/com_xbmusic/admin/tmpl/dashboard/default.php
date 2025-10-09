@@ -220,9 +220,9 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 								<a href="<?php echo $station['az_url']; ?>" target="_blank">
                          			<?php echo $station['az_url']; ?></a>
                          			<br />
-							    <?php if ($station['az_id']>0 ) : ?>
+							    <?php if ($station['az_stid']>0 ) : ?>
 							    	<i>AzID</i>: 
-							        <?php echo $station['az_id'].' '.$station['az_apiname']; ?>
+							        <?php echo $station['az_stid'].' '.$station['az_apiname']; ?>
 							    <?php else : ?>
 							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
 							    <?php endif; ?> 

@@ -65,13 +65,13 @@ class Com_xbmusicInstallerScript extends InstallerScript
                 $res = $this->remSymlinks('');
                 if (!empty($res)) $message .= 'Symlinks removed: <code>'.implode(', ', $res).'</code><br />';
                 if (Folder::delete(JPATH_ROOT.'/xbmusic')){
-                    $message .= ' ...<code>/xbmusic</code> folder and files deleted. NB SymLink targets have not been touched<br />';
+                    $message .= ' ...<code>/xbmusic</code> folder and files deleted. NB SymLink targets have <b>NOT</b>> been touched<br />';
                 } else {
                     $err = 'Problem deleting <code>/xbmusic</code> - please check';
                     $app->enqueueMessage($err,'Error');
                 }
             } else {
-                $message .= '<b>/xbMusic files <code>/xbmusic</code> has NOT been deleted.<br />';
+                $message .= '<b>/xbMusic files</b> <code>/xbmusic</code> has <b>NOT</b> been deleted.<br />';
             }
             
             if ($params->get('saveimages',1)==0) {
@@ -85,7 +85,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                     }
                 }
             } else {
-                $message .= '<b>/xbMusic image files <code>/images/xbmusic</code>> have NOT been deleted.<br />';
+                $message .= '<b>/xbMusic image files</b> <code>/images/xbmusic</code> have <b>NOT</b> been deleted.<br />';
             }
             
             if ($params->get('savelogs',1)==0) {
@@ -99,7 +99,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
                     }
                 }
             } else {
-                $message .= '<b><code>/xbmusic-data</code> files (logs &amp; playlists) have NOT been deleted.<br />';
+                $message .= '<b><code>/xbmusic-data</code></b> files (logs &amp; playlists) have <b>NOT</b> been deleted.<br />';
             }
             $message .= 'NB Any tags created by xbMusic have <b>NOT</b> been removed as they may have been used by other components. This will include all tags under "Music Genres" and "Locations" as well as any others. Remove manually if no longer required.<br />';
         } else {

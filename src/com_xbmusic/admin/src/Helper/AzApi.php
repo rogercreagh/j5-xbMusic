@@ -52,7 +52,7 @@ class AzApi {
                 $this->apiurl = $station['az_url'].'/api';
                 $this->apikey = $station['az_apikey'];
                 $this->apiname = $station['az_apiname'];
-                $this->azstid = $station['az_id'];
+                $this->azstid = $station['az_stid'];
             } else {
                 $this->apiurl = trim($params->get('az_url',''),'/').'/api';
                 $this->apikey = $params->get('az_apikey','');
