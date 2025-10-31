@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ * @package xbMusic
+ * @filesource admin/forms/dataman.xml
+ * @version 0.0.59.1 30th October 2025
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
+-->
+ 
+<form>
+	<config>
+		<inlinehelp button="show"/>
+	</config>
+
+	<fieldset name="azuracast" label="Azuracast"
+	     addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field" 
+	>
+		<field name="selectedapi" type="number"
+			label="Selected API idx"
+			description="Currently selected API key local database ID"
+			class="readonly" readonly="true"
+			size="10" default="0"			 
+		/>
+			
+		<field name="apilist" type="xbapikeyslist"
+			label="Select API key ID"
+			description="Either select an api key available to user or enter new key below"
+			class=""
+			default="0"
+			onchange="this.form.submit();"
+		>
+			<option value="0">Select key or enter new</option>
+		</field>
+		
+		<field name="newapikey" type="text"
+			label="Enter new key"
+			description="Enter full 49 character key including colon between id and value"
+			showon="selectedapiid!:"
+		>
+		</field>
+		<field name="loadazid" type="hidden"
+			default="0"
+		/>
+		<field name="dbstid" type="hidden"
+			default="0"
+		/>
+		<field name="foldername" type="text"
+			label="Selected Folder"
+			description=""
+			readonly="true"
+			size="80"
+		/>
+		<field name="selectedfiles" type="hidden"
+			label="Selected Files"
+			description="Selected files will be cleared by closing folder"
+			readonly="true"
+			size="80"
+			rows="6"
+		/>
+		<field name="filename" type="hidden" 
+			label="File name" description="" 
+		/>
+	</fieldset>
+	<fieldset name="files" label="Symlinks"
+	>
+		<field name="fmnote1" type="note"
+			label="Music Files"
+			description="Music files need to be found within folder xbmusic/ in the root of the joomla installation. To include files from a different location on the server you can create a symlink to the target folder below. If your Azuracast instance is on this server you can configure it to use a media folder outside its docker container. You can then create a symlink here to that folder to enable xbMusic to use the live media folder. See the help files for a more detailed discussion." 
+		/>
+		<field name="fmnote2" type="note"
+			label="Shared Azuracast media folder"
+			description="" 
+		/>
+		<field name="link_target" type="text"
+			label="New Symlink Target"
+			description="Enter the absolute path to the target folder where music files are stored"
+			hint="enter absolute path to folder"
+			default=""
+		/>
+		<field name="link_name" type="text"
+			label="Link name in /xbmusic"
+			description="Enter the name without path for the new symlink. Must not be an existing folder or file in xbmusic/ and the path must exist in xbmusic"
+			default=""
+			showon="link_target!:"
+		/> 
+		<field name="fmnote2" type="note"
+			description="Once you have created the symlink and imported tracks from it you must not delete it without first deleting all the tracks and related info"
+		/>
+	</fieldset>
+</form>

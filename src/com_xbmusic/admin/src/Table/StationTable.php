@@ -57,7 +57,7 @@ class StationTable extends Table implements VersionableTableInterface, TaggableT
         // Set name
         $this->title = htmlspecialchars_decode($this->title, ENT_QUOTES);
  
-        $this->az_apikey = str_replace(' ', '', $this->az_apikey);
+        //$this->az_apikey = str_replace(' ', '', $this->az_apikey);
         
         //json encode ext_links if set
         if (is_array($this->ext_links)) {

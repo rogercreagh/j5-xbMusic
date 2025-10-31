@@ -38,7 +38,7 @@ class PlaylistTable extends Table implements VersionableTableInterface, Taggable
     {
         $this->typeAlias = 'com_xbmusic.playlist';
         
-        parent::__construct('#__xbmusic_playlists', 'id', $db, $dispatcher);
+        parent::__construct('#__xbmusic_azplaylists', 'id', $db, $dispatcher);
         
         $this->created = Factory::getDate()->toSql();
         $this->setColumnAlias('published', 'status');

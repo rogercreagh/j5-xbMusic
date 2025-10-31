@@ -52,7 +52,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&tagid=';
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=taglist'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TAGS'); ?></h3>
+		<h2><i class='fas fa-tags' ></i> <?php echo Text::_('XBMUSIC_XBMUSIC_TAGS'); ?></h2>
       	<p class="xb095"><?php echo Text::_('XBMUSIC_TAGSPAGE_SUBTITLE'); ?></p>
 		
 		<?php // Search tools bar

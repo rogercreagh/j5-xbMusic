@@ -8,6 +8,13 @@
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
+/*
+ changes needed
+ add tabs for playlists and schedule based on existing views but specific to one station
+ move azuracast info to top section and remove tab
+ add links to general tab
+ 
+ */
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
@@ -124,14 +131,6 @@ $item = $this->item;
 			</div>
 			<div class="col-12 col-md-6 ">
         		<?php echo $this->form->renderField('az_stid');?>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-12 col-md-6 ">
-        		<?php echo $this->form->renderField('az_apikey');?>
-			</div>
-			<div class="col-12 col-md-6 ">
-        		<?php echo $this->form->renderField('az_apiname');?>
 			</div>
 		</div>
 		<div class="row">

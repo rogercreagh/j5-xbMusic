@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.51.8 5th May 2025
+ * @version 0.0.58.5 16th October 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -79,6 +79,9 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', 'dashboard.toAzuracast')->listCheck(false)->icon('fas fa-broadcast-tower') ;
+        }
         
         
         $canDo = ContentHelper::getActions('com_xbmusic');

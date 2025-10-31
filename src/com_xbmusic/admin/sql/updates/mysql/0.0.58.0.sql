@@ -1,1 +1,1 @@
-ALTER TABLE `#__xbmusic_playlists` ADD `allowdupes` INT(1) unsigned NOT NULL DEFAULT '0' AFTER `publicschd`;
+ALTER TABLE `#__xbmusic_azplaylists` ADD `allowdupes` INT(1) unsigned NOT NULL DEFAULT '0' AFTER `publicschd`;

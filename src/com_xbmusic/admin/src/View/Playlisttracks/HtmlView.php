@@ -49,7 +49,7 @@ class HtmlView extends BaseHtmlView {
 
         //get playlist data
         $this->id = $this->state->get('id',0);
-        $this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_playlists', 'title', $this->id) : 'xxx';
+        $this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_azplaylists', 'title', $this->id) : 'xxx';
                 
         $this->addToolbar();
         

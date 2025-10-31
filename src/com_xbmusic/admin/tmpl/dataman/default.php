@@ -64,7 +64,7 @@ $wa->addInlineScript("window.onload = function() {
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />
 
-        <h3>xbMusic Data Manager</h3>
+        <h2><i class='icon-database' ></i> Data Manager</h2>
 
 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
@@ -266,15 +266,15 @@ $wa->addInlineScript("window.onload = function() {
 							<?php if ($station['az_stid']>0 ) : ?>
 							    <p>
 							    	<i>AzID</i>: 
-    							    <?php echo $station['az_stid'].' '.$station['az_apiname']; ?>
+    							    <?php echo $station['az_stid']; //.' '.$station['az_apiname']; ?>
     							    <br />
     								<i>AzURL</i>: 
     								<a href="<?php echo $station['az_url']; ?>" target="_blank">
                              			<?php echo $station['az_url']; ?></a>
                              		<br />
     								<i>AzAPI User</i>: 
-    								<a href="<?php echo $station['az_apiname']; ?>" target="_blank">
-                             			<?php echo $station['az_apiname']; ?></a>
+    								<a href="<?php // echo $station['az_apiname']; ?>" target="_blank">
+                             			<?php // echo $station['az_apiname']; ?></a>
                          		</p>
                          		<p><i>Media path under <b>/xbmusic/</b></i> :
                          			<code><?php echo (empty($station['mediapath'])) ? '<br />REQUIRED : please use Edit button above and enter path to station media': $station['mediapath']; ?></code>

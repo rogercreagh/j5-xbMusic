@@ -23,6 +23,7 @@ use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
 use Joomla\Filter\OutputFilter;
 use DateTime;
@@ -377,7 +378,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function getItemIdFromAlias(string $table, string $alias){
-        $db = Factory::getDbo();
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
         $query = $db->getQuery(true);
         $query->select($db->qn('id'))->from($db->qn($table))->where('alias = '.$db->q($alias));
         $db->setQuery($query);
@@ -954,7 +956,21 @@ class XbmusicHelper extends ComponentHelper
 	    
 	}
 	
-	/************ DB AZURACAST STATION FUNCTIONS ************/
+	/************ DB AZURACAST FUNCTIONS ************/
+	
+	public static function getUserApiKeys($userid = 0) {
+	    if ($userid == 0) {
+	        $userid = Factory::getApplication()->getIdentity()->id; //->getSession()->get('user');	        
+	    }
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('*')
+	    ->from($db->qn('#__xbmusic_userapikeys'))
+	    ->where('user_id = '.$db->q($user->id));
+	    $db->setQuery($query);
+	    return $db->loadObjectList();	    
+	}
 	
 	/**
 	 * @name getStations()
@@ -973,7 +989,7 @@ class XbmusicHelper extends ComponentHelper
 	        foreach ($dbstations AS &$station) {
 	            $query->clear();
 	            $query->select('COUNT(id) AS plcnt , SUM(scheduledcnt) AS schtot, COUNT(CASE WHEN scheduledcnt > 0 THEN 1 ELSE NULL END) AS schlists');
-	            $query->from('#__xbmusic_playlists');
+	            $query->from('#__xbmusic_azplaylists');
 	            $query->where('db_stid = '.$db->q($station['id']));
 	            $db->setQuery($query);
 	            $cnts = $db->loadAssoc();
@@ -1034,7 +1050,7 @@ class XbmusicHelper extends ComponentHelper
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('*');
-	    $query->from('#__xbmusic_playlists');
+	    $query->from('#__xbmusic_azplaylists');
 	    $query->where($db->qn('db_stid').' = '. $dbstid); //?????????
 	    $db->setQuery($query);
 	    return $db->loadAssoc();
@@ -1060,5 +1076,73 @@ class XbmusicHelper extends ComponentHelper
 	    }	    
 	}
 		
+	public static function saveApiUserkey($fullkey, $selected = 1, $userid = 0) {
+	    
+	    if ($userid == 0) $userid = Factory::getApplication()->getIdentity()->id;
+	    if ((strlen($fullkey) != 49) || (strpos($fullkey, ':') != 16)) {
+	        Factory::getApplication()->enqueueMessage('New key incorrect length or format','Warning');
+	        return false;
+        }
+        $splitkey = explode(':', $fullkey);
+        $keyid = $splitkey[0];
+        $keyval = $splitkey[1];
+        //check if key is valid and if so get comment
+        $api = new AzApi(0,0,$fullkey);
+        if ($api->getApikey())
+        $comment = 'xxx';
+        //check if key id exists
+        if (self::getApikeyByKeyid($keyid) == false) {
+            $colarr = array('id', 'user_id', 'az_apikeyid', 'az_apikeyval',
+                'az_apicomment'
+            );
+            $db = Factory::getDbo(); //Factory::getContainer()->get(DatabaseInterface::class);
+            $values=array($db->q(0),$db->q($userid),$db->q($keyid),$db->q($keyval),
+                $db->q($comment)
+            );
+            $query = $db->getQuery(true);
+            $query->insert($db->qn('#__xbmusic_userapikeys'));
+            $query->columns(implode(',',$db->qn($colarr)));
+            $query->values(implode(',',$values));
+            try {
+                $db->setQuery($query);
+                $res = $db->execute();
+            } catch (\Exception $e) {
+                Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+                return false;
+            }
+            if ($res == true) {
+                $newid = $db->insertid();
+                if ($selected) {
+                    $query->clear();
+                    $query->update($db->qn('#__xbmusic_userapikeys'));
+                    $query->set($db->qn('selected'). ' = (id='.$newid.')');
+                    try {
+                        $db->setQuery($query);
+                        $res = $db->execute();
+                    } catch (\Exception $e) {
+                        Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+                        return false;
+                    }
+                    
+                }
+                Factory::getApplication()->enqueueMessage(Text::_('new api key created and selected').' : '.$newid);
+            }
+            return $res;
+            
+        }
+	}
+	
+	public static function getApikeyByKeyid(string $keyid) {
+	    $db = Factory::getDbo(); //Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('*');
+	    $query->from('#__xbmusic_userapikeys');
+	    $query->where($db->qn('az_apikeyid').' = '. $db->q($keyid)); 
+	    $db->setQuery($query);
+	    $result = $db->loadObject();
+	    if (is_null($result)) return false;
+	    return $result;
+	}
+	
 } //end xbmusicHelper
 

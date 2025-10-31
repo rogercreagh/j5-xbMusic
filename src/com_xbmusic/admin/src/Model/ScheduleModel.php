@@ -173,7 +173,7 @@ class ScheduleModel extends ListModel {
         }
        /*
         SELECT a.id AS plid , a.title AS pltitle, a.az_jingle, a.publicschd
-FROM `j512_xbmusic_playlists` AS a
+FROM `j512_xbmusic_azplaylists` AS a
 LEFT JOIN `j512_xbmusic_azschedules` as sh ON a.id = sh.dbplid
 LEFT JOIN `j512_xbmusic_azstations` AS st ON a.db_stid = st.id
 WHERE st.id = 2
@@ -190,7 +190,7 @@ WHERE st.id = 2
                 .', sh.az_days AS az_days, sh.az_loop AS az_loop'
                 )
             );
-        $query->from('#__xbmusic_playlists AS a');
+        $query->from('#__xbmusic_azplaylists AS a');
         $query->join('LEFT', $db->qn('#__xbmusic_azschedules').' AS sh','a.id = sh.dbplid');
         $query->join('LEFT', $db->qn('#__xbmusic_azstations').' AS st',' a.db_stid = st.id');
         

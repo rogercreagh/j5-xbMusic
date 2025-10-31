@@ -81,7 +81,7 @@ function playAudio(name, filepathname) {
 			</audio>        		
             <div id="playertitle" class="pull-left" style="margin:5px 20px 0 0;"></div>
         </div>
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TRACKS'); ?></h3>
+		<h2><i class='fas fa-guitar' ></i> <?php echo Text::_('XBMUSIC_LIST_TRACKS'); ?></h2>
 		<div class="clearfix"></div>		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));

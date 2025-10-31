@@ -126,7 +126,7 @@ $input = Factory::getApplication()->getInput();
     		<div class="row">
 				<?php if ($this->stncnt == 0)  : ?>
     				<p><?php echo Text::_('XBMUSIC_NO_STATIONS_YET'); ?>
-    				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php echo $this->az_apiname; ?></code> 
+    				<br /><?php echo Text::_('XBMUSIC_CURRENT_CREDS'); ?> : APIname: <code><?php //echo $this->az_apiname; ?></code> 
     				at <code><?php echo $this->az_url; ?></code> <?php echo Text::_('XBMUSIC_OPTIONS_LINK'); ?></p>
 				<?php elseif ($this->item->az_plid > 0) : ?>
 					<hr />

@@ -205,7 +205,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 					</table>
 				</div>
 				<div class="xbbox gradpurple">
-					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=dataman#azuracast"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=azuracast"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
                 <?php if ($this->azuracast == 1) : ?>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>
@@ -222,7 +222,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
                          			<br />
 							    <?php if ($station['az_stid']>0 ) : ?>
 							    	<i>AzID</i>: 
-							        <?php echo $station['az_stid'].' '.$station['az_apiname']; ?>
+							        <?php echo $station['az_stid']; //.' '.$station['az_apiname']; ?>
 							    <?php else : ?>
 							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
 							    <?php endif; ?> 

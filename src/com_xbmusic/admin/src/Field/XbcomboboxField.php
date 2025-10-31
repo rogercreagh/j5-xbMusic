@@ -6,7 +6,7 @@
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
- * @desc creates a form field type to select an album from list
+ * @desc creates a form field type to combo box
  ******/
 
 namespace Crosborne\Component\Xbmusic\Administrator\Field;
@@ -40,9 +40,14 @@ class XbcomboboxField extends ListField {
             $query->select('DISTINCT '.$db->qn($column).' AS value, '.$db->qn($column).' AS text');
             $query->from($db->qn('#__'.$table));
             $db->setQuery($query);
-            $result = $db->loadObjectList();            
+            $result = $db->loadAssocList(); 
+           
+        } else {
+            $result = [];
         }
-        $options = array_merge(parent::getOptions(), $result);
+        //nedd to remove any values in result already in options
+        
+        $options = array_unique(array_merge(parent::getOptions(), $result));
         return $options;
         
     }

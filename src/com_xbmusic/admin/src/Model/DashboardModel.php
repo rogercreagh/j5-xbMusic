@@ -67,7 +67,7 @@ class DashboardModel extends ListModel {
         return $this->ItemCnts('song','#__xbmusic_songs');
     }
     public function getPlaylistCnts() {
-        return $this->ItemCnts('playlist','#__xbmusic_playlists');
+        return $this->ItemCnts('playlist','#__xbmusic_azplaylists');
     }
     public function getArtistCnts() {
         return $this->ItemCnts('artist','#__xbmusic_artists');

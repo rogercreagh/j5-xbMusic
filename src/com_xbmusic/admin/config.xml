@@ -44,7 +44,7 @@
 				<option value="0">Off</option>
 				<option value="1">On</option>	
         </field>
-        
+<!-- 
         <field name="az_apikey" type="text"
         	label="Azuracast API Key"
         	description="Enter a default api key as generated on Azuracast, this will be saved with the station. No spaces."
@@ -55,10 +55,11 @@
         
         <field name="az_apiname" type="text"
         	label="API User:Keyname"
-        	description="The user and name you gave your api key on Azuracast, this will be saved with the station"
+        	description="The username  and the comment you gave your api key on Azuracast"
 			size="50"
 			showon="azuracast:1"
         />
+ -->        
         
         <field name="az_url" type="url"
         	label="Azuracast Server URL"
@@ -398,53 +399,57 @@
 		<field name ="albumtagnote" type="note"
 			label="XBMUSIC_CONFIG_ALBUMTAG_NOTE"
 		/>
-		<field name="albumtagparents" type="tag"
+		<field name="albumtagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
-			mode="nested"
-			multiple="true"	
-			levels="1"
-			remote-search = "false"		
+			mode="nested" multiple="true"	
+			levels="1" parent="0"
+            class="xbtags"
+            layout="joomla.form.field.tag"
 		/>
 		<field name ="artisttagnote" type="note"
 			label="XBMUSIC_CONFIG_ARTISTTAG_NOTE"
 		/>
-		<field name="artisttagparents" type="tag"
+		<field name="artisttagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
-			mode="nested"
-			multiple="true"			
-			levels="1"
+			mode="nested" multiple="true"	
+			levels="1" parent="0"
+            class="xbtags"
+            layout="joomla.form.field.tag"
 		/>
 		<field name ="plisttagnote" type="note"
 			label="XBMUSIC_CONFIG_PLISTTAG_NOTE"
 		/>
-		<field name="plisttagparents" type="tag"
+		<field name="plisttagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
-			mode="nested"
-			multiple="true"			
-			levels="1"
+			mode="nested" multiple="true"	
+			levels="1" parent="0"
+            class="xbtags"
+            layout="joomla.form.field.tag"
 		/>
 		<field name ="songtagnote" type="note"
 			label="XBMUSIC_CONFIG_SONGTAG_NOTE"
 		/>
-		<field name="songtagparents" type="tag"
+		<field name="songtagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
-			mode="nested"
-			multiple="true"			
-			levels="1"
+			mode="nested" multiple="true"	
+			levels="1" parent="0"
+            class="xbtags"
+            layout="joomla.form.field.tag"
 		/>
 		<field name ="tracktagnote" type="note"
 			label="XBMUSIC_CONFIG_TRACKTAG_NOTE"
 		/>
-		<field name="tracktagparents" type="tag"
+		<field name="tracktagparents" type="xbtags"
 			label="XBMUSIC_CONFIG_TAG_PARENTS"
 			description="XBMUSIC_CONFIG_TAG_PARENTS_DESC"
-			mode="nested"
-			multiple="true"			
-			levels="1"
+			mode="nested" multiple="true"	
+			levels="1" parent="0"
+            class="xbtags"
+            layout="joomla.form.field.tag"
 		/>
 		
 	</fieldset>		

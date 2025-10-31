@@ -16,7 +16,7 @@ use Joomla\CMS\Language\Text;
 $options = array('value'=>'','text'=>'No change');
 $db = Factory::getDbo();
 $query  = $db->getQuery(true);
-$query->select('id AS value, title AS text')->from('#__xbmusic_playlists');
+$query->select('id AS value, title AS text')->from('#__xbmusic_azplaylists');
 $query->order('title ASC');
 $db->setQuery($query);
 $result = $db->loadObjectList();

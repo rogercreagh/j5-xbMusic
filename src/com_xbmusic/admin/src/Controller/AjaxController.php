@@ -63,7 +63,7 @@ class AjaxController extends BaseController
                     $item->value =  $plist->id;
                     $item->text = $plist->name;
                     //check if playlist is already imported
-                    if (XbcommonHelper::getItem('#__xbmusic_playlists', $item->value, 'az_plid', 'db_stid = '.$dbstid)) 
+                    if (XbcommonHelper::getItem('#__xbmusic_azplaylists', $item->value, 'az_plid', 'db_stid = '.$dbstid)) 
                         $item->value = -1;
                     $options[] = $item;
                 }

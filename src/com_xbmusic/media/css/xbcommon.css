@@ -144,9 +144,14 @@ ul.nav-tabs {
 	background-color:aliceblue;
 }
 
-/** class to reduce label width on horizontal form layout **/
+/** classes to reduce label width on horizontal form layout **/
 .xblblcompact .control-group .control-label {
 	width: unset;
+}
+
+/** reduce width for controls label and input/select - use this on parent div wraping the control(s) */
+.xbctl150 .control-label, .xbctl150 input, .xbctl150 select {
+	max-width: 150px;
 }
 
 /* end of joomla system overrides */
@@ -177,9 +182,6 @@ ul.nav-tabs {
 }
 .xbboxwht, .xbbgwht {
 	background-color: #f7f7f7; /* to lift from pure white bckgrnd */
-}
-.xbbggy {
-	background-color: #eee;
 }
 
 /* box gradientbackgrounds */
@@ -434,6 +436,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbmb20 { margin-bottom:20px; }
 
 /* padding */
+.xbp10-20 {padding: 10px 20px;}
 .xbpb10 { padding-bottom:10px;}
 .xbpl5 {padding-left:5px;}
 .xbpl10 {padding-left:10px;}
@@ -448,7 +451,8 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbpt17 { padding-top:17px;}
 
 /* heights */
-.xbht200 {height:200px;};
+.xbht200 {height:200px;}
+.xbht150 {height:150px;}
 
 /* maxheights */
 .xbmh200 {max-height:200px; }
@@ -461,6 +465,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbw18 {width: 18px; }
 .xbw100 {width:100px; }
 .xbw125 {width:125px; }
+.xbw600 {width: 600px;}
 
 .xbwi125 {width: 125px !important;}
 
@@ -470,10 +475,18 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbwp40 {width:40%; }
 
 /* maxwidth eg for divs */
+.xbmw450 { max-width:450px; }
+.xbmw600 { max-width:600px; }
 .xbmw1000 { max-width:1000px; }
 .xbmw1100 { max-width:1100px; }
 .xbmw1200 { max-width:1200px; }
 .xbmw1400 { max-width:1400px; }
+
+.xbmwp100 {max-width:100%; }
+.xbmwp60 {max-width:60%; }
+.xbmwp50 {max-width:50%; }
+.xbmwp40 {max-width:40%; }
+
 
 /* borders */
 .xbbb1 { border-bottom:solid 1px gray;}
@@ -488,6 +501,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbbgltgreen {background-color: #dfd; }
 .xbbgltred {background-color: #faa; }
 .xbbgwhite {background-color: #fff; }
+.xbbggy {background-color: #eee; }
 
 /* fg colours */
 .xbgold { color:#edc500; }
@@ -557,11 +571,6 @@ dl.xbdl dd {
 .table-freeze th {
 	position: sticky;
 	top: 0;
-}
-
-/** reduce width for controls label and input/select - use this on parent div wraping the control(s) */
-.xbctl150 .control-label, .xbctl150 input, .xbctl150 select {
-	max-width: 150px;
 }
 
 /** xbtags field specific modifications to choicesjs **/

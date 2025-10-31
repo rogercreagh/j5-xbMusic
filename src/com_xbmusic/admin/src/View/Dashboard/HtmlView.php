@@ -37,7 +37,7 @@ class HtmlView extends BaseHtmlView {
         $catbadge = '<span class="xbbadge badge-cat">';        
         
         $this->azuracast = $params->get('azuracast','0');
-        $this->az_apikey = $params->get('az_apikey','0');
+ //       $this->az_apikey = $params->get('az_apikey','0');
         $this->az_url = $params->get('az_url','');
         $this->stations = XbmusicHelper::getStations();            
  //       if (($this->azuracast == 1) && ($this->az_apikey) != '') {
@@ -292,12 +292,15 @@ class HtmlView extends BaseHtmlView {
         $childBar = $dropdown->getChildToolbar();
         $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
         $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-        $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
-        $childBar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
+ //       $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+//        $childBar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', 'dashboard.toAzuracast')->listCheck(false)->icon('fas fa-broadcast-tower') ;
+        }
         $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
         
         

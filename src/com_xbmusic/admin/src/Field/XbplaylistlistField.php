@@ -35,7 +35,7 @@ class XbplaylistlistField extends ListField {
         $query  = $db->getQuery(true);
         //SELECT id, CONCAT(title, ' (',(SELECT COuNT(*) FROM j512_xbmusic_songalbum AS a WHERE a.song_id = s.id),')') AS title FROM j512_xbmusic_songs AS s
         
-        $query->select('id AS value, title AS text')->from('#__xbmusic_playlists');
+        $query->select('id AS value, title AS text')->from('#__xbmusic_azplaylists');
         $query->order('title ASC');
         $db->setQuery($query);
         $result = $db->loadObjectList();

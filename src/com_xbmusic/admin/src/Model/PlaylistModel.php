@@ -240,7 +240,7 @@ class PlaylistModel extends AdminModel {
         //alias defaults to title
         if ($data['alias'] == '') {
             $data['alias'] = OutputFilter::stringURLSafe($data['title']);
-            $data['alias'] = XbcommonHelper::makeUniqueAlias($data['alias'], '#__xbmusic_playlists');
+            $data['alias'] = XbcommonHelper::makeUniqueAlias($data['alias'], '#__xbmusic_azplaylists');
         }
         
         if (isset($data['created_by_alias'])) {
@@ -714,7 +714,7 @@ class PlaylistModel extends AdminModel {
         }
         if ($dbdata['title'] == '') $dbdata['title'] = $azpldata->name;
         $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
-        $dbdata['alias'] = XbcommonHelper::makeUniqueAlias($dbdata['alias'], '#__xbmusic_playlists');
+        $dbdata['alias'] = XbcommonHelper::makeUniqueAlias($dbdata['alias'], '#__xbmusic_azplaylists');
         $dbdata['az_plid'] = $azpldata->id;
         $dbdata['az_name'] = $azpldata->name;
         $dbdata['db_stid'] = $dbdata['azstation'];
@@ -973,7 +973,7 @@ class PlaylistModel extends AdminModel {
         $query = $db->getQuery(true);
         $query->select('sh.id AS id, sh.az_shid AS az_shid, sh.dbplid AS dbplid, az_starttime, az_endtime, az_startdate, az_enddate, az_days, az_loop');
         $query->from('#__xbmusic_azschedules AS sh');
-        $query->innerjoin('#__xbmusic_playlists AS a ON sh.dbplid= a.id');
+        $query->innerjoin('#__xbmusic_azplaylists AS a ON sh.dbplid= a.id');
         $query->where('sh.dbplid = '.$playlist_id);
         $query->order('az_startdate ASC', 'az_starttime ASC');
         $db->setQuery($query);

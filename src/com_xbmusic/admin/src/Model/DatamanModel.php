@@ -532,6 +532,11 @@ class DatamanModel extends AdminModel {
     
     /************ AZURACAST FUNCTIONS ************/
     
+    public function getAzStations() {
+        $api = new AzApi();
+        return $api->azStations();
+    }
+    
     /**
      * @name importAzStation()
      * @desc creates or updates a single station with details from Azuracast 
@@ -588,7 +593,7 @@ class DatamanModel extends AdminModel {
         // we need to update title alias apikey apiname azstream website azplayer description az info modified modified_by    
         $db = $this->getDatabase();
         $conditions = array('title='.$db->q($azstation->name), 'alias='.$db->q($azstation->shortcode),
-            'az_stid='.$db->q($azstation->id), 'az_apikey='.$db->q($apikey), 'az_apiname='.$db->q($apiname),
+            'az_stid='.$db->q($azstation->id), 
             'az_stream='.$db->q($azstation->listen_url), 'website='.$db->q($azstation->url),
             'az_player='.$db->q($azstation->public_player_url), 'description='.$db->q($azstation->description), 
             'az_info='.$db->q(json_encode($azstation)), 
@@ -623,14 +628,14 @@ class DatamanModel extends AdminModel {
         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
 //        XbcommonHelper::getCreateCat($catdata)
         $colarr = array('id', 'az_stid', 'title', 'alias',
-            'az_apikey', 'az_apiname', 'az_url',
+            'az_url',
             'az_stream','website', 'az_player',
             'catid', 'description', 'az_info',
             'created','created_by', 'created_by_alias'
         );
         $db = $this->getDatabase();
         $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
-            $db->q($apikey), $db->q($apiname), $db->q($azurl),
+            $db->q($azurl),
             $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
             $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
             $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast')
@@ -737,11 +742,6 @@ class DatamanModel extends AdminModel {
 //     }
     
    
-//     public function getAzStations() {
-//         $api = new AzApi();
-//         return $api->azStations();
-//     }
-    
 //     public function azPlaylists(int $stid) {
 //         $api = new AzApi();
 //         return $api->azPlaylists($stid);

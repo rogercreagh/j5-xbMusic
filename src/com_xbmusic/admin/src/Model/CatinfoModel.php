@@ -36,7 +36,7 @@ class CatinfoModel extends ItemModel {
             $query->select('c.id AS id, c.path AS path, c.title AS title, c.description AS description, c.alias AS alias, c.level, c.parent_id, c.note As note, c.metadata AS metadata' );
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_albums AS al WHERE al.catid = c.id) AS albumcnt');
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_artists AS ar WHERE ar.catid = c.id) AS artistcnt');
-            $query->select('(SELECT COUNT(*) FROM #__xbmusic_playlists AS pl WHERE pl.catid = c.id) AS playlistcnt');
+            $query->select('(SELECT COUNT(*) FROM #__xbmusic_azplaylists AS pl WHERE pl.catid = c.id) AS playlistcnt');
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_songs AS sg WHERE sg.catid = c.id) AS songcnt');
             $query->select('(SELECT COUNT(*) FROM #__xbmusic_tracks AS tk WHERE tk.catid = c.id) AS trackcnt');
             $query->from('#__categories AS c');
@@ -80,7 +80,7 @@ class CatinfoModel extends ItemModel {
                     $query->clear();
                     $query->select('b.id AS id, b.title AS title')
                     ->from('#__categories AS c');
-                    $query->join('LEFT','#__xbmusic_playlists AS b ON b.catid = c.id');
+                    $query->join('LEFT','#__xbmusic_azplaylists AS b ON b.catid = c.id');
                     $query->where('c.id='.$item->id);
                     $query->order('b.title');
                     $db->setQuery($query);

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="component" method="upgrade">
 	<name>com_xbmusic</name>
-	<creationDate>9th October 2025</creationDate>
-	<version>0.0.58.4</version>
+	<creationDate>30th October 2025</creationDate>
+	<version>0.0.59.1</version>
 	<author>RogerCO</author>
 	<authorEmail>roger@crosborne.co.uk</authorEmail>
 	<authorUrl>www.crosborne.uk</authorUrl>
@@ -24,8 +24,8 @@
 			<file charset="utf8" driver="mysql">sql/uninstall.mysql.utf8.sql</file>
 		</sql>
 	</uninstall> 
-	<!-- 
-	 -->
+	<!--  -->	
+
 	<update>
 		<schemas>
 			<schemapath type="mysql">sql/updates/mysql</schemapath>
@@ -73,6 +73,44 @@
 					<menu-quicktask>index.php?option=com_xbmusic&amp;view=artist&amp;layout=edit</menu-quicktask>
 				</params>
 			</menu>
+			<menu link="option=com_xbmusic&amp;view=songs" >
+				xbmusic_iconmenu_songs
+				<params>
+					<menu-quicktask-title>XBMUSIC_NEW_SONG</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=song&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=tracks" >
+				xbmusic_iconmenu_tracks
+				<params>
+					<menu-quicktask-title>XBMUSIC_NEW_TRACK</menu-quicktask-title>
+					<menu-quicktask-icon>eye</menu-quicktask-icon>
+					<menu-quicktask>index.php?option=com_xbmusic&amp;view=track&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=azuracast" >
+				xbmusic_iconmenu_azuracast
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=dataman" >
+				xbmusic_iconmenu_dataman
+			</menu>
+			<menu link="option=com_config&amp;view=component&amp;component=com_xbmusic" >
+				xbmusic_iconmenu_options				
+			</menu>
+		</submenu>
+		
+	</administration>
+<!-- deleted menu items
+			<menu link="option=com_xbmusic&amp;view=catlist" >
+				xbmusic_iconmenu_categories
+				<params>
+					<menu-quicktask-title>XB_NEW_CATEGORY</menu-quicktask-title>
+					<menu-quicktask>index.php?option=com_categories&amp;extension=com_xbmusic&amp;view=category&amp;layout=edit</menu-quicktask>
+				</params>
+			</menu>
+			<menu link="option=com_xbmusic&amp;view=taglist" >
+				xbmusic_iconmenu_taglist
+			</menu>
 			<menu link="option=com_xbmusic&amp;view=playlists" >
 				xbmusic_iconmenu_playlists
 				<params>
@@ -89,41 +127,8 @@
 					<menu-quicktask>index.php?option=com_xbmusic&amp;view=schedule</menu-quicktask>
 				</params>
 			</menu>
-			<menu link="option=com_xbmusic&amp;view=songs" >
-				xbmusic_iconmenu_songs
-				<params>
-					<menu-quicktask-title>XBMUSIC_NEW_SONG</menu-quicktask-title>
-					<menu-quicktask>index.php?option=com_xbmusic&amp;view=song&amp;layout=edit</menu-quicktask>
-				</params>
-			</menu>
-			<menu link="option=com_xbmusic&amp;view=tracks" >
-				xbmusic_iconmenu_tracks
-				<params>
-					<menu-quicktask-title>XBMUSIC_NEW_TRACK</menu-quicktask-title>
-					<menu-quicktask-icon>eye</menu-quicktask-icon>
-					<menu-quicktask>index.php?option=com_xbmusic&amp;view=track&amp;layout=edit</menu-quicktask>
-				</params>
-			</menu>
-			<menu link="option=com_xbmusic&amp;view=catlist" >
-				xbmusic_iconmenu_categories
-				<params>
-					<menu-quicktask-title>XB_NEW_CATEGORY</menu-quicktask-title>
-					<menu-quicktask>index.php?option=com_categories&amp;extension=com_xbmusic&amp;view=category&amp;layout=edit</menu-quicktask>
-				</params>
-			</menu>
-			<menu link="option=com_xbmusic&amp;view=taglist" >
-				xbmusic_iconmenu_taglist
-			</menu>
-			<menu link="option=com_xbmusic&amp;view=dataman" >
-				xbmusic_iconmenu_dataman
-			</menu>
-			<menu link="option=com_config&amp;view=component&amp;component=com_xbmusic" >
-				xbmusic_iconmenu_options				
-			</menu>
-		</submenu>
-		
-	</administration>
 
+ -->
 <!-- 
 	<files folder="site">
 		<folder>forms</folder>

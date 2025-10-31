@@ -2,7 +2,7 @@
 DROP TABLE IF EXISTS
   `#__xbmusic_albums`,
   `#__xbmusic_artists`,
-  `#__xbmusic_playlists`,
+  `#__xbmusic_azplaylists`,
   `#__xbmusic_songs`,
   `#__xbmusic_tracks`,
   `#__xbmusic_trackartist`,

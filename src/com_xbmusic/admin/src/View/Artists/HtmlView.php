@@ -4,7 +4,7 @@
  * @filesource admin/src/View/Artists/HtmlView.php
  * @version 0.0.9.0 21st June 2024
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -46,6 +46,7 @@ class HtmlView extends BaseHtmlView {
         $this->activeFilters = $this->get('ActiveFilters');
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
+        $this->azuracast = $this->params->get('azuracast',0);
         
         $this->addToolbar();
         
@@ -119,6 +120,9 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('tracksview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', 'dashboard.toAzuracast')->listCheck(false)->icon('fas fa-broadcast-tower') ;
+        }
         $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
         
         if ($canDo->get('core.admin')) {

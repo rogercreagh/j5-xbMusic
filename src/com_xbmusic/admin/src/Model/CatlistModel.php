@@ -51,7 +51,7 @@ class CatlistModel extends ListModel {
         
         $query->select('(SELECT COUNT(*) FROM #__xbmusic_albums AS al WHERE al.catid = c.id ) AS albumcnt');
         $query->select('(SELECT COUNT(*) FROM #__xbmusic_artists AS ar WHERE ar.catid = c.id ) AS artistcnt');
-        $query->select('(SELECT COUNT(*) FROM #__xbmusic_playlists AS pl WHERE pl.catid = c.id ) AS playlistcnt');
+        $query->select('(SELECT COUNT(*) FROM #__xbmusic_azplaylists AS pl WHERE pl.catid = c.id ) AS playlistcnt');
         $query->select('(SELECT COUNT(*) FROM #__xbmusic_songs AS sg WHERE sg.catid = c.id ) AS songcnt');
         $query->select('(SELECT COUNT(*) FROM #__xbmusic_tracks AS tr WHERE tr.catid = c.id ) AS trackcnt');
         

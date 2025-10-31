@@ -119,11 +119,11 @@ class PlaylistsModel extends ListModel {
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
-                    .'a.note, st.title AS st_name, st.az_apiname AS az_apiname, st.az_url AS st_url'
+                    .'a.note, st.title AS st_name, st.az_url AS st_url'
                 )
             );
         $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
-        $query->from('#__xbmusic_playlists AS a');
+        $query->from('#__xbmusic_azplaylists AS a');
         
         // Join azstations
         $query->select('st.title AS azstation' )

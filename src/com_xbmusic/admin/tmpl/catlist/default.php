@@ -52,7 +52,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=catlist'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></h3>
+		<h2<i class='fas fa-folder-tree' ></i> s><?php echo Text::_('XBMUSIC_XBMUSIC_CATEGORIES'); ?></h2>
       	<p class="xb095"><?php echo Text::_('XBMUSIC_CATSPAGE_SUBTITLE'); ?></p>
 		
 		<?php // Search tools bar

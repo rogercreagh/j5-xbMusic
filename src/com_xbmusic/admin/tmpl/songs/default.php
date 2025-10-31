@@ -61,7 +61,7 @@ if (strpos($listOrder, 'modified') !== false) {
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=songs'); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_SONGS'); ?></h3>
+		<h2><i class='fas fa-music' ></i> <?php echo Text::_('XBMUSIC_LIST_SONGS'); ?></h2>
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));

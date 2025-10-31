@@ -106,17 +106,6 @@
 			maxlength="2000"
 		/>
 
-		<field name="az_apikey" type="text"
-			label="API Key" 
-			descripition="api key used to access azuracast"
-			size="60" maxlength="80"
-		/>
-			
-		<field name="az_apiname" type="text"
-			label="API username" descripition="API username used for access"
-			size="20" maxlength="40"
-		/>
-			
 		<field name="az_stream" type="text"
 			label="Primary Stream URL" descripition="URL for the primary stream"
 			readonly="true"

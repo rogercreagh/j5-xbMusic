@@ -1,1 +1,1 @@
-ALTER TABLE `#__xbmusic_playlists` ADD `publicschd` INT(1) NOT NULL DEFAULT '1' AFTER `scheduledcnt`;
+ALTER TABLE `#__xbmusic_azplaylists` ADD `publicschd` INT(1) NOT NULL DEFAULT '1' AFTER `scheduledcnt`;

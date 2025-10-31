@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.56.0 17th July 2025
+ * @version 0.0.59.0 19th October 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -180,7 +180,7 @@ class XbcommonHelper extends ComponentHelper {
         $res['albumcnt'] = $db->loadResult();
         $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_artists AS a WHERE a.catid = '.$db->q($id));
         $res['artistcnt'] = $db->loadResult();
-        $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_playlists AS a WHERE a.catid = '.$db->q($id));
+        $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_azplaylists AS a WHERE a.catid = '.$db->q($id));
         $res['playlistcnt'] = $db->loadResult();
         $db->setQuery('SELECT COUNT(*) FROM #__xbmusic_songs AS a WHERE a.catid = '.$db->q($id));
         $res['songcnt'] = $db->loadResult();
@@ -529,33 +529,41 @@ class XbcommonHelper extends ComponentHelper {
         $query->where($db->qn($col).' = '.$db->q($val));
         if ($where != '') $query->where($where);
         $db->setQuery($query);
-        if ($retarray) return $db->loadAssoc();
-        return $db->loadObject();
+        try {
+            if ($retarray) {
+                $res = $db->loadAssoc();
+            } else {
+                $res = $db->loadObject();
+            }
+        } catch (\Exception $e) {
+            $dberr = $e->getMessage();
+            Factory::getApplication()->enqueueMessage('getItems() '.$dberr.'<br />Query: '.$query->dump(), 'error');
+            $res = false;
+        }
+        return $res;
     }
     
     /**
-     * @name getItems
+     * @name getItems()
+     * @desc get a list of items (arrays or objects) from table with optional condition string
      * @param string $table - table name containing item(s)
-     * @param string $column - column to search in
-     * @param string $search - value to search for, for partial string match use %str%
-     * @param string $filter - optional string to use as andwhere clause
+     * @param string $where - optional string to use as where clause ("colname = value")
+     * @param bool $retarray - true to return a items as arrays, otherwise as objects
      * @return array of objects
      */
-    public static function getItems(string $table, string $column, $search = '', $filter = '' ) {
-        //TODO make case insenstive?
+    public static function getItems(string $table, $where = '',$retarray = false ) {
         $db = Factory::getDbo();
         //$db = Factory::getContainer()->get(DatabaseInterface::class);
         $query = $db->getQuery(true);
         $query->select('*')->from($db->qn($table).' AS a');
-        if (($search !='') && (($search[0] == '%') || ($search[-1] == '%'))) {
-            $query->where($db->qn($column). 'LIKE ('.$db->q($search).')');
-        } else {
-            $query->where($db->qn($column).' = '.$db->q($search));
-        }
-        if ($filter !='') $query->where($filter);
+        if ($where !='') $query->where($where);
         $db->setQuery($query);
         try {
-            $res = $db->loadObjectList();
+            if ($retarray) {
+                $res = $db->loadAssocList();
+            } else {
+                $res = $db->loadObjectList();
+            }
         } catch (\Exception $e) {
             $dberr = $e->getMessage();
             Factory::getApplication()->enqueueMessage('getItems() '.$dberr.'<br />Query: '.$query->dump(), 'error');
