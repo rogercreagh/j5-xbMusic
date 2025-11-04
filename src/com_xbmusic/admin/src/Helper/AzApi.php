@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.1 30th October 2025
+ * @version 0.0.59.2 3rd November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -38,45 +38,61 @@ class AzApi {
      * @desc if a db user id is provided will get the url and apikey from database
      * @desc otherwise will use the first value from userapikeys for given user
      * @param int $apidbid - id of key in userapikeys table
-     * @param int userid - id of user to retrieve first keyy from
+     * @param int $userid - id of user to retrieve first key from
+     * @param string  $apifullkey - full 49 char api key
      */
-    public function __construct(int $dbapiid = 0, int $userid = 0, $apifullkey = '' ) { //int $dbstid = 0, 
+    public function __construct(int $dbapiid = 0, int $userid = 0, $apifullkey = '', $azurl = null ) { //int $dbstid = 0, 
         //check Azuracast enabled
         $keyinfo = false;
         $params = ComponentHelper::getParams('com_xbmusic');
         if ($params->get('azuracast',0) == 0) return false;        
-        $this->apiurl = trim($params->get('az_url',''),'/').'/api';
         
         if ($dbapiid > 0) { //we're getting an apikey from the userapikeys table using the id
+            //TODO ammend to get selected key and fallback if none selected
             $keyinfo = XbcommonHelper::getItem('#__xbmusic_userapikeys', $dbapiid);
         } else {
             //if a userid not specified use the current user
             if ($userid == 0) $userid = Factory::getApplication()->getIdentity()->id; //->getSession()->get('user');
-            $keyinfo = XbcommonHelper::getItem('#__xbmusic_userapikeys', $userid, 'user_id');
+            $keyinfo = XbmusicHelper::getSelectedApiKey($userid);
         }
-        
+        // handle alternate server to one set in params 
+        if ($azurl) {
+            $this->apiurl = $azurl;
+        } else {
+            $this->apiurl = trim($params->get('az_url',''),'/').'/api';
+        }
+                    
         if ($keyinfo) {
             $this->apifullkey = $keyinfo->az_apikeyid.':'.$keyinfo->az_apikeyval;
             $this->apicomment = $keyinfo->az_apicomment;
         } elseif (strlen($apifullkey) == 49) {
-            //we'll 
+             
             $this->apifullkey = $apifullkey;
-            $me = $this->getApiStatus(); //returns false on error
-            if ($me) {
+            $me = $this->azMe(); 
+            if (!isset($me->code)) {
                 $url = $this->apiurl.'/frontend/account/api-key/'.strok($apifullkey,':');
                 $result = $this->azApiGet($url);
                 if (!isset($result->code)) {
                     $this->apicomment = $result->comment;
-                }                               
+//                 } else {
+//                     // error getting apikey may be permissions issue but ok
+//                     return false;
+                }
+            } else {
+                //failed to login to api
+                Factory::getApplication()->enqueueMessage('Error creating API object.<br>'
+                    .$me->code.' : '.$me->formatted_message, 'Error');
+                
+                $this->apifullkey = ''; //overwrite any existing
+                $this->apicomment = '';
+                return false;
             }
             
-        } 
-//        if ($this->apicomment == '') {
-//            //no user apikey but we can still use public api calls
-//            $this->apifullkey = ''; //overwrite any existing
-//            $this->apicomment = 'no key provided';
-//        }
-
+        } else { //else we've not got a valid key 
+            Factory::getApplication()->enqueueMessage('Error creating API object.<br>'
+                .'No api key provided or found for current user', 'Error');
+            
+        }
         $this->authorization = "Authorization: Bearer ".$this->apifullkey;
     }
     
@@ -84,7 +100,7 @@ class AzApi {
         return $this->apifullkey;
     }
     
-    public function getApiname() {
+    public function getApicomment() {
         return $this->apicomment;
     }
     
@@ -97,31 +113,45 @@ class AzApi {
     }
     
     /***
-     * @name getApiStatus()
+     * @name azMe()
      * @desc gets account details for az_api user, false if not logged in, invalid apikey or error
      * user details as object-> email, name, locale, 24hr, id, roles[id,name], avatar[]
-     * @return false | user object 
+     * @return $result  user or error object 
      */
-    public function getApiStatus()    {
+    public function azMe() {
         $url=$this->apiurl.'/frontend/account/me';
+        return $this->azApiGet($url);        
+    }
+    
+    /**
+     * @name azStations()
+     * @desc get list of Az stations on server.
+     * Public properties for all stations plus admin properties if avaiable
+     * @return object
+     */
+    public function azStations() {
+        //first get public stations info
+        $url = $this->apiurl.'/stations';
         $result = $this->azApiGet($url);
-        if (isset($result->code)) {
-            return false;  
+        foreach ($result as &$station) {
+            //try for station profile
+            $url = $this->apiurl.'/station/'.$station->id.'/profile';
+            $profile = $this->azApiGet($url);
+            //if okay set isadmin and merge with public
+            if (!isset($profile->code)) {
+                $station->isadmin = true;
+                //merge to add services and schedule elements
+                $station = (object) array_merge((array) $station, (array) $profile);
+            } else {
+                $station->isadmin = false;
+            }
         }
         return $result;
     }
     
-    public function azStations() {
-        $url=$this->apiurl.'/stations';
+    public function azServer() {
+        $url = $this->apiurl.'/admin/settings';
         $result = $this->azApiGet($url);
-        foreach ($result as $station) {
-            $admin = false;
-            $quota = $this->azStationQuota($station->id);
-            if (isset($quota->used)) {
-                $admin = true;
-            }
-            $station->isadmin = $admin;
-        }
         return $result;
     }
     
@@ -135,7 +165,7 @@ class AzApi {
         $url=$this->apiurl.'/station/'.$azstid;
         $result = $this->azApiGet($url);
         $admin = false;
-        $quota = $this->azStationQuota($station->id);
+        $quota = $this->azStationQuota($azstid);
         if (isset($quota->used)) {
             $admin = true;
         }

@@ -1,10 +1,10 @@
 /**
  * @package xbmusic
  * @filesource /media/js/closedetails.js
- * @version 0.0.53.0 5th June 2025
+ * @version 0.0.59.2 3rd November 2025
  * @desc functions to auto details sections and prevent propogation of clicks
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2019
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  * 
 **/
@@ -26,18 +26,21 @@ All_Details.forEach(deet=>{
 /**
  * @name toggleOpenOneOnly()
  * @description close other details sections when one is opened. 
- * Needs an input type checkbox or hidden with id="autoclose" and attribute checked="true"
- * checkbox enables user to toggle the autoclose, use hidden input to force it always on
+ * Set autoclose with an input type checkbox with id="autoclose".
+ * checkbox enables user to toggle the autoclose, if not present then autoclose always on
  */
 function toggleOpenOneOnly(e) {
-  if (document.getElementById('autoclose').checked){
-    if (this.open) {
-      All_Details.forEach(deet=>{
-        if (deet!=this && deet.open) deet.open = false
-      });
-	  sessionStorage.setItem('deetopen', this.id);
-    }   
-  }
+	var checkbox = document.getElementById('autoclose');
+	if (!checkbox || checkbox.checked){
+		if (this.open) {
+			All_Details.forEach(deet=>{
+				if (deet!=this && deet.open) deet.open = false
+			});
+	  		sessionStorage.setItem('deetopen', this.id);
+    	} else {
+			sessionStorage.removeItem('deetopen');
+		}  
+  	}
 }
 
 /**

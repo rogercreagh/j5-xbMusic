@@ -2,8 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AzuracastModel.php
- * @version 0.0.58.4 14th October 2025
- * @author Roger C-O
+ * @version 0.0.59.2 31st October 2025
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
@@ -39,11 +38,52 @@ class AzuracastModel extends AdminModel {
         return $form;
     }
     
+    protected function loadFormData() {
+       
+        $app  = Factory::getApplication();
+        $data = $app->input->get('jform', array(), 'ARRAY');
+        if (!isset($data['apilist'])) $data['apilist'] = 0;
+        if ($data['apilist']  >0) {
+            $keydeets = XbmusicHelper::getSelectedApiKey();
+            $data['apilist'] = ($keydeets) ? $keydeets->id : 0;
+        }
+        return $data;
+        
+//        if ((!isset($data['apilist'])) || ($data['apilist'] > 0)) {
+//            $keydeets = XbmusicHelper::getSelectedApiKey();
+//            $data['apilist'] = ($keydeets) ? $keydeets->id : 0;
+//        }
+//        return $data;
+    }
     
+/* Azuracast api function calls. If code set report message else return object  */
+
+    /***
+     * @name getAzMe()
+     * @desc fetches the azuracast user object for the current apikey
+     * @param $api object
+     * @return false | azuser object
+     */
+    public function getAzMe($api=null) {
+        if (!isset($api)) $api = new AzApi();
+        $result = $api->azme();
+        if (isset($result->code)) {
+            Factory::getApplication()->enqueueMessage('API error getting User details. <br />'
+                .$result->code.' '.$result->formatted_message,'Error');
+            return false;
+        }
+        return $result;
+    }
     
-    public function getAzStations() {
-        $api = new AzApi();
-        return $api->azStations();
+    public function getAzStations($api = null) {
+        if (!isset($api)) $api = new AzApi();
+        $result = $api->azStations();
+        if (isset($result->code)) {
+            Factory::getApplication()->enqueueMessage('API error getting User details. <br />'
+                .$result->code.' '.$result->formatted_message,'Error');
+            return false;
+        }
+        return $result;
     }
     
     /**
@@ -53,21 +93,22 @@ class AzuracastModel extends AdminModel {
      * @param int $azstid
      * @return int|object - id of new/updated dbstation is ok or error object if fails
      */
-    public function importAzStation(int $azstid) {
+    public function importAzStation(int $azstid, $api = null) {
         //        $params = ComponentHelper::getParams('com_xbmusic');
         //        $azurl = $params->get('az_url');
-                    $api = new AzApi();
+        if (!isset($api)) $api = new AzApi();
         $azstation = $api->azStation($azstid);
         if (isset($azstation->code))
             return $azstation;
-            //now test if dbstastion exists ? update ELSE create
-            $dbstid = $this->getDbStid(trim($azstation->url,'/'), $azstation->id);
-            if ($dbstid > 0) {
-                $res = $this->updateDbStation($dbstid,$azstation);
-            } else {
-                $res = $this->createDbStation($azstation);
-            }
-            return $res;
+        //TODO error check
+        //now test if dbstastion exists ? update ELSE create
+        $dbstid = $this->getDbStid(trim($azstation->url,'/'), $azstation->id);
+        if ($dbstid > 0) {
+            $res = $this->updateDbStation($dbstid,$azstation);
+        } else {
+            $res = $this->createDbStation($azstation);
+        }
+        return $res;
     }
     
     /**
@@ -93,11 +134,7 @@ class AzuracastModel extends AdminModel {
      * @param object $station
      * returns boolean|Exception true if ok
      */
-    public function createDbStation($station) {
-        $api = new AzApi();
-        $apikey = $api->getApikey();
-        $azurl = $api->getAzurl();
-        $apiname = $api->getApiname();
+    public function createDbStation($azstation) {
         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
         //        XbcommonHelper::getCreateCat($catdata)
         $colarr = array('id', 'az_stid', 'title', 'alias',
@@ -106,10 +143,9 @@ class AzuracastModel extends AdminModel {
             'created','created_by', 'created_by_alias'
         );
         $db = $this->getDatabase();
-        $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
-            $db->q($apikey), $db->q($apiname), $db->q($azurl),
-            $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
-            $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
+        $values=array($db->q(0),$db->q($azstation->id),$db->q($azstation->name),$db->q($azstation->shortcode),
+            $db->q($azstation->listen_url), $db->q($azstation->url),$db->q($azstation->public_player_url),
+            $db->q($uncatid),$db->q($azstation->description),$db->q(json_encode($azstation)),
             $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast')
         );
         //$db = Factory::getContainer()->get(DatabaseInterface::cl
@@ -126,9 +162,9 @@ class AzuracastModel extends AdminModel {
         }
         if ($res == true) {
             $newid = $db->insertid();
-            Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$station->name));
+            Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$azstation->name));
         }
-        return $res;
+        return ($res) ? $newid : false;
     }
     
     public function deleteDbStation(int $stid) {

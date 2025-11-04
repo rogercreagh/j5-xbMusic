@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/StationController.php
- * @version 0.0.54.1 13th June 2025
+ * @version 0.0.59.2 3rd November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -36,13 +36,13 @@ class StationController extends FormController {
 
     public function save($key = null, $urlVar = null) {
         $return = parent::save($key, $urlVar);
-        $this->setRedirect('index.php?option=com_xbmusic&view=dataman#azuracast');
+        $this->setRedirect('index.php?option=com_xbmusic&view=azuracast');
         return $return;
     }
     
     public function cancel($key = null) {
         $return = parent::cancel($key);
-        $this->setRedirect('index.php?option=com_xbmusic&view=dataman#azuracast');
+        $this->setRedirect('index.php?option=com_xbmusic&view=azuracast');
         return $return;
     }
     
@@ -82,7 +82,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->checkin($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo );
     }
     
@@ -105,7 +105,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo );
     }
     
@@ -114,7 +114,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,0);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo );
     }
     
@@ -123,7 +123,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo);
     }
     
@@ -132,7 +132,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->delete($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo );
     }
     
@@ -141,7 +141,7 @@ class StationController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('station');
         $wynik = $model->publish($pid,-2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=azuracast');
         $this->setRedirect($redirectTo );
     }
     

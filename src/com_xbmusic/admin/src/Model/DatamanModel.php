@@ -589,7 +589,7 @@ class DatamanModel extends AdminModel {
         $api = new AzApi();
         $apikey = $api->getApikey();
         $azurl = $api->getAzurl();
-        $apiname = $api->getApiname();
+        $apiname = $api->getApicomment();
         // we need to update title alias apikey apiname azstream website azplayer description az info modified modified_by    
         $db = $this->getDatabase();
         $conditions = array('title='.$db->q($azstation->name), 'alias='.$db->q($azstation->shortcode),
@@ -624,7 +624,7 @@ class DatamanModel extends AdminModel {
         $api = new AzApi();
         $apikey = $api->getApikey();
         $azurl = $api->getAzurl();
-        $apiname = $api->getApiname();
+        $apiname = $api->getApicomment();
         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
 //        XbcommonHelper::getCreateCat($catdata)
         $colarr = array('id', 'az_stid', 'title', 'alias',
@@ -688,7 +688,7 @@ class DatamanModel extends AdminModel {
 //         $api = new AzApi();
 //         $apikey = $api->getApikey();
 //         $azurl = $api->getAzurl();
-//         $apiname = $api->getApiname();
+//         $apiname = $api->getApicomment();
 //         $azstations = $api->azStations();
 //         if (isset($azstations->code)) 
 //             return $azstations;

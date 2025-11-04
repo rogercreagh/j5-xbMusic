@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Station Form file v0.0.54.1 17th June 2025 -->
+<!-- xbMusic Station Form file v0.0.59.2 3rd November 2025 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
@@ -133,6 +133,22 @@
 			size="40" maxlength="120"
 		/>
 			
+		<field name="foldername" type="text"
+			label="Selected Folder"
+			description=""
+			readonly="true"
+			size="80"
+		/>
+		<field name="selectedfiles" type="hidden"
+			label="Selected Files"
+			description="Selected files will be cleared by closing folder"
+			readonly="true"
+			size="80"
+			rows="6"
+		/>
+		<field name="filename" type="hidden" 
+			label="File name" description="" 
+		/>
 	</fieldset>
 	
 <!-- Standard joomla -->

@@ -58,6 +58,9 @@ VALUES
 	);
 
 #main xbmusic tables
+SET FOREIGN_KEY_CHECKS=0;
+
+# core tables albums, artists, songs, tracks
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_albums` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -194,7 +197,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   UNIQUE (`filepathname`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-#azuracast tables
+#azuracast tables azstations, azplaylists, azschedules only used if azuracast enabled
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -298,18 +301,18 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   PRIMARY KEY (`id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-# new link tables tracksong, trackartist, trackplaylist
+# link tables userapikeys, trackartist, trackplaylist, tracksong, artistgroup
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_userapikeys` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `az_url` varchar(80) NOT NULL,
-  `azapikeyid` varchar(20) NOT NULL DEFAULT '',
-  `azapikeyval` varchar(40) NOT NULL DEFAULT '',
-  `azusername` varchar(255) NOT NULL DEFAULT '',	
+  `az_apikeyid` varchar(20) NOT NULL,
+  `az_apikeyval` varchar(40) NOT NULL,
+  `az_apicomment` varchar(255) NOT NULL DEFAULT '',	
   `selected` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-#  UNIQUE `userapikey` (`user_id`,`azapikeyval`),
+  UNIQUE `userapiidx` (`user_id`, `az_apikeyid`),
   FOREIGN KEY(`user_id`) REFERENCES `#__users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
@@ -369,4 +372,4 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_artistgroup` (
   KEY `group_id` (`group_id`)
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
-
+SET FOREIGN_KEY_CHECKS=1;

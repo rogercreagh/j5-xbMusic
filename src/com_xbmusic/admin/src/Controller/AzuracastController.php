@@ -67,6 +67,17 @@ class AzuracastController extends FormController {
         }        
     }
     
+    function switchapi() {
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $newkeyid = $post['apilist'];
+        if ($newkeyid > 0) {
+            XbmusicHelper::setSelectedApi($newkeyid);
+        }
+        $redirectTo =('index.php?option=com_xbmusic&view=azuracast');
+        $this->setRedirect($redirectTo );       
+    }
+    
     function saveapi() {
         $jip = Factory::getApplication()->getInput();
         $post   = $jip->get('jform', 'array()', 'ARRAY');

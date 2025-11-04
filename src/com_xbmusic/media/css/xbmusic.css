@@ -75,12 +75,10 @@ table[id^=subfieldList] thead tr td div.btn-group {
 #toolbar-views + .ms-auto {
 	margin-left:20px !important;
 }
-/** remove left auto margin on inline-help on schedule view **/
-.view-schedule #toolbar-inlinehelp.ms-auto {
-	margin-left:30px !important;
-}
-/** remove left auto margin on inline-help on dataman view **/
-.view-dataman #toolbar-inlinehelp.ms-auto {
+/** remove left auto margin on inline-help on dataman, schedule and azuracast views **/
+.view-dataman #toolbar-inlinehelp.ms-auto ,
+.view-schedule #toolbar-inlinehelp.ms-auto 
+.view-azuracast #toolbar-inlinehelp.ms-auto {
 	margin-left:30px !important;
 }
 

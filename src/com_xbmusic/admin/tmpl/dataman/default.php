@@ -80,7 +80,7 @@ $wa->addInlineScript("window.onload = function() {
 	</summary>	
 	<div class="row form-vertical">
 		<div class="col-md-6">
-			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER')?>
+			<p><?php echo Text::_('XBMUSIC_SELECT_FOLDER_TRACKS')?>
 	    	<div id="container"> </div>
 		</div>
 		<div class="col-md-6">
