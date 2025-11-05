@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.2 3rd November 2025
+ * @version 0.0.59.3 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -31,8 +31,8 @@ class AzApi {
     protected $apifullkey;
     protected $apicomment;
     protected $apiurl;
-    protected $azstid;
     protected $authorization;
+    protected $status;
     
     /**
      * @desc if a db user id is provided will get the url and apikey from database
@@ -43,57 +43,81 @@ class AzApi {
      */
     public function __construct(int $dbapiid = 0, int $userid = 0, $apifullkey = '', $azurl = null ) { //int $dbstid = 0, 
         //check Azuracast enabled
+        $app = Factory::getApplication();
         $keyinfo = false;
+        $this->status = true;
         $params = ComponentHelper::getParams('com_xbmusic');
-        if ($params->get('azuracast',0) == 0) return false;        
+        if ($params->get('azuracast',0) == 0) {
+            $this->status = false;
+            return;        
+        }
+        //If we're given a server url use it, otherwise use params default
+        if (!$azurl) {
+            $azurl = trim($params->get('az_url',''),'/');
+        }
+        if (!filter_var($azurl, FILTER_VALIDATE_URL)) {
+            $app->enqueueMessage('Invalid URL : '.$azurl,'Error');
+            $this->status = false;
+            return;
+        } 
+        $azurl = trim($azurl,'/').'/api';
+        //check server reachable
+        $headers = get_headers($azurl);
+        $notok = true;
+        $n = 0;
+        while ($notok && ($n<count($headers))) {
+            if (strpos($headers[$n], '200 OK') > 0) $notok = false;
+            $n ++;
+        }
+        if ($notok) {
+            $app->enqueueMessage('Server not accessible : '.$azurl,'Error');
+            $this->status = false;
+            return;
+        }
+        $this->apiurl = $azurl;
         
-        if ($dbapiid > 0) { //we're getting an apikey from the userapikeys table using the id
-            //TODO ammend to get selected key and fallback if none selected
-            $keyinfo = XbcommonHelper::getItem('#__xbmusic_userapikeys', $dbapiid);
-        } else {
-            //if a userid not specified use the current user
-            if ($userid == 0) $userid = Factory::getApplication()->getIdentity()->id; //->getSession()->get('user');
-            $keyinfo = XbmusicHelper::getSelectedApiKey($userid);
-        }
-        // handle alternate server to one set in params 
-        if ($azurl) {
-            $this->apiurl = $azurl;
-        } else {
-            $this->apiurl = trim($params->get('az_url',''),'/').'/api';
-        }
-                    
-        if ($keyinfo) {
-            $this->apifullkey = $keyinfo->az_apikeyid.':'.$keyinfo->az_apikeyval;
-            $this->apicomment = $keyinfo->az_apicomment;
-        } elseif (strlen($apifullkey) == 49) {
-             
+        if (strlen($apifullkey) == 49) {
+            //we've been given a key, lets test it
+            $this->authorization = "Authorization: Bearer ".$apifullkey;
+            $url = $this->apiurl.'/frontend/account/api-key/'.strtok($apifullkey,':');
+            $result = $this->azApiGet($url);
+            if (isset($result->code)) {
+                $app->enqueueMessage('Could not login with . '.$apifullkey .
+                    '<br />Code: '.$result->code.'  : '.$result->type.' '.$result->message ,'Error');
+                $this->status = false;
+                return;
+            }                //TODO ammend to get selected key and fallback if none selected
+            
+            $this->apicomment = $result->comment;
+            
             $this->apifullkey = $apifullkey;
-            $me = $this->azMe(); 
-            if (!isset($me->code)) {
-                $url = $this->apiurl.'/frontend/account/api-key/'.strok($apifullkey,':');
-                $result = $this->azApiGet($url);
-                if (!isset($result->code)) {
-                    $this->apicomment = $result->comment;
-//                 } else {
-//                     // error getting apikey may be permissions issue but ok
-//                     return false;
+        } else {
+            if ($dbapiid > 0) { //we're getting an apikey from the userapikeys table using the id
+                $keyinfo = XbcommonHelper::getItem('#__xbmusic_userapikeys', $dbapiid);
+                if (!$keyinfo) {
+                    $app->enqueueMessage('Invalid dbkey id '.$dbapiid.'for table userapikeys. '.$azurl,'Error');
+                    $this->status = false;
+                    return;                  
                 }
             } else {
-                //failed to login to api
-                Factory::getApplication()->enqueueMessage('Error creating API object.<br>'
-                    .$me->code.' : '.$me->formatted_message, 'Error');
-                
-                $this->apifullkey = ''; //overwrite any existing
-                $this->apicomment = '';
-                return false;
+                //if a userid not specified use the current user
+                if ($userid == 0) $userid = Factory::getApplication()->getIdentity()->id; //->getSession()->get('user');
+                $keyinfo = XbmusicHelper::getSelectedApiKey($userid);
             }
-            
-        } else { //else we've not got a valid key 
-            Factory::getApplication()->enqueueMessage('Error creating API object.<br>'
-                .'No api key provided or found for current user', 'Error');
-            
+            if ($keyinfo) {
+                $this->apifullkey = $keyinfo->az_apikeyid.':'.$keyinfo->az_apikeyval;
+                $this->apicomment = $keyinfo->az_apicomment;
+            } else {
+                $app->enqueueMessage('Unable to retrieve API key info. ','Error');
+                $this->status = false;
+                return;
+            }
         }
-        $this->authorization = "Authorization: Bearer ".$this->apifullkey;
+        $this->authorization = "Authorization: Bearer ".$this->apifullkey;           
+    }
+    
+    public function getStatus() {
+        return $this->status;
     }
     
     public function getApikey() {

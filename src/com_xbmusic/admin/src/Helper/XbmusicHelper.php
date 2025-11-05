@@ -1129,57 +1129,63 @@ class XbmusicHelper extends ComponentHelper
 	        Factory::getApplication()->enqueueMessage('New key incorrect length or format','Error');
 	        return false;
         }
+        //check if key is valid and if so get comment
+        $api = new AzApi(0,0,$fullkey);
+        if ($api->getStatus() == false) {
+            //error messages already printed by api::_construct
+            return false;
+        }
         $splitkey = explode(':', $fullkey);
         $keyid = $splitkey[0];
         $keyval = $splitkey[1];
-        //check if key is valid and if so get comment
-        $api = new AzApi(0,0,$fullkey);
-        if ($api->getApikey()) {
-            $comment = $api->getApicomment();
-            $azurl = $api->getAzurl();
-        }
+        $comment = $api->getApicomment();
+        $azurl = $api->getAzurl();
         
-        //check if key id exists
-        if (self::getApikeyByKeyid($keyid) == false) {
-            $colarr = array('id', 'user_id', 'az_url', 'az_apikeyid', 'az_apikeyval',
-                'az_apicomment'
-            );
-            $db = Factory::getDbo(); //Factory::getContainer()->get(DatabaseInterface::class);
-            $values=array($db->q(0),$db->q($userid),$db->q($azurl),$db->q($keyid),$db->q($keyval),
-                $db->q($comment)
-            );
-            $query = $db->getQuery(true);
-            $query->insert($db->qn('#__xbmusic_userapikeys'));
-            $query->columns(implode(',',$db->qn($colarr)));
-            $query->values(implode(',',$values));
-            try {
-                $db->setQuery($query);
-                $res = $db->execute();
-            } catch (\Exception $e) {
-                Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
-                return false;
-            }
-            if ($res == true) {
-                $newid = $db->insertid();
-                if ($selected) {
-                    $query->clear();
-                    $query->update($db->qn('#__xbmusic_userapikeys'));
-                    $query->where($db->qn('user_id').' = '. $db->q($userid));
-                    $query->set($db->qn('selected'). ' = (id='.$newid.')');
-                    try {
-                        $db->setQuery($query);
-                        $res = $db->execute();
-                    } catch (\Exception $e) {
-                        Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
-                        return false;
-                    }
-                    
-                }
-                Factory::getApplication()->enqueueMessage(Text::_('new api key created and selected').' : '.$newid);
-            }
-            return $res;
-            
+        //check if key id already exists for user and server
+        $dbid = self::checkKeyExists($keyid,$userid,$azurl);
+        if ($dbid > 0) {
+            Factory::getApplication()->enqueueMessage('API key already exists for this user.','Info');
+            return $dbid;
         }
+        $colarr = array('id', 'user_id', 'az_url', 'az_apikeyid', 'az_apikeyval',
+            'az_apicomment'
+        );
+        $db = Factory::getDbo(); //Factory::getContainer()->get(DatabaseInterface::class);
+        $values=array($db->q(0),$db->q($userid),$db->q($azurl),$db->q($keyid),$db->q($keyval),
+            $db->q($comment)
+        );
+        $query = $db->getQuery(true);
+        $query->insert($db->qn('#__xbmusic_userapikeys'));
+        $query->columns(implode(',',$db->qn($colarr)));
+        $query->values(implode(',',$values));
+        try {
+            $db->setQuery($query);
+            $res = $db->execute();
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return false;
+        }
+        if ($res == true) {
+            $newid = $db->insertid();
+            if ($selected) {
+                self::setSelectedApi($newid, $userid);
+            }
+            Factory::getApplication()->enqueueMessage(Text::_('new api key created and selected').' : '.$newid);
+        }
+        return $res;               
+	}
+	
+	static function checkKeyExists(string $keyid, $userid = 0, $azurl = null) {
+	    $db = Factory::getDbo(); //Factory::getContainer()->get(DatabaseInterface::class);
+	    $query = $db->getQuery(true);
+	    $query->select('id');
+	    $query->from('#__xbmusic_userapikeys');
+	    $query->where($db->qn('az_apikeyid').' = '. $db->q($keyid));
+	    if ($userid > 0) $query->where($db->qn('user_id').' = '.$db->q($userid));
+	    if ($azurl) $query->where($db->qn('az_url').' = '.$db->q($azurl));
+	    $db->setQuery($query);
+	    $result = $db->loadResult();
+	    return (is_null($result)) ? false : $result;
 	}
 	
 	/**

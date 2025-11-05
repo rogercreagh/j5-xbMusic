@@ -40,14 +40,21 @@ class XbcomboboxField extends ListField {
             $query->select('DISTINCT '.$db->qn($column).' AS value, '.$db->qn($column).' AS text');
             $query->from($db->qn('#__'.$table));
             $db->setQuery($query);
-            $result = $db->loadAssocList(); 
+            $result = $db->loadObjectList(); 
            
         } else {
             $result = [];
         }
-        //nedd to remove any values in result already in options
+        //need to remove any values in result already in options
+        $presets = parent::getOptions();
+        $vals = array_column( $presets, 'value' );
+        foreach ($vals as $val) {
+            foreach ($result as $key=>$res) {
+                if ($res->value == $val) unset($result[$key]);
+            }
+        }
         
-        $options = array_unique(array_merge(parent::getOptions(), $result));
+        $options =  array_merge((array)$presets , $result);
         return $options;
         
     }

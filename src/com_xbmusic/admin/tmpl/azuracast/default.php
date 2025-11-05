@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.2 4th November 2025
+ * @version 0.0.59.3 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -36,17 +36,29 @@ $wa->addInlineScript("function pleaseWait(targ) {
 <script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=azuracast'); ?>" method="post" name="adminForm" id="adminForm">
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=azuracast'); ?>" method="post" name="adminForm" 
+<?php if (($this->azuracast == 0) || ($this->azurl == '') ) : ?>
+    <div class="xbbox gradpink xbht200 xbflexvc">
+        <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
+        	<p><?php echo $this->noazmess2; ?></p>
+        </div>
+    </div>
+<?php else: ?>
+id="adminForm">
 		<input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
 		<input type="hidden" id="multi" value="0" />
 		<input type="hidden" id="extlist" value="xxx" />
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
 		<h2><?php echo Text::_('XBMUSIC_AZURACAST_STATIONS');?></h2>
          
+	<?php if($this->azme == false): ?>
+		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
+	<?php else : ?>
 		<p><?php echo Text::sprintf('XBMUSIC_USING_SERVER_ACCOUNT',$this->azurl, $this->account); ?> </p>
 		<p><?php echo Text::_('Current API key'); ?>
 		: <?php echo $this->apicomment; ?> <code><?php echo $this->apikey; ?></code></p>
-       
+	<?php endif; ?>
+      
         <div class="pull-left xblblcompact xbw600 xbmwp50" >
 			<?php echo $this->form->renderField('apilist'); ?>
 			<?php echo $this->form->renderField('newapikey'); ?>
@@ -61,16 +73,6 @@ $wa->addInlineScript("function pleaseWait(targ) {
         </div>
         <div class="clearfix"></div>
 
-<?php if ($this->azuracast == 0 ) : ?>
-    <div class="xbbox gradpink xbht200 xbflexvc">
-        <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
-        	<p><?php echo $this->noazmess2; ?></p>
-        </div>
-    </div>
-<?php else: ?>
-	<?php if($this->azme == false): ?>
-		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
-	<?php endif; ?>
 	<?php if ($this->apikey == ''): ?>
 		<P><?php echo Text::_('XBMUSIC_AZAPI_NO_KEY')?>
 	<?php endif; ?>
@@ -169,7 +171,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
                                     $btntext = Text::_('XB_IMPORT');
                                     $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$azstation->name,$this->azurl)."'";
                                 } 
-                                $confirm = "doConfirm(".$popbody.",".$pophead.",'dataman.importazstation');"; 
+                                $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.importazstation');"; 
                                 ?>  								
             				<?php endif; ?>
             				<details id="azstid<?php echo $azstation->id; ?>" >
@@ -243,8 +245,8 @@ $wa->addInlineScript("function pleaseWait(targ) {
 		<input type="hidden" name="boxchecked" value="0" />
 		<?php echo HTMLHelper::_('form.token'); ?>
 
-	</form>
 <?php endif; //azuracast enabled ?>
+	</form>
     <p>&nbsp;</p>
     <?php echo XbcommonHelper::credit('xbMusic');?>
     

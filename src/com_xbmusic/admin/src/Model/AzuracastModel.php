@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AzuracastModel.php
- * @version 0.0.59.2 31st October 2025
+ * @version 0.0.59.3 5th November 2025
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
@@ -65,18 +65,28 @@ class AzuracastModel extends AdminModel {
      * @return false | azuser object
      */
     public function getAzMe($api=null) {
-        if (!isset($api)) $api = new AzApi();
+        $default = new \stdClass();
+        $default->name = 'Public Functions Only';
+        $default->roles = [];
+        if (!isset($api)) {
+            $api = new AzApi();
+            if ($api->getStatus() == false)  return $default;
+        }
+        
         $result = $api->azme();
         if (isset($result->code)) {
             Factory::getApplication()->enqueueMessage('API error getting User details. <br />'
                 .$result->code.' '.$result->formatted_message,'Error');
-            return false;
+            return $default;
         }
         return $result;
     }
     
     public function getAzStations($api = null) {
-        if (!isset($api)) $api = new AzApi();
+        if (!isset($api)) {
+            $api = new AzApi();
+            if ($api->getStatus() == false)  return false;
+        }
         $result = $api->azStations();
         if (isset($result->code)) {
             Factory::getApplication()->enqueueMessage('API error getting User details. <br />'
@@ -96,7 +106,10 @@ class AzuracastModel extends AdminModel {
     public function importAzStation(int $azstid, $api = null) {
         //        $params = ComponentHelper::getParams('com_xbmusic');
         //        $azurl = $params->get('az_url');
-        if (!isset($api)) $api = new AzApi();
+        if (!isset($api)) {
+            $api = new AzApi();
+            if ($api->getStatus() == false)  return false;
+        }
         $azstation = $api->azStation($azstid);
         if (isset($azstation->code))
             return $azstation;

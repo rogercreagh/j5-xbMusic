@@ -391,7 +391,7 @@
 	</fieldset>		
 	
 <!-- TAGS TAB -->
-	<fieldset
+	<fieldset addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		name="tags"
 		label="XBMUSIC_CONFIG_TAGS_SET"
 		description="XBMUSIC_CONFIG_TAGS_SET_DESC"
