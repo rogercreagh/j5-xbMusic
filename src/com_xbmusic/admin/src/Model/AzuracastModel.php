@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AzuracastModel.php
- * @version 0.0.59.3 5th November 2025
+ * @version 0.0.59.4 5th November 2025
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
@@ -21,6 +21,7 @@ use DirectoryIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
@@ -44,7 +45,7 @@ class AzuracastModel extends AdminModel {
         $data = $app->input->get('jform', array(), 'ARRAY');
         if (!isset($data['apilist'])) $data['apilist'] = 0;
         if ($data['apilist']  >0) {
-            $keydeets = XbmusicHelper::getSelectedApiKey();
+            $keydeets = XbazuracastHelper::getSelectedApiKey();
             $data['apilist'] = ($keydeets) ? $keydeets->id : 0;
         }
         return $data;

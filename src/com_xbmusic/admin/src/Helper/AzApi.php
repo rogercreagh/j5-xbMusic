@@ -20,6 +20,7 @@ use Joomla\Database\DatabaseInterface;
 use Joomla\Plugin\Fields\SQL\Extension\SQL;
 use \CURLFile;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 /**
  * public functions will return $result as 
@@ -102,7 +103,7 @@ class AzApi {
             } else {
                 //if a userid not specified use the current user
                 if ($userid == 0) $userid = Factory::getApplication()->getIdentity()->id; //->getSession()->get('user');
-                $keyinfo = XbmusicHelper::getSelectedApiKey($userid);
+                $keyinfo = XbazuracastHelper::getSelectedApiKey($userid);
             }
             if ($keyinfo) {
                 $this->apifullkey = $keyinfo->az_apikeyid.':'.$keyinfo->az_apikeyval;

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ScheduleModel.php
- * @version 0.0.51.8 2nd May 2025
+ * @version 0.0.59.4 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -23,7 +23,7 @@ use Joomla\CMS\MVC\Model\ListModel;
 //use Joomla\Utilities\ArrayHelper;
 // use Joomla\CMS\Uri\Uri;
 //use Joomla\CMS\Table\Table;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 class ScheduleModel extends ListModel {
     
@@ -168,7 +168,7 @@ class ScheduleModel extends ListModel {
 		$dbstid = $this->getState('filter.dbstid',0);
         // if there is only one station we'll make sure it is default
         if ($dbstid == 0) {
-            $dbstid = XbmusicHelper::singleStationId();
+            $dbstid = XbazuracastHelper::singleStationId();
             $this->setState('filter.dbstid', $dbstid);
         }
        /*

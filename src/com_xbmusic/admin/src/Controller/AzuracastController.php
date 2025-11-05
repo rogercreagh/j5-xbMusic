@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/AzuracastController.php
- * @version 0.0.59.0 22nd October 2025
+ * @version 0.0.59.4 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -18,7 +18,7 @@ use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 class AzuracastController extends FormController {
     
@@ -72,7 +72,7 @@ class AzuracastController extends FormController {
         $post   = $jip->get('jform', 'array()', 'ARRAY');
         $newkeyid = $post['apilist'];
         if ($newkeyid > 0) {
-            XbmusicHelper::setSelectedApi($newkeyid);
+            XbazuracastHelper::setSelectedApi($newkeyid);
         }
         $redirectTo =('index.php?option=com_xbmusic&view=azuracast');
         $this->setRedirect($redirectTo );       
@@ -82,7 +82,7 @@ class AzuracastController extends FormController {
         $jip = Factory::getApplication()->getInput();
         $post   = $jip->get('jform', 'array()', 'ARRAY');
         $fullkey = str_replace(' ','',$post['newapikey']);
-        XbmusicHelper::saveApiUserkey($fullkey);
+        XbazuracastHelper::saveApiUserkey($fullkey);
         
         $redirectTo =('index.php?option=com_xbmusic&view=azuracast');
         $this->setRedirect($redirectTo );

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Schedule/HtmlView.php
- * @version 0.0.51.8 2nd May 2025
+ * @version 0.0.59.4 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -22,6 +22,7 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 // use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -42,7 +43,7 @@ class HtmlView extends BaseHtmlView {
         $this->onestation = 1; //dummy value to hide station button
         $this->dbstid = '';
         if ($this->azuracast ==1) {
-            $this->xbstations = XbmusicHelper::getStations();
+            $this->xbstations = XbazuracastHelper::getStations();
             if ($this->xbstations) {
                 
                 $this->items         = $this->get('Items');
@@ -55,7 +56,7 @@ class HtmlView extends BaseHtmlView {
                     throw new GenericDataException(implode("\n", $errors), 500);
                 }
                 
-                $this->onestation = XbmusicHelper::singleStationId();
+                $this->onestation = XbazuracastHelper::singleStationId();
                 if ($this->onestation) {
                     $this->dbstid = $this->onestation;
                 } else {
@@ -64,7 +65,7 @@ class HtmlView extends BaseHtmlView {
                         ? $this->activeFilters['dbstid'] : $this->state->get('filter.dbstid','');
                 }
                 if ($this->dbstid >0) {
-                    $this->station = XbmusicHelper::getDbStation($this->dbstid);
+                    $this->station = XbazuracastHelper::getDbStation($this->dbstid);
                     $this->displayfmt = (key_exists('displayfmt', $this->activeFilters)) 
                         ? $this->activeFilters['displayfmt'] : $this->state->get('filter.displayfmt','1');
                     $this->numhours = (key_exists('numhours', $this->activeFilters)) 

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Azuracast/HtmlView.php
- * @version 0.0.59.3 5th November 2025
+ * @version 0.0.59.4 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -26,7 +26,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 // use Joomla\CMS\Layout\FileLayout;
 // use Joomla\CMS\MVC\View\GenericDataException;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
-// use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -47,7 +47,7 @@ class HtmlView extends BaseHtmlView {
             $this->noazmess1 = Text::_('Default Server URL not set');
             $this->noazmess2 = Text::_('Please set a valid Azuracast url in the Options');            
         } else {
-            $userapikey = XbmusicHelper::getSelectedApiKey($this->user->id);
+            $userapikey = XbazuracastHelper::getSelectedApiKey($this->user->id);
             if ($userapikey) {
                 $this->apiid = $userapikey->id;
                 $this->azurl = $userapikey->az_url;
@@ -64,7 +64,7 @@ class HtmlView extends BaseHtmlView {
             if ($api->getStatus() == true) {
                 $model = $this->getModel();
                 $this->azme = $model->getAzMe($api);
-                $this->xbstations = XbmusicHelper::getStations();           
+                $this->xbstations = XbazuracastHelper::getStations();           
                 if ($this->azme) {
                     $this->account = '<b>'.$this->azme->name. '</b> (<i>Roles:</i> ';
                     foreach ($this->azme->roles as $role) {

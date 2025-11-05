@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.55.2 28th June 2025
+ * @version 0.0.59.4 5th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -21,6 +21,7 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -106,9 +107,9 @@ class HtmlView extends BaseHtmlView {
         $this->azuracast = $this->params->get('azuracast','0');
         $this->az_apiname = $this->params->get('az_apiname','not set');
         $this->az_url = $this->params->get('az_url','not set');
-        $this->stncnt = count(XbmusicHelper::getStations());
+        $this->stncnt = count(XbazuracastHelper::getStations());
         if ($this->item->db_stid > 0) {
-            $this->station = XbmusicHelper::getDbStation($this->item->db_stid);
+            $this->station = XbazuracastHelper::getDbStation($this->item->db_stid);
         }
         if ($this->item->id > 0) $this->tracks = XbmusicHelper::getPlaylistTrackTitles($this->item->id);
         
