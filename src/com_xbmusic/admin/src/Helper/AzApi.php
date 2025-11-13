@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.3 5th November 2025
+ * @version 0.0.59.5 12th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -44,6 +44,7 @@ class AzApi {
      */
     public function __construct(int $dbapiid = 0, int $userid = 0, $apifullkey = '', $azurl = null ) { //int $dbstid = 0, 
         //check Azuracast enabled
+        //possible extension to return negative values for errors and positive for user, stadmin, sysadmin
         $app = Factory::getApplication();
         $keyinfo = false;
         $this->status = true;
@@ -116,6 +117,8 @@ class AzApi {
         }
         $this->authorization = "Authorization: Bearer ".$this->apifullkey;           
     }
+ 
+    /*** getters for properties ***/
     
     public function getStatus() {
         return $this->status;
@@ -129,14 +132,14 @@ class AzApi {
         return $this->apicomment;
     }
     
+    public function getApiurl() {
+        return $this->apiurl;
+    }
+    
     public function getAzurl() {
         return str_replace('/api','',$this->apiurl);
     }
-    
-    public function getAzstid() {
-        return $this->azstid;
-    }
-    
+        
     /***
      * @name azMe()
      * @desc gets account details for az_api user, false if not logged in, invalid apikey or error
@@ -151,7 +154,7 @@ class AzApi {
     /**
      * @name azStations()
      * @desc get list of Az stations on server.
-     * Public properties for all stations plus admin properties if avaiable
+     * Public properties for all stations plus station & system station admin properties as avaiable
      * @return object
      */
     public function azStations() {
@@ -164,20 +167,78 @@ class AzApi {
             $profile = $this->azApiGet($url);
             //if okay set isadmin and merge with public
             if (!isset($profile->code)) {
-                $station->isadmin = true;
+                $station->isadmin = 1;
+                //only services and schedule are added in profile
+                $station->services = $profile->services;
+                $station->schedule = $profile->schedule;
+                $url = $this->apiurl .'/station/'. $station->id.'/quota';
+                $quota = $this->azApiGet($url);
+                if (!isset($quota->code)) {
+                    $station->quota = $quota;
+                } else {
+                    $station->quota = 'Quota not avialable with current login.';
+                }
                 //merge to add services and schedule elements
-                $station = (object) array_merge((array) $station, (array) $profile);
+//                $station = (object) array_merge((array) $station, (array) $profile);
+                $url = $this->apiurl.'/admin/station/'.$station->id;
+                $sysadmin = $this->azApiGet($url);
+                if (!isset($sysadmin->code)) {
+                    $station->issysadmin = 1;
+                    //lots of new info for sysadmin
+                    $station = (object) array_merge((array) $station, (array) $sysadmin);
+                } else {
+                    $station->issysadmin = 0;
+                }
             } else {
-                $station->isadmin = false;
+                $station->isadmin = 0;
             }
         }
         return $result;
     }
     
-    public function azServer() {
+    /**
+     * @name azServerInfo()
+     * @desc Gets the server info if user has admin privileges.
+     * Api calls to admin/settings, admin/api-keys, admin/backups, admin/users, admin/storage-locations
+     * @return object - server settings or error code & message if ->sysadmin false
+     */
+    public function azServerInfo() {
         $url = $this->apiurl.'/admin/settings';
-        $result = $this->azApiGet($url);
-        return $result;
+        $settings = $this->azApiGet($url);
+        $settings->sysadmin = (isset($settings->code)) ? 0 : 1;
+        if ($settings->sysadmin) {
+            $url = $this->apiurl.'/admin/api-keys';
+            $apikeys = $this->azApiGet($url);
+            if (!isset($apikeys->code)) {
+                $settings->apikeys = $apikeys;
+                $settings->sysadmin =2;
+            }
+            $url = $this->apiurl.'/admin/backups';
+            $backups = $this->azApiGet($url);
+            if (!isset($backups->code)) {
+                $settings->backups = $backups;
+            }
+            $url = $this->apiurl.'/admin/users';
+            $users = $this->azApiGet($url);
+            if (!isset($users->code)) {
+                $settings->users = $users;
+                $settings->sysadmin =2;
+            }
+            $url = $this->apiurl.'/admin/storage_locations';
+            $storagelocations = $this->azApiGet($url);
+            if (!isset($storagelocations->code)) {
+                $settings->storage_locations = $storagelocations;
+                $settings->sysadmin =2;
+            }
+            $url = $this->apiurl.'/admin/server/stats';
+            $serverstats = $this->azApiGet($url);
+            if (!isset($serverstats->code)) {
+                $settings->serverstats = $serverstats;
+                $settings->sysadmin =2;
+            }
+        }
+        //we are returning full settings so error message can be extracted if not sysadmin
+        return $settings;
     }
     
     public function azStationQuota(int $azstid) {
@@ -189,6 +250,7 @@ class AzApi {
     public function azStation(int $azstid) {
         $url=$this->apiurl.'/station/'.$azstid;
         $result = $this->azApiGet($url);
+        $result->azurl = strtok($this->apiurl,'/');
         $admin = false;
         $quota = $this->azStationQuota($azstid);
         if (isset($quota->used)) {

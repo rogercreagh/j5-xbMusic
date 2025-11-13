@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.3 5th November 2025
+ * @version 0.0.59.5 12th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -36,7 +36,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
 <script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 
 <div id="xbcomponent" >
-	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=azuracast'); ?>" method="post" name="adminForm" 
+	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=azuracast'); ?>" method="post" name="adminForm" id="adminForm">
 <?php if (($this->azuracast == 0) || ($this->azurl == '') ) : ?>
     <div class="xbbox gradpink xbht200 xbflexvc">
         <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
@@ -44,7 +44,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
         </div>
     </div>
 <?php else: ?>
-id="adminForm">
+
 		<input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
 		<input type="hidden" id="multi" value="0" />
 		<input type="hidden" id="extlist" value="xxx" />
@@ -201,10 +201,70 @@ id="adminForm">
     								<?php endif; ?>
     								)</span>
     							</summary>
-    							<i>AzURL</i>: <a href="<?php echo $this->azurl; ?>" target="_blank">
-                             			<?php echo $this->azurl; ?></a>
+    							<i>Website</i>: <a href="<?php echo $azstation->url; ?>" target="_blank">
+                             			<?php echo $azstation->url; ?></a>
                              	<br />
-                             	<?php echo '<pre>'.print_r($azstation,true).'</pre>'; ?>
+                             	<i>Description</i>: <?php echo $azstation->description; ?>
+                             	<br />
+                             	<i>Listen</i>: <?php echo $azstation->listen_url; ?>
+                             	<br />
+                             	<i>Public</i>: <?php echo ($azstation->is_public) ? 'Yes' : 'No'; ?>
+                             	<br />
+                             	<i>Role</i>: <?php if(!$azstation->isadmin) {
+                             	    echo 'Public';
+                             	} elseif (!$azstation->isadmin) {
+                             	    echo 'Station Manager';
+                             	} else {
+                             	    echo 'Station Admin';
+                             	} ?>
+                             	<br />                             	
+                             	<i>Mounts</i>: <?php echo count($azstation->mounts); ?> mount points
+                             	<?php foreach ($azstation->mounts  as $mount) {
+                             	    echo '<br /><span class="xbpl50">- '.$mount->name.'</span>';
+                             	}?>
+                             	
+                             	<?php if ($azstation->isadmin) : ?>
+                                 	<br />
+                                 	<i>Schedule</i>: 
+                                 	<?php $schcnt = count($azstation->schedule); 
+                                 	if ($schcnt == 0 ) : ?>
+                                 		<?php echo 'No scheduled items reported'; ?>
+                                 	<?php else : ?> 
+                                 	    <?php echo $schcnt.' '.'scheduled times.'; ?>
+                                 	    <a href="index.php?option=com_xbmusic&view=schedule&stid=
+                                 	    <?php echo $azstation->id; ?>">Schedule View</a>
+                                 	<?php endif; ?>                           	
+                                 	<br />
+                                 	<i>Services</i>: 
+                                 	<?php echo ($azstation->services->backendRunning) ? 'Backend OK' : 'Backend Stopped';  ?>
+                                 	<?php if ($azstation->issysadmin) : ?>
+                                     	<details>
+                                     		<summary>
+                                     			<?php echo $azstation->backend_type; ?>
+                                			</summary> 
+                                			<pre><?php echo print_r($azstation->backend_config,true);?>
+                                			</pre>
+                                		</details>
+                            		<?php endif; ?>
+                                 	<?php echo ($azstation->services->frontendRunning) ? 'Frontend OK' : 'Frontend Stopped';?>
+                                 	<?php if ($azstation->issysadmin) : ?>
+                                     	<details>
+                                     		<summary>
+                                     			<?php echo $azstation->frontend_type; ?>
+                                			</summary> 
+                                			<pre><?php echo print_r($azstation->frontend_config,true);?>
+                                			</pre>
+                                		</details>
+                                 	<?php endif; ?>
+                                	
+                                 	<br />
+                                 	<i>Storage Quota</i>: <?php echo $azstation->quota->used
+                                 	      .' ('.$azstation->quota->used_percent.'%) of '
+                                        .$azstation->quota->available.' in '.$azstation->quota->num_files; ?> 
+                                 	<br />
+                                 	<hr />
+                             	<?php endif; ?>
+                             	<?php //echo '<pre>'.print_r($azstation,true).'</pre>'; ?>
     							<i><?php echo Text::_('XB_WEBSITE'); ?></i>: 
     						    <a href="<?php echo $azstation->url; ?>" target="_blank">
     								<?php echo $azstation->url; ?></a>
@@ -236,8 +296,112 @@ id="adminForm">
         <hr />
 
         <h3><?php echo Text::_('Azuracast Server Info'); ?></h3>
-        <p>Server URL: <?php echo $this->azurl; ?></p>
-		<p>User: blah has roles foo bar 
+        <p>Server URL: <?php echo $this->azurl; ?>
+        
+        <?php if (isset($this->item->server->code)) : ?>
+	        </p><p class="xbit xbred">Current API user is not System Admin. 
+	        	<br /><?php echo $this->item->server->code.' '.$this->item->server->formatted_message; ?>
+	        </p>
+	    <?php else: ?>
+	    	<span class="xbpl50"><i><?php echo ($this->item->server->sysadmin == 2) ? 'Full system admin privileges' : 'Limited system admin privileges'; ?></i></span></p>
+	    	Server Info
+	    	<dl class="xbdl">
+	    		<dt>Server Name</dt>
+	    		<dd><?php echo $this->item->server->instance_name; ?></dd>
+	    		
+	    		<dt>Base URL</dt>
+	    		<dd><?php echo $this->item->server->instance_name; ?></dd>
+	    			    		
+	    		<dt>Azuracast version</dt>
+	    		<dd><?php echo $this->item->server->update_results->current_release; ?></dd>
+	    		
+	    		<dt>Latest release</dt>
+	    		<dd><?php echo $this->item->server->update_results->latest_release; ?> 
+	    			<i>Last checked</i>: <?php echo date('Y-m-d H:i',$this->item->server->update_last_run);  ?></dd>
+	    	
+	    	</dl>
+	    	<?php if (isset($this->item->server->users)) : ?>
+    	    	<?php echo count($this->item->server->users); ?> Users on Server	
+    	    	<dl class="xbdl">
+        	    	<?php foreach ($this->item->server->users as $usr) : ?>	    		
+        	    		<dt>
+            	    		<?php if ($usr->is_me) echo '<b>';
+            	    		echo $usr->name; ?>
+            	    		<?php if ($usr->is_me) echo '</b>'; ?>
+        	    		</dt>
+        	    		<dd>
+            	    		 <i>Roles:</i> <?php foreach ($usr->roles as $role) {
+            	    		     echo ' ['.$role->name. '] ';
+            	    		 } 
+            	    		 echo ' <i>with '.count($usr->api_keys).' API keys</i>';?>      	    		
+        	    		</dd>
+        	    	<?php endforeach; ?>
+    	    	</dl>
+	    	<?php endif; ?>
+	    	
+	    	<?php if (isset($this->item->server->backups)) : ?>
+    	    	Backups	
+    	    	<dl class="xbdl">
+    	    		<dt>Last run</dt>
+    	    		<dd><?php echo date('Y-m-d H:i',$this->item->server->backup_last_run); ?></dd>
+    	    		
+    	    		<dt>Most Recent</dt>
+    	    		<dd><?php echo $this->item->server->backups[0]->path; ?></dd>
+    	    		
+    	    		<dt></dt>
+    	    		<dd><i>taken</i>: <?php echo date('Y-m-d H:i',$this->item->server->backups[0]->timestamp); ?>
+    	    		 <span class="xbpl20 xbit">size</span>: 
+    	    		 	<?php echo XbcommonHelper::formatBytes($this->item->server->backups[0]->size); ?>
+    	    		 	<i>in location ID:</i><?php echo $this->item->server->backups[0]->storageLocationId; ?>
+    	    		</dd>
+    	    	</dl>
+	    	<?php endif; ?>
+	    	
+	    	<?php if (isset($this->item->server->storage_locations)) : ?>
+    	    	Storage Locations	
+    	    	<dl class="xbdl">
+        	    	<?php foreach ($this->item->server->storage_locations as $loc) : ?>	    		       	    		
+        	    		<dt>ID : <?php echo $loc->id; ?></dt>
+        	    		<dd><?php echo $loc->type; ?></dd>
+        	    		
+        	    		<dt></dt>
+        	    		<dd><i>Path</i>: <?php echo $loc->path; ?></dd>
+        	    		
+        	    		<dt></dt>
+        	    		<dd><i>Used</i>: <?php echo $loc->storageUsed.' of '.$loc->storageQuota.' ('.$loc->storageUsedPercent.'%)'; ?></dd>
+        	    		
+        	    	<?php endforeach; ?>
+    	    	</dl>
+	    	<?php endif; ?>
+	    	
+	    	<?php if (isset($this->item->server->serverstats)) : ?>
+    	    	Server Status	
+    	    	<dl class="xbdl">
+    	    		<dt>CPU Cores</dt>
+    	    		<dd><?php echo count($this->item->server->serverstats->cpu->cores); ?></dd>
+    	    		
+    	    		<dt>Memory</dt>
+    	    		<dd><i>Total</i>: <?php echo $this->item->server->serverstats->memory->total_readable; ?></dd>
+    	    		<dt></dt>
+    	    		<dd><i>Free</i>: <?php echo $this->item->server->serverstats->memory->free_readable; ?></dd>
+    	    		
+    	    		<dt>Swap</dt>
+    	    		<dd><i>Total</i>: <?php echo $this->item->server->serverstats->swap->total_readable; ?></dd>
+    	    		<dt></dt>
+    	    		<dd><i>Free</i>: <?php echo $this->item->server->serverstats->swap->free_readable; ?></dd>   	    		
+    	    		
+    	    		<dt>Disk</dt>
+    	    		<dd><i>Total</i>: <?php echo $this->item->server->serverstats->disk->total_readable; ?></dd>
+    	    		<dt></dt>
+    	    		<dd><i>Free</i>: <?php echo $this->item->server->serverstats->disk->free_readable; ?></dd>
+    	    		
+    	    	</dl>
+	    	<?php endif; ?>
+	    	
+	    	
+	    	<?php //echo '<pre>'.print_r($this->item->server, true);?>
+	    <?php endif; ?>
+		 
         
         
 		<input type="hidden" id="rem_name" name="rem_name" value="" />

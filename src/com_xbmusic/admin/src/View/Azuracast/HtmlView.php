@@ -62,7 +62,10 @@ class HtmlView extends BaseHtmlView {
             }
             $api = new AzApi();
             if ($api->getStatus() == true) {
+                $this->item  = $this->get('Item');
+                
                 $model = $this->getModel();
+                
                 $this->azme = $model->getAzMe($api);
                 $this->xbstations = XbazuracastHelper::getStations();           
                 if ($this->azme) {

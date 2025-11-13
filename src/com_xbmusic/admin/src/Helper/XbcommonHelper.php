@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.59.0 19th October 2025
+ * @version 0.0.59.5 12th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -770,7 +770,24 @@ class XbcommonHelper extends ComponentHelper {
         return preg_match("<[a-z]+?[^<]*?>[^<]*?<\/.*?>|<[a-z]+?[^>]*?\/>",$test);
     }
     
-    /**************** File Functions *******************/
+    /**
+     * @name formatBytes
+     * @desc takes a number and returns a formatted string
+     * @desc from https://stackoverflow.com/questions/2510434/format-bytes-to-kilobytes-megabytes-gigabytes
+     * @param unknown $size
+     * @param number $precision
+     * @return string
+     */
+    public static function formatBytes($size, $precision = 2)
+    {
+        $base = log($size, 1024);
+        $suffixes = ['', 'K', 'M', 'G', 'T'];
+        
+        return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[(int) floor($base)];
+    }
+    
+    
+/**************** File Functions *******************/
     
     /**
      * @name newestFile()
@@ -853,14 +870,14 @@ class XbcommonHelper extends ComponentHelper {
     
     /**
      * @name check_url()
-     * @desc gets headers for url and returns true if status 300,301,302 returned
+     * @desc gets headers for url and returns true if status 200,301,302 returned
      * @param string $url
      * @return boolean
      */
     public static function check_url(string $url) {
         $headers = @get_headers( $url);
         $headers = (is_array($headers)) ? implode( "\n ", $headers) : $headers;
-        return (bool)preg_match('#^HTTP/.*\s+[(200|301|302)]+\s#i', $headers);
+        return (bool)preg_match('#^HTTP/.*\s+[(200 |301 |302 )]+\s#i', $headers);
     }
     
     /**
@@ -898,6 +915,8 @@ class XbcommonHelper extends ComponentHelper {
         return false;
     }
     
+/*************** TAG FUNCTIONS  ****************/    
+
     /**
      * @name getTag()
      * @desc gets a tag's details given its id
@@ -914,7 +933,7 @@ class XbcommonHelper extends ComponentHelper {
         $db->setQuery($query);
         return $db->loadObject();
     }
-    
+       
     /**
      * @name tagFilterQuery()
      * @desc given tag filter ids and logic appends appropriate where statement to query
@@ -958,6 +977,8 @@ class XbcommonHelper extends ComponentHelper {
         }
         return $query;
     }
+  
+/***************** IMAGE FUNCTIONS *****************/    
     
     /**
      * @name imageMimeToExt()
