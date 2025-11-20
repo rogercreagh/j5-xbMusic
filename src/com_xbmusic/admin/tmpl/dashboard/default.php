@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.52.5 3rd June 2025
+ * @version 0.0.59.5 20th November 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -23,11 +23,24 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 HTMLHelper::_('behavior.multiselect');
 HTMLHelper::_('formbehavior.chosen', 'select');
 
+$wa = $this->document->getWebAssetManager();
+$wa->addInlineScript("function pleaseWait(targ) {
+		document.getElementById(targ).style.display = 'block';
+	}");
+
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dashboard'); ?>" method="post" name="adminForm" id="adminForm">
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />		
 		<h2><i class='icon-info-circle'></i> <?php echo Text::_('XB_STATUS_SUM'); ?></h2>
+    	<div id="azwaiter" class="xbbox alert-info" style="display:none;">
+          <table style="width:100%">
+              <tr>
+                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
+                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
+              </tr>
+          </table>
+    	</div>
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
 				<div class="xbbox gradgreen">
@@ -36,7 +49,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-green"><?php echo $this->trackcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->trackcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->trackcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->trackcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->trackcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
@@ -71,7 +84,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-cyan"><?php echo $this->songcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->songcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->songcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->songcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->songcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
@@ -106,7 +119,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-blue"><?php echo $this->artistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->artistcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->artistcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->artistcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->artistcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
@@ -141,13 +154,13 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-yellow"><?php echo $this->albumcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->albumcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->albumcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->albumcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
             			 title="<?php echo Text::_('XB_ARCHIVED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['archived'];?></span></span>
             			<span class="xbpl50"><span class="icon-trash xblabel <?php echo ($this->albumcnts['trashed']==0) ? 'label-grey' : 'label-pink';?>"
-            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['trashed'];?></span></span>
+            			 title="<?php echo Text::_('XB_TRASHED'); ?>">&nbsp;&nbsp;<?php echo $this->albumcnts['trashed'];?></span></span></p>
 					<table class="xbwp100">
 						<tr>
 							<td class="xbwp50 xbpl20">
@@ -167,7 +180,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 							</td>
 						</tr>
 					</table>
-					</p>
+					
 				</div>
 
 				<div class="xbbox gradpink">
@@ -176,7 +189,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-pink"><?php echo $this->playlistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->playlistcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->playlistcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->playlistcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->playlistcnts['archived']==0) ? 'label-grey' : 'label-black';?>"
@@ -205,7 +218,8 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 					</table>
 				</div>
 				<div class="xbbox gradpurple">
-					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="index.php?option=com_xbmusic&view=azuracast"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="#"
+						 onclick="pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
                 <?php if ($this->azuracast == 1) : ?>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>
@@ -251,7 +265,7 @@ HTMLHelper::_('formbehavior.chosen', 'select');
 						<span class="xbbadge badge-cat"><?php echo $this->catcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
             			<span class="xbpl20"></span><span class="icon-check xblabel <?php echo ($this->catcnts['published']==0) ? 'label-grey' : 'label-green';?>"
-            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['published'];?></span></span>
+            			 title="<?php echo Text::_('XB_PUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['published'];?></span>
             			<span class="xbpl50"><span class="icon-times xblabel <?php echo ($this->catcnts['unpublished']==0) ? 'label-grey':'label-orange';?>"
             			 title="<?php echo Text::_('XB_UNPUBLISHED'); ?>">&nbsp;&nbsp;<?php echo $this->catcnts['unpublished'];?></span></span>
             			<span class="xbpl50"><span class="icon-archive xblabel <?php echo ($this->catcnts['archived']==0) ? 'label-grey' : 'label-black';?>"

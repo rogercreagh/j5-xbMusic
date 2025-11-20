@@ -63,7 +63,10 @@ class HtmlView extends BaseHtmlView {
             $api = new AzApi();
             if ($api->getStatus() == true) {
                 $this->item  = $this->get('Item');
-                
+                if (isset($this->item->server->storage_locations)) {
+                    $this->indexedlocs = array_column($this->item->server->storage_locations,null,'id');
+                }
+                    
                 $model = $this->getModel();
                 
                 $this->azme = $model->getAzMe($api);

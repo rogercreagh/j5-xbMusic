@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.59.4 6th November 2025
+ * @version 0.0.59.5 20th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -81,7 +81,7 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         if ( $this->azuracast) {
-            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', 'dashboard.toAzuracast')->listCheck(false)->icon('fas fa-broadcast-tower') ;
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', '')->listCheck(false)->icon('fas fa-broadcast-tower')->onclick("pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')") ;
         }
         
         

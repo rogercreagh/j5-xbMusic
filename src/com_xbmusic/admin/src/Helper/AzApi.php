@@ -33,7 +33,7 @@ class AzApi {
     protected $apicomment;
     protected $apiurl;
     protected $authorization;
-    protected $status;
+    protected $status; //true if we have a connection to azuracast
     
     /**
      * @desc if a db user id is provided will get the url and apikey from database
@@ -197,6 +197,26 @@ class AzApi {
     }
     
     /**
+     * @name azStation()
+     * @desc returns details of a single station given the az id
+     * @param int $azstid
+     * @return mixed
+     */
+    public function azStation(int $azstid) {
+        $url=$this->apiurl.'/station/'.$azstid;
+        $result = $this->azApiGet($url);
+        $result->azurl = str_replace('/api','',$this->apiurl);
+        $admin = false;
+        $quota = $this->azStationQuota($azstid);
+        if (isset($quota->used)) {
+            $admin = true;
+        }
+        $result->isadmin = $admin;
+        //what about sysadmin?
+        return $result;      
+ }
+    
+    /**
      * @name azServerInfo()
      * @desc Gets the server info if user has admin privileges.
      * Api calls to admin/settings, admin/api-keys, admin/backups, admin/users, admin/storage-locations
@@ -211,6 +231,12 @@ class AzApi {
             $apikeys = $this->azApiGet($url);
             if (!isset($apikeys->code)) {
                 $settings->apikeys = $apikeys;
+                $settings->sysadmin =2;
+            }
+            $url = $this->apiurl.'/admin/roles';
+            $roles = $this->azApiGet($url);
+            if (!isset($apikeys->code)) {
+                $settings->roles = $roles;
                 $settings->sysadmin =2;
             }
             $url = $this->apiurl.'/admin/backups';
@@ -244,19 +270,6 @@ class AzApi {
     public function azStationQuota(int $azstid) {
         $url=$this->apiurl.'/station/'.$azstid.'/quota';
         $result = $this->azApiGet($url);
-        return $result;
-    }
-    
-    public function azStation(int $azstid) {
-        $url=$this->apiurl.'/station/'.$azstid;
-        $result = $this->azApiGet($url);
-        $result->azurl = strtok($this->apiurl,'/');
-        $admin = false;
-        $quota = $this->azStationQuota($azstid);
-        if (isset($quota->used)) {
-            $admin = true;
-        }
-        $result->isadmin = $admin;
         return $result;
     }
     

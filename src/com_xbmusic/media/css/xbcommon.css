@@ -1,9 +1,9 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.51.4 19th April 2025
+ * @version xbmusic-J5 0.0.59.5 18th November 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 /****
@@ -556,6 +556,34 @@ dl.xbdl dd:before {
 dl.xbdl dd {
 	padding: 0 0 2px 0;
 	margin:0;
+}
+
+/* definition list using grid layout and enabling nested list
+/* nested list should appear in a dd element of the parent list 
+*/
+dl.xbgl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+}
+
+dl.xbgl dt {
+  grid-column: 1;
+  font-style: italic;
+  font-weight: normal;
+  text-align: right;
+  padding-left:20px;
+}
+dl.xbgl dt:after {
+  content:' :';
+}
+dl.xbgl dd {
+  grid-column: 2;
+  margin-left:15px;
+}
+
+dl.xbgl dd dl{
+  display: grid;
+  grid-template-columns: max-content 1fr;
 }
 
 /** table freeze header row. wrap table in <div class="table-scroll and <table class="table-freeze **/
