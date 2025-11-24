@@ -121,7 +121,10 @@ class StationTable extends Table implements VersionableTableInterface, TaggableT
     public function bind($array, $ignore = [])
     {
         if (isset($array['params']) && \is_array($array['params'])) {
-            $registry = new Registry($array['params']);
+            //$registry = new Registry($array['params']);
+            $parameter = new Registry;
+            $parameter->loadArray($array['params']);
+            $array['params'] = (string)$parameter;
             //check stuff in the params
         }
        

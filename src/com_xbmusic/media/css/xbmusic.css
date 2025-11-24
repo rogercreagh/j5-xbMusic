@@ -39,7 +39,22 @@ select.filelist-small {-webkit-appearance: none; font-size:0.9rem; padding:4px 1
 /* reduce width of control input to 120px */
 .xbfix120 {width:120px !important; }
 
-
+/* list control small */
+.control-group:has(.controls > select.list-small) {
+  width:160px;
+  }
+.control-group .list-small {
+	font-size: 0.8rem;
+    padding: 4px 8px;
+    width: 150px;
+}
+.control-label:has(+ .controls > select.list-small) {
+	font-size: 0.8rem; 
+}
+/* hide label for select list */
+.control-label:has(+ .controls > select.hidelbl) {
+	display: none; 
+}
 
 /* the preview eye button */
 #xbcomponent .icon-eye {

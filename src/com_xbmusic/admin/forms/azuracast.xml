@@ -42,14 +42,12 @@
 		>
 		
 		</field>
-		<!-- 
 		<field name="loadazid" type="hidden"
 			default="0"
 		/>
 		<field name="dbstid" type="hidden"
 			default="0"
 		/>
-		 -->
 	</fieldset>
 	
 	<fieldset name="files" label="Symlinks"

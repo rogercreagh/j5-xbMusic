@@ -124,14 +124,80 @@ class StationModel extends AdminModel {
     public function getItem($pk = null) {
         if ($item = parent::getItem($pk)) {
             if (!empty($item->id)) {
-//                 $tagsHelper = new TagsHelper();
-//                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.station');                
+                $item->playlists = $this->getDbPlaylists($item->id);
+                $item->dateorder = Factory::getApplication()->input->get('dateorder',1);
+                $tagsHelper = new TagsHelper();
+                $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.station');                
 //                 $item->tracks = $this->getStationTrackList($item->id);
 //                 $item->artists = XbmusicHelper::getStationArtists($item->id);
 //                 $item->albums = XbmusicHelper::getStationAlbums($item->id);
             }
-        }        
+        } 
+        
         return $item;
+    }
+    
+    public function getDbPlaylists($stdbid) {
+        $db    = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $app = Factory::getApplication();
+        $user  = $app->getIdentity();
+        $status = '';
+        // Select the required fields from the table.
+        $query->select(
+            $this->getState(
+                'list.select',
+                'DISTINCT a.id, a.title, a.alias, a.description, '
+                .'a.az_plid, a.az_name, a.az_type,'
+                .'a.scheduledcnt, publicschd,'
+                .'a.checked_out, a.checked_out_time, a.catid, '
+                .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
+                .'a.modified, a.modified_by, a.ordering, a.lastsync, '
+                .'a.note'
+                )
+            );
+        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
+        $query->from('#__xbmusic_azplaylists AS a');
+        
+        $query->where($db->qn('db_stid').' = '.$db->q($stdbid));
+                
+        // Join over the users for the checked out user.
+        $query->select('uc.name AS editor')
+        ->join('LEFT', '#__users AS uc ON uc.id=a.checked_out');
+        
+        // Join over the categories.
+        $query->select('c.title AS category_title, c.created_user_id AS category_uid, c.level AS category_level'.
+            ',c.path AS category_path')
+            ->join('LEFT', '#__categories AS c ON c.id = a.catid');
+            
+            // Join over the parent categories.
+            $query->select('parent.title AS parent_category_title, parent.id AS parent_category_id,
+						parent.created_user_id AS parent_category_uid, parent.level AS parent_category_level');
+			
+			$query->join('LEFT', '#__categories AS parent ON parent.id = c.parent_id');
+												
+			if (is_numeric($status)) {
+			    $query->where('a.status = ' . (int) $status);
+			} elseif ($status === '') {
+			    $query->where('(a.status = 0 OR a.status = 1)');
+			}
+						
+			// Add the list ordering clause.
+			$orderCol  = 'a.title'; //todo order by sched start
+			$orderDirn = 'ASC';
+									
+			$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
+			$db->setQuery($query);
+			$playlists = $db->loadObjectList();
+			$tagsHelper = new TagsHelper;
+			foreach ($playlists as &$pl) {
+			    
+			    $pl->tags = $tagsHelper->getItemTags('com_xbmusic.playlist' , $pl->id);
+			    
+			    $pl->tracks = $this->getPlaylistTracks($pl->id);
+			    $pl->schedules = $this->getPlaylistSchedule($pl->id);
+			} //end foreach
+			return $playlists;			
     }
     
     public function getForm($data = [], $loadData = true) {
@@ -181,6 +247,10 @@ class StationModel extends AdminModel {
 //             $data->tracklist = $this->getStationTrackList($data->id);
 //             $data->artists = XbmusicHelper::getStationArtists($data->id);
 //             $data->albums = XbmusicHelper::getStationAlbums($data->id);
+
+//            $data->dateorder = $app->input->get('dateorder',1);
+
+            
             
             $retview = $app->input->get('retview','');
             // Pre-select some filters (Status, Category, Language, Access) in edit form if those have been selected in Article Manager: Articles
@@ -214,7 +284,17 @@ class StationModel extends AdminModel {
             return $data;
         }
         
-    public function save($data) {
+        public function setDateOrder($post) {
+//            Factory::getApplication()->enqueueMessage('setdo '.$do);
+            
+            $params = json_decode(XbcommonHelper::getItemValue('#__xbmusic_azstations', 'params', $post['id'])  );
+            $params->dateorder = $post['params']['dateorder'];
+            $res = XbcommonHelper::setItemValue('#__xbmusic_azstations', 'params', $post['id'], json_encode($params));
+            return $res;
+        }
+        
+        
+        public function save($data) {
         $app    = Factory::getApplication();
         $input  = $app->getInput();
         $params = ComponentHelper::getParams('com_xbmusic');
@@ -323,6 +403,30 @@ class StationModel extends AdminModel {
     
     private function canCreateCategory() {
         return $this->getCurrentUser()->authorise('core.create', 'com_content');
+    }
+    
+    public function getPlaylistTracks($pid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('t.id AS trackid, t.title AS tracktitle, t.sortartist AS artistname, pt.listorder AS ordering');
+        $query->join('LEFT','#__xbmusic_trackplaylist AS pt ON pt.track_id = t.id');
+        $query->from('#__xbmusic_tracks AS t');
+        $query->where('pt.playlist_id = '.$pid);
+        $query->order('pt.listorder, t.title ASC');
+        $db->setQuery($query);
+        $res = $db->loadAssocList();
+        return $res;
+    }
+    
+    public function getPlaylistSchedule($pid) {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->select('s.id AS schdbid, s.az_starttime, s.az_endtime, s.az_startdate, s.az_enddate, s.az_days, s.az_loop');
+        $query->from('#__xbmusic_azschedules AS s');
+        $query->where('s.dbplid = '.$pid);
+        $query->order('s.az_startdate, s.az_starttime ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
     }
     
     private function getStationTrackList($stationid) {

@@ -85,7 +85,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
 		<P><?php echo Text::_('XBMUSIC_AZAPI_NO_KEY')?>
 	<?php endif; ?>
 	</p>
-	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
+	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="" style="margin:0 5px;" />
           		</p>
 	
         <div class="row">
@@ -193,33 +193,40 @@ $wa->addInlineScript("function pleaseWait(targ) {
                                     $btnclass = 'btn-warning';
                                     $popbody = "'".Text::sprintf('XBMUSIC_RELOAD_FROM',$azstation->name,$this->azurl)."'"; 
                                     $btntext = Text::_('XB_RELOAD');
-                                } else {
+                                    $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.reloadazstation','azwaiter');";
+    							} else {
                                     $btnclass = 'btn-info';
                                     $btntext = Text::_('XB_IMPORT');
                                     $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$azstation->name,$this->azurl)."'";
+                                    $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.importazstation','azwaiter');"; 
                                 } 
-                                $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.importazstation','azwaiter');"; 
                                 ?>  								
             				<?php endif; ?>
             				<details id="azstid<?php echo $azstation->id; ?>" >
     							<summary><i></i>
     								<span class="xbit xbpl20 xbdarkgrey">AzID: <?php echo $azstation->id; ?></span>
     								<span class="xbr11"> <?php echo $azstation->name; ?></span>
-    								<div class="pull-right">
-            							<?php if (!in_array($this->azurl.'-'.$azstation->id, 
-            							    array_column($this->xbstations, "azurlid"))) : ?>  								
-                							<?php if ($azstation->isadmin) : ?>
-            									<button id="impaz<?php echo $azstation->id; ?>" 
-                									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
-                        							onclick="document.getElementById('jform_loadazid').value=
-                        							<?php echo $azstation->id.';'.$confirm; ?>;" >
-                									<i class="icon-download"></i> <?php echo $btntext; ?>
-        										</button>
-        									<?php endif; ?>
-        								<?php else: ?>
-        									<p class="xbit xbdarkgrey">Already Imported</p>
-        								<?php endif; ?>
-    								</div>
+                					<?php if ($azstation->isadmin) : ?>
+        								<div class="pull-right">
+                							<?php if (!in_array($this->azurl.'-'.$azstation->id, 
+                							    array_column($this->xbstations, "azurlid"))) : ?>  								
+                									<button id="impaz<?php echo $azstation->id; ?>" 
+                    									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
+                            							onclick="document.getElementById('jform_loadazid').value=
+                            							<?php echo $azstation->id.';'.$confirm; ?>;" >
+                    									<i class="icon-download"></i> <?php echo $btntext; ?>
+            										</button>
+            								<?php else: ?>
+            									<p class="xbit xbdarkgrey">Already Imported</p>
+                									<button id="relaz<?php echo $azstation->id; ?>" 
+                    									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
+                            							onclick="document.getElementById('jform_loadazid').value=
+                            							<?php echo $azstation->id.';'.$confirm; ?>;" >
+                    									<i class="icon-download"></i> <?php echo $btntext; ?>
+            										</button>
+            								<?php endif; ?>
+        								</div>
+        							<?php endif; ?>
     								<span class="xbit xbpl20 xbdarkgrey">(
      								<?php if ($azstation->isadmin) : ?>
     									<?php echo Text::_('Station Manager');  ?>
@@ -321,8 +328,8 @@ $wa->addInlineScript("function pleaseWait(targ) {
     							</dl>                             	
     						</details>
         				<?php endforeach; ?>
-//            			<?php echo $this->form->renderField('loadazid'); ?>
-//            			<?php echo $this->form->renderField('dbstid'); ?>
+            			<?php echo $this->form->renderField('loadazid'); ?>
+            			<?php echo $this->form->renderField('dbstid'); ?>
         			<?php endif; ?>
        			<?php else : ?>
                      <p><i><?php if ($this->azurl =='') {

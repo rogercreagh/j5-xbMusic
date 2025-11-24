@@ -36,7 +36,7 @@ class StationController extends FormController {
 
     public function save($key = null, $urlVar = null) {
         $return = parent::save($key, $urlVar);
-        $this->setRedirect('index.php?option=com_xbmusic&view=azuracast');
+        if ($this->task != 'apply') $this->setRedirect('index.php?option=com_xbmusic&view=azuracast');
         return $return;
     }
     
@@ -98,6 +98,14 @@ class StationController extends FormController {
         $this->setRedirect((string)Uri::getInstance());
         
         return parent::batch($model);
+    }
+    
+    public function setdateorder() {
+        $jip =  Factory::getApplication()->input;
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $model = $this->getModel('station');
+        $wynik = $model->setDateOrder($post);
+        $this->setRedirect((string)Uri::getInstance());
     }
  
     public function publish() {

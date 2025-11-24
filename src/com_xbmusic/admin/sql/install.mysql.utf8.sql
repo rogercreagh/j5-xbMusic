@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.54.1 16th June 2025
+# sql installation file for component xbMusic 0.0.59.6 20th November 2025
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -203,6 +203,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(190) NOT NULL,
   `alias` varchar(190) NOT NULL,
+  `slug` varchar(190) NOT NULL DEFAULT '',
   `az_stid` int(10) unsigned NOT NULL Default '0',
   `az_url` varchar(190) COMMENT 'server base url',
   `az_info` mediumtext,
@@ -222,6 +223,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
   `checked_out_time` datetime,
   `modified` datetime,
   `modified_by` int(10) unsigned NOT NULL DEFAULT '0',
+  `lastsync` datetime,
   `metadata` mediumtext NOT NULL DEFAULT '',
   `ordering` int(10) NOT NULL DEFAULT '0',
   `params` mediumtext NOT NULL DEFAULT '',
@@ -233,7 +235,9 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azstations` (
 CREATE TABLE IF NOT EXISTS `#__xbmusic_azplaylists` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
   `title` varchar(190) NOT NULL DEFAULT '',
-  `alias` varchar(190) NOT NULL DEFAULT '',
+  `alias` varchar(190) NOT NULL,
+  `slug` varchar(190) NOT NULL DEFAULT '',
+  `description` mediumtext,
   `scheduledcnt` int(10) unsigned NOT NULL DEFAULT '0',
   `publicschd` int(1) unsigned NOT NULL DEFAULT '1',
   `allowdupes` int(1) unsigned NOT NULL DEFAULT '0',
@@ -259,6 +263,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azplaylists` (
   `checked_out_time` datetime,
   `modified` datetime,
   `modified_by` int(10) NOT NULL DEFAULT '0',
+  `lastsync` datetime,
   `metadata` mediumtext NOT NULL DEFAULT '',
   `ordering` int(10) NOT NULL DEFAULT '0',
   `params` mediumtext NOT NULL DEFAULT '',
@@ -269,6 +274,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azplaylists` (
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,  
+  `slug` varchar(190) NOT NULL DEFAULT '',
+  `description` mediumtext,
   `dbplid` int(10) unsigned NOT NULL Default '0',
   `az_shid` int(10) unsigned NOT NULL Default '0',
   `az_starttime` time,
@@ -286,6 +293,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
   `checked_out_time` datetime,
   `modified` datetime,
   `modified_by` int(10) NOT NULL DEFAULT '0',
+  `lastsync` datetime,
 #  `title` varchar(190) NOT NULL DEFAULT '',
 #  `alias` varchar(190) NOT NULL DEFAULT '',
 #  `az_stid` int(10) unsigned NOT NULL Default '0',

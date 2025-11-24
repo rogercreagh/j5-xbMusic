@@ -10,10 +10,16 @@
 		<field name="id" type="number" 
 			label="JGLOBAL_FIELD_ID_LABEL"
 			description="JGLOBAL_FIELD_ID_DESC" 
-			class="readonly" readonly="true"
+			class="xbfix120 readonly" readonly="true"
 			size="10" default="0"			 
 		/>
 
+		<field name="az_stid" type="number"
+			label="Azuracast Id" 
+			descripition="ID on the Azuracast server - other stations on different servers may have the same id"
+			class="xbfix120 readonly" readonly="true"
+			size="10" default="0"			 
+		/>
 		<field name="title" type="text" 
 			label="JGLOBAL_TITLE"
 			description="JFIELD_TITLE_DESC"
@@ -27,6 +33,13 @@
 			description="JFIELD_ALIAS_DESC"
 			hint="JFIELD_ALIAS_PLACEHOLDER"
 			size="40" 
+		/>
+	
+		<field name="slug" type="text" 
+			label="Slug"
+			description="Short one-line station description"
+			hint="Short one-line station description"
+			size="120" 
 		/>
 	
 		<field name="description" type="textarea"
@@ -91,11 +104,6 @@
 			class="readonly" readonly="true"
 		/>
 			
-		<field name="az_stid" type="number"
-			label="Azuracast Id" descripition="ID on the Azuracast server - other stations on different servers may have the same id"
-			class="readonly" readonly="true"
-			size="10" default="0"			 
-		/>
 			
 		<field
 			name="az_info" type="textarea"
@@ -179,6 +187,14 @@
 			showtime="true"
 			filter="user_utc" />
 
+		<field name="lastsync" type="calendar"
+			label="Last Sync" 
+			description="Datetime station details were last sync'd with Azuracast"
+			class="inputbox" size="20" 			
+			translateformat="true"
+			showtime="true"
+			filter="user_utc" />
+
 		<field name="modified_by" type="user"
 			label="XB_FIELD_MODIFIED_BY_LBL" 
 			description="XB_FIELD_MODIFIED_BY_DESC" />
@@ -207,5 +223,25 @@
 
 	</fieldset>
 
+	<fields name="params">
+		<fieldset
+				name="params"
+				label="JGLOBAL_FIELDSET_DISPLAY_OPTIONS"
+		>
+		<field 
+			name="dateorder" type="list" 
+			label="Date"
+			description="" 
+			class="list-small xbw150 hidelbl"
+			filter="intval" size="1" 
+			onchange="Joomla.submitbutton('station.setdateorder');"
+		>
+			<option value="0">Created</option>
+			<option value="1">Modified</option>
+			<option value="2">LastSync</option>
+		</field>
 
+			
+		</fieldset>
+	</fields>
 </form>
