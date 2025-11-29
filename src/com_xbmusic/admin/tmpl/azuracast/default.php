@@ -96,8 +96,8 @@ $wa->addInlineScript("
 		<P><?php echo Text::_('XBMUSIC_AZAPI_NO_KEY')?>
 	<?php endif; ?>
 	</p>
-	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="" style="margin:0 5px;" />
-          		</p>
+	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="" checked="" style="margin:0 5px;" />
+    </p>
 	
         <div class="row">
         	<div class="col-md-6">
