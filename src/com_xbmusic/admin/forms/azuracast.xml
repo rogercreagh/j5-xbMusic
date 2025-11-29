@@ -39,6 +39,7 @@
 			label="Enter new key"
 			description="Enter full 49 character key including colon between id and value"
 			showon="apilist:0"
+			onchange="showApiBtn();"
 		>
 		
 		</field>

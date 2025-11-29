@@ -30,6 +30,17 @@ $wa->addInlineScript("function pleaseWait(targ) {
 		document.getElementById(targ).style.display = 'block';
 	}");
 
+$wa->addInlineScript("
+    $(document).ready(function() {
+        $('#jform_newapikey').on('keyup', function() {
+            if (document.getElementById('jform_newapikey').value.length==49) {
+                document.getElementById('impapi').style.display = 'unset';
+            } else {
+                document.getElementById('impapi').style.display = 'none';
+            }
+        });
+    })
+");
 ?>    
 <link rel="stylesheet" href="<?php echo Uri::root(true);?>/media/com_xbmusic/css/foldertree.css">
 
@@ -189,14 +200,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
             	    	<?php $pophead = "'".Text::_('XBMUSIC_CONFIRM_AZIMPORT')."'"; ?>
             			<?php foreach($this->azstations as $azstation) : ?>
             				<?php if ($azstation->isadmin) : ?>            				
-    							<?php if (in_array($this->azurl.'-'.$azstation->id, array_column($this->xbstations, "azurlid"))) {
-                                    $btnclass = 'btn-warning';
-                                    $popbody = "'".Text::sprintf('XBMUSIC_RELOAD_FROM',$azstation->name,$this->azurl);
-                                    $popbody .= Text::_('NB This will overwrite any local changes you have made')."'";
-                                    
-                                    $btntext = Text::_('XB_RELOAD');
-                                    $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.reloadazstation','azwaiter');";
-    							} else {
+    							<?php if(!in_array($this->azurl.'-'.$azstation->id, array_column($this->xbstations, "azurlid"))) {
                                     $btnclass = 'btn-info';
                                     $btntext = Text::_('XB_IMPORT');
                                     $popbody = "'".Text::sprintf('XBMUSIC_IMPORT_FROM',$azstation->name,$this->azurl)."'";
@@ -219,13 +223,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
                     									<i class="icon-download"></i> <?php echo $btntext; ?>
             										</button>
             								<?php else: ?>
-            									<p class="xbit xbdarkgrey">Already Imported&nbsp;&nbsp;
-                									<button id="relaz<?php echo $azstation->id; ?>" 
-                    									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
-                            							onclick="document.getElementById('jform_loadazid').value=
-                            							<?php echo $azstation->id.';'.$confirm; ?>;" >
-                    									<i class="icon-download"></i> <?php echo $btntext; ?>
-            										</button>
+            									<p class="xbit xbdarkgrey">Already Imported
             								<?php endif; ?></p>
         								</div>
         							<?php endif; ?>
