@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.9 29th November 2025
+ * @version 0.0.59.11 29th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -78,17 +78,19 @@ $wa->addInlineScript("
               </tr>
           </table>
     	</div>
-        <div class="pull-left xblblcompact xbw600 xbmwp50" >
-			<?php echo $this->form->renderField('apilist'); ?>
-			<?php echo $this->form->renderField('newapikey'); ?>
-        </div>
-        <div class="pull-left xbml50 xblblcompact xbctl150 xbmwp50">
-			<br />
-			<?php ?>
-        	<button id="impapi" class="btn btn-sm btn-primary" type="button"
-        		onclick="Joomla.submitbutton('azuracast.saveapi');" >
-				<i class="icon-save icon-white"></i> &nbsp;<?php echo Text::_('XBMUSIC_SAVE_NEW_KEY'); ?>        	
-        	</button>
+        <div class="row">
+        	<div class="col-md-6 xblblcompact form-vertical">
+				<?php echo $this->form->renderField('apilist'); ?>
+        	</div>
+        	<div class="col-md-6 xblblcompact form-vertical">
+    			<?php echo $this->form->renderField('newapikey'); ?>
+    			<div style="text-align:right;">
+                	<button id="impapi" class="btn btn-sm btn-primary" type="button" style="display:none;"
+                		onclick="Joomla.submitbutton('azuracast.saveapi');" >
+        				<i class="icon-save icon-white"></i> &nbsp;<?php echo Text::_('XBMUSIC_SAVE_NEW_KEY'); ?>        	
+                	</button>
+            	</div>
+            </div>
         </div>
         <div class="clearfix"></div>
 

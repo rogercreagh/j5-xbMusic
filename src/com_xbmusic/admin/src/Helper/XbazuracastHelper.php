@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.59.4 5th November 2025
+ * @version 0.0.59.11 29th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -88,7 +88,7 @@ class XbazuracastHelper extends ComponentHelper
                 $cnts = $db->loadAssoc();
                 $station['plcnt'] = $cnts['plcnt'];
                 $station['schlists'] = $cnts['schlists'];
-                $station['schtot'] = $cnts['schtot'];
+                $station['schtot'] = ($station['schlists']==0) ? 0 : $cnts['schtot'];
                 //create a unique identifier for server + station id
                 $station['azurlid'] = $station['az_url'].'-'.$station['az_stid'];
             }

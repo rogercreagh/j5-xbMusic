@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.59.5 20th November 2025
+ * @version 0.0.59.11 29th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -218,9 +218,9 @@ $wa->addInlineScript("function pleaseWait(targ) {
 					</table>
 				</div>
 				<div class="xbbox gradpurple">
+                <?php if ($this->azuracast == 1) : ?>
 					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="#"
 						 onclick="pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
-                <?php if ($this->azuracast == 1) : ?>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>
 						<?php if(count($this->stations)>1) : ?>
@@ -255,6 +255,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
                   		<p><i><?php echo Text::_('No stations have been saved yet. Use Dataman - Azuracast tab to fetch available stations'); ?></i>
 					<?php endif; ?>
 				<?php else: ?>
+ 					<h3 CLASS="xbmb20"><i class='fas fa-radio' ></i> <?php echo Text::_('XBMUSIC_AZURACAST'); ?></h3>
 					<p class="xbnote">Azuracast connection not enabled in <a href="index.php?option=com_config&view=component&component=com_xbmusic" >options</a> General tab</p>
 				<?php endif; ?>
 				</div>

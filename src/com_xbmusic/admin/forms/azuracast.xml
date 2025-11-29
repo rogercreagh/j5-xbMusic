@@ -32,12 +32,13 @@
 			default="0"
 			onchange="document.getElementById('task').value='azuracast.switchapi';this.form.submit();"
 		>
-			<option value="0">Select key or enter new below</option>
+			<option value="0">Select existing key for current user</option>
 		</field>
 		
 		<field name="newapikey" type="text"
 			label="Enter new key"
-			description="Enter full 49 character key including colon between id and value"
+			description="Enter new full 49 character key for this user including colon between id and value"
+			hint="new key with 49 chars including colon"
 			showon="apilist:0"
 			onchange="showApiBtn();"
 		>
