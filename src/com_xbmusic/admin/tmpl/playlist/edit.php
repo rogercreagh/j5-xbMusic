@@ -8,6 +8,11 @@
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
+/**
+ on loading page get user, we have a station id - but not an azstid need that 
+ 
+ */
+
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;

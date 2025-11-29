@@ -29,6 +29,7 @@ class AjaxController extends BaseController
         $input = $this->app->getInput(); 
 
         $dbstid = $input->get("dbstid", 0);
+        $azstid = $input->get('azstid', 0);
         
         // Generate some enqueued messages which will be displayed using the js code
         //$this->app->enqueueMessage("Enqueued notice", "notice");
@@ -39,9 +40,9 @@ class AjaxController extends BaseController
         $opt->value = 0; $opt->text='Select Playlist';
         $options[] = $opt;
         
-        if ($dbstid > 0) {
-            $api = new AzApi($dbstid);
-            $playlists = $api->azPlaylists();
+        if ($azstid > 0) {
+            $api = new AzApi();
+            $playlists = $api->azPlaylists($azstid);
             //$this->app->enqueueMessage('<pre>'.print_r($playlists,true).'</pre>');
             if (isset($playlists->code)) {
                 $msg = 'Error from API: '.$playlists->code.' - '.$playlists->formatted_message;
@@ -89,7 +90,7 @@ class AjaxController extends BaseController
             '</div></div></div>';
         try
         {
-            $this->app->enqueueMessage(Text::_('XBMUSIC_AZURACAST_PLAYLISTS_LOADED'),'success');
+            $this->app->enqueueMessage(Text::_('XBMUSIC_AZURACAST_PLAYLISTS_LOADED','success');
             echo new JsonResponse($result,"");
         }
         catch(\Exception $e)

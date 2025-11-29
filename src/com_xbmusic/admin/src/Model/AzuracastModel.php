@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AzuracastModel.php
- * @version 0.0.59.5 12th November 2025
+ * @version 0.0.59.10 28th November 2025
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
@@ -49,12 +49,6 @@ class AzuracastModel extends AdminModel {
             $data['apilist'] = ($keydeets) ? $keydeets->id : 0;
         }
         return $data;
-        
-//        if ((!isset($data['apilist'])) || ($data['apilist'] > 0)) {
-//            $keydeets = XbmusicHelper::getSelectedApiKey();
-//            $data['apilist'] = ($keydeets) ? $keydeets->id : 0;
-//        }
-//        return $data;
     }
     
     public function getItem($pk = null) {
@@ -90,6 +84,12 @@ class AzuracastModel extends AdminModel {
         return $result;
     }
     
+    /***
+     * @name getAzStations()
+     * @desc gets all public stations from server with additional admin and sysadmin details per api permissions
+     * @param object $api
+     * @return boolean|object
+     */
     public function getAzStations($api = null) {
         if (!isset($api)) {
             $api = new AzApi();
@@ -97,7 +97,7 @@ class AzuracastModel extends AdminModel {
         }
         $result = $api->azStations();
         if (isset($result->code)) {
-            Factory::getApplication()->enqueueMessage('API error getting User details. <br />'
+            Factory::getApplication()->enqueueMessage('API error getting stations list details. <br />'
                 .$result->code.' '.$result->formatted_message,'Error');
             return false;
         }
@@ -106,32 +106,35 @@ class AzuracastModel extends AdminModel {
     
     /**
      * @name importAzStation()
-     * @desc creates or updates a single station with details from Azuracast
-     * @desc using the curent config credentials
+     * @desc creates a single station with frsh details from Azuracast
+     * @desc using the curent API credentials
      * @param int $azstid
+     * @param object $api
      * @return int|object - id of new/updated dbstation is ok or error object if fails
      */
     public function importAzStation(int $azstid, $api = null) {
-        //        $params = ComponentHelper::getParams('com_xbmusic');
-        //        $azurl = $params->get('az_url');
         if (!isset($api)) {
             $api = new AzApi();
             if ($api->getStatus() == false)  return false;
         }
         $azstation = $api->azStation($azstid);
-        if (isset($azstation->code))
-            return $azstation;
-        //TODO error check
-        //now test if dbstastion exists ? update ELSE create
+        if (isset($azstation->code)) {
+            Factory::getApplication()->enqueueMessage('API error getting station details. <br />'
+                .$azstation->code.' '.$azstation->formatted_message,'Error');
+            return false;
+        }
         $dbstid = $this->getDbStid(trim($azstation->url,'/'), $azstation->id);
         if ($dbstid > 0) {
-            $res = $this->updateDbStation($dbstid,$azstation);
+            // $res = $this->updateDbStation($dbstid,$azstation);
+            Factory::getApplication()->enqueueMessage($azstation->name.' already in database with id '.$dbstid. '<br />'
+                .'To reload station from server first delete it, then load. To sync with server use Edit button','Info');
+            return false;
         } else {
-            $res = $this->createDbStation($azstation);
+            $res = $this->createDbStation($azstation,$api);
         }
         return $res;
-    }
-    
+}
+
     /**
      * @name getDbStid()
      * @desc returns the id of a station in the db which has the given azurl and azid
@@ -155,9 +158,8 @@ class AzuracastModel extends AdminModel {
      * @param object $station
      * returns boolean|Exception true if ok
      */
-    public function createDbStation($azstation) {
+    public function createDbStation($azstation,$api) {
         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
-        //        XbcommonHelper::getCreateCat($catdata)
         $colarr = array('id', 'az_stid', 'title', 'alias',
             'az_url','az_stream','website', 'az_player',
             'catid', 'description', 'az_info',
@@ -170,7 +172,6 @@ class AzuracastModel extends AdminModel {
             $db->q($azstation->description), $db->q(json_encode($azstation)),
             $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast')
         );
-        //$db = Factory::getContainer()->get(DatabaseInterface::cl
         $query = $db->getQuery(true);
         $query->insert($db->qn('#__xbmusic_azstations'));
         $query->columns(implode(',',$db->qn($colarr)));
@@ -180,15 +181,163 @@ class AzuracastModel extends AdminModel {
             $res = $db->execute();
         } catch (\Exception $e) {
             Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
-            return $e;
+            return false;
         }
         if ($res == true) {
             $newid = $db->insertid();
             Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$azstation->name));
+            //now import playlists and schedules
+            $playlists = $api->azPlaylists($azstation->id);
+            if (isset($playlists->code)) {
+                Factory::getApplication()->enqueueMessage('API error getting playlists details. <br />'
+                    .$playlists->code.' '.$playlists->formatted_message,'Warning');
+                return false;
+            }
+            //             $playlists->playlists = $playlists;
+            $cnt = 0;
+            foreach ($playlists as $pl) {
+                $ok = $this->savePlaylist($newid, $pl);
+                if ($ok) $cnt++;
+            }
+            Factory::getApplication()->enqueueMessage($cnt.' playlists created','Success');
         }
         return ($res) ? $newid : false;
     }
     
+    public function savePlaylist($dbstid, $playlist) {
+        $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id; //TOD create stations catergory
+        $alias = $playlist->short_name.'-'.$playlist->station_id.'-'.$playlist->id;
+        $alias = XbcommonHelper::makeUniqueAlias($alias, '#__xbmusic_azplaylists');
+        $az_cntper = 0;
+        $type = $playlist->type;
+        switch ($type) {
+            case 'default':
+                $az_type = 1;
+                break;
+            case 'once_per_x_songs':
+                $az_type = 2;
+                $az_cntper = $playlist->play_per_songs;
+                break;
+            case 'once_per_x_minutes':
+                $az_type = 3;
+                $az_cntper = $playlist->play_per_minutes;
+                break;
+            case 'once_per_hour':
+                $az_type = 4;
+                $az_cntper = $playlist->play_per_hour_minute;
+                break;
+            case 'custom':
+                $az_type = -1;
+                break;
+                
+            default:
+                $az_type = 0;
+                break;
+        }
+        $az_jingle = ($playlist->is_jingle == 'true') ? 1 : 0;
+        $status = ($playlist->is_enabled == 'true') ? 1 : 0;
+        $syncdate = date("Y-m-d H:i:s");
+        $colarr = array('id', 'title', 'alias',
+            'slug','scheduledcnt', 'az_plid',
+            'az_name', 'db_stid', 'az_info',
+            'az_type','az_cntper','az_order',
+            'az_jingle','az_weight','az_num_songs',
+            'az_total_length','description',
+            'catid', 'status','lastsync',
+            'created','created_by', 'created_by_alias'
+        );
+        $db = $this->getDatabase();
+        $values=array($db->q(0),$db->q($playlist->name),$db->q($alias),
+            $db->q($playlist->short_name),$db->q(count($playlist->schedule_items)),$db->q($playlist->id),
+            $db->q($playlist->name),$db->q($dbstid),$db->q(json_encode($playlist)),
+            $db->q($az_type),$db->q($az_cntper),$db->q($playlist->order),
+            $db->q($az_jingle),$db->q($playlist->weight),$db->q($playlist->num_songs),
+            $db->q($playlist->total_length),$db->q($playlist->description),
+            $db->q($uncatid),$db->q($status),$db->q($syncdate),
+            $db->q($syncdate),$db->q($this->getCurrentUser()->id),$db->q('import from Azuracast API')
+        );        
+        $query = $db->getQuery(true);
+        $query->insert($db->qn('#__xbmusic_azplaylists'));
+        $query->columns(implode(',',$db->qn($colarr)));
+        $query->values(implode(',',$values));
+        $db->setQuery($query);
+        try {
+            $res = $db->execute();
+        } catch (\Exception $e) {
+            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            return false;
+        }
+        if ($res) {
+            $plid = $db->insertid();
+            $this->createSchedules($plid, $playlist);
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_IMPORT_OK').' '.$plid,'Success');
+            return $plid;
+        } else {
+            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');
+        }
+        return false;
+    }
+    
+    private function createSchedules(int $dbplid, $playlist) {
+        $scheduleitems = $playlist->schedule_items;
+        $status = ($playlist->is_enabled == true) ? 1 : 0;
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $res = true;
+        $cnt = 0;
+        $colarr = array('id', 'dbplid', 'az_shid',
+            'az_starttime', 'az_endtime',
+            'az_days', 'az_loop', 'status',
+            'created','created_by','created_by_alias',
+            'lastsync','note','az_startdate','az_enddate'
+        );
+        foreach ($scheduleitems as $schd) {
+            //check doesn't exist?
+            $azdays = implode(',',$schd->days);
+            $azloop = ($schd->loop_once == true) ? 1 : 0;
+            $query->clear();
+            $query->insert($db->qn('#__xbmusic_azschedules'));
+            $query->columns(implode(',',$db->qn($colarr)));
+            $valarr = array($db->q(0),$db->q($dbplid),$db->q($schd->id),
+                $db->q(date("H:i:s", strtotime($schd->start_time))),
+                $db->q(date("H:i:s", strtotime($schd->end_time))),
+                $db->q($azdays),$db->q($azloop),$db->q($status),
+                $db->q(Factory::getDate()->toSql()),
+                $db->q(Factory::getApplication()->getIdentity()->id),
+                $db->q('import from Azuracast API'),
+                $db->q(Factory::getDate()->toSql()),
+                $db->q('imported from Azuracast'),
+                'NULL','NULL'
+            );
+            if ($schd->start_date!='') {$valarr[13] = $db->q($schd->start_date);}
+            if ($schd->end_date!='') {$valarr[14] = $db->q($schd->end_date);}
+            $query->values(implode(',',$valarr));
+            try {
+                $db->setQuery($query);
+                $res = $db->execute();
+            } catch (\Exception $e) {
+                Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage(),'Error');
+                Factory::getApplication()->enqueueMessage('Problem saving schedule item '. $schd->id, 'Warning');
+                Factory::getApplication()->enqueueMessage($cnt.' schedule items saved', 'Warning');
+                return false;
+            }
+            if ($res == false) {
+                Factory::getApplication()->enqueueMessage('Problem saving schedule item '. $schd->id, 'Warning');
+            } else {
+                $cnt ++;
+            }
+        }
+        Factory::getApplication()->enqueueMessage($cnt.' schedule items saved', 'Success');
+        return $res;
+    }
+    
+    /***
+     * @name deleteDbStation()
+     * @desc this will delete a station from the database, playlist and schedule details will be cascade deleted
+     * PlaylistTrack links will also be deleted but not the tracks themselves
+     * @param int $stid
+     * @return boolean
+     */
     public function deleteDbStation(int $stid) {
         //needs dbstid to delete
         $db = $this->getDatabase();
@@ -200,10 +349,9 @@ class AzuracastModel extends AdminModel {
             $res = $db->execute();
         } catch (\Exception $e) {
             Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
-            return $e;
+            return false;
         }
         return $res;
-        //needs to also delete stid from playlists, tracks
     }
     
     public function updateDbStation(int $dbstid, object $azstation) {
@@ -220,254 +368,5 @@ class AzuracastModel extends AdminModel {
         //$stationinfo->code is set if failed
         return $stationinfo;
     }
-        /*****
-        // /admin/api-keys
-         [
-  {
-    "id": "string",
-    "verifier": "string",
-    "user": {
-      "id": 0,
-      "email": "demo@azuracast.com",
-      "auth_password": "",
-      "name": "Demo Account",
-      "locale": "en_US",
-      "show_24_hour_time": true,
-      "two_factor_secret": "A1B2C3D4",
-      "created_at": 1609480800,
-      "updated_at": 1609480800,
-      "roles": [
-        "string"
-      ]
-    },
-    "comment": "string",
-    "links": {
-      "additionalProp1": "string",
-      "additionalProp2": "string",
-      "additionalProp3": "string"
-    }
-  }
-]
-         
- //admin/backups
-  [
-  {
-    "path": "automatic_backup_20251106_033300.tgz",
-    "basename": "automatic_backup_20251106_033300.tgz",
-    "pathEncoded": "MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA2XzAzMzMwMC50Z3o=",
-    "timestamp": 1762399983,
-    "size": 10973578,
-    "storageLocationId": 1,
-    "links": {
-      "download": "/api/admin/backups/download/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA2XzAzMzMwMC50Z3o=",
-      "delete": "/api/admin/backups/delete/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA2XzAzMzMwMC50Z3o="
-    }
-  },
-  {
-    "path": "automatic_backup_20251105_033200.tgz",
-    "basename": "automatic_backup_20251105_033200.tgz",
-    "pathEncoded": "MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA1XzAzMzIwMC50Z3o=",
-    "timestamp": 1762313523,
-    "size": 10917096,
-    "storageLocationId": 1,
-    "links": {
-      "download": "/api/admin/backups/download/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA1XzAzMzIwMC50Z3o=",
-      "delete": "/api/admin/backups/delete/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA1XzAzMzIwMC50Z3o="
-    }
-  },
-  {
-    "path": "automatic_backup_20251104_033101.tgz",
-    "basename": "automatic_backup_20251104_033101.tgz",
-    "pathEncoded": "MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA0XzAzMzEwMS50Z3o=",
-    "timestamp": 1762227063,
-    "size": 10864589,
-    "storageLocationId": 1,
-    "links": {
-      "download": "/api/admin/backups/download/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA0XzAzMzEwMS50Z3o=",
-      "delete": "/api/admin/backups/delete/MXxhdXRvbWF0aWNfYmFja3VwXzIwMjUxMTA0XzAzMzEwMS50Z3o="
-    }
-  }
-]
-
-       //admin/users
-        *[
-  {
-    "email": "rogercreagh@hotmail.com",
-    "auth_password": "",
-    "name": "Roger CO",
-    "locale": "default",
-    "show_24_hour_time": null,
-    "two_factor_secret": null,
-    "created_at": 1735746698,
-    "updated_at": 1761898011,
-    "roles": [
-      {
-        "name": "Super Administrator",
-        "id": 1
-      }
-    ],
-    "api_keys": [
-      {
-        "user": "Roger CO",
-        "comment": "Xbmusic",
-        "id": "28b19c397616ae17"
-      },
-      {
-        "user": "Roger CO",
-        "comment": "Android App",
-        "id": "ec8c33b0acfe030a"
-      }
-    ],
-    "passkeys": [],
-    "login_tokens": [],
-    "id": 1,
-    "is_me": true,
-    "links": {
-      "self": "https://radio.xbone.uk/api/admin/user/1",
-      "masquerade": "https://radio.xbone.uk/login-as/1/zYDug08bSP"
-    }
-  },
-  {
-    "email": "roger@crosborne.co.uk",
-    "auth_password": "",
-    "name": "RR Manager",
-    "locale": null,
-    "show_24_hour_time": null,
-    "two_factor_secret": null,
-    "created_at": 1740767136,
-    "updated_at": 1761897794,
-    "roles": [
-      {
-        "name": "RR Station Manager",
-        "id": 3
-      },
-      {
-        "name": "XbmusicAdmin",
-        "id": 4
-      }
-    ],
-    "api_keys": [
-      {
-        "user": "RR Manager",
-        "comment": "RR Real Manager",
-        "id": "11d89d798e405417"
-      }
-    ],
-    "passkeys": [],
-    "login_tokens": [],
-    "id": 2,
-    "is_me": false,
-    "links": {
-      "self": "https://radio.xbone.uk/api/admin/user/2",
-      "masquerade": "https://radio.xbone.uk/login-as/2/zYDug08bSP"
-    }
-  }
-]
-
-//admin/settings
- {
-  "app_unique_identifier": "3e56a67c-c851-11ef-80e2-0242ac130002",
-  "base_url": "https://radio.xbone.uk",
-  "instance_name": "Xbone Server",
-  "prefer_browser_url": true,
-  "use_radio_proxy": true,
-  "history_keep_days": 730,
-  "always_use_ssl": true,
-  "api_access_control": null,
-  "enable_static_nowplaying": true,
-  "analytics": "all",
-  "check_for_updates": true,
-  "update_results": {
-    "current_release": "0.23.1",
-    "latest_release": "0.23.1",
-    "needs_rolling_update": false,
-    "needs_release_update": false,
-    "rolling_updates_available": 0,
-    "can_switch_to_stable": false
-  },
-  "update_last_run": 1762438620,
-  "public_theme": null,
-  "hide_album_art": false,
-  "homepage_redirect_url": null,
-  "default_album_art_url": null,
-  "use_external_album_art_when_processing_media": false,
-  "use_external_album_art_in_apis": false,
-  "last_fm_api_key": null,
-  "hide_product_name": false,
-  "public_custom_css": null,
-  "public_custom_js": null,
-  "internal_custom_css": null,
-  "backup_enabled": true,
-  "backup_time_code": "321",
-  "backup_exclude_media": true,
-  "backup_keep_copies": 3,
-  "backup_storage_location": 1,
-  "backup_format": "tgz",
-  "backup_last_run": 1762399981,
-  "backup_last_output": "Exited with code 0:\nAzuraCast Backup\n================\n\nPlease wait while a backup is generated...\n\nBacking up MariaDB...\n---------------------\n\n\nCreating backup archive...\n--------------------------\n\nvar/azuracast/storage/uploads/\nvar/azuracast/storage/uploads/background.png\nvar/azuracast/storage/uploads/browser_icon/\nvar/azuracast/storage/uploads/browser_icon/180.png\nvar/azuracast/storage/uploads/browser_icon/original.png\nvar/azuracast/storage/uploads/browser_icon/114.png\nvar/azuracast/storage/uploads/browser_icon/96.png\nvar/azuracast/storage/uploads/browser_icon/48.png\nvar/azuracast/storage/uploads/browser_icon/144.png\nvar/azuracast/storage/uploads/browser_icon/57.png\nvar/azuracast/storage/uploads/browser_icon/16.png\nvar/azuracast/storage/uploads/browser_icon/72.png\nvar/azuracast/storage/uploads/browser_icon/152.png\nvar/azuracast/storage/uploads/browser_icon/36.png\nvar/azuracast/storage/uploads/browser_icon/120.png\nvar/azuracast/storage/uploads/browser_icon/60.png\nvar/azuracast/storage/uploads/browser_icon/32.png\nvar/azuracast/storage/uploads/browser_icon/192.png\nvar/azuracast/storage/uploads/browser_icon/76.png\nvar/azuracast/storage/uploads/album_art.png\ntmp/azuracast_backup_mariadb/db.sql\n\nCleaning up temporary files...\n------------------------------\n\n\n [OK] Backup complete in 1.74 seconds.",
-  "setup_complete_time": 1735808700,
-  "sync_disabled": false,
-  "sync_last_run": 1762459861,
-  "external_ip": null,
-  "geolite_license_key": null,
-  "geolite_last_run": 1762454520,
-  "mail_enabled": true,
-  "mail_sender_name": "Xbone Azuracast",
-  "mail_sender_email": "xbone@crosborne.co.uk",
-  "mail_smtp_host": "smtp.ionos.co.uk",
-  "mail_smtp_port": 587,
-  "mail_smtp_username": "roger@crosborne.co.uk",
-  "mail_smtp_password": "Wm0itcr&s",
-  "mail_smtp_secure": false,
-  "avatar_service": "disabled",
-  "avatar_default_url": "https://www.azuracast.com/img/avatar.png",
-  "acme_email": "rogercreagh@hotmail.com",
-  "acme_domains": "radio.xbone.uk",
-  "ip_source": "local"
-}
-
-//admin/storage-locations
- 
- {
-  "media_storage_location": [
-    {
-      "value": 2,
-      "text": "Local: /var/azuracast/stations/wreckers_radio/media",
-      "description": null
-    },
-    {
-      "value": 5,
-      "text": "Local: /var/azuracast/stations/radioroger/media",
-      "description": null
-    }
-  ],
-  "recordings_storage_location": [
-    {
-      "value": 3,
-      "text": "Local: /var/azuracast/stations/wreckers_radio/recordings",
-      "description": null
-    },
-    {
-      "value": 6,
-      "text": "Local: /var/azuracast/stations/radioroger/recordings",
-      "description": null
-    }
-  ],
-  "podcasts_storage_location": [
-    {
-      "value": 4,
-      "text": "Local: /var/azuracast/stations/wreckers_radio/podcasts",
-      "description": null
-    },
-    {
-      "value": 7,
-      "text": "Local: /var/azuracast/stations/radioroger/podcasts",
-      "description": null
-    }
-  ]
-}
-
-
-         */
     
 }

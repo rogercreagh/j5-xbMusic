@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.5 20th November 2025
+ * @version 0.0.59.9 29th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -49,7 +49,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
 		<input type="hidden" id="multi" value="0" />
 		<input type="hidden" id="extlist" value="xxx" />
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
-		<h2><?php echo Text::_('XBMUSIC_AZURACAST_STATIONS');?></h2>
+		<h2><?php echo Text::_('XBMUSIC_AZURACAST_SERVER_STATIONS');?></h2>
          
 	<?php if($this->azme == false): ?>
 		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
@@ -191,7 +191,9 @@ $wa->addInlineScript("function pleaseWait(targ) {
             				<?php if ($azstation->isadmin) : ?>            				
     							<?php if (in_array($this->azurl.'-'.$azstation->id, array_column($this->xbstations, "azurlid"))) {
                                     $btnclass = 'btn-warning';
-                                    $popbody = "'".Text::sprintf('XBMUSIC_RELOAD_FROM',$azstation->name,$this->azurl)."'"; 
+                                    $popbody = "'".Text::sprintf('XBMUSIC_RELOAD_FROM',$azstation->name,$this->azurl);
+                                    $popbody .= Text::_('NB This will overwrite any local changes you have made')."'";
+                                    
                                     $btntext = Text::_('XB_RELOAD');
                                     $confirm = "doConfirm(".$popbody.",".$pophead.",'azuracast.reloadazstation','azwaiter');";
     							} else {
@@ -217,19 +219,23 @@ $wa->addInlineScript("function pleaseWait(targ) {
                     									<i class="icon-download"></i> <?php echo $btntext; ?>
             										</button>
             								<?php else: ?>
-            									<p class="xbit xbdarkgrey">Already Imported</p>
+            									<p class="xbit xbdarkgrey">Already Imported&nbsp;&nbsp;
                 									<button id="relaz<?php echo $azstation->id; ?>" 
                     									class="btn btn-sm <?php echo $btnclass; ?>" type="button"
                             							onclick="document.getElementById('jform_loadazid').value=
                             							<?php echo $azstation->id.';'.$confirm; ?>;" >
                     									<i class="icon-download"></i> <?php echo $btntext; ?>
             										</button>
-            								<?php endif; ?>
+            								<?php endif; ?></p>
         								</div>
         							<?php endif; ?>
     								<span class="xbit xbpl20 xbdarkgrey">(
      								<?php if ($azstation->isadmin) : ?>
-    									<?php echo Text::_('Station Manager');  ?>
+     									<?php if ($azstation->issysadmin) : ?>
+        									<?php echo Text::_('System Manager');  ?>
+     									<?php else: ?>
+        									<?php echo Text::_('Station Manager');  ?>
+     									<?php endif; ?>
     								<?php else : ?>
     									<?php echo Text::_('not admin');  ?>
     								<?php endif; ?>
@@ -240,11 +246,6 @@ $wa->addInlineScript("function pleaseWait(targ) {
     								<dd><?php echo $azstation->shortcode; ?></dd>
     								<dt>Description</dt>
     								<dd><span class="xb09"><?php echo $azstation->description; ?></span></dd>
-    								<?php if (isset($azstation->genre)) : ?>
-        								<dt>Genres</dt>
-        								<dd><?php echo $azstation->genre; ?>
-        								</dd>   									
-    								<?php endif; ?>
     								
     								<dt><?php echo Text::_('XB_WEBSITE'); ?></dt>
     								<dd><a href="<?php echo $azstation->url; ?>" target="_blank">
@@ -270,13 +271,13 @@ $wa->addInlineScript("function pleaseWait(targ) {
         									<?php echo ($azstation->services->frontendRunning == 1)? 
                              	              'OK' : '<span class="xbred">Stopped</span>' ; ?> 
                              	        </dd>
-        								<?php if (isset($azstation->frontend_type)) : ?>
+        								<?php if (isset($azstation->admininfo->frontend_type)) : ?>
             								<dd>
                                          	<details>
                                          		<summary>
-                                         			<?php echo $azstation->frontend_type; ?>
+                                         			<?php echo $azstation->admininfo->frontend_type; ?>
                                     			</summary> 
-                                    			<pre><?php echo print_r($azstation->frontend_config,true);?>
+                                    			<pre><?php echo print_r($azstation->admininfo->frontend_config,true);?>
                                     			</pre>
                                     		</details>
             								</dd>
@@ -285,13 +286,13 @@ $wa->addInlineScript("function pleaseWait(targ) {
                              	            <?php echo ($azstation->services->backendRunning == 1)? 
                              	              'OK' : '<span class="xbred">Stopped</span>' ; ?>
                              	        </dd>
-        								<?php if (isset($azstation->backend_type)) : ?>
+        								<?php if (isset($azstation->admininfo->backend_type)) : ?>
             								<dd>
                                          	<details>
                                          		<summary>
-                                         			<?php echo $azstation->backend_type; ?>
+                                         			<?php echo $azstation->admininfo->backend_type; ?>
                                     			</summary> 
-                                    			<pre><?php echo print_r($azstation->backend_config,true);?>
+                                    			<pre><?php echo print_r($azstation->admininfo->backend_config,true);?>
                                     			</pre>
                                     		</details>
             								</dd>
@@ -311,20 +312,49 @@ $wa->addInlineScript("function pleaseWait(targ) {
                                         	<?php echo number_format($azstation->quota->num_files); ?> files
                                         </dd>
     								<?php endif; ?>
-    								<?php if (isset($this->indexedlocs)) : ?>
-        								<dt>Media</dt>
-        								<dd><?php $loc = $this->indexedlocs[$azstation->media_storage_location];
-        								    echo $loc->path;?></dd>
-        								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
-        								<dt>Recordings</dt>
-        								<dd><?php $loc = $this->indexedlocs[$azstation->recordings_storage_location];
-        								    echo $loc->path;?></dd>
-        								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
-        								<dt>Podcasts</dt>
-        								<dd><?php $loc = $this->indexedlocs[$azstation->podcasts_storage_location];
-        								    echo $loc->path;?></dd>
-        								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
-    								<?php endif ;?>
+    								<?php if($azstation->issysadmin): ?>
+        								<dd><hr /><b><i>System Admin Info</i></b></dd>
+         								<?php if (isset($azstation->admininfo->timezone)) : ?>
+            								<dt>Timezone</dt>
+            								<dd><?php echo $azstation->admininfo->timezone; ?>
+            								</dd>   									
+        								<?php endif; ?>
+         								<?php if (isset($azstation->admininfo->genre)) : ?>
+            								<dt>Genres</dt>
+            								<dd><?php echo $azstation->admininfo->genre; ?>
+            								</dd>   									
+        								<?php endif; ?>
+         								<?php if (($azstation->admininfo->enable_requests)) : ?>
+            								<dt>Requests</dt><dd>Enabled</dd>
+            								<dd><?php echo 'delay '.$azstation->admininfo->request_delay; ?></dd>
+            								<dd><?php echo 'threshold '.$azstation->admininfo->request_Threshold; ?>
+            								</dd>   									
+        								<?php endif; ?>
+         								<?php if (($azstation->admininfo->enable_streamers)) : ?>
+            								<dt>Streamers</dt><dd>Enabled</dd>
+            								<dd><?php if($azstation->admininfo->is_streamer_live) : ?>
+            									<span class="xbred">Currently Live</span>
+            								<?php else : ?>
+            									Not Live
+            								<?php endif; ?>
+            								</dd>   									
+        								<?php endif; ?>
+        								
+        								<?php if (isset($this->indexedlocs)) : ?>
+            								<dt>Media</dt>
+            								<dd><?php $loc = $this->indexedlocs[$azstation->admininfo->media_storage_location];
+            								    echo $loc->path;?></dd>
+            								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
+            								<dt>Recordings</dt>
+            								<dd><?php $loc = $this->indexedlocs[$azstation->admininfo->recordings_storage_location];
+            								    echo $loc->path;?></dd>
+            								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
+            								<dt>Podcasts</dt>
+            								<dd><?php $loc = $this->indexedlocs[$azstation->admininfo->podcasts_storage_location];
+            								    echo $loc->path;?></dd>
+            								<dd>Used <?php echo $loc->storageUsed.' of '.$loc->storageQuota; ?>
+        								<?php endif ;?>
+    								<?php endif; ?>
     							</dl>                             	
     						</details>
         				<?php endforeach; ?>

@@ -68,7 +68,7 @@
 		<field name="azplaylist" type="xbazplaylists" 
 			label="Azuracast Playlist"
 			description="Azuracast Playlist linked to this one" 
-			dbstid=""
+			azstid=""
 			showon="azstation>0"
 			default="0"			 
 		>

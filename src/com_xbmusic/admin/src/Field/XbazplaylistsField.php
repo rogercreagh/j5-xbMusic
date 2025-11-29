@@ -33,10 +33,10 @@ class XbazplaylistsField extends ListField {
      */
     public function getOptions() { 
         $options = parent::getOptions();
-        $dbstid = $this->dbstid;
+        $azstid = $this->azstid;
         if ($dbstid > 0) {
-            $api = new AzApi($dbstid);
-            $playlists = $api->azPlaylists();
+            $api = new AzApi();
+            $playlists = $api->azPlaylists($azstid);
             if (isset($playlists->code)) {
                 Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_AZURACAST_ERROR').
                     ' '.$this->$playlists->code.'<br/>'.$playlists->formatted_message.

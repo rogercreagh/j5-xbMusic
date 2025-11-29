@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.5 12th November 2025
+ * @version 0.0.59.9 27th November 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -154,7 +154,7 @@ class AzApi {
     /**
      * @name azStations()
      * @desc get list of Az stations on server.
-     * Public properties for all stations plus station & system station admin properties as avaiable
+     * Public properties for all stations plus station & system station admin properties if avaiable
      * @return object
      */
     public function azStations() {
@@ -162,35 +162,13 @@ class AzApi {
         $url = $this->apiurl.'/stations';
         $result = $this->azApiGet($url);
         foreach ($result as &$station) {
-            //try for station profile
-            $url = $this->apiurl.'/station/'.$station->id.'/profile';
-            $profile = $this->azApiGet($url);
+            $station->isadmin = 0;
+            $station->issysadmin = 0;
+            //try for station profile - only available if station admin privileges
+            $profile = $this->azStation($station->id);
             //if okay set isadmin and merge with public
             if (!isset($profile->code)) {
-                $station->isadmin = 1;
-                //only services and schedule are added in profile
-                $station->services = $profile->services;
-                $station->schedule = $profile->schedule;
-                $url = $this->apiurl .'/station/'. $station->id.'/quota';
-                $quota = $this->azApiGet($url);
-                if (!isset($quota->code)) {
-                    $station->quota = $quota;
-                } else {
-                    $station->quota = 'Quota not avialable with current login.';
-                }
-                //merge to add services and schedule elements
-//                $station = (object) array_merge((array) $station, (array) $profile);
-                $url = $this->apiurl.'/admin/station/'.$station->id;
-                $sysadmin = $this->azApiGet($url);
-                if (!isset($sysadmin->code)) {
-                    $station->issysadmin = 1;
-                    //lots of new info for sysadmin
-                    $station = (object) array_merge((array) $station, (array) $sysadmin);
-                } else {
-                    $station->issysadmin = 0;
-                }
-            } else {
-                $station->isadmin = 0;
+                $station = $profile;
             }
         }
         return $result;
@@ -199,22 +177,41 @@ class AzApi {
     /**
      * @name azStation()
      * @desc returns details of a single station given the az id
+     * requires station admin privileges
+     * if also system admin privileges will return additional info                 
      * @param int $azstid
      * @return mixed
      */
     public function azStation(int $azstid) {
-        $url=$this->apiurl.'/station/'.$azstid;
+        $url=$this->apiurl.'/station/'.$azstid.'/profile';
         $result = $this->azApiGet($url);
-        $result->azurl = str_replace('/api','',$this->apiurl);
-        $admin = false;
-        $quota = $this->azStationQuota($azstid);
-        if (isset($quota->used)) {
-            $admin = true;
+        if (!isset($result->code)) {
+            $station = $result->station;
+            $station->azurl = str_replace('/api','',$this->apiurl);           
+            $station->isadmin = 1;
+            // services and schedule are added in profile
+            $station->services = $result->services;
+            $station->schedule = $result->schedule;
+            $url = $this->apiurl .'/station/'. $azstid.'/quota';
+            $quota = $this->azApiGet($url);
+            if (!isset($quota->code)) {
+                $station->quota = $quota;
+            }
+            //add sys admin details if available
+            $url = $this->apiurl.'/admin/station/'.$azstid;
+            $sysadmin = $this->azApiGet($url);
+            if (!isset($sysadmin->code)) {
+                $station->issysadmin = 1;
+                // new info for sysadmin
+                $station->admininfo = $sysadmin;
+            } else {
+                $station->issysadmin = 0;
+            }
+            return $station;      
+        } else {
+            return $result;
         }
-        $result->isadmin = $admin;
-        //what about sysadmin?
-        return $result;      
- }
+    }
     
     /**
      * @name azServerInfo()
@@ -273,10 +270,10 @@ class AzApi {
         return $result;
     }
     
-    public function azPlaylists() {
-        if ($this->azstid == 0)
+    public function azPlaylists(int $azstid) {
+        if ($azstid == 0)
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
-        $url=$this->apiurl.'/station/'.$this->azstid.'/playlists';
+        $url=$this->apiurl.'/station/'.$azstid.'/playlists';
         $result = $this->azApiGet($url);
         return $result;
     }
