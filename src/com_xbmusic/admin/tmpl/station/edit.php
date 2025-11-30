@@ -182,7 +182,7 @@ $item = $this->item;
 						<th >
 							<?php echo Text::_('JGLOBAL_TITLE'); ?>
 						</th>
-							<th><?php echo Text::_('Schedule'); ?>
+							<th><?php echo Text::_('Schedule Slots'); ?>
 							</th>
 						<th><?php echo Text::_('XBMUSIC_TRACKS'); ?>
 						</th>
@@ -221,7 +221,7 @@ $item = $this->item;
                             </div>
                             <?php if ($pl->status == -2) : ?>
                             	<div style="float:left;">
-                            		<a href="index.php?option=com_xbmusic&task=song.delete&cid=<?php echo $pl->id?>">
+                            		<a href="index.php?option=com_xbmusic&task=playlist.delete&cid=<?php echo $pl->id?>">
                             			<span class="fas fa-xmark xbred xbpl5" style="font-size:1.6rem;"></span>
                             		</a>
                             	</div>
@@ -261,8 +261,7 @@ $item = $this->item;
 							</div>
 						</td>
 						<td class="xbmt5 xbmh400 xbyscroll <?php if(!$pl->publicschd) echo 'xbdim'; ?>" onclick="stopProp(event);">
-							<?php if ($pl->az_plid) : ?>
-								on <?php echo $pl->azstation; ?>
+							<?php if ($pl->az_plid) : ?>								
 								<?php if ($pl->scheduledcnt > 0) : ?>
 									<details>
 										<summary class="xbnit"><?php echo $pl->scheduledcnt; 
