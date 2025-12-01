@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.11 29th November 2025
+ * @version 0.0.59.11 1st December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -298,9 +298,15 @@ $wa->addInlineScript("
             								</dd>
         								<?php endif; ?>
     								<?php endif; ?>
-    								<?php if (isset($azstation->schedule)) : ?>
+    								<?php if (isset($azstation->plcnt)) : ?>
+        								<dt>Playlist</dt>
+        								<dd><?php echo $azstation->plcnt; ?>
+        									<?php echo Text::_('playlists defined'); ?>
+        								</dd>
+    								<?php endif; ?>
+    								<?php if (isset($azstation->schcnt)) : ?>
         								<dt>Schedule</dt>
-        								<dd><?php echo (count($azstation->schedule)); ?>
+        								<dd><?php echo $azstation->schcnts; ?>
         									<?php echo Text::_('schedule timeslots defined'); ?>
         								</dd>
     								<?php endif; ?>
