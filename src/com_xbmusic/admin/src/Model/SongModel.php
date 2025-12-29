@@ -73,7 +73,8 @@ class SongModel extends AdminModel {
         }
         return true;
     }
- 
+
+/*    link tsables now cascade delete 
     public function delete(&$pks) {
         //first need to delete links to albums, artists, tracks
         $db = Factory::getDbo();
@@ -87,7 +88,7 @@ class SongModel extends AdminModel {
         }           
         return parent::delete($pks);
     }
-       
+ */       
     protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
             return false;

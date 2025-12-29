@@ -1,10 +1,10 @@
-<?php 
+        <?php 
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlisttracks/default.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.59.17 22nd December 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -29,12 +29,14 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns');
-$wa->useScript('multiselect');
+$wa->useScript('table.columns')
+    ->useScript('multiselect')
+    ->useScript('xbmusic.xbgeneral');
 
 $app       = Factory::getApplication();
 $user  = $app->getIdentity();
 $userId    = $user->get('id');
+$playlist = $this->playlist;
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn = $this->escape($this->state->get('list.direction'));
 $saveOrder = ($listOrder == 'ordering');
@@ -50,8 +52,70 @@ if ($saveOrder && !empty($this->items)) {
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlisttracks&id='.$this->id); ?>" method="post" name="adminForm" id="adminForm">
-		<h3><?php echo '<i>'.Text::_('XBMUSIC_PLAYLISTTRACKS').'</i> : '.$this->title; ?></h3>
-		<p class=xbit"><?php echo Text::_('XBMUSIC_PLAYLISTTRACKS_INFO');?>
+    	<h2><?php echo Text::_('Tracks in'); ?> 
+    		<a href="index.php?option=com_xbmusic&task=playlist.edit&id=<?php echo $playlist->id; ?>">
+    			<?php echo $playlist->title; ?> playlist
+    		</a>
+    	</h2>
+    	<h3><span class="xbnorm xbit"><?php echo Text::_('Station'); ?></span> : 
+    		<a href="index.php?option=com_xbmusic&task=station.edit&id=<?php echo $this->station['id']; ?>" >
+    			<?php echo $this->station['title']; ?></a>
+    		<span class="xbnorm xbit"><?php echo Text::_('XBMUSIC_SERVER'); ?></span> <?php echo $this->station['az_url']; ?>
+    	</h3>
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+		<span class="xbnote"><?php echo Text::_('XBMUSIC_PLAYLISTTRACKS_INFO');?></span>
+		<p>Playlist details and schedule last sync'd with azuracast at 
+			<?php $sync = new DateTime($playlist->lastsync);
+			     echo $sync->format('H:i \o\n D jS M Y');?>. 
+			Track list last sync'd at <?php if (!is_null($playlist->tracks_sync)) {
+              $sync = new DateTime($playlist->tracks_sync);
+			     echo $sync->format('H:i \o\n D jS M Y'); } else { echo '<i>Unknown</i>'; } ?>
+        </p>
+		<details>
+			<summary><?php echo Text::_('Playlist Information'); ?></summary>
+			<div class="row">
+				<div class="col-md-6">
+        			<dl class="xbgl">
+        				<dt><?php echo Text::_('XB_TYPE'); ?></dt>
+        				<dd><?php if ($playlist->az_type < 2) {
+        				    echo Text::_('XBMUSIC_AZTYPE'.$playlist->az_type); 
+        					} else {
+        					    echo Text::sprintf('XBMUSIC_AZTYPE'.$playlist->az_type, $playlist->az_cntper);
+        					} ?>
+        				</dd>
+        				<dt><?php echo Text::_('XB_WEIGHT'); ?></dt>
+        				<dd><?php echo $playlist->az_weight; ?>
+        				</dd>
+        				<dt><?php echo Text::_('XB_ORDERING'); ?></dt>
+        				<dd><?php echo ucfirst($playlist->az_order); ?>
+        				</dd>					
+        			</dl>
+                </div>
+				<div class="col-md-6">
+        			<dl class="xbgl">
+        				<dt><?php echo Text::_('Scheduled'); ?></dt>
+        				<dd><?php echo $playlist->schedulecnt.Xbtext::_('slots in schedule'); ?>
+        				<br /><span class="xbnote"><?php echo Text::_('Check times in') ?> 
+        					<a href="index.php?option=com_xbmusic&task=playlist.edit&id=<?php echo $playlist->id; ?>#schedule">
+        						Playlist Schedule Tab</a></span>
+        				</dd>
+        				<dt><?php echo Text::_('Track Count'); ?></dt>
+        				<dd><?php echo $playlist->az_num_songs.Xbtext::_('in Azuracast',XBTRL  + XBSP1); ?>
+        					<span <?php if ($playlist->az_num_songs != $this->pagination->total) echo 'class="xbred"'; ?>
+        					    >, 
+        						<?php echo $this->pagination->total.Xbtext::_('in local list', XBTRL + XBSP1); ?>
+        					</span>
+        				</dd>
+        				<dt><?php echo Text::_('Duration'); ?></dt>
+        				<dd><?php echo XbcommonHelper::secondsToHms($playlist->az_total_length) ; ?>
+        				</dd>
+					
+        			</dl>
+            	</div>
+            </div>
+		</details>
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>
@@ -85,9 +149,11 @@ if ($saveOrder && !empty($this->items)) {
 						<th class="center " style="width:25px;" >
 							<?php echo HTMLHelper::_('grid.checkall'); ?>
 						</th>
+					<?php if ($playlist->az_order == 'sequential') : ?>
 						<th scope="col" class="text-center d-none d-md-table-cell" style="width:125px;">
 							<?php echo HTMLHelper::_('searchtools.sort', '', 'ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-sort'); ?>
 						</th>
+					<?php endif; ?>
 						<th class="nowrap center " style="width:95px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JSTATUS', 'a.status', $listDirn, $listOrder); ?>
 						</th>
@@ -121,6 +187,7 @@ if ($saveOrder && !empty($this->items)) {
                             <?php echo HTMLHelper::_('grid.id', $i, $item->id, false, 'cid', 'cb', $item->track_title); ?>
 							<?php //echo HTMLHelper::_('grid.id', $i, $item->id); ?>
 						</td>
+					<?php if ($playlist->az_order == 'sequential') : ?>
                         <td class="text-center d-none d-md-table-cell xbw125">
                             <?php
                             $iconClass = '';
@@ -136,7 +203,7 @@ if ($saveOrder && !empty($this->items)) {
 							<input type="text" name="order[]" size="5" readonly="true" 
                             	value="<?php echo $item->ordering; ?>" class="text-area-order xborderip" />
                         </td>
-						
+					<?php endif; ?>	
 						<td class="track-status">
 							<div style="float:left;">
                                 <?php
@@ -175,7 +242,7 @@ if ($saveOrder && !empty($this->items)) {
 								</p>
 							</div>
 						</td>
-						<td><?php echo $item->artist; ?>
+						<td><?php echo $item->artists ; ?>
 						</td>
 						<td><?php echo $item->album_title;?>
 						</td>

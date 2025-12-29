@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Station/HtmlView.php
- * @version 0.0.54.1 17th June 2025
+ * @version 0.0.59.15 13th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -36,7 +36,8 @@ class HtmlView extends BaseHtmlView {
         $this->canDo = ContentHelper::getActions('com_xbmusic', 'station', $this->item->id);
         
         $this->params      = $this->get('State')->get('params');
-                
+        $this->azuracast = $this->params->get('azuracast','0');
+        
 //        $this->tagparentids = $this->params->get('stationtagparents',[]);
         
         // Check for errors.
@@ -69,12 +70,42 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             $toolbar->apply('station.apply');
-            $toolbar->save('station.save');
+            // $toolbar->save('station.save');
+            //$toolbar->standardButton('stationapply', 'JTOOLBAR_APPLY', '')->listCheck(false)->icon('icon-apply')->onclick("showEl('azwaiter');Joomla.submitbutton('station.apply')") ;
+            $toolbar->standardButton('stationsave', 'JTOOLBAR_SAVE', '')->listCheck(false)->icon('icon-save')->onclick("showEl('azwaiter');Joomla.submitbutton('station.save')") ;
             
         }        
-        $toolbar->cancel('station.cancel', 'JTOOLBAR_CLOSE');
+        //$toolbar->cancel('station.cancel', 'JTOOLBAR_CLOSE');
+        $toolbar->standardButton('stationcancel', 'JTOOLBAR_CLOSE', '')->listCheck(false)->icon('icon-cancel')->onclick("showEl('azwaiter');Joomla.submitbutton('station.cancel')") ;
+        //$toolbar->divider();
+        $dropdown = $toolbar->dropdownButton('views')
+        ->text('XBMUSIC_OTHER_VIEWS')
+        ->toggleSplit(false)
+        ->icon('icon-ellipsis-h')
+        ->buttonClass('btn btn-action')
+        ->listCheck(false);
+        $childBar = $dropdown->getChildToolbar();
+        $childBar->standardButton('dashboardview', 'XB_DASHBOARD', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
+        $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        //       $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        //        $childBar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
+        $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
+        $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', '')->listCheck(false)->icon('fas fa-broadcast-tower')->onclick("showEl('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')") ;
+        }
+        $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
         
-        $toolbar->divider();
+        
+        $canDo = ContentHelper::getActions('com_xbmusic');
+        if ($canDo->get('core.admin')) {
+            //$toolbar->preferences('com_xbmusic');
+            ToolbarHelper::preferences('com_xbmusic');
+        }
+        
         $toolbar->inlinehelp();
         $toolbar->help('Station: Edit',false,'https://crosborne.uk/xbmusic/doc#stationedit');
         

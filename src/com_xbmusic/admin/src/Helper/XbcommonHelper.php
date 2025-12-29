@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.59.5 12th November 2025
+ * @version 0.0.59.17 22nd December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -784,6 +784,13 @@ class XbcommonHelper extends ComponentHelper {
         $suffixes = ['', 'K', 'M', 'G', 'T'];
         
         return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[(int) floor($base)];
+    }
+    
+    public static function secondsToHms($seconds) {
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        $seconds = $seconds % 60;
+        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
     }
     
     

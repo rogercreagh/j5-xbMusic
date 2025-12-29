@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.53.1 12th June 2025
+ * @version 0.0.59.16 16th December+ 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -76,7 +76,8 @@ class TrackModel extends AdminModel {
     protected function batchPlaylist($value, $pks, $contexts) {
         Factory::getApplication()->enqueueMessage('Playlist add '.$value.' to '.implode(',',$pks).' contexts '.implode(','.$contexts));
     }
-    
+ 
+/*   link tables now cascade delete  
     public function delete(&$pks) {
         //first need to delete links artists, songs
         $db = Factory::getDbo();
@@ -101,7 +102,8 @@ class TrackModel extends AdminModel {
         return parent::delete($pks);
     }
     
-    public function loadId3() {
+ */    
+ public function loadId3() {
         $app  = Factory::getApplication();
         $app->setUserState('com_xbmusic.edit.track.id3data', null);
         $app->setUserState('com_xbmusic.edit.track.id3loaded', 0);

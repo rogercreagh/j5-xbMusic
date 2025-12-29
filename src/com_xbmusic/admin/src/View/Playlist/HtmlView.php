@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlist/HtmlView.php
- * @version 0.0.59.4 5th November 2025
+ * @version 0.0.59.15 13th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -47,7 +47,12 @@ class HtmlView extends BaseHtmlView {
         }
         
         if ($this->item->az_plid > 0) {
-            $this->azchanged = true;
+            if ($this->item->modified > $this->item->created) {
+                $this->azchanged = false;
+            } else {
+                $this->azchanged = true;               
+            }
+            
             $cntr = 0; 
             switch ($this->item->az_type) {
                 case '1':
@@ -107,13 +112,18 @@ class HtmlView extends BaseHtmlView {
         $this->azuracast = $this->params->get('azuracast','0');
         $this->az_apiname = $this->params->get('az_apiname','not set');
         $this->az_url = $this->params->get('az_url','not set');
+        $dispvals = array('Nothing', 'Summary only','Summary and Errors','Summary, Errors &amp; Warnings','All information');
+        $this->logging = $dispvals[$this->params->get('loglevel','0')];
+        $this->messaging = $dispvals[$this->params->get('msglevel','0')];
+        
         $this->stncnt = count(XbazuracastHelper::getStations());
         if ($this->item->db_stid > 0) {
             $this->station = XbazuracastHelper::getDbStation($this->item->db_stid);
         }
         if ($this->item->id > 0) $this->tracks = XbmusicHelper::getPlaylistTrackTitles($this->item->id);
-        
-            // Check for errors.
+        $this->aztrkcnt = ($this->item->id > 0) ? $this->item->az_info->num_songs : 0;
+        $this->dbtrkcnt = ($this->item->id > 0) ? count($this->tracks) : 0;
+        // Check for errors.
         if (\count($errors = $this->get('Errors'))) {
             throw new GenericDataException(implode("\n", $errors), 500);
         }
@@ -143,29 +153,68 @@ class HtmlView extends BaseHtmlView {
         
         if (!$checkedOut && $itemEditable) {
             $toolbar->apply('playlist.apply');
+            $toolbar->save('playlist.save');
             
-            $saveGroup = $toolbar->dropdownButton('save-group');
-            if ($isNew) {
-                $toolbar->save('playlist.save');
-            } else {
-                $saveGroup->configure(
-                    function (Toolbar $childBar) use ($canDo, $isNew) {
-                        $childBar->save('playlist.save');
-                        if (!$isNew && $canDo->get('core.create')) {
-                            $childBar->save2copy('playlist.save2copy');
-                        }
-                        if ($canDo->get('core.create')) {
-                            $childBar->save2new('playlist.save2new');
-                        }
-                    }
-                    );
-            }
+//             $saveGroup = $toolbar->dropdownButton('save-group');
+//             if ($isNew) {
+//                 $toolbar->save('playlist.save');
+//             } else {
+//                 $saveGroup->configure(
+//                     function (Toolbar $childBar) use ($canDo, $isNew) {
+//                         $childBar->save('playlist.save');
+//                         if (!$isNew && $canDo->get('core.create')) {
+//                             $childBar->save2copy('playlist.save2copy');
+//                         }
+//                         if ($canDo->get('core.create')) {
+//                             $childBar->save2new('playlist.save2new');
+//                         }
+//                     }
+//                     );
+//             }
         }
         
         $toolbar->cancel('playlist.cancel', 'JTOOLBAR_CLOSE');
         $toolbar->divider();
         $toolbar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
         $toolbar->standardButton('playlisttracksview', 'Tracks List', 'dashboard.toPlaylisttracks')->icon('fas fa-headphones') ;
+ 
+        $dropdown = $toolbar->dropdownButton('views')
+        ->text('XBMUSIC_OTHER_VIEWS')
+        ->toggleSplit(false)
+        ->icon('icon-ellipsis-h')
+        ->buttonClass('btn btn-action')
+        ->listCheck(false);
+        $childBar = $dropdown->getChildToolbar();
+        $childBar->standardButton('dashboardview', 'XB_DASHBOARD', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
+        $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
+        $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
+        //       $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-headphones') ;
+        //        $childBar->standardButton('scheduleview', 'XBMUSIC_SCHEDULE', 'dashboard.toSchedule')->listCheck(false)->icon('fas fa-clock') ;
+        $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
+        $childBar->standardButton('trackview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
+        $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
+        $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $stations = XbazuracastHelper::getStations();
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST_STATIONS', '')
+            ->listCheck(false)->icon('fas fa-broadcast-tower')
+            ->onclick("showEl('azwaiter',Joomla.JText._('XBMUSIC_WAITING_SERVER'));
+                Joomla.submitbutton('dashboard.toAzuracast')") ;
+            foreach ($stations AS $station) {
+                $childBar->linkButton('stationview'.$station['id'],'<span class="xbpl20">'.$station['title'].'</span>', '')
+                ->url('index.php?option=com_xbmusic&task=station.edit&id='.$station['id'])
+                ->listCheck(false)->icon('fas fa-radio');
+            }
+        }
+        $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
+        
+        
+        $canDo = ContentHelper::getActions('com_xbmusic');
+        if ($canDo->get('core.admin')) {
+            //$toolbar->preferences('com_xbmusic');
+            ToolbarHelper::preferences('com_xbmusic');
+        }
+        
         $toolbar->inlinehelp();
         $toolbar->help('Playlist: Edit',false,'https://crosborne.uk/xbmusic/doc#playlistedit');
         

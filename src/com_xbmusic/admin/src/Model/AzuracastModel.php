@@ -163,14 +163,16 @@ class AzuracastModel extends AdminModel {
         $colarr = array('id', 'az_stid', 'title', 'alias',
             'az_url','az_stream','website', 'az_player',
             'catid', 'description', 'az_info',
-            'created','created_by', 'created_by_alias'
+            'created','created_by', 'created_by_alias',
+            'lastsync'
         );
         $db = $this->getDatabase();
         $values=array($db->q(0),$db->q($azstation->id),$db->q($azstation->name),$db->q($azstation->shortcode),
             $db->q($azstation->azurl), $db->q($azstation->listen_url), $db->q($azstation->url),
             $db->q($azstation->public_player_url), $db->q($uncatid),
             $db->q($azstation->description), $db->q(json_encode($azstation)),
-            $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast')
+            $db->q(Factory::getDate()->toSql()),$db->q($this->getCurrentUser()->id), $db->q('import from Azuracast'),
+            $db->q(Factory::getDate()->toSql())
         );
         $query = $db->getQuery(true);
         $query->insert($db->qn('#__xbmusic_azstations'));

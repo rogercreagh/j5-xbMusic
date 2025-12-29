@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Playlisttracks/HtmlView.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.0.59.17 21st December 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -12,16 +12,18 @@ namespace Crosborne\Component\Xbmusic\Administrator\View\Playlisttracks;
 
 defined('_JEXEC') or die;
 
-// use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Helper\ContentHelper;
-// use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
-// use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
+use Joomla\CMS\Pagination\Pagination;
+// use Joomla\CMS\Factory;
+// use Joomla\CMS\Installer\Installer;
+// use Joomla\CMS\MVC\View\GenericDataException;
 // use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
@@ -46,11 +48,13 @@ class HtmlView extends BaseHtmlView {
         $this->activeFilters = $this->get('ActiveFilters');
                
         $this->params      = ComponentHelper::getParams('com_xbmusic');;
-
+        $this->azuracast = $this->params->get('azuracast','0');
+        
         //get playlist data
         $this->id = $this->state->get('id',0);
-        $this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_azplaylists', 'title', $this->id) : 'xxx';
-                
+        //$this->title = ($this->id>0) ? XbcommonHelper::getItemValue('#__xbmusic_azplaylists', 'title', $this->id) : 'xxx';
+        $this->playlist = XbcommonHelper::getItem('#__xbmusic_azplaylists', $this->id); 
+        $this->station = XbazuracastHelper::getDbStation($this->playlist->db_stid);
         $this->addToolbar();
         
         return parent::display($tpl);
@@ -97,6 +101,18 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('tracksview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('far fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $stations = XbazuracastHelper::getStations();
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST_STATIONS', '')
+            ->listCheck(false)->icon('fas fa-broadcast-tower')
+            ->onclick("showEl('azwaiter',Joomla.JText._('XBMUSIC_WAITING_SERVER'));
+                Joomla.submitbutton('dashboard.toAzuracast')") ;
+            foreach ($stations AS $station) {
+                $childBar->linkButton('stationview'.$station['id'],'<span class="xbpl20">'.$station['title'].'</span>', '')
+                ->url('index.php?option=com_xbmusic&task=station.edit&id='.$station['id'])
+                ->listCheck(false)->icon('fas fa-radio');
+            }
+        }
         $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('database') ;
         
         if ($canDo->get('core.admin')) {

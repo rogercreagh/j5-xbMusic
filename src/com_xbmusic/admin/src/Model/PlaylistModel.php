@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.58.3 3rd Octiber 2025
+ * @version 0.0.59.17 22nd December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -26,62 +26,12 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
 use \SimpleXMLElement;
+use Exception;
 //use Webauthn\MetadataService\Event\NullEventDispatcher;
 
 class PlaylistModel extends AdminModel {
   
     public $typeAlias = 'com_xbmusic.playlist';
-    
-    protected $xbmusic_batch_commands = array(
-        'untag' => 'batchUntag',
-    );
-    
-    public function batch($commands, $pks, $contexts) {
-        $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
-        return parent::batch($commands, $pks, $contexts);
-    } 
-    
-    protected function batchUntag($value, $pks, $contexts) {
-        $taghelper = new TagsHelper();
-        $message = 'tag:'.$value.' removed from playlists :';
-        foreach ($pks as $pk) {
-            if ($this->getCurrentUser()->authorise('core.edit', $contexts[$pk])) {
-                $existing = $taghelper->getItemTags('com_xbmusic.playlist', $pk, false);
-                $oldtags = array_column($existing,'tag_id');
-                $newtags = array();
-                for ($i = 0; $i<count($oldtags); $i++) {
-                    if ($oldtags[$i] != $value) {
-                        $newtags[] = $oldtags[$i];
-                    }
-                }
-                $params = array( 'id' => $pk, 'tags' => $newtags );
-                
-                if($this->save($params)){
-                    $message .= ' '.$pk;
-                }
-            } else {
-                $this->setError(Text::_('JLIB_APPLICATION_ERROR_BATCH_CANNOT_EDIT'));
-                return false;
-            }
-            Factory::getApplication()->enqueueMessage($message);
-        }
-        return true;
-    }
-    
-    public function delete(&$pks) {
-        //first need to delete links to albums, artists, tracks
-        //this should now be down by sql cascade
-        $db = Factory::getDbo();
-        $query = $db->getQuery(true);
-        foreach ($pks as $pk) {
-            $query->delete($db->qn('#__xbmusic_trackplaylist'));
-            $query->where($db->qn('playlist_id').' = '.$db->q($pk));
-            $db->setQuery($query);
-            $db->execute();
-            $query->clear();
-        }
-        return parent::delete($pks);
-    }
     
     protected function canDelete($record) {
         if (empty($record->id) || ($record->status != -2)) {
@@ -122,10 +72,8 @@ class PlaylistModel extends AdminModel {
                 $tagsHelper = new TagsHelper();
                 $item->tags = $tagsHelper->getTagIds($item->id, 'com_xbmusic.playlist');  
                 if ($item->az_info) $item->az_info = json_decode($item->az_info);
-//                $registry = new Registry;
-//                $registry->
-//                $params->loadJSON($item->params);
-//                $item->params = $params;
+                // TODO get station info as $item->station
+                
             }
         }        
         return $item;
@@ -217,26 +165,6 @@ class PlaylistModel extends AdminModel {
         $infomsg = '';
         $warnmsg = '';
 
-        if ($input->get('task') == 'save2copy') {
-            $origTable = clone $this->getTable();
-            $origTable->load($input->getInt('id'));
-            
-            if ($data['title'] == $origTable->title) {
-                list($title, $alias) = $this->generateNewTitle($data['catid'], $data['alias'], $data['title']);
-                $data['title'] = $title;
-                $data['alias'] = $alias;
-            } else {
-                if ($data['alias'] == $origTable->alias) {
-                    $data['alias'] = '';
-                }
-            }
-            //need to add tracklinks
-            $this->storePlaylistTracks($origTable->id, $data['tracklist']);
-            // standard Joomla practice is to set the new copy record as unpublished
-            $data['status'] = 0;
-        }
-        
-       
         //alias defaults to title
         if ($data['alias'] == '') {
             $data['alias'] = OutputFilter::stringURLSafe($data['title']);
@@ -362,136 +290,230 @@ class PlaylistModel extends AdminModel {
     }
     
     function storePlaylistTracks($playlist_id, $trackList) {
-        //delete existing  list
+        $res = false;
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
+        $query->select('*')->from($db->quoteName('#__xbmusic_trackplaylist'));
+        $query->where('playlist_id = '.$playlist_id);
+        $db->setQuery($query);
+        $oldlist = $db->loadAssocList();
+        if (!is_array($oldlist)) $oldlist = [];
+        //get existing tracklist to restore in case of failure
+        //delete existing  list
+        $query->clear();
         $query->delete($db->quoteName('#__xbmusic_trackplaylist'));
         $query->where('playlist_id = '.$playlist_id);
         $db->setQuery($query);
         $db->execute();
         //restore the new list
-        $n = 1;
+        $n = 0;
+        $query->clear();
+        $query->insert($db->quoteName('#__xbmusic_trackplaylist'));
+        $query->columns('playlist_id,track_id,note,listorder');
         foreach ($trackList as $trk) {
             if ($trk['track_id'] > 0) {
-                $query = $db->getQuery(true);
-                $query->insert($db->quoteName('#__xbmusic_trackplaylist'));
-                $query->columns('playlist_id,track_id,note,listorder');
+                $query->clear('values');
                 $query->values('"'.$playlist_id.'","'.$trk['track_id'].'","'.$trk['note'].'","'.$n.'"');
-                //try
-                $db->setQuery($query);
-                $db->execute();
-                $n ++;
+                try {
+                    $db->setQuery($query);
+                    $res = $db->execute();                    
+                } catch (\Exception $e) {
+                    Factory::getApplication()->enqueueMessage('Error saving list '.$e->getCode().' '.$e->getMessage().
+                        '<br />'.$query->dump(),'Error');
+                }
+                if ($res) $n ++;
             }
         }
+        if (($n == 0) && (count($oldlist)>0)) {
+            $query->clear();
+            $query->insert($db->quoteName('#__xbmusic_trackplaylist'));
+            $query->columns('playlist_id,track_id,note,listorder');
+            $query->values($oldlist);
+            $db->setQuery($query);
+            try {
+                $db->execute();
+            } catch (\Exception $e) {
+                Factory::getApplication()->enqueueMessage('Error restoring old values '.$e->getCode().' '.$e->getMessage().
+                    '<br />'.$query->dump(),'Error');
+            }
+            
+        }
+        return $n;
     }
 
     public function importTrklistAz($data) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $loglevel = $params['loglevel'];
+        $msglevel = $params['msglevel'];
+//        $loglevel = $this->loglevel; //$data['params']['loglevel'];
+//        $msglevel = $this->msglevel; //$data['params']['loglevel'];
         $app = Factory::getApplication();
+        if (!$this->save($data)) {
+            $app->enqueueMessage('Save playlist data failed','Error');
+            return false;
+        }
         if (($data['az_plid'] > 0) && ($data['db_stid']>0)){
-            $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
+            $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['db_stid']);
+//            $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
  //           $station = XbcommonHelper::getItem('#__xbmusic_azstations', $data['db_stid']);
-            if (empty($stmedia)) {
+            if (empty($station->mediapath)) {
                 $errstr = 'Station media path not set. Unable to assign tracks to list. Please visit <a href="index.php?option=com_xbmusic&task=station.edit&id='.$data['db_stid'].'" >Edit Station</a> page and enter media path';
-                $app->enqueueMessage($errstr,'Error');
+                if ($msglevel >1) $app->enqueueMessage($errstr,'Error');
                 return false;
             }
             
-            $m3ufpathname = $this->makeM3uFilename($data['alias'], $data['db_stid'],'import-');
+            $m3ufpathname = $this->makeM3uFilename($data['alias'], $station->alias);
             
-            $api = new AzApi($data['db_stid']);
-            $result = $api->getAzPlaylistM3u($data['az_plid'], $m3ufpathname);
+            //get az station id for use in the api call
+//            $azstid = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'az_stid', $data['db_stid']);
+            $api = new AzApi();
+            $result = $api->getAzPlaylistM3u($station->az_stid, $data['az_plid'], $m3ufpathname);
             if ($result == true) {
-                $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['db_stid']);
-                $logfilename = 'playlistaz_import_'.$stalias.'_'.$data['alias'].date('Y-m-d-Hi').'.log';
+ //               $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['db_stid']);
+                $logfilename = 'az_import_'.$station->alias.'_'.$data['alias'].date('Y-m-d-Hi').'.log';
                 $loglines = '';
                 $loghead = '[IMPORT M3U]Importing M3U file from Azuracast for Playlist '.$data['title']."\n";
                 if (file_exists($m3ufpathname)) {
+                    if ($loglevel > 0) $loglines .= XBSUM.'Source File: '.$fname."\n";
                     $newtrks = $this->getM3uTracks($m3ufpathname, $data, $loglines);
-                    if (!empty($newtrks)) {
-                        $loglines .= XBINFO.count($newtrks).' lines imported from Azuracast'."\n";
-                        $loglines .= $this->cleanTracklist($newtrks,$data);
-                        $this->storePlaylistTracks($data['id'], $newtrks);                        
+                    if (empty($newtrks)) {
+                        if ($msglevel > 2) $app->enqueueMessage('No new tracks found to import','Warning');
+                        if ($loglevel > 2) $loglines .= 'No new tracks found to import'."\n";
+                    } else {
+                        $newtrks = $this->cleanTracklist($newtrks, $loglines, $data);
+                        $res = $this->storePlaylistTracks($data['id'], $newtrks);
+                        if ($res > 0) {
+                            $msg = $res . ' files restored to track list';
+                            if ($msglevel >0) $app->enqueueMessage($msg,'Success');
+                            if ($loglevel > 0 ) $loglines .= XBSUM.$msg."\n";
+                            //save lastsync to playlist
+                            $db = Factory::getDbo();
+                            $query = $db->getQuery(true)
+                                ->update($db->qn('#__xbmusic_azplaylists'));
+                            $query->set($db->qn('tracks_sync').' = CURRENT_TIMESTAMP');
+                            $query->where($db->qn('id').' = '.$db->q($data[]));
+                            try {
+                                $db->setQuery($query);
+                                $ret = $db->execute();
+                            } catch (Exception $e) {
+                                $msg = 'Error saving tracks_synce value for playlist<br/ >'.$e->getMessage().'<br />'.$query->dump();
+                                if ($msglevel > 0) $app->enqueueMessage($msg,'Error');
+                                if ($loglevel > 0) $loglines .= XBSUM.$msg."\n";
+                            }
+                        
+                            
+                        } else {
+                            $msg = 'Error saving tracklist - check data.';
+                            if ($msglevel > 0) $app->enqueueMessage($msg,'Error');
+                            if ($loglevel > 0) $loglines .= XBSUM.$msg."\n";                            
+                        }
                     }
                 } else {
-                    $app->enqueueMessage('Could not find m3u file '.$m3ufpathname,'Error');
+                    if ($msglevel >1) $app->enqueueMessage('Could not find m3u file '.$m3ufpathname,'Error');
                     $loglines .= XBERR.'Import file '.basename($m3ufpathname).' not found. '."\n";
                 }
                 XbmusicHelper::writelog($loghead.$loglines, $logfilename);
                 return true;
             } else {
-                $app->enqueueMessage('API error: '.print_r($result,true),'Error');
+                if ($msglevel >1) $app->enqueueMessage('API error: '.print_r($result,true),'Error');
                 return false;
             }
         } else {
-            $app->enqueueMessage('Station or Playlist ID missing. St:'.$data['db_stid']. 'Pl:'.$data['az_plid'],'Error');   
+            if ($msglevel >1) $app->enqueueMessage('Station or Playlist ID missing. St:'.$data['db_stid']. 'Pl:'.$data['az_plid'],'Error');   
             return false;
         }
     }
     
     public function loadTrklistM3u($data) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $loglevel = $params['loglevel'];
+        $msglevel = $params['msglevel'];
+//        $loglevel = $this->loglevel; //$data['params']['loglevel'];
+//        $msglevel = $this->msglevel; //$data['params']['loglevel'];
+        
         $app = Factory::getApplication();
+        if (!$this->save($data)) {
+            $app->enqueueMessage('Save playlist data failed','Error');
+            return false;
+        }
         $path = JPATH_ROOT. "/xbmusic-data/m3u/";
         $source = '';
         if ($data['loadsource'] == 1) {
-            $source = 'client upload';
-            //get uploaded file
             $file = $app->getInput()->files->get('jform')['upload_filem3u'];
+            //get uploaded file
             $fname = File::makeSafe($file['name']);
             $src = $file['tmp_name'];
+            $source = 'client upload '.$src;
             $dest = $path . $fname;
-            File::upload($src, $dest);
+            try {
+                $upok = File::upload($src, $dest);                
+            } catch (\Exception $e) {
+                if ($msglevel > 1) $app->enqueueMessage('UPLOAD FAILED: '.$source.'<br />'.$e->getMessage(), 'Error');
+                return false;
+            }
         } else {
             $source = '/xbmusic-data/m3u/';
             $fname = $data['local_filem3u'];
         }
-        $logfilename = 'playlistm3u_import_'.date('Y-m-d-Hi').'.log';
+        $loglines = '';
+        $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['db_stid']);
+        $logfilename = 'm3u_import_'.$stalias.'_'.$data['alias'].date('Y-m-d-Hi').'.log';
         $loghead = '[IMPORT M3U]Importing M3U file from '.$source.' for Playlist '.$data['title']."\n";
-        $loglines = XBINFO.'File: '.$fname."\n";
         if (file_exists($path.$fname)) {
-            $newtrks = $this->getM3uTracks($path.$fname, $data, $logfilename);            
-            if (!empty($newtrks)) {
-                $loglines .= $this->cleanTracklist($newtrks,$data);
+            if ($loglevel > 0) $loglines .= XBSUM.'Source File: '.$fname."\n";
+            $newtrks = $this->getM3uTracks($path.$fname, $data, $loglines);            
+            if (empty($newtrks)) {
+                if ($msglevel > 2) $app->enqueueMessage('No new tracks found to import','Warning');
+                if ($loglevel > 2) $loglines .= 'No new tracks found to import'."\n";
+            } else {
+                $newtrks = $this->cleanTracklist($newtrks, $loglines, $data);
                 $this->storePlaylistTracks($data['id'], $newtrks);                
+                // returns fa
             }
         } else {
-            $msg = 'Could not find m3u file '.'/xbmusic-data/m3u/'.$fname;
-            $app->enqueueMessage($msg,'Error');
-            $loglines .= XBERR.$msg."\n";
+            $msg = 'Could not find m3u file ';
+            if ($msglevel > 1) $app->enqueueMessage($msg.'<Code>xbmusic-data/m3u/'.$fname.'</code>','Error');
+            if ($loglevel > 1) $loglines .= XBERR.$msg.'/xbmusic-data/m3u/'.$fname."\n";
         }
-        XbmusicHelper::writelog($loghead.$loglines, $logfilename);                
+        if (($loglines != '') && ($loglevel > 0)) XbmusicHelper::writelog($loghead.$loglines, $logfilename);                
         return true;
     }
     
     /**
-     * @name cleanTracllist()
+     * @name cleanTracklist()
      * @desc used by loadTrklistM3u() and loadTrklistAz() to merge imported list with existing and remove dupes as required
      * @param array $tracklst - the list being imported
      * @param array $data - the form data including existing tracklist
      * @return string - log messages
      */
-    private function cleanTracklist(array &$tracklst, array $data) {
+    private function cleanTracklist(array $tracklst, string &$loglines, array $data) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $loglevel = $params['loglevel'];
+        $msglevel = $params['msglevel'];
+        
         $app = Factory::getApplication();
         $stname = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'title', $data['db_stid']);
-        $loglines = '';
         if ((!empty($data['tracklist'])) && ($data['params']['clearfirst'] == 0)) {
+            //we have an existing tracklist and we are not clearing it
             $tracklst = array_merge($data['tracklist'],$tracklst);
             $msg = 'Imported tracks appended to '.count($data['tracklist']).' in existing list';
-            $app->enqueueMessage($msg, 'Info');
-            $loglines .= XBINFO.$msg."\n";
+            if ($msglevel > 3) $app->enqueueMessage($msg, 'Info');
+            if ($loglevel > 3) $loglines .= XBINFO.$msg."\n";
         } else {
             $msg='Existing list replaced with new list';
-            $app->enqueueMessage('$msg', 'Info');
-            $loglines .= XBINFO.$msg."\n";
+            if ($msglevel > 3) $app->enqueueMessage('$msg', 'Info');
+            if ($loglevel > 3) $loglines .= XBINFO.$msg."\n";
         }
+        //azuracast will only accept duplicates in a sequential list
         if (($data['az_order'] != 'sequential') || ($data['allowdupes'] != 1)) {
             $cnt1 = count($tracklst);
             $tracklst = $this->removeDupes($tracklst);
             if (count($tracklst) < $cnt1) {
-                $app->enqueueMessage('NB Duplicate tracks removed here, but changes not yet written back to '.$stname.'<br />Export playlist to update Azuracast', 'Warning');
-                $loglines .= ($cnt1-count($tracklst)).XBWARN.' duplicate tracks removed. Azuracast not updated yet'."\n";
+                if ($msglevel > 2) $app->enqueueMessage('NB Duplicate tracks removed here, but changes not yet written back to '.$stname.'<br />Export playlist to update Azuracast', 'Warning');
+                if ($loglevel > 2) $loglines .= ($cnt1-count($tracklst)).XBWARN.' duplicate tracks removed. Azuracast not updated yet'."\n";
             }
         }
-        return $loglines;
+        return $tracklst;
     }
     
     public function exportTrklistAz($data) {
@@ -598,18 +620,26 @@ class PlaylistModel extends AdminModel {
      * @param string $action
      * @return string file full path name unique in xbmusic-data/m3u/ prefix_station_playlist_yy-mm-dd-hhmm[-cycleno]
      */
-    private function makeM3uFilename(string $plalias, $stalias = '', $prefix = '') {
-        $m3ufname = JPATH_ROOT."/xbmusic-data/m3u/".$prefix.$stalias.'_'.$plalias.'_'.date('Y-m-d-Hi').".m3u";
-        $n = 0;
-        $parts = pathinfo($m3ufname);
-        $tname = $parts['filename'];
-        while (file_exists($parts['dirname'].'/'.$tname.'.'.$parts['extension'])) {
-            $n ++;
-            $tname = $parts['filename']."-";
-            $tname .= ($n<10) ? '0' : '';
-            $tname .= $n;
+    private function makeM3uFilename(string $plalias, $stalias = '', $replace = false) {
+        $m3ufname = JPATH_ROOT."/xbmusic-data/m3u/".$stalias."_".$plalias.".m3u";
+        //'_'.date('Y-m-d-Hi').".m3u";
+        if ($replace) {
+            if (file_exists($m3ufname)) {
+                unlink($m3ufname);
+                clearstatcache(true,$m3ufname);
+            }
+        } else {          
+            $n = 0;
+            $parts = pathinfo($m3ufname);
+            $tname = $parts['filename'];
+            while (file_exists($parts['dirname'].'/'.$tname.'.'.$parts['extension'])) {
+                $n ++;
+                $tname = $parts['filename']."-";
+                $tname .= ($n<10) ? '0' : '';
+                $tname .= $n;
+            }
+            $m3ufname = $parts['dirname'].'/'.$tname.'.'.$parts['extension'];
         }
-        $m3ufname = $parts['dirname'].'/'.$tname.'.'.$parts['extension'];
         return $m3ufname;
     }
  
@@ -623,63 +653,105 @@ class PlaylistModel extends AdminModel {
      * @return boolean|string[][]|NULL[][]
      */
     public function getM3uTracks(string $m3ufile, array $data, &$loglines) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $loglevel = $params['loglevel'];
+        $msglevel = $params['msglevel'];
+//        $loglevel = $this->loglevel; //$data['params']['loglevel'];
+//        $msglevel = $this->msglevel; //$data['params']['loglevel'];
+        clearstatcache(true,$m3ufile);
         $app = Factory::getApplication();
         $msgstr = ''; $warnstr = ''; $errstr = '';
 //        $logstr = '';
 //        $logfilename = 'playlistm3u_import_'.date('Y-m-d').'.log';
+        //check file size <?
         $filelist = [];
+        $missingfiles = [];
+//        $createfiles = [];
+        $newtrks = [];
+//        $trks2create = [];
         $ignoremissing = $data['params']['ignoremissing']; //data['ignoremissing']
         $createtracks = $data['params']['createtrks'];
+        $delafter = $data['delete_m3u'];
         $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
         $mediapath = JPATH_ROOT.'/xbmusic/'.$stmedia;
         if ($lines = file($m3ufile)) {
-            $msg = 'Missing file ';
-            foreach ($lines as $line) {
-                if (file_exists($mediapath.trim($line))) {
-                    $filelist[] = trim($line);
-                } elseif ($ignoremissing) {
-                    $warnstr .= $msg.$mediapath.trim($line).'<br />';
-                    $loglines .= XBWARN.$msg.$mediapath.$line."\n";
-                } else {
-                    $errstr .= $msg.$mediapath.trim($line).'<br />';
-                    $loglines .= XBERR.$msg.$line."\n";
+            if (count($lines) >400) {
+                $app->enqueueMessage('M3U file contains over 400 lines. Importing the whole list will take some time and may create memory overflow or other data loss issues. The file will saved as multiple files each containing no more than 400 lines with a suffix added to the name. Please import each file separately from the data folder.','Warning');
+                //process file here - chunk the array as save each as separate file
+                $chunks = array_chunk($lines, 300);
+                foreach ($chunks as $key=>$value) {
+                    $parts = pathinfo($m3ufile);
+                    $chunkfile = $parts['dirname'].'/'.$parts['filename'].'_'.($key+1).'.'.$parts['extension'];
+                    if (file_exists($chunkfile)) {
+                        unlink($chunkfile);
+                        clearstatcache(true,$chunkfile);
+                    }
+                    file_put_contents($chunkfile, implode(PHP_EOL, $value));
+                }
+                $app->enqueueMessage(count($chunks).' '.'chunk files <code>'.$m3ufile.'_N</code> have been saved in'. 
+                    '<code>/xbmusic-data/m3u/</code>','Success');
+                return false;
+            } else {
+                $msg = 'Missing files ';
+                foreach ($lines as $line) {
+                    if (file_exists($mediapath.trim($line))) {
+                        $filelist[] = trim($line);
+                    } elseif ($ignoremissing) {
+                        $warnstr .= $msg.$mediapath.trim($line).'<br />';
+                        $missingfiles[] = trim($line);
+                        if ($loglevel > 2) $loglines .= XBWARN.$msg.$mediapath.$line."\n";
+                    } else {
+                        $missingfiles[] = trim($line);
+                        $errstr .= $msg.$mediapath.trim($line).'<br />';
+                        if ($loglevel > 1) $loglines .= XBERR.$msg.$line."\n";
+                    }
                 }
             }
         } else {
-            $errstr = 'Could not open m3u file for reading '.basename($m3ufile);
-            $app->enqueueMessage($errstr,'Error');
-            $loglines .= XBERR.$errstr."\n";
+            $errstr = 'Could not open m3u file for reading ';
+            if ($msglevel > 1) $app->enqueueMessage($errstr.'<code>'.basename($m3ufile).'</code>','Error');
+            if ($loglevel > 1) $loglines .= XBERR.$errstr.basename($m3ufile)."\n";
             return false;
+        }
+        if (!empty($missingfiles)) {
+            $f = fopen(JPATH_ROOT.'/xbmusic-data/m3u/missing_files.m3u', 'a');
+            fwrite($f, implode("\n", $missingfiles));
+            fclose($f);
+            if ($loglevel > 0) $loglines .= XBSUM.'Missing files list appended to /xbmusic-data/m3u/missing_files.m3u'."\n";
+            $warnstr .= 'Missing files list appended to <code>/xbmusic-data/m3u/missing_files.m3u</code><br />';
         }
         if ($errstr != '') {
             $msg = 'Import aborted due to missing file(s):';
-            $app->enqueueMessage($errstr.'<br />'.$msg,'Error');
-            $loglines .= XBERR.$msg."\n";
+            if ($msglevel > 1) $app->enqueueMessage($errstr.'<br />'.$msg,'Error');
+            if ($loglevel > 1) $loglines .= XBERR.$msg."\n";
+            if ($delafter == 2) umlink($m3ufile);
             return false;              
         }
         if (count($filelist)==0) {
             $warnstr .= 'No valid files found to add to playlist';
-            $app->enqueueMessage($warnstr,'Warning');
-            $loglines .= XBWARN.$warnstr."\n";
+            if ($msglevel > 2) $app->enqueueMessage($warnstr,'Warning');
+            if ($loglevel > 2) $loglines .= XBWARN.$warnstr."\n";
+            if ($delafter == 2) umlink($m3ufile);
             return false;
         }
         $msgstr .= count($filelist).' valid files found in m3u file: ';
-        $loglines = XBINFO.$msgstr."\n";
+        if ($loglevel > 0) $loglines = XBINFO.$msgstr."\n";
         $cnt= 0;
-        $newtrks = [];
+        $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
+        $dmmodel = $this->getMVCFactory()->createModel('Dataman');
+        
         foreach ($filelist as $file) {  
-            //first we'll check if the track needs importing
-            
+            // we'll check if the track needs importing           
             $trk = XbcommonHelper::getItem('#__xbmusic_tracks',$mediapath.$file,'filepathname');
             if (is_null($trk)) {
                 if ($createtracks) {
-                    $file = array($stmedia.$file);
-                    $dmmodel = $this->getMVCFactory()->createModel('Dataman'); 
-                    $dmmodel->parseFilesMp3($file, '');
+                    //add station media path to file pathname from m3u
+                    //$trks2create[] = $stmedia.$file;
+                    $loglines .= $dmmodel->parseID3(JPATH_ROOT.'/xbmusic/'.$stmedia.$file, $cnts);
                     $trk = XbcommonHelper::getItem('#__xbmusic_tracks',$mediapath.$file,'filepathname');
                 } else {
                     $warnstr .= 'Ignoring '.$file.' not in database.<br />';
-                    $loglines .= XBWARN.'Ignoring '.$file.' not in database.'."\n";                    
+                    if ($loglevel > 2) $loglines .= XBWARN.'Ignoring '.$file.' not in database.'."\n";                    
                 }
             }
             if (!is_null($trk)) {
@@ -687,88 +759,29 @@ class PlaylistModel extends AdminModel {
                 $cnt ++;
             }
         }
+        Factory::getApplication()->enqueueMessage('<pre>'.print_r($cnts,true).'</pre>');
+//         $creatcnt = count($trks2create);
+//         if ($creatcnt > 0) {
+//             $dmmodel = $this->getMVCFactory()->createModel('Dataman');
+//             if ($creatcnt > 50) {
+//                 $msg = $creatcnt . ' missing tracks need adding to database. Only creating first 50. Remainder in file <code>MissingTracks_'.$m3ufile.'</code> in the <code>xbmusic-data/m3u</code> folder. Re-import this file to create and ass the missing ones.';
+//             }
+//             $trks2create = array_chunk($trks2create, 50);
+//             foreach ($trks2create as $chunk) {    
+//                 //parseFilesMp3 takes a single file or folder name or an array of filenames but no more than 50 at a time
+//                 $cnt += $dmmodel->parseFilesMp3($chunk);                                
+//             }
+//         }
+        if ($delafter == 2) unlink($m3ufile);
+        if (($cnts['errtrk' == 0]) && ($delafter == 1)) unlink($m3ufile);
         $msg = $cnt.' files to add to playlist';
         $msgstr .= $msg.'<br />';
-        $loglines .= XBINFO.$msg."\n";
-        $app->enqueueMessage($msgstr,'Info');
-        if ($warnstr != '') $app->enqueueMessage($warnstr,'Warning');
+        if ($loglevel > 0) $loglines .= XBINFO.$msg."\n";
+        if ($msglevel > 3) $app->enqueueMessage($msgstr,'Info');
+        if (($msglevel > 2) && ($warnstr != '')) $app->enqueueMessage($warnstr,'Warning');
         return $newtrks;        
     }
-    
-    public function loadPlaylist($dbdata) {
-        //get api with dbstid
-        $api = new AzApi($dbdata['azstation']);
-        //get azplaylist
-        $azpldata = $api->azPlaylist($dbdata['azplaylist']);
-        if (isset($azpldata->code)) {
-            Factory::getApplication()->enqueueMessage('loadPlaylist Azuracast API Error: code '.$azpldata->code.' - '.$azpldata->type.
-                '<br />'.$azpldata->formatted_message,'Warning');
-            return false;
-        }
-        if ($dbdata['id'] > 0) {
-            $dbdata['modified_by'] = $this->getCurrentUser()->id;
-            $dbdata['modified'] = Factory::getDate()->toSql();
-        } else {
-            $dbdata['created_by'] = $this->getCurrentUser()->id;
-            $dbdata['created_by_alias'] = 'import from Azuracast API';
-        }
-        if ($dbdata['title'] == '') $dbdata['title'] = $azpldata->name;
-        $dbdata['alias'] = $azpldata->short_name.'-'.$dbdata['azstation'].'-'.$azpldata->id;
-        $dbdata['alias'] = XbcommonHelper::makeUniqueAlias($dbdata['alias'], '#__xbmusic_azplaylists');
-        $dbdata['az_plid'] = $azpldata->id;
-        $dbdata['az_name'] = $azpldata->name;
-        $dbdata['db_stid'] = $dbdata['azstation'];
-        
-        $dbdata['az_info'] = json_encode($azpldata);
-        
-        $dbdata['az_cntper'] = 0;
-        $type = $azpldata->type;
-        switch ($type) {
-            case 'default':
-                $dbdata['az_type'] = 1;
-                break;
-            case 'once_per_x_songs':
-                $dbdata['az_type'] = 2;
-                $dbdata['az_cntper'] = $azpldata->play_per_songs;
-                break;
-            case 'once_per_x_minutes':
-                $dbdata['az_type'] = 3;
-                $dbdata['az_cntper'] = $azpldata->play_per_minutes;
-                break;
-            case 'once_per_hour':
-                $dbdata['az_type'] = 4;
-                $dbdata['az_cntper'] = $azpldata->play_per_hour_minute;
-                break;
-            case 'custom':
-                $dbdata['az_type'] = -1;
-                break;
-                
-            default:
-                $dbdata['az_type'] = 0;
-                break;
-        }
-        $dbdata['az_order'] = $azpldata->order;
-        $dbdata['az_jingle'] = ($azpldata->is_jingle == 'true') ? 1 : 0;
-        $dbdata['az_weight'] = $azpldata->weight;
-        $dbdata['scheduledcnt'] = count($azpldata->schedule_items);
-        if ($azpldata->is_enabled == false) $dbdata['status'] = 0;
-        
-        $ans = $this->save($dbdata);
-        if ($ans) {
-            //save tracklist
-            //check if schedule matches az data
-            //also need to remove existing schedule items for this playlist and generate new ones
-//            Factory::getApplication()->enqueueMessage();
-            $id = $this->getState('playlist.id');
-            $this->deleteSchedules($id);
-            $this->createSchedules($id, $azpldata);
-            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_IMPORT_OK').$id,'Success');
-            return $id;
-        } else {
-            Factory::getApplication()->enqueueMessage(Text::_('XBMUSIC_PLAYLIST_SAVE_FAIL'),'Error');
-        }
-        return false;
-    }
+
     
     public function reloadPlaylist($dbdata) {
         $api = new AzApi($dbdata['db_stid']);
@@ -1001,40 +1014,6 @@ class PlaylistModel extends AdminModel {
         foreach ($scheduleList as $schd) {
             $query->clear('values');
    
-            /*
-             * Array
-(
-    [0] => stdClass Object
-        (
-            [start_time] => 1945
-            [end_time] => 1954
-            [start_date] => 2025-01-24
-            [end_date] => 
-            [days] => Array
-                (
-                    [0] => 2
-                    [1] => 1
-                    [2] => 3
-                    [3] => 4
-                    [4] => 5
-                    [5] => 6
-                    [6] => 7
-                )
-
-            [loop_once] => 
-            [id] => 5
-        )
-
-    [1] => stdClass Object
- 
-             */
-//           if ($trk['track_id'] > 0) {
-               $query->values('"'.$playlist_id.'","'.$schd->id.'","'.$schd->start_time.'","'.$schd->az_endtime.'","'.$schd->az_startdate.'","'.$schd->az_enddate.'","'.implode(",",$schd->az_days).'","'.$az_loop.'","'.$showpublic.'","'.$status.'","'.$created.'","'.$created_by.'"');
-                //try
-//                $db->setQuery($query);
-//                $db->execute();
-//                $n ++;
-//            }
         }
     }
     

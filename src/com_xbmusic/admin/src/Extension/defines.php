@@ -39,6 +39,7 @@ define('XBUCALL', 8192); // all upper case
  * 
  * 
  */
+define('XBSUM','[SUMMARY] ');
 define('XBINFO','[INFO] ');
 define('XBWARN','[WARNING] ');
 define('XBERR','[ERROR] ');

@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Azuracast/HtmlView.php
- * @version 0.0.59.4 5th November 2025
+ * @version 0.0.59.14 9th December 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -35,7 +35,8 @@ class HtmlView extends BaseHtmlView {
     public function display($tpl = null) {
 
         $this->user = Factory::getApplication()->getIdentity();
-        
+        $this->noazmess1 = '';
+        $this->noazmess2 = '';
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->azuracast = $params->get('azuracast',0);
         if ($this->azuracast == 0) {

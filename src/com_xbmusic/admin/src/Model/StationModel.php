@@ -288,7 +288,9 @@ class StationModel extends AdminModel {
 //            Factory::getApplication()->enqueueMessage('setdo '.$do);
             
             $params = json_decode(XbcommonHelper::getItemValue('#__xbmusic_azstations', 'params', $post['id'])  );
+            if (is_null($params)) $params = new \stdClass();
             $params->dateorder = $post['params']['dateorder'];
+            
             $res = XbcommonHelper::setItemValue('#__xbmusic_azstations', 'params', $post['id'], json_encode($params));
             return $res;
         }

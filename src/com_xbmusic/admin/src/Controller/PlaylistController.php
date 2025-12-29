@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/PlaylistController.php
- * @version 0.0.58.3 3rd October 2025
+ * @version 0.0.59.16 16th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -35,19 +35,28 @@ class PlaylistController extends FormController {
         }
     }
 
-//     protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
+    protected function postSaveHook(BaseDatabaseModel $model, $validData = array()) {
         
-//         $task = $this->getTask();
-//         $item = $model->getItem();
+        $task = $this->getTask();
+//        $item = $model->getItem();
         
-//         if (($task=='setfolder')) {
-//             $tid = $validData['id'];
-//             if ($tid>0) {
-//                 $this->setRedirect('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$tid);
-//             }
-//         }
-// }
+        if (($task=='save')) {
+            $tid = $validData['db_stid'];
+            if ($tid>0) {
+                $this->setRedirect('index.php?option=com_xbmusic&view=station&layout=edit&id='.$tid);
+            }
+        }
+    }
         
+    public function cancel($key=null) {
+        $jip =  Factory::getApplication()->getInput();
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+        $this->setRedirect($redirectTo );
+    }
+
+    /**
+     * no longer used and error in azstation
     public function loadplaylist() {
         $jip =  Factory::getApplication()->getInput();
         $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
@@ -60,6 +69,7 @@ class PlaylistController extends FormController {
         $redirectTo =('index.php?option=com_xbmusic&view=playlist&layout=edit&id='.$wynik);
         $this->setRedirect($redirectTo );
     }
+     */
     
     public function reloadplaylist() {
         $jip =  Factory::getApplication()->getInput();
@@ -162,7 +172,9 @@ class PlaylistController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+//        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo );
     }
     
@@ -171,7 +183,9 @@ class PlaylistController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,0);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+        //$redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo );
     }
     
@@ -180,16 +194,20 @@ class PlaylistController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+        //$redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo);
     }
     
     public function delete() {
         $jip =  Factory::getApplication()->getInput();
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->delete($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+//        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo );
     }
     
@@ -198,7 +216,9 @@ class PlaylistController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->publish($pid,-2);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+        //$redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo );
     }
     
@@ -207,7 +227,9 @@ class PlaylistController extends FormController {
         $pid =  $jip->get('cid');
         $model = $this->getModel('playlist');
         $wynik = $model->checkin($pid);
-        $redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
+        $data = $jip->get('jform',null,null); //the nulls prevent filtering array contents
+        $redirectTo =('index.php?option=com_xbmusic&view=station&layout=edit&id='.$data['db_stid']);
+        //$redirectTo =('index.php?option=com_xbmusic&task=display&view=playlists');
         $this->setRedirect($redirectTo );
     }
     
@@ -242,13 +264,15 @@ class PlaylistController extends FormController {
         
         return false;
     }
-    
+
+    /**
+     * 
     public function batch($model = null) {
         
         $this->checkToken();
         
         // Set the model
-        /** @var \Joomla\Component\Content\Administrator\Model\ArticleModel $model */
+        // @var \Joomla\Component\Content\Administrator\Model\ArticleModel $model 
        // $model = $this->getModel('playlist');
         $model = $this->getModel('Playlist', '', []);
         
@@ -258,6 +282,7 @@ class PlaylistController extends FormController {
         
         return parent::batch($model);
     }
+     */
  
     
 }

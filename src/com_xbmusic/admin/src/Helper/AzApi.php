@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.9 27th November 2025
+ * @version 0.0.59.11 1st December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -191,7 +191,19 @@ class AzApi {
             $station->isadmin = 1;
             // services and schedule are added in profile
             $station->services = $result->services;
-            $station->schedule = $result->schedule;
+//            $station->schedule = $result->schedule;
+            $url = $this->apiurl .'/station/'. $azstid.'/playlists';;
+            $scnt = 0;
+            $station->plcnt = 0;
+            $playlists = $this->azApiGet($url);
+            if (!isset($playlists->code)) {
+                $station->playlists = $playlists;
+                $station->plcnt = count($playlists);
+                foreach ($playlists as $pl) {
+                    if (isset($pl->schedule_items)) $scnt += count($pl->schedule_items);
+                }
+            }
+            $station->schcnt = $scnt;
             $url = $this->apiurl .'/station/'. $azstid.'/quota';
             $quota = $this->azApiGet($url);
             if (!isset($quota->code)) {
@@ -207,6 +219,7 @@ class AzApi {
             } else {
                 $station->issysadmin = 0;
             }
+//            $station->schedule = [];
             return $station;      
         } else {
             return $result;
@@ -286,10 +299,10 @@ class AzApi {
         return $result;
     }
        
-    public function getAzPlaylistM3u(int $azplid, string $m3ufpathname) {
-        if ($this->azstid == 0)
+    public function getAzPlaylistM3u(int $azstid, int $azplid, string $m3ufpathname) {
+        if ($azstid == 0)
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
-        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/m3u';
+        $url=$this->apiurl.'/station/'.$azstid.'/playlist/'.$azplid.'/export/m3u';
         $result = $this->azApiDownloadPlaylist($url, $m3ufpathname);
         return $result;
     }

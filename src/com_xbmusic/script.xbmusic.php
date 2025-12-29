@@ -350,10 +350,11 @@ class Com_xbmusicInstallerScript extends InstallerScript
               `#__xbmusic_albums`,
               `#__xbmusic_artists`,
               `#__xbmusic_azschedules`,
-              `#__xbmusic_azstations`,
               `#__xbmusic_azplaylists`,
+              `#__xbmusic_azstations`,
               `#__xbmusic_songs`,
-              `#__xbmusic_tracks`
+              `#__xbmusic_tracks`,
+              `#__xbmusic_userapikeys`
             ');
             $res = $db->execute();
             if ($res === false) {

@@ -44,7 +44,7 @@ class PlaylisttracksModel extends ListModel {
         parent::__construct($config);
     }
     
-    protected function populateState($ordering = 'ordering', $direction = 'desc')
+    protected function populateState($ordering = 'ordering', $direction = 'asc')
     {
         $app = Factory::getApplication();
         
@@ -96,34 +96,24 @@ class PlaylisttracksModel extends ListModel {
         $query = $db->getQuery(true);
         $app = Factory::getApplication();
         $user  = $app->getIdentity();
-        // Select the required fields from the table.
-        /*
-         SELECT pt.id AS id, pt.track_id, pt.listorder AS ordering,t.title AS track_title, t.sortartist AS artist, b.title AS album_title
-, GROUP_CONCAT(at.artist_id SEPARATOR ',') AS artists
-FROM j5_xbmusic_trackplaylist AS pt
-LEFT JOIN `j5_xbmusic_trackartist` AS at ON pt.track_id = at.track_id
-INNER JOIN `j5_xbmusic_tracks` AS t ON t.id = pt.track_id
-LEFT JOIN `j5_xbmusic_albums` AS b ON b.id = t.album_id
-WHERE pt.playlist_id = 1 
-GROUP BY pt.id
-#HAVING '3' IN (artists)
-ORDER BY ordering ASC
-         */
         $query->select(
-            $this->getState(
-                'list.select',
-                'pt.id AS id, pt.track_id, pt.listorder AS ordering,'.
-                't.title AS track_title, t.sortartist AS artist, b.title AS album_title, 1 AS catid, '.
+                'pt.id AS id, pt.track_id, pt.listorder AS ordering, pt.note AS note, '.
+                't.title AS track_title, t.sortartist AS sortartist, '.
+                't.catid AS catid, c.title AS cattitle, '.
                 't.checked_out AS checked_out, t.checked_out_time AS checked_out_time, '.
-                't.status AS status, t.access AS access, t.note AS note, '.
-                't.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias'               
-                )
+                't.status AS status, t.access AS access, t.note AS tracknote, '.
+                't.created AS created, t.created_by AS created_by, t.created_by_alias AS created_by_alias, '.
+                'b.title AS album_title, b.id AS album_id'                
             );
-        $query->select('GROUP_CONCAT(at.artist_id SEPARATOR '.$db->q(',').') AS artists');
+        //$query->select('GROUP_CONCAT(CONCAT(a.id, ":",a.name) SEPARATOR ",") AS artists');
+        $query->select('GROUP_CONCAT(at.artist_id SEPARATOR '.$db->q(',').') AS artids');
+        $query->select('GROUP_CONCAT(a.name SEPARATOR '.$db->q(', ').') AS artists');
         $query->from('#__xbmusic_trackplaylist AS pt');
         $query->join('LEFT',$db->qn('#__xbmusic_trackartist').' AS at ON pt.track_id = at.track_id');
+        $query->join('LEFT',$db->qn('#__xbmusic_artists').' AS a ON at.artist_id = a.id');
         $query->join('INNER', $db->qn('#__xbmusic_tracks'). ' AS t ON t.id = pt.track_id');
         $query->join('LEFT', $db->qn('#__xbmusic_albums'). ' AS b ON b.id = t.album_id');
+        $query->join('LEFT', $db->qn('#__categories'). ' AS c ON c.id = t.catid');
         $query->where('pt.playlist_id = '.$this->id); 
         
         //search in track/album/artist titles
@@ -131,13 +121,13 @@ ORDER BY ordering ASC
         if (!empty($search)) {
             //search in sort artist (prefix a: )
             if (stripos($search, 'a:') === 0) {
-                $search = $db->quote('%' . $db->escape(substr($search, 3), true) . '%');
-                $query->where('(t.sortartist LIKE ' . $search . ')');
+                $search = $db->quote('%' . trim($db->escape(substr($search, 2), true)) . '%');
+                $query->where('(SELECT(GROUP_CONCAT(a.name SEPARATOR ","))) LIKE '. $search );
             }
             //search in album title (prefix b: )
             elseif (stripos($search, 'b:') === 0) {
                 $search = $db->quote('%' . $db->escape(substr($search, 3), true) . '%');
-                $query->where('(a.introtext LIKE ' . $search . ' OR a.fulltext LIKE ' . $search . ')');
+                $query->where('(b.title LIKE ' . $search . ')');
             }
             //search in track title (prefix t: or nothing)
             else {
@@ -156,9 +146,9 @@ ORDER BY ordering ASC
         $afilt = $this->getState('filter.artist');
         $query->group('pt.id');
         if (is_numeric($afilt)) {
-            $query->having($db->q($afilt).' IN (artists)');
+            $query->where($afilt.' IN (SELECT(GROUP_CONCAT(at.artist_id SEPARATOR ",")))');
         }
-               
+        
         // Add the list ordering clause.
 		$orderCol  = $this->state->get('list.ordering', 'ordering');
 		$orderDirn = $this->state->get('list.direction', 'ASC');		

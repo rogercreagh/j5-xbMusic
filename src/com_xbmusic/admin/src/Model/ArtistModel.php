@@ -102,15 +102,14 @@ class ArtistModel extends AdminModel {
         return false;
     }
 
-    public function delete(&$pks) {
+ /*   link tables now cascade delete but artistgroup table still needs cleaning        
+  */            
+  public function delete(&$pks) {
         //first need to delete links to tracks, artistgroups
         $db = Factory::getDbo();
         $query = $db->getQuery(true);
         foreach ($pks as $pk) {
-            $query->delete($db->qn('#__xbmusic_trackartist'));
-            $query->where($db->qn('artist_id').' = '.$db->q($pk));
-            $db->setQuery($query);
-            $db->execute();
+
             $query->clear();
             $query->delete($db->qn('#__xbmusic_artistgroup'));
             $query->where($db->qn('artist_id').' = '.$db->q($pk));

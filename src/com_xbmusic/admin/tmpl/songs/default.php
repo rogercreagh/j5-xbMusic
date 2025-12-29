@@ -29,9 +29,10 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns');
-$wa->useScript('multiselect');
-
+$wa->useScript('table.columns')
+    ->useScript('multiselect')
+    ->useScript('xbmusic.xbgeneral');
+    
 $app       = Factory::getApplication();
 $user  = Factory::getApplication()->getIdentity();
 $userId    = $user->get('id');
@@ -62,6 +63,9 @@ if (strpos($listOrder, 'modified') !== false) {
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=songs'); ?>" method="post" name="adminForm" id="adminForm">
 		<h2><i class='fas fa-music' ></i> <?php echo Text::_('XBMUSIC_LIST_SONGS'); ?></h2>
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
 		
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));

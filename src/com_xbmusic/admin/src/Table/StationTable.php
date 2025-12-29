@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Table/Table.php
- * @version 0.0.55.1 21ST June 2025
+ * @version 0.0.59.15 14th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -113,6 +113,11 @@ class StationTable extends Table implements VersionableTableInterface, TaggableT
         // Set modified_by to created_by if not set
         if (empty($this->modified_by)) {
             $this->modified_by = $this->created_by;
+        }
+        
+        // mediapath with no opening slash and with trailing slash
+        if (!empty($this->mediapath)) {
+            $this->mediapath = trim($this->mediapath,'/ ').'/'; 
         }
         
         return true;

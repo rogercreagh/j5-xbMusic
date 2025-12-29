@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.55.4 6th July 2025
+ * @version 0.0.59.12 2nd December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -38,6 +38,8 @@ class DatamanModel extends AdminModel {
     protected $defcats = [];
     //when creating alias with strURLsafe() punction, apostrophes and quotes get converted into hyphens - we don't want that
     protected $unwantedaliaschars = array("?","!",",",";",".","'","\"");
+    protected $loglevel;
+    protected $msglevel;
     
     public function getForm($data = array(), $loadData = true) {
         $form = $this->loadForm('com_xbmusic.dataman', 'dataman',
@@ -52,20 +54,21 @@ class DatamanModel extends AdminModel {
     
     /**
      * @name parseFilesMp3()
-     * @desc takes either a folder path or a set of file pathnames and parses the files ID3 data
+     * @desc takes either a folder path or a single filename or an array of filenames and parses the files ID3 data
      * prepends the logging infomation to a log file with current date in /xbmusic-data/logs/
-     * @param string|array $files - if a string it is assumed to be a folder 
+     * @param string|array $files - if a string may be a folder or filename 
      * @param int $cattype
-     * @return boolean
+     * @return boolean|array false if failed or count of newtrks (all counts in log)
      */
-    public function parseFilesMp3($files, $usedaycat) {
+    public function parseFilesMp3($files, $usedaycat = '') {
         $basemusicfolder = JPATH_ROOT.'/xbmusic/'; //XbmusicHelper::$musicBase;
         $dosubfolders = true;
-        $maxitems = 50;
+        $maxitems = 60;
         $maxlevels = 6;
         $itemcnt = 0;
         $app = Factory::getApplication();
         $params = ComponentHelper::getParams('com_xbmusic');
+        $msglevel = $params->get('msglevel',1);
         $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
         $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
         //start log
@@ -75,71 +78,76 @@ class DatamanModel extends AdminModel {
         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
         $starttime = time();
         //are we doing a whole folder, or selected files?
-        if (is_string($files)) {
-            //we have a folder name with trailing slash
-            $folder = $files;
-            $files = [];
-            if (trim($folder,'/') != '') {
-                //start by getting any mp3s in the base folder
-                $mp3list = $this->getMp3FileList($basemusicfolder.$folder);
-                $itemcnt = count($mp3list);
-                if ($itemcnt > $maxitems) {
-                    $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
-                    $app->enqueueMessage($errmsg,'Error');
-                    $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
-                    XbmusicHelper::writelog($logmsg);
-                    return false;
-                } else {
-                    $files = $mp3list;
-                    $msg = Text::sprintf('Found %s mp3s in %s',$itemcnt,$folder);
-                    //$app->enqueueMessage($msg);
-                    $logmsg .= $msg."\n";
-                }
-            } //endif folder ok
-            if ($dosubfolders) {
-                $subfolders = $this->getSubfolderList($basemusicfolder.$folder,0,$maxlevels,$maxitems, $itemcnt);
- //               $foldercnt = count($subfolders);
-                if ($itemcnt > $maxitems) {
-                    $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
-                    $app->enqueueMessage($errmsg,'Error');
-                    $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
-                    XbmusicHelper::writelog($logmsg);
-                    return false;
-                } else {
-                    foreach ($subfolders as $folder) {
-                        $mp3list = $this->getMp3FileList($folder);
-                        $foundcnt = count($mp3list);
-                        $files = array_merge($files,$mp3list);
-                        $msg = Text::sprintf('Found %s mp3 files in %s and subfolders',$foundcnt,$folder);
-                        $app->enqueueMessage($msg);
-                        $logmsg .= $msg."\n";
-                    }
-                }
-                
-            }
-        } elseif (is_array($files)) {
-            //we've got a list of files, make the paths complete
+        if (is_array($files)) {
             foreach ($files as $key=>$file) {
                 $files[$key] = $basemusicfolder.$file;
-            }
+            }            
+        } elseif (is_string($files)) {
+            //check if it is a file .mp3 or folder
+            if (strtolower(substr($files), -4) === '.mp3' ) {
+                //we have a single file
+                $files = array($basemusicfolder.$files);
+            } else {              
+                //we have a folder name with trailing slash
+                $folder = $files;
+                $files = [];
+                if (trim($folder,'/') != '') {
+                    //start by getting any mp3s in the base folder
+                    $mp3list = $this->getMp3FileList($basemusicfolder.$folder);
+                    $itemcnt = count($mp3list);
+                    if ($itemcnt > $maxitems) {
+                        $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
+                        if ($msglevel>1) $app->enqueueMessage($errmsg,'Error');
+                        $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
+                        XbmusicHelper::writelog($logmsg);
+                        return false;
+                    } else {
+                        $files = $mp3list;
+                        $msg = Text::sprintf('Found %s mp3s in %s',$itemcnt,$folder);
+                        //$app->enqueueMessage($msg);
+                        $logmsg .= $msg."\n";
+                    }
+                } //endif folder ok
+                if ($dosubfolders) {
+                    $subfolders = $this->getSubfolderList($basemusicfolder.$folder,0,$maxlevels,$maxitems, $itemcnt);
+     //               $foldercnt = count($subfolders);
+                    if ($itemcnt > $maxitems) {
+                        $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
+                        if ($msglevel>1) $app->enqueueMessage($errmsg,'Error');
+                        $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
+                        XbmusicHelper::writelog($logmsg);
+                        return false;
+                    } else {
+                        foreach ($subfolders as $folder) {
+                            $mp3list = $this->getMp3FileList($folder);
+                            $foundcnt = count($mp3list);
+                            $files = array_merge($files,$mp3list);
+                            $msg = Text::sprintf('Found %s mp3 files in %s and subfolders',$foundcnt,$folder);
+                            if ($msglevel>3) $app->enqueueMessage($msg);
+                            $logmsg .= $msg."\n";
+                        }
+                    }
+                    
+                }
+            }           
         } else {
             // not a string and not an array - invalid
             $errmsg .= Text::_('XBMUSIC_INVALID_FILES_LIST');
-            Factory::getApplication()->enqueueMessage($errmsg,'Error');
+            if ($msglevel>1) Factory::getApplication()->enqueueMessage($errmsg,'Error');
             $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
             XbmusicHelper::writelog($logmsg);
             return false;
         } //endif
         if (count($files)==0){
             $errmsg .= Xbtext::_('XBMUSIC_NO_MP3_FOUND',XBSP2 + XBTRL).$folder;
-            Factory::getApplication()->enqueueMessage($errmsg,'Warning');
+            if ($msglevel>2) Factory::getApplication()->enqueueMessage($errmsg,'Warning');
             $logmsg .= $loghead.XBWARN.$errmsg.XBENDLOG;
             XbmusicHelper::writelog($logmsg);
             return false;
         }
         // ok we're going to iterate through the files
         // $logmsg .= $file."\n";
-        $app->enqueueMessage('parsing '.count($files));
+        if ($msglevel>3) $app->enqueueMessage('parsing '.count($files));
         foreach ($files as $file) {
             $logmsg .= $this->parseID3($file, $cnts);
         }
@@ -150,7 +158,7 @@ class DatamanModel extends AdminModel {
         $loghead .= XBENDITEM;
         $logmsg = $loghead.$logmsg.XBENDLOG;
         XbmusicHelper::writelog($logmsg);
-        return true;
+        return $cnts['newtrk'];
     } //end parseFilesMp3()
     
     private function getMp3FileList($folder, $ext = 'mp3') {
@@ -169,7 +177,7 @@ class DatamanModel extends AdminModel {
         //            Factory::getApplication()->enqueueMessage('in getSubfolderList level: '.$level.' maxfolders: '.$maxitems.' itemcnt: '.$itemcnt.'- folder: '.$folder);
         $level ++;
         if ($level == $maxlevels) {
-            Factory::getApplication()->enqueueMessage('Maximum depth reached, will not check subfolders');
+            Factory::getApplication()->enqueueMessage('Maximum depth reached, will not check subfolders','Warning');
         }
         $subfolderlist = [];
         
@@ -218,6 +226,7 @@ class DatamanModel extends AdminModel {
         $doalbumurl = (key_exists(2, $urlhandling)) ? true : false;
         $doartisturl = (key_exists(3, $urlhandling)) ? true : false;
         $loglevel = $params->get('loglevel',3);
+        $msglevel = $params->get('msglevel',1);
         $app = Factory::getApplication();
         //start the logging for this file
         $ilogmsg = '[IMPORT BULK] '.str_replace(JPATH_ROOT.'/xbmusic/','',$filepathname)."\n";
@@ -231,7 +240,7 @@ class DatamanModel extends AdminModel {
             $msg = Text::_('XBMUSIC_TRACK_IN_DB').Xbtext::_($tid,XBSP1 + XBDQ);
             $ilogmsg .= XBERR.$msg.$enditem;
             $cnts['duptrk'] ++;
-            $app->enqueueMessage(trim($msg),'Error');
+            if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');
             return $ilogmsg;
         }
 // 2. set track->pathname and track->filename, if filename exists then warning
@@ -242,7 +251,7 @@ class DatamanModel extends AdminModel {
             $msg = Text::_('XBMUSIC_FILENAME_IN_DB').Xbtext::_($fpath,7).Text::_('XBMUSIC_WITH_TKID').Xbtext::_($fid,XBDQ + XBNL);
             $ilogmsg .= XBWARN.$msg;
             $msg2 = Xbtext::_('XBMUSIC_IMPORTING_ANYWAY',XBNL + XBTRL);
-            $app->enqueueMessage(trim($msg).'<br />'.trim($msg2),'Warning');
+            if ($msglevel>2) $app->enqueueMessage(trim($msg).'<br />'.trim($msg2),'Warning');
             $ilogmsg .= XBWARN.$msg2;
         }
         
@@ -253,7 +262,7 @@ class DatamanModel extends AdminModel {
             $msg = Xbtext::_('XBMUSIC_NO_TRACK_TITLE_IN_ID3',XBNL + XBTRL);
             $ilogmsg .= XBERR.$msg.$enditem;
             $cnts['errtrk'] ++;
-            $app->enqueueMessage(trim($msg),'Error');
+            if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');
             return $ilogmsg;          
         }
 
@@ -322,7 +331,7 @@ class DatamanModel extends AdminModel {
                     if ($song['id']=== false) {
                         $msg = Text::_('XBMUSIC_FAILED_SAVE_SONG').Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
                         $ilogmsg .= XBERR.$msg;
-                        $app->enqueueMessage(trim($msg),'Error');                         
+                        if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');                         
                     } elseif ($song['id'] >0) {
                         $cnts['newsng'] ++;
                         $msg = Xbtext::_('XBMUSIC_NEW_SONG_SAVED',XBSP2 + XBTRL).'. Id:'.$song['id'].Xbtext::_($song['title'],XBSP1 + XBDQ + XBNL);
@@ -331,7 +340,7 @@ class DatamanModel extends AdminModel {
                     } else {
                         $msg = Text::_('XBMUSIC_SONG_ALREADY_DB').Xbtext::_($song['title'],XBSP3 + XBDQ).Xbtext::_('XBMUSIC_SONG_ALREADY_DB2',XBNL + XBTRL);
                         $ilogmsg = XBWARN.$msg;
-                        $app->enqueueMessage(trim($msg),'Warning');
+                        if ($msglevel>2) $app->enqueueMessage(trim($msg),'Warning');
                         $song['id'] = $song['id'] * -1;
  //                       if ($optalbsong & 1) $gadd = XbcommonHelper::addTagsToItem('com_xbmusic.song', $song['id'], $genreids);
  //                       if ($loglevel==4) $ilogmsg .= XBINFO.$gadd.Xbtext::_('XBMUSIC_GENRES_TO_SONG',XBSP3 + XBTRL).$song['id'].': '.Xbtext::_($song['title'],XBDQ + XBNL);
@@ -372,7 +381,7 @@ class DatamanModel extends AdminModel {
                     if ($artist['id'] === false) {
                         $msg = Text::_('XBMUSIC_ARTIST_SAVE_FAILED').Xbtext::_($artist['title'],13);
                         $ilogmsg .= XBERR.$msg;
-                        $app->enqueueMessage(trim($msg),'Error');
+                        if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');
                     } elseif ($artist['id'] > 0) {
                         $cnts['newart'] ++;
                         $msg = Xbtext::_('XBMUSIC_ARTIST_NEW_SAVED',XBSP2 + XBTRL).'id: '.$artist['id'].Xbtext::_($artist['name'],XBSP1 + XBDQ + XBNL);
@@ -425,7 +434,7 @@ class DatamanModel extends AdminModel {
                 } else {
                     $msg = Xbtext::_('XBMUSIC_ARTWORK_CREATE_FAILED',XBNL + XBTRL);
                     $ilogmsg .= XBWARN.$msg;
-                    $app->enqueueMessage(trim($msg),'Warning');
+                    if ($msglevel>2) $app->enqueueMessage(trim($msg),'Warning');
                 }
             } //end ifset image data
 
@@ -442,7 +451,7 @@ class DatamanModel extends AdminModel {
                 if ($albumdata['id']===false) {
                     $msg = Text::_('XBMUSIC_ALBUM_SAVE_FAILED').Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
                         $ilogmsg .= XBERR.$msg;
-                        $app->enqueueMessage($msg,'Error');                       
+                        if ($msglevel>1) $app->enqueueMessage($msg,'Error');                       
                 } elseif ($albumdata['id']>0) { 
                     $cnts['newalb'] ++;                       
                     $msg = Text::_('XBMUSIC_ALBUM_SAVED').Xbtext::_($albumdata['title'],XBSP1 + XBDQ + XBNL);
@@ -482,13 +491,13 @@ class DatamanModel extends AdminModel {
             if ($trackdata['id']=== false) {
                 $msg = Text::_('XBMUSIC_TRACK_SAVE_FAILED').Xbtext::_($trackdata['title'],XBSP1 + XBDQ + XBNL);
                 $ilogmsg .= XBERR.$msg;
-                $app->enqueueMessage(trim($msg),'Error');
+                if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');
             } elseif ($trackdata['id'] >0) {
                 $cnts['newtrk'] ++;
                 $msg = Xbtext::_('XBMUSIC_TRACK_SAVED',XBSP2 + XBTRL).'. Id:'.$trackdata['id'].Xbtext::_($trackdata['title'],XBSP1 + XBDQ + XBNL);
                 if ($loglevel==4) $ilogmsg .= XBINFO.$msg;
                 $newmsg .= trim($msg).'<br />';
-                $app->enqueueMessage($newmsg,'Success');
+                if ($msglevel>3) $app->enqueueMessage($newmsg,'Success');
              //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','tracksong')."\n";
                 if ($dotrackurl) {
                     foreach ($id3data['urls'] as $url) {
@@ -500,7 +509,7 @@ class DatamanModel extends AdminModel {
                 $msg .= ' : '.Text::_('XBMUSIC_TRACK_SAVE_FAILED').Xbtext::_($trackdata['title'], XBSP1 + XBDQ + XBNL);
                 $ilogmsg .= XBERR.$msg;
                 $newmsg .= trim($msg).'<br />';
-                $app->enqueueMessage(trim($msg),'Error');
+                if ($msglevel>1) $app->enqueueMessage(trim($msg),'Error');
                 
                 //   $ilogmsg .= XBINFO.XbmusicHelper::addItemLinks($trackdata['id'],$songlinks, 'track','tracksong')."\n";
             }
@@ -586,6 +595,9 @@ class DatamanModel extends AdminModel {
      * @return \Exception|boolean true if okay
      */
     public function updateDbStation(int $dbstid,object $azstation) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $msglevel = $params->get('msglevel',1);
+        $app = Factory::getApplication();
         $api = new AzApi();
         $apikey = $api->getApikey();
         $azurl = $api->getAzurl();
@@ -607,10 +619,10 @@ class DatamanModel extends AdminModel {
             $db->setQuery($query);
             $res = $db->execute();
         } catch (\Exception $e) {
-            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            if ($msglevel>1) $app->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
             return $e;
         }
-        Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_STATION_UPDATED',$dbstid, $azstation->name));
+        if ($msglevel>3) $app->enqueueMessage(Text::sprintf('XBMUSIC_STATION_UPDATED',$dbstid, $azstation->name));
         return $res;
     }
     
@@ -621,6 +633,8 @@ class DatamanModel extends AdminModel {
      * returns boolean|Exception true if ok
      */
     public function createDbStation($station) {
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $msglevel = $params->get('msglevel',1);
         $api = new AzApi();
         $apikey = $api->getApikey();
         $azurl = $api->getAzurl();
@@ -649,18 +663,19 @@ class DatamanModel extends AdminModel {
             $db->setQuery($query);
             $res = $db->execute();            
         } catch (\Exception $e) {
-            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            if ($msglevel>1) Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
             return $e;
         }
         if ($res == true) { 
             $newid = $db->insertid();
-            Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$station->name));
+            if ($msglevel>3) Factory::getApplication()->enqueueMessage(Text::sprintf('XBMUSIC_NEW_STATION_CREATED',$newid,$station->name));
         }
         return $res; 
     }
     
     public function deleteDbStation(int $stid) {
-        //needs dbstid to delete
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $msglevel = $params->get('msglevel',1);
         $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->delete($db->qn('#__xbmusic_azstations'));
@@ -669,7 +684,7 @@ class DatamanModel extends AdminModel {
             $db->setQuery($query);
             $res = $db->execute();
         } catch (\Exception $e) {
-            Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+            if ($msglevel>1) Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
             return $e;
         }
         return $res;
