@@ -84,12 +84,13 @@ $wa->useScript('keepalive')
 	</div>
 	<hr />
     	<div id="waiter" class="xbbox alert-info" style="display:none;">
-          <table style="width:100%">
-              <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_PARSE'); ?></b> </td>
-              </tr>
-          </table>
+          	<table style="width:100%">
+              	<tr>
+					<?php $waitpic = Uri::root().'/media/com_xbmusic/images/waiting.gif'; ?>            
+					<td style="width:200px;"><img src="<?php echo $waitpic; ?>>" style="height:100px" /> </td>
+					<td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_PARSE'); ?></b> </td>
+				</tr>
+			</table>
     	</div>
 	<div class="row">
 		<div class="col-md-8 form-vertical">

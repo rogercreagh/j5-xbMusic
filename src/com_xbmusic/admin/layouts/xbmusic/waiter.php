@@ -11,8 +11,9 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\HTML\HTMLHelper;
-use MongoDB\BSON\Javascript;
+//use MongoDB\BSON\Javascript;
 
 /**
  * Layout variables
@@ -33,7 +34,8 @@ if (!is_array($displayData)) {
     	<div id="azwaiter" class="xbbox alert-info" style="display:none;">
           <table style="width:100%">
               <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
+              	  <?php $waitpic = Uri::root().'/media/com_xbmusic/images/waiting.gif'; ?>
+                  <td style="width:200px;"><img src="<?php echo $waitpic; ?>" style="height:100px" /> </td>
                   <td style="vertical-align:middle;"><b><span id="waitmessage"><?php echo $message; ?></span></b> </td>
               </tr>
           </table>
