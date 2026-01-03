@@ -1,8 +1,8 @@
-<?php 
+ <?php 
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.59.11 29th November 2025
+ * @version 0.0.59.16 16th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -13,9 +13,9 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-// use Joomla\CMS\Layout\LayoutHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
@@ -24,23 +24,20 @@ HTMLHelper::_('behavior.multiselect');
 HTMLHelper::_('formbehavior.chosen', 'select');
 
 $wa = $this->document->getWebAssetManager();
-$wa->addInlineScript("function pleaseWait(targ) {
-		document.getElementById(targ).style.display = 'block';
-	}");
+$wa->useScript('xbmusic.xbgeneral');
+//$wa->addInlineScript("function showEl(targ) {
+//		document.getElementById(targ).style.display = 'block';
+//	}");
 
 ?>
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dashboard'); ?>" method="post" name="adminForm" id="adminForm">
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />		
 		<h2><i class='icon-info-circle'></i> <?php echo Text::_('XB_STATUS_SUM'); ?></h2>
-    	<div id="azwaiter" class="xbbox alert-info" style="display:none;">
-          <table style="width:100%">
-              <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
-              </tr>
-          </table>
-    	</div>
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+
 		<div class="xbwp100">
         	<div class="xbwp60 pull-left xbpr20">
 				<div class="xbbox gradgreen">
@@ -184,7 +181,7 @@ $wa->addInlineScript("function pleaseWait(targ) {
 				</div>
 
 				<div class="xbbox gradpink">
-					<h3 class="xbmb20"><i class='fas fa-headphones' ></i> <a href="index.php?option=com_xbmusic&view=playlists"><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-headphones' ></i> <?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-pink"><?php echo $this->playlistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>
@@ -209,7 +206,8 @@ $wa->addInlineScript("function pleaseWait(targ) {
 							</td>
 						</tr>
 						<tr>
-							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_playlist; ?></span>
+							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: 
+								<?php echo $this->rootcat_playlist; ?>
 								<br /><span class="xbnit"><?php echo Text::_('XB_DEFAULT_CATEGORY'); ?></span>: <span class="xbbadge badge-cat"><?php echo $this->defcat_playlist; ?></span>
 							</td>
 							<td><span class="xbnit"><?php echo Text::_('XB_TAG_GROUPS'); ?></span>: <?php echo $this->plisttagparents; ?>
@@ -220,25 +218,30 @@ $wa->addInlineScript("function pleaseWait(targ) {
 				<div class="xbbox gradpurple">
                 <?php if ($this->azuracast == 1) : ?>
 					<h3 class="xbmb20"><i class='fas fa-radio' ></i> <a href="#"
-						 onclick="pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
+						 onclick="showEl('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')"><?php echo Text::_('XBMUSIC_AZURACAST'); ?></a></h3>
 					<?php if(!empty($this->stations)) : ?>
 						<?php foreach($this->stations as $station) : ?>
 						<?php if(count($this->stations)>1) : ?>
 							<details>
-								<summary><?php echo $station['id']; ?> <span class="xbr11"><?php echo $station['title']; ?></span>
+								<summary><?php echo $station['id']; ?> <span class="xbr11">
+									<a href="index.php?option=com_xbmusic&task=station.edit&id=
+										<?php echo $station['id']; ?>"><?php echo $station['title']; ?></a></span>
 								</summary>
 						<?php else : ?>
-							<h3><?php echo $station['title']; ?></h3>
+							 <p class="xbr11 xbbold">
+									<a href="index.php?option=com_xbmusic&task=station.edit&id=
+										<?php echo $station['id']; ?>"><?php echo $station['title']; ?></a>
+										</p>
 						<?php endif; ?>
 								<i>AzURL</i>: 
 								<a href="<?php echo $station['az_url']; ?>" target="_blank">
-                         			<?php echo $station['az_url']; ?></a>
-                         			<br />
+                         			<?php echo $station['az_url']; ?></a>                        			
 							    <?php if ($station['az_stid']>0 ) : ?>
-							    	<i>AzID</i>: 
-							        <?php echo $station['az_stid']; //.' '.$station['az_apiname']; ?>
+							    	<span class="xbpl20"><i>AzID</i>: 
+							        <?php echo $station['az_stid']; ?></span>
 							    <?php else : ?>
-							        <span class="xbit"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
+							    	<br />
+							        <span class="xbit xbred"><?php echo Xbtext::_('Azuracast details missing'); ?></span>
 							    <?php endif; ?> 
 							    <br />
 							    <i>Website</i>: 
@@ -324,9 +327,22 @@ $wa->addInlineScript("function pleaseWait(targ) {
 	        			<dl class="xbdlinline">
 	        				<dt><?php echo Text::_('XBMUSIC_MUSIC_FOLDER'); ?>: </dt>
 	        					<dd><?php echo XbmusicHelper::$musicBase; ?></dd>
+	        				<dt><?php echo 'Azuracast'; ?></dt>
+	        					<dd><?php echo ($this->azuracast) ? 'url: '.$this->az_url : 'Disabled'; ?></dd>
+	        				<dt><?php echo 'Logging'; ?></dt>
+	        					<dd><?php echo $this->logging; ?></dd>
+	        				<dt><?php echo 'Messages'; ?></dt>
+	        					<dd><?php echo $this->messaging; ?></dd>
+	        				<dt><?php echo 'Import Category'; ?></dt>
+	        					<dd><?php echo $this->impcat; ?></dd>
 	        				<dt><?php echo 'ID3 Genre'; ?></dt>
 	        					<dd><?php echo $this->id3genreuse; ?></dd>
+	        				<dt><?php echo 'Normalize genre names'; ?></dt>
+	        					<dd><?php echo $this->normalize; ?></dd>
+	        				<dt><?php echo 'Split Medley track'; ?></dt>
+	        					<dd><?php echo $this->medley; ?></dd>
 	        			</dl>
+	        					
         			<?php echo HTMLHelper::_('bootstrap.endSlide'); ?>
     				<?php echo HtmlHelper::_('bootstrap.addSlide', 'slide-dashboard', Text::_('XB_ABOUT'), 'about','xbaccordion'); ?>
 						<p><?php echo Text::_( 'XBMUSIC_ABOUT' ); ?></p>

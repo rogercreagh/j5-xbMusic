@@ -1,7 +1,7 @@
 /*******
  * @package xbCommon Files
  * @filesource media/css/xbcommon.css
- * @version xbmusic-J5 0.0.59.5 18th November 2025
+ * @version xbmusic-J5 0.0.59.15 14th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -380,6 +380,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 /* text alignment */
 .xbtc, .xbcredit {text-align:center;}
 .xbtr {text-align:right;}
+.xbvc {vertical-align:middle;}
 
 /* text decoration */
 .xbnotdec {
@@ -459,6 +460,8 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbmh300 {max-height:300px; }
 .xbmh400 {max-height:400px; }
 .xbmh800 {max-height:800px; }
+.xbmh30dvh {max-height:30dvh; }
+.xbmh50dvh {max-height:50dvh; }
 .xbmh60dvh {max-height:60dvh; }
 
 /* widths */

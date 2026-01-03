@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.0.59.1 30th October 2025
+ * @version 0.0.59.14 9th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -30,7 +30,7 @@
 			description="List of API keys available for current user."
 			class=""
 			default="0"
-			onchange="document.getElementById('task').value='azuracast.switchapi';this.form.submit();"
+			onchange="showEl('azwaiter');Joomla.submitbutton('azuracast.switchapi');"
 		>
 			<option value="0">Select existing key for current user</option>
 		</field>
@@ -40,7 +40,6 @@
 			description="Enter new full 49 character key for this user including colon between id and value"
 			hint="new key with 49 chars including colon"
 			showon="apilist:0"
-			onchange="showApiBtn();"
 		>
 		
 		</field>

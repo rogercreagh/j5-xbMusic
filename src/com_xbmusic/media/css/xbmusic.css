@@ -15,6 +15,11 @@ audio {
 }
 
 /*--------------------------------*/
+/* remove fixed width from form label */
+.control-label:has(+ .controls input.xbwunset) {
+	width:unset;
+	margin-right:10px;
+}
 
 /* small radio buttons and file input use btn-small */
 .control-group  .btn-small > label, 
@@ -92,9 +97,11 @@ table[id^=subfieldList] thead tr td div.btn-group {
 }
 /** remove left auto margin on inline-help on dataman, schedule and azuracast views **/
 .view-dataman #toolbar-inlinehelp.ms-auto ,
-.view-schedule #toolbar-inlinehelp.ms-auto 
-.view-azuracast #toolbar-inlinehelp.ms-auto {
-	margin-left:30px !important;
+.view-schedule #toolbar-inlinehelp.ms-auto, 
+.view-azuracast #toolbar-inlinehelp.ms-auto,
+.view-station #toolbar-inlinehelp.ms-auto, 
+.view-playlist #toolbar-inlinehelp.ms-auto {
+	margin-left:20px !important;
 }
 
 /** spacer before the saveId3 button in Toolbar **/

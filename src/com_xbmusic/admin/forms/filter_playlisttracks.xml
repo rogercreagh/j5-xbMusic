@@ -5,7 +5,7 @@
 		<field
 			name="search" type="text"
 			label="Title Search"
-			description="Search in Track Title, or prefix with 'a:' for artist, 'b:' for album"
+			description="Search in Track Title, or prefix with 'a:' for Artist, 'b:' for alBum"
 			hint="JSEARCH_FILTER"
 		/>
 

@@ -299,10 +299,10 @@ class AzApi {
         return $result;
     }
        
-    public function getAzPlaylistM3u(int $azplid, string $m3ufpathname) {
-        if ($this->azstid == 0)
+    public function getAzPlaylistM3u(int $azstid, int $azplid, string $m3ufpathname) {
+        if ($azstid == 0)
             return (object) ['code' => true, 'msg'=>'Station ID not set'];
-        $url=$this->apiurl.'/station/'.$this->azstid.'/playlist/'.$azplid.'/export/m3u';
+        $url=$this->apiurl.'/station/'.$azstid.'/playlist/'.$azplid.'/export/m3u';
         $result = $this->azApiDownloadPlaylist($url, $m3ufpathname);
         return $result;
     }

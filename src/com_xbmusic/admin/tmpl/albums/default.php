@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.30.4 12th February 2025
+ * @version 0.0.59.17 21st December 2025
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -29,8 +29,9 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns');
-$wa->useScript('multiselect');
+$wa->useScript('table.columns')
+    ->useScript('multiselect')
+    ->useScript('xbmusic.xbgeneral');
 
 $app       = Factory::getApplication();
 $user  = Factory::getApplication()->getIdentity();
@@ -66,6 +67,10 @@ if (strpos($listOrder, 'modified') !== false) {
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=albums'); ?>" method="post" name="adminForm" id="adminForm">
 		<h2><i class='fas fa-compact-disc' ></i> <?php echo Text::_('XBMUSIC_LIST_ALBUMS'); ?></h2>
 		
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>

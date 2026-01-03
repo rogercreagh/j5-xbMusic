@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.11 1st December 2025
+ * @version 0.0.59.18 23rd December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -13,22 +13,20 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
+//use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 HTMLHelper::_('jquery.framework');
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
-->useScript('xbmusic.foldertree')
-->useScript('xbmusic.showdown')
-->useScript('joomla.dialog');
-
-$wa->addInlineScript("function pleaseWait(targ) {
-		document.getElementById(targ).style.display = 'block';
-	}");
+    ->useScript('xbmusic.foldertree')
+    ->useScript('xbmusic.showdown')
+    ->useScript('joomla.dialog')
+    ->useScript('xbmusic.xbgeneral');
 
 $wa->addInlineScript("
     $(document).ready(function() {
@@ -48,35 +46,17 @@ $wa->addInlineScript("
 
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=azuracast'); ?>" method="post" name="adminForm" id="adminForm">
-<?php if (($this->azuracast == 0) || ($this->azurl == '') ) : ?>
-    <div class="xbbox gradpink xbht200 xbflexvc">
-        <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
-        	<p><?php echo $this->noazmess2; ?></p>
-        </div>
-    </div>
-<?php else: ?>
+		<h2><?php echo Text::_('XBMUSIC_AZURACAST_SERVER_STATIONS');?></h2>
 
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+            
 		<input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
 		<input type="hidden" id="multi" value="0" />
 		<input type="hidden" id="extlist" value="xxx" />
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
-		<h2><?php echo Text::_('XBMUSIC_AZURACAST_SERVER_STATIONS');?></h2>
          
-	<?php if($this->azme == false): ?>
-		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
-	<?php else : ?>
-		<p><?php echo Text::sprintf('XBMUSIC_USING_SERVER_ACCOUNT',$this->azurl, $this->account); ?> </p>
-		<p><?php echo Text::_('Current API key'); ?>
-		: <?php echo $this->apicomment; ?> <code><?php echo $this->apikey; ?></code></p>
-	<?php endif; ?>
-      
-    	<div id="azwaiter" class="xbbox alert-info" style="display:none;">
-          <table style="width:100%">
-              <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
-              </tr>
-          </table>
     	</div>
         <div class="row">
         	<div class="col-md-6 xblblcompact form-vertical">
@@ -86,13 +66,28 @@ $wa->addInlineScript("
     			<?php echo $this->form->renderField('newapikey'); ?>
     			<div style="text-align:right;">
                 	<button id="impapi" class="btn btn-sm btn-primary" type="button" style="display:none;"
-                		onclick="Joomla.submitbutton('azuracast.saveapi');" >
+                		onclick="showEl('azwaiter'); Joomla.submitbutton('azuracast.saveapi');" >
         				<i class="icon-save icon-white"></i> &nbsp;<?php echo Text::_('XBMUSIC_SAVE_NEW_KEY'); ?>        	
                 	</button>
             	</div>
             </div>
         </div>
         <div class="clearfix"></div>
+<?php if ($this->noazmess1 != '' ) : ?>
+    <div class="xbbox gradpink xbht200 xbflexvc">
+        <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
+        	<p><?php echo $this->noazmess2; ?></p>
+        </div>
+    </div>
+<?php else: ?>
+	<?php if($this->azme == false): ?>
+		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
+	<?php else : ?>
+		<p><?php echo Text::sprintf('XBMUSIC_USING_SERVER_ACCOUNT',$this->azurl, $this->account); ?> </p>
+		<p><?php echo Text::_('Current API key'); ?>
+		: <?php echo $this->apicomment; ?> <code><?php echo $this->apikey; ?></code></p>
+	<?php endif; ?>
+      
 
 	<?php if ($this->apikey == ''): ?>
 		<P><?php echo Text::_('XBMUSIC_AZAPI_NO_KEY')?>
@@ -427,7 +422,7 @@ $wa->addInlineScript("
             	    	<?php endforeach; ?>
         	    	</dl>
 	    		</details>
-	    	<?php endif; ?>
+	    	<?php endif; // isset users ?>
 	    	
 	    	<?php if (isset($this->item->server->backups)) : ?>
 	    		<details>
@@ -450,7 +445,7 @@ $wa->addInlineScript("
         	    	</dl>
 	    		</details>
     	    		
-	    	<?php endif; ?>
+	    	<?php endif; // isset backups ?>
 	    	
 	    	<?php if (isset($this->item->server->storage_locations)) : ?>
 	    		<details>
@@ -469,7 +464,7 @@ $wa->addInlineScript("
             	    	<?php endforeach; ?>
         	    	</dl>
         	    </details>
-	    	<?php endif; ?>
+	    	<?php endif; // isset storage_locations?>
 	    	
 	    	<?php if (isset($this->item->server->serverstats)) : ?>
 	    		<details>
@@ -493,20 +488,18 @@ $wa->addInlineScript("
         	    		<dd><i>Free</i>: <?php echo $this->item->server->serverstats->disk->free_readable; ?></dd>        	    		
         	    	</dl>
         	    </details>
-	    	<?php endif; ?>
-	    	
+	    	<?php endif; // isset serverstats ?>
 	    	
 	    	<?php //echo '<pre>'.print_r($this->item->server, true);?>
-	    <?php endif; ?>
+	    <?php endif; // not isset server->code ?>
 		 
-        
-        
+<?php endif; //azuracast enabled ?>
+              
 		<input type="hidden" id="rem_name" name="rem_name" value="" />
 		<input type="hidden" id="task" name="task" value="" />
 		<input type="hidden" name="boxchecked" value="0" />
 		<?php echo HTMLHelper::_('form.token'); ?>
 
-<?php endif; //azuracast enabled ?>
 	</form>
     <p>&nbsp;</p>
     <?php echo XbcommonHelper::credit('xbMusic');?>

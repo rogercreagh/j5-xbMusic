@@ -14,7 +14,7 @@ window.doConfirm = function(poptext, pophead, task, targ = '') {
 	poptext = poptext + '<br />Are you really sure?'
     JoomlaDialog.confirm(poptext,pophead).then((result) => { 
     if(result) {
-		if (targ !='') pleaseWait(targ);
+		if (targ !='') showEl(targ);
         Joomla.submitbutton(task);
       };
    });

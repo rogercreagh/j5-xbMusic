@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dashboard/HtmlView.php
- * @version 0.0.59.5 20th November 2025
+ * @version 0.0.59.17 21st December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -23,10 +23,10 @@ use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Joomla\CMS\Helper\TagsHelper;
-use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 //use Joomla\CMS\Layout\FileLayout;
 //use Joomla\CMS\Toolbar\ToolbarFactoryInterface;
+//use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 class HtmlView extends BaseHtmlView {
     
@@ -38,13 +38,12 @@ class HtmlView extends BaseHtmlView {
         $catbadge = '<span class="xbbadge badge-cat">';        
         
         $this->azuracast = $params->get('azuracast','0');
- //       $this->az_apikey = $params->get('az_apikey','0');
         $this->az_url = $params->get('az_url','');
         $this->stations = XbazuracastHelper::getStations();            
- //       if (($this->azuracast == 1) && ($this->az_apikey) != '') {
- //       } else {
- //           $this->stations = [];
- //       }
+        $dispvals = array('Nothing', 'Summary only','Summary and Errors','Summary, Errors &amp; Warnings','All information');
+        $this->logging = $dispvals[$params->get('loglevel','0')];
+        $this->messaging = $dispvals[$params->get('msglevel','0')];
+        $this->impcat = ($params->get('impcat',0) == 1) ? 'Date Imported' : 'Item Defaults';
         
         $rootcat_album = $params->get('rootcat_album',0);
         if ($rootcat_album == 0) {
@@ -70,13 +69,13 @@ class HtmlView extends BaseHtmlView {
         $artalb = (int) $params->get('addgenre',0);
         switch ($genreparam) {
             case 1:
-                $this->id3genreuse = Text::_('as Category');
+                $this->id3genreuse = Text::_('Track Category');
                 break;  
             case 2:
-                $this->id3genreuse = Text::_('as Tag');
+                $this->id3genreuse = Text::_('Track Tag');
                 break;
             case 3:
-                $this->id3genreuse = Text::_('Category &amp; Tag');
+                $this->id3genreuse = Text::_('Track Category &amp; Tag');
                 break;
             default:
                 $this->id3genreuse = Text::_('not used');
@@ -85,18 +84,37 @@ class HtmlView extends BaseHtmlView {
         if ($genreparam > 1) {
             switch ($artalb) {
                 case 1:
-                    $this->id3genreuse .= ', '.Text::_('also tag Song');
+                    $this->id3genreuse .= ' '.Text::_(', Song tag');
                     break;
                 case 2:
-                    $this->id3genreuse .= ', '.Text::_('also tag Album');
+                    $this->id3genreuse .= ', '.Text::_(', Album tag');
                     break;
                 case 3:
-                    $this->id3genreuse .= ', '.Text::_('also tag Song &amp; Album');
+                    $this->id3genreuse .= ', '.Text::_(', Song &amp; Album tags');
                     break;                       
                 default:
                 break;
             }               
         }
+        $this->medley = ($params->get('splitsongs',0)) ? 'Single song' : 'separate by "," or "/"';
+        
+        $this->normalize = '';
+        $genrehyphen = $params->get('genrehyphen',0);
+        $genrespaces = $params->get('genrespaces',0);
+        $genrecase = $params->get('genrecase',0);
+        if (($genrecase + $genrehyphen + $genrespaces) == 0) {
+            $this->normalize = 'no normalization';
+        } else {
+            if ($genrehyphen == 1) $this->normalize .= "Slash to Hyphen, ";
+            if ($genrehyphen == 2) $this->normalize .= "Hyphen to Slash, ";
+            if ($genrespaces == 1) $this->normalize .= "Space to Hyphen, ";
+            if ($genrespaces == 2) $this->normalize .= "Space to Slash, ";
+            if ($genrespaces == 3) $this->normalize .= "Space to separate tags, ";
+            if ($genrecase == 0) $this->normalize .= "no case change";
+            if ($genrecase == 1) $this->normalize .= "Initial capital";
+            if ($genrecase == 2) $this->normalize .= "Lower case";
+        }
+        
         //==========================
         
         $rootcat_artist = $params->get('rootcat_artist',0);
@@ -300,7 +318,15 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         if ( $this->azuracast) {
-            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', '')->listCheck(false)->icon('fas fa-broadcast-tower')->onclick("pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')") ;
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST_STATIONS', '')
+            ->listCheck(false)->icon('fas fa-broadcast-tower')
+            ->onclick("showEl('azwaiter',Joomla.JText._('XBMUSIC_WAITING_SERVER'));
+                Joomla.submitbutton('dashboard.toAzuracast')") ;
+            foreach ($this->stations AS $station) {
+                $childBar->linkButton('stationview'.$station['id'],'<span class="xbpl20">'.$station['title'].'</span>', '')
+                ->url('index.php?option=com_xbmusic&task=station.edit&id='.$station['id'])
+                ->listCheck(false)->icon('fas fa-radio');
+            }
         }
         $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
         

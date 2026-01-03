@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.59.5 20th November 2025
+ * @version 0.0.59.17 21st December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -13,6 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
@@ -24,26 +25,11 @@ HTMLHelper::_('jquery.framework');
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
-->useScript('form.validate')
-->useScript('xbmusic.foldertree')
-->useScript('xbmusic.showdown')
-->useScript('joomla.dialog');
-
-$wa->addInlineScript("function pleaseWait(targ) {
-		document.getElementById(targ).style.display = 'block';
-	}");
-/**
-$wa->addInlineScript("window.onload = function() {
-    var selfolder = sessionStorage.getItem('selfolder');
-    if (selfolder) {
-        var sellink = document.querySelector('#container li.folder a[rel=selfolder]');
-        if (sellink) { sellink.parentElement.classList.add('selected expanded');}
-    }
-};");
-**/
-//Factory::getDocument()->addScriptDeclaration('function pleaseWait(targ) {
-//		document.getElementById(targ).style.display = "block";
-//	}');
+    ->useScript('form.validate')
+    ->useScript('xbmusic.foldertree')
+    ->useScript('xbmusic.showdown')
+    ->useScript('joomla.dialog')
+    ->useScript('xbmusic.xbgeneral');
 
 // Create shortcut to parameters.
 //$params = clone $this->state->get('params');
@@ -66,15 +52,10 @@ $wa->addInlineScript("window.onload = function() {
 
         <h2><i class='icon-database' ></i> Data Manager</h2>
 
-    	<div id="azwaiter" class="xbbox alert-info" style="display:none;">
-          <table style="width:100%">
-              <tr>
-                  <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
-              </tr>
-          </table>
-    	</div>
-		<div class="main-card">
+ 		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+ 		<div class="main-card">
 			<?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'import', 'recall' => true]); ?>
     
 	<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'import', Text::_('XB_IMPORT')); ?>

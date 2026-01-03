@@ -81,9 +81,17 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
         if ( $this->azuracast) {
-            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST', '')->listCheck(false)->icon('fas fa-broadcast-tower')->onclick("pleaseWait('azwaiter');Joomla.submitbutton('dashboard.toAzuracast')") ;
+            $stations = XbazuracastHelper::getStations();
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST_STATIONS', '')
+                ->listCheck(false)->icon('fas fa-broadcast-tower')
+                ->onclick("showEl('azwaiter',Joomla.JText._('XBMUSIC_WAITING_SERVER'));
+                    Joomla.submitbutton('dashboard.toAzuracast')") ;
+            foreach ($stations AS $station) {
+                $childBar->linkButton('stationview'.$station['id'],'<span class="xbpl20">'.$station['title'].'</span>', '')
+                ->url('index.php?option=com_xbmusic&task=station.edit&id='.$station['id'])
+                ->listCheck(false)->icon('fas fa-radio');
+            }
         }
-        
         
         $canDo = ContentHelper::getActions('com_xbmusic');
         if ($canDo->get('core.admin')) {

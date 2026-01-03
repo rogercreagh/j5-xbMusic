@@ -31,8 +31,9 @@ HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('table.columns')
-    ->useScript('multiselect');
-
+    ->useScript('multiselect')
+    ->useScript('xbmusic.xbgeneral');    
+    
 $app       = Factory::getApplication();
 $user  = $app->getIdentity();
 $userId    = $user->get('id');
@@ -56,9 +57,9 @@ if (strpos($listOrder, 'modified') !== false) {
 
 ?>
 <script>
-function stopProp(event) {
-	event.stopPropagation();
-}
+//function stopProp(event) {
+//	event.stopPropagation();
+//}
 </script>
 <script>
 function playAudio(name, filepathname) {
@@ -83,6 +84,9 @@ function playAudio(name, filepathname) {
         </div>
 		<h2><i class='fas fa-guitar' ></i> <?php echo Text::_('XBMUSIC_LIST_TRACKS'); ?></h2>
 		<div class="clearfix"></div>		
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>

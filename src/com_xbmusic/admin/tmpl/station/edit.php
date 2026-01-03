@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/station/edit.php
- * @version 0.0.59.9 27th Novemeber 2025
+ * @version 0.0.59.15 13th Decemeber 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -35,6 +35,10 @@ $wa->useScript('keepalive')
 ->useScript('form.validate')
 ->useScript('xbmusic.showdown');
 //$wa->useScript('table.columns');
+$wa->addInlineScript("function showEl(targ) {
+		document.getElementById(targ).style.display = 'block';
+	}");
+
 
 $user  = Factory::getApplication()->getIdentity();
 $userId    = $user->get('id');
@@ -80,6 +84,17 @@ $item = $this->item;
 <div id="xbcomponent">
     <form action="<?php echo Route::_('index.php?option=com_xbmusic&view=station&layout=edit&id='. (int) $item->id); ?>"
     	method="post" name="adminForm" id="item-form" class="form-validate" >
+    	<h2><?php echo $this->item->title; ?></h2>
+		<h3><span class="xbnorm">Server : </span><?php echo $this->item->az_url; ?></h3>
+        <div id="azwaiter" class="xbbox alert-info" style="display:none;">
+            <table style="width:100%">
+                <tr>
+                    <td style="width:200px;"><img src="/media/com_xbmusic/images/waiting.gif" style="height:100px" /> </td>
+                    <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
+				</tr>
+			</table>
+		</div>
+        
     	<div class="row form-vertical">
     		<div class="col-md-4">
      			<?php echo $this->form->renderField('title'); ?> 
@@ -182,7 +197,7 @@ $item = $this->item;
 						<th >
 							<?php echo Text::_('JGLOBAL_TITLE'); ?>
 						</th>
-							<th><?php echo Text::_('Schedule Slots'); ?>
+							<th><?php echo Text::_('Scheduled Slots'); ?>
 							</th>
 						<th><?php echo Text::_('XBMUSIC_TRACKS'); ?>
 						</th>
@@ -257,6 +272,7 @@ $item = $this->item;
                                 	><span class="icon-eye xbpl10"></span></span>
 								</p>
 								<p class="xb09r"><i>Alias</i>: &nbsp;<?php echo $pl->alias; ?>
+								<br />
 								</p>
 							</div>
 						</td>
@@ -270,20 +286,29 @@ $item = $this->item;
 										<div class="xbmt5 xbmh400 xbyscroll">
 											<ul style="margin:5px;">
             									<?php foreach ($pl->schedules as $schd) : ?>
-            										<li><?php echo $schd['az_starttime'];
-            										if ($schd['az_days'] != '') { 
-            										    echo '<i> on </i>'.$schd['az_days'];
-            										} else {
+            										<li><?php echo date('g:ia', strtotime($schd['az_starttime'])); ?>
+            										 <i>to</i> 
+            										 <?php echo date('g:ia', strtotime($schd['az_endtime'])); ?>
+            										<?php 
+            										if ((strlen($schd['az_days']) == 0) || (strlen($schd['az_days']) == 13)) { 
             										    echo '<i>'.Xbtext::_('XBMUSIC_EVERYDAY',XBLC1+XBTRL).'</i>';
-            										}
-            										if ($schd['az_startdate']) {
-            										    echo '<span class="xbpl20 xbit">from </span>'
-                                                            .$schd['az_startdate'].'<i> to </i>'.$schd['az_enddate'];
             										} else {
-            										    echo '<span class="xbpl20 xbit">'
-                                                            .Xbtext::_('XBMUSIC_ALWAYS',XBLC1+XBTRL).'</span>';
+            										    echo '<i> on </i>'.$schd['az_days'];
+            										} ?>
+            										<br /><span class="xbr09">
+            										<?php 
+            										if ($schd['az_startdate']) {
+            										    echo ' from '
+                                                            .$schd['az_startdate']; 
             										}
-            										?></li>
+            										if ($schd['az_enddate']) {
+            										    echo ' from '.$schd['az_startdate'];
+            										} else {
+            										    echo ' '.Text::_('forever');            										
+            										}
+            										?>
+            										</span>
+													</li>
             									<?php endforeach; ?>
     										</ul>										
     									</div>
@@ -330,7 +355,8 @@ $item = $this->item;
 						</ul>						    											
 						</td>
 						<td class="nowrap xbr09 xbtc">
-							<?php $date = $pl->{$dateOrderCol[$item->params['dateorder']]};
+							<?php $do = (isset($item->params['dateorder'])) ? $item->params['dateorder'] : 0;
+							 $date = $pl->{$dateOrderCol[$do]};
 							echo $date > 0 ? HTMLHelper::_('date', $date, Text::_('D d M \'y H:i')) : 'n/a';
 							?>
 						</td>
@@ -349,7 +375,7 @@ $item = $this->item;
 	<div class="form-vertical">
 		<div class="row">
 			<div class="col-12 col-md-6 " style="white-space: pre-wrap;">
-        		<pre><?php echo print_r(json_decode($azinfo),true);?></pre>
+        		<pre><?php echo print_r(json_decode($item->az_info),true);?></pre>
 			</div>
 		</div>
 		

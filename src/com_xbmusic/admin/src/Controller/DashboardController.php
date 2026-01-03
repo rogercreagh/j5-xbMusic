@@ -32,9 +32,9 @@ class DashboardController extends AdminController
     public function toArtists() {
         $this->setRedirect('index.php?option=com_xbmusic&view=artists');
     }
-    public function toPlaylists() {
-        $this->setRedirect('index.php?option=com_xbmusic&view=playlists');
-    }
+//     public function toPlaylists() {
+//         $this->setRedirect('index.php?option=com_xbmusic&view=playlists');
+//     }
     public function toPlaylisttracks() {
         $jip =  $this->input;
         if ($jip->exists('cid')) {

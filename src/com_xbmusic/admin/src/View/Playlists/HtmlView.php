@@ -21,6 +21,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 // use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 // use Joomla\CMS\Helper\TagsHelper;
 //use Joomla\CMS\Layout\FileLayout;
@@ -118,11 +119,22 @@ class HtmlView extends BaseHtmlView {
         $childBar->standardButton('dashboardview', 'XB_DASHBOARD', 'dashboard.toDashboard')->listCheck(false)->icon('fas fa-info-circle') ;
         $childBar->standardButton('albumsview', 'XBMUSIC_ALBUMS', 'dashboard.toAlbums')->listCheck(false)->icon('fas fa-compact-disc') ;
         $childBar->standardButton('artistsview', 'XBMUSIC_ARTISTS', 'dashboard.toArtists')->listCheck(false)->icon('fas fa-users-line') ;
-//        $childBar->standardButton('playlistsview', 'XBMUSIC_PLAYLISTS', 'dashboard.toPlaylists')->listCheck(false)->icon('fas fa-rectangle-list') ;
         $childBar->standardButton('songsview', 'XBMUSIC_SONGS', 'dashboard.toSongs')->listCheck(false)->icon('fas fa-music') ;
         $childBar->standardButton('tracksview', 'XBMUSIC_TRACKS', 'dashboard.toTracks')->listCheck(false)->icon('fas fa-guitar') ;
         $childBar->standardButton('catsview', 'XB_CATEGORIES', 'dashboard.toCats')->listCheck(false)->icon('fas fa-folder-tree') ;
         $childBar->standardButton('tagsview', 'XB_TAGLIST', 'dashboard.toTags')->listCheck(false)->icon('fas fa-tags') ;
+        if ( $this->azuracast) {
+            $stations = XbazuracastHelper::getStations();
+            $childBar->standardButton('azuracastview', 'XBMUSIC_AZURACAST_STATIONS', '')
+            ->listCheck(false)->icon('fas fa-broadcast-tower')
+            ->onclick("showEl('azwaiter',Joomla.JText._('XBMUSIC_WAITING_SERVER'));
+                Joomla.submitbutton('dashboard.toAzuracast')") ;
+            foreach ($stations AS $key=>$station) {
+                $childBar->linkButton('stationview'.$station['id'],'<span class="xbpl20">'.$station['title'].'</span>', '')
+                ->url('index.php?option=com_xbmusic&task=station.edit&id='.$station['id'])
+                ->listCheck(false)->icon('fas fa-radio');
+            }
+        }
         $childBar->standardButton('datamanview', 'XB_DATAMAN', 'dashboard.toDataman')->listCheck(false)->icon('icon-database') ;
         
         if ($canDo->get('core.admin')) {

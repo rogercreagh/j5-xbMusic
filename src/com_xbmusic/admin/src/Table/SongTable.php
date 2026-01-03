@@ -103,15 +103,11 @@ class SongTable extends Table implements VersionableTableInterface, TaggableTabl
             $this->ordering = self::getNextOrder($this->_db->quoteName('catid') . ' = ' . ((int) $this->catid) . ' AND ' . $this->_db->quoteName('status') . ' >= 0');
         }
         
-        // Set modified to created if not set
-        if (!$this->modified) {
-            $this->modified = $this->created;
-        }
+        // Set modified to current
+        $this->modified = Factory::getDate()->toSql();
         
-        // Set modified_by to created_by if not set
-        if (empty($this->modified_by)) {
-            $this->modified_by = $this->created_by;
-        }
+        // Set modified_by to currentuser
+        $this->modified_by = Factory::getApplication()->getIdentity()->id;
         
         return true;
     }

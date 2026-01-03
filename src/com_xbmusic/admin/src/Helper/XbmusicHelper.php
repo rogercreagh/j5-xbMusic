@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbazuracastHelper.php
- * @version 0.0.55.2 28th June 2025
+ * @version 0.0.59.16 15th December 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -587,6 +587,8 @@ class XbmusicHelper extends ComponentHelper
 	    return $imgdata;
 	}
 	
+	/************* GENRE FUNCTIONS ************/
+	
 	/**
 	 * @name normaliseGenrename()
 	 * @desc applies any normalisation to names for genres specified in component options
@@ -595,28 +597,51 @@ class XbmusicHelper extends ComponentHelper
 	 * @return string
 	 */
 	public static function normaliseGenrename(string $genrename, string &$ilogmsg) {
+	    $origname = $genrename;
 	    $params = ComponentHelper::getParams('com_xbmusic');
 	    $opthyphen = $params->get('genrehyphen',1);
 	    $optspaces = $params->get('genrespaces',1);
 	    $optcase = $params->get('genrecase',1);
 	    $cnt = 0;
+//	    $genrename = str_replace(';',' ',$genrename);
+	    if ($optspaces == 3) {
+	        $strarr = explode(' ',$genrename);
+	        $hasShortElement = false;
+	        for ($i = 0; $i < count($strarr); $i++) {
+	            if (strlen($strarr[$i]) < 3) {
+	                $hasShortElement = true;
+	                break; // Exit loop early if a short element is found
+	            }
+	        }
+	        if ($hasShortElement) {
+	            $cnt++;
+	            str_replace(' ','-',$genrename);
+	        }
+	    }
 	    if ($opthyphen == 1) {
-	        $genrename = str_replace('/','-',$genrename, $cnt);
+	        $genrename = str_replace('/','-',$genrename, $c);
+	        $cnt += $c;
 	    } elseif ($opthyphen==2) {
-	        $genrename = str_replace('-','/',$genrename, $cnt);
-	    }
-	    if ($optspaces == 1)  {
-	        $genrename = str_replace(' ','-',$genrename, $cnt);
-	    } elseif ($optspaces == 2) {
-	        $genrename = str_replace(' ','/',$genrename, $cnt);
-	    }
-	    if ($cnt > 0) $ilogmsg .= $genrename.' normalized'."\n";
-	    if ($optcase > 0) $genrename = strtolower($genrename);
-	    if ($optcase == 1) $genrename = ucfirst($genrename);
-	    return $genrename;	    
+	        $genrename = str_replace('-','/',$genrename, $c);
+	        $cnt += $c;
+        }
+        if ($optspaces == 1)  {
+            $genrename = str_replace(' ','-',$genrename, $c);
+            $cnt += $c;
+        } elseif ($optspaces == 2) {
+            $genrename = str_replace(' ','/',$genrename, $c);
+            $cnt += $c;
+        }
+        if ($cnt > 0) {
+            $ilogmsg .= $genrename.' normalized'."\n";
+            Factory::getApplication()->enqueueMessage($cnt.' '.$origname.' to '.$genrename);
+        }
+        if ($optcase > 0) $genrename = strtolower($genrename);
+        if ($optcase == 1) $genrename = ucfirst($genrename);
+        return $genrename;
+            
 	} // end normaliseGenrename()
 
-	/*************  ************/
 	
 	/**
 	 * @name createGenres()
@@ -630,23 +655,40 @@ class XbmusicHelper extends ComponentHelper
 	    $params = ComponentHelper::getParams('com_xbmusic');
 	    $optspaces = $params->get('genrespaces',1);
 	    //split names including commas 
-	    $genrenames = str_replace(',', '||', $genrenames);
+	    $genrenames = str_replace(array(',',';'), '||', $genrenames);
 	    // if required split names with spaces into two or more genres "Folk Rock" -> "Folk" and "Rock"
-	    if ($optspaces == 3) $genrenames = str_replace(array(' || ', ' '), '||', $genrenames);	        
+	    $genrenarr = explode('||', $genrenames);
+	    if ($optspaces == 3) { 
+	        //hyphenate names with 1 or 2 letter parts eg "a cappella"
+	        foreach ($genrenarr as &$item) {
+	            $hasShortElement = false;
+	            $strarr = explode(' ',$item);
+	            for ($i = 0; $i < count($strarr); $i++) {
+	                if (strlen($strarr[$i]) < 3) {
+	                    $hasShortElement = true;
+	                    break; // Exit loop early if a short element is found
+	                }
+	            }
+	            if ($hasShortElement) {
+	                str_replace(' ','-',$item);
+	            }
+	        }
+	    }
 	    $genres = array();
-	    $genrenames = explode('||', $genrenames);
         //get the parent tag for genre tags
         $parentgenre = XbcommonHelper::getCreateTag(array('title'=>'MusicGenres'));
-	    foreach ($genrenames as &$genre) {
-	        $genre = trim($genre,'-');
-	        $genre = self::normaliseGenrename(trim($genre), $ilogmsg);
+	    foreach ($genrenarr as &$genre) {
+	        $genre = trim($genre,'-');	        	        
+	        $genre = self::normaliseGenrename(trim($genre), $ilogmsg);	        
 	        //get or create the genre tag id and title
-	        $newtag = XbcommonHelper::getCreateTag(array('title'=>$genre, 'parent_id'=>$parentgenre['id'],
+	        $tag = XbcommonHelper::getCreateTag(array('title'=>$genre, 'parent_id'=>$parentgenre['id'],
 	                       'created_by_alias'=>'xbMusicHelper::createGenres()'));
-	        if ($newtag) $genres[] = $newtag;
+	        if ($tag) $genres[] = $tag;
 	    } //end foreach genre
 	    return $genres;
 	} //end createGenres()
+	
+	/*************  ************/
 	
 	public static function getTrackArtists($tid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
@@ -826,7 +868,7 @@ class XbmusicHelper extends ComponentHelper
             $db->setQuery($query);
             $db->execute();
             $cnt = $db->getAffectedRows();
-            Factory::getApplication()->enqueueMessage($cnt.Text::sprintf('XBMUSIC_ROWS_DELETED', $cnt));
+            Factory::getApplication()->enqueueMessage($cnt.' '.Text::_('XBMUSIC_ROWS_DELETED'));
         } catch (Exception $e) {
             Factory::getApplication()->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
             return $e;
