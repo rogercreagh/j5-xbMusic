@@ -36,7 +36,7 @@ if (!is_array($displayData)) {
               <tr>
               	  <?php $waitpic = Uri::root().'/media/com_xbmusic/images/waiting.gif'; ?>
                   <td style="width:200px;"><img src="<?php echo $waitpic; ?>" style="height:100px" /> </td>
-                  <td style="vertical-align:middle;"><b><span id="waitmessage"><?php echo $message; ?></span></b> </td>
+                  <td style="vertical-align:middle;"><b><span id="waitmessage"><?php echo Text::_($message); ?></span></b> </td>
               </tr>
           </table>
     	</div>

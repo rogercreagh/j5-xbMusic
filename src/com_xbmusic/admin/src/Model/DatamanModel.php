@@ -84,7 +84,7 @@ class DatamanModel extends AdminModel {
             }            
         } elseif (is_string($files)) {
             //check if it is a file .mp3 or folder
-            if (strtolower(substr($files), -4) === '.mp3' ) {
+            if (strtolower(substr($files, -4)) === '.mp3' ) {
                 //we have a single file
                 $files = array($basemusicfolder.$files);
             } else {              

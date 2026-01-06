@@ -33,11 +33,9 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 ->useScript('form.validate')
-->useScript('xbmusic.showdown');
+->useScript('xbmusic.showdown')
+->useScript('xbmusic.xbgeneral');
 //$wa->useScript('table.columns');
-$wa->addInlineScript("function showEl(targ) {
-		document.getElementById(targ).style.display = 'block';
-	}");
 
 
 $user  = Factory::getApplication()->getIdentity();
@@ -86,15 +84,9 @@ $item = $this->item;
     	method="post" name="adminForm" id="item-form" class="form-validate" >
     	<h2><?php echo $this->item->title; ?></h2>
 		<h3><span class="xbnorm">Server : </span><?php echo $this->item->az_url; ?></h3>
-        <div id="azwaiter" class="xbbox alert-info" style="display:none;">
-            <table style="width:100%">
-                <tr>
-					<?php $waitpic = Uri::root().'/media/com_xbmusic/images/waiting.gif'; ?>	
-                    <td style="width:200px;"><img src="<?php echo $waitpic; ?>>" style="height:100px" /> </td>
-                    <td style="vertical-align:middle;"><b><?php echo Text::_('XBMUSIC_WAITING_SERVER'); ?></b> </td>
-				</tr>
-			</table>
-		</div>
+		<?php
+            $waitmessage = 'XBMUSIC_WAITING_SERVER';
+            echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
         
     	<div class="row form-vertical">
     		<div class="col-md-4">

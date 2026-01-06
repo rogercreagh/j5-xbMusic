@@ -31,6 +31,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbazuracastHelper;
 class HtmlView extends BaseHtmlView {
     
     public function display($tpl = null) {
+        Text::script('XBMUSIC_WAITING_SERVER');
         $app = Factory::getApplication();
         $taghelper = new TagsHelper();
         $params = ComponentHelper::getParams('com_xbmusic');

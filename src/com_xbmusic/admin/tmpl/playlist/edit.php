@@ -347,8 +347,8 @@ $input = Factory::getApplication()->getInput();
 			<div class="row">
 				<div class="col12 col-md-5">
             		<button id="btnloadm3u" class="btn btn-info btn-sm icon-white xbmr50" type="button" 
-                        		onclick="hideEl(document.getElementById('saveopts'))
-                        		  showEl(document.getElementById('loadopts'));
+                        		onclick="hideEl('saveopts');
+                        		  showEl('loadopts');
                         		  var opt = document.querySelector('input[name=\'jform[loadsource]\']:checked').value;
                         		  setimpbtn(opt);
                         " >
@@ -356,8 +356,8 @@ $input = Factory::getApplication()->getInput();
                         			<?php echo Text::_('Import Tracklist'); ?>
                     </button>
             		<button id="btnsavem3u" class="btn btn-success btn-sm icon-white" type="button" 
-                        		onclick="hideEl(document.getElementById('loadopts'));
-                        		  showEl(document.getElementById('saveopts'));" >
+                        		onclick="hideEl('loadopts');
+                        		  showEl('saveopts');" >
                 					<i class="fas fa-link"></i> &nbsp; 
                         			<?php echo Text::_('Export Tracklist'); ?>
                     </button>				

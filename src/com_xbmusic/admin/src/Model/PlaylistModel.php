@@ -391,7 +391,7 @@ class PlaylistModel extends AdminModel {
                             $query = $db->getQuery(true)
                                 ->update($db->qn('#__xbmusic_azplaylists'));
                             $query->set($db->qn('tracks_sync').' = CURRENT_TIMESTAMP');
-                            $query->where($db->qn('id').' = '.$db->q($data[]));
+                            $query->where($db->qn('id').' = '.$db->q($data['id']));
                             try {
                                 $db->setQuery($query);
                                 $ret = $db->execute();
@@ -675,10 +675,11 @@ class PlaylistModel extends AdminModel {
         $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
         $mediapath = JPATH_ROOT.'/xbmusic/'.$stmedia;
         if ($lines = file($m3ufile)) {
-            if (count($lines) >400) {
+            if (count($lines) >100) {
                 $app->enqueueMessage('M3U file contains over 400 lines. Importing the whole list will take some time and may create memory overflow or other data loss issues. The file will saved as multiple files each containing no more than 400 lines with a suffix added to the name. Please import each file separately from the data folder.','Warning');
                 //process file here - chunk the array as save each as separate file
-                $chunks = array_chunk($lines, 300);
+                $chunks = array_chunk($lines, 200);
+                clearstatcache();
                 foreach ($chunks as $key=>$value) {
                     $parts = pathinfo($m3ufile);
                     $chunkfile = $parts['dirname'].'/'.$parts['filename'].'_'.($key+1).'.'.$parts['extension'];
@@ -686,13 +687,14 @@ class PlaylistModel extends AdminModel {
                         unlink($chunkfile);
                         clearstatcache(true,$chunkfile);
                     }
-                    file_put_contents($chunkfile, implode(PHP_EOL, $value));
+                    file_put_contents($chunkfile, $value);
                 }
                 $app->enqueueMessage(count($chunks).' '.'chunk files <code>'.$m3ufile.'_N</code> have been saved in'. 
                     '<code>/xbmusic-data/m3u/</code>','Success');
                 return false;
             } else {
                 $msg = 'Missing files ';
+                    clearstatcache();
                 foreach ($lines as $line) {
                     if (file_exists($mediapath.trim($line))) {
                         $filelist[] = trim($line);

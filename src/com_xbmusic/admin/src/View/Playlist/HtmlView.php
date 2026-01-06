@@ -32,6 +32,7 @@ class HtmlView extends BaseHtmlView {
     
     public function display($tpl = null) {
         
+        Text::script('XBMUSIC_WAITING_SERVER');
         $this->form  = $this->get('Form');
         $this->item  = $this->get('Item');
 //        $this->state = $this->get('State');

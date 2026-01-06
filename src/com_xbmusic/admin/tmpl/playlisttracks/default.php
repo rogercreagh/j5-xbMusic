@@ -96,7 +96,7 @@ if ($saveOrder && !empty($this->items)) {
 				<div class="col-md-6">
         			<dl class="xbgl">
         				<dt><?php echo Text::_('Scheduled'); ?></dt>
-        				<dd><?php echo $playlist->schedulecnt.Xbtext::_('slots in schedule'); ?>
+        				<dd><?php echo $playlist->scheduledcnt.Xbtext::_('slots in schedule'); ?>
         				<br /><span class="xbnote"><?php echo Text::_('Check times in') ?> 
         					<a href="index.php?option=com_xbmusic&task=playlist.edit&id=<?php echo $playlist->id; ?>#schedule">
         						Playlist Schedule Tab</a></span>

@@ -87,6 +87,7 @@ function playAudio(name, filepathname) {
 		<?php
             $waitmessage = 'XBMUSIC_WAITING_SERVER';
             echo LayoutHelper::render('xbmusic.waiter', array('message'=>$waitmessage)); ?>
+            
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>

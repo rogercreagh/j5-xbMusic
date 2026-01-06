@@ -34,6 +34,7 @@ class HtmlView extends BaseHtmlView {
     
     public function display($tpl = null) {
 
+        Text::script('XBMUSIC_WAITING_SERVER');
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->azuracast = $params->get('azuracast',0);
         $this->xbstations = XbazuracastHelper::getStations();
