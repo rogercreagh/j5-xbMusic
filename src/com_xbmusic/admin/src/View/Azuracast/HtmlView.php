@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Azuracast/HtmlView.php
- * @version 0.0.59.14 9th December 2025
+ * @version 0.0.59.20 4th February 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -35,63 +35,71 @@ class HtmlView extends BaseHtmlView {
     public function display($tpl = null) {
 
         $this->user = Factory::getApplication()->getIdentity();
+        $this->apierror = 0;
+        
         $this->noazmess1 = '';
         $this->noazmess2 = '';
         $params = ComponentHelper::getParams('com_xbmusic');
         $this->azuracast = $params->get('azuracast',0);
         if ($this->azuracast == 0) {
+            $this->apierror = 1; //az not enabled
             $this->noazmess1 = Text::_('XBMUSIC_AZURACAST_NOT_ENABLED');
             $this->noazmess2 = Text::_('XBMUSIC_AZURACAST_NOT_ENABLED_ACTION');
         }
         $this->azurl = $params->get('az_url','');
         if ($this->azurl == '') {
-            $this->noazmess1 = Text::_('Default Server URL not set');
-            $this->noazmess2 = Text::_('Please set a valid Azuracast url in the Options');            
+            $this->apierror = 2; //azurl not set
+            $this->noazmess1 = Text::_('XBMUSIC_AZURACAST_NO_SERVER');
+            $this->noazmess2 = Text::_('XBMUSIC_AZURACAST_NO_SERVER_ACTION');            
         } else {
             $userapikey = XbazuracastHelper::getSelectedApiKey($this->user->id);
-            if ($userapikey) {
-                $this->apiid = $userapikey->id;
-                $this->azurl = $userapikey->az_url;
-                $this->apikey = $userapikey->az_apikeyid.':'.$userapikey->az_apikeyval;
-                $this->apicomment = $userapikey->az_apicomment;
-            } else {
+            if (is_null($userapikey)) {
+                $this->apierror = 3; //user has no api key
                 $this->apiid = 0;
                 $this->apikey = '';
                 $this->apicomment = '';                
                 $this->noazmess1 = Text::_('XBMUSIC_AZURACAST_NOAPI');
                 $this->noazmess2 = Text::_('XBMUSIC_AZURACAST_NOAPI_ACTION');
-            }
-            $api = new AzApi();
-            if ($api->getStatus() == true) {
-                $this->item  = $this->get('Item');
-                if (isset($this->item->server->storage_locations)) {
-                    $this->indexedlocs = array_column($this->item->server->storage_locations,null,'id');
-                }
+            } else {
+                // check key is for right server
+                //?do we care we are going to use it anyway
+                $this->azurl = $userapikey->az_url;
+                $this->apiid = $userapikey->id;
+                $this->apikey = $userapikey->az_apikeyid.':'.$userapikey->az_apikeyval;
+                $this->apicomment = $userapikey->az_apicomment;
+                $api = new AzApi();
+                if ($api->getStatus() == true) {
+                    $this->item  = $this->get('Item');
+                    if (isset($this->item->server->storage_locations)) {
+                        $this->indexedlocs = array_column($this->item->server->storage_locations,null,'id');
+                    }
+                        
+                    $model = $this->getModel();
                     
-                $model = $this->getModel();
-                
-                $this->azme = $model->getAzMe($api);
-                $this->xbstations = XbazuracastHelper::getStations();           
-                if ($this->azme) {
-                    $this->account = '<b>'.$this->azme->name. '</b> (<i>Roles:</i> ';
-                    foreach ($this->azme->roles as $role) {
-                        $this->account .= $role->name .', ';
-                    }
-                    $this->account = trim($this->account,' ,').') <i>API:</i> '.$this->apicomment.')';           
-                    foreach ($this->xbstations as &$station) {
-                        $quota = $api->azStationQuota($station['az_stid']);
-                        $station['isadmin'] = (isset($quota->used)) ? true : false;
-                    }
-                } else {
-                    $this->account = '<i>(XBMUSIC_NOT_LOGGED_IN)</i>';                
-                    $this->noazmess1 = Text::_('XBMUSIC_AZURACAST_INVALID_API');
-                    $this->noazmess2 = Text::sprintf('XBMUSIC_AZURACAST_INVALID_API_ACTION',$this->azurl);
-                    foreach ($this->xbstations as &$station) {                   
-                        $station['isadmin'] = false;
-                    }
-                }
-                $this->azstations = $model->getAzStations($api);                   
-            }
+                    $this->azme = $model->getAzMe($api);
+                    $this->xbstations = XbazuracastHelper::getStations();           
+                    if ($this->azme) {
+                        $this->account = '<b>'.$this->azme->name. '</b> (<i>Roles:</i> ';
+                        foreach ($this->azme->roles as $role) {
+                            $this->account .= $role->name .', ';
+                        }
+                        $this->account = trim($this->account,' ,').') <i>API:</i> '.$this->apicomment.')';           
+                        foreach ($this->xbstations as &$station) {
+                            $quota = $api->azStationQuota($station['az_stid']);
+                            $station['isadmin'] = (isset($quota->used)) ? true : false;
+                        }
+                    } else {
+                        $this->apierror = 4; //api key invalid
+                        $this->account = '<i>(XBMUSIC_NOT_LOGGED_IN)</i>';                
+                        $this->noazmess1 = Text::_('XBMUSIC_AZURACAST_INVALID_API');
+                        $this->noazmess2 = Text::sprintf('XBMUSIC_AZURACAST_INVALID_API_ACTION',$this->azurl);
+                        foreach ($this->xbstations as &$station) {                   
+                            $station['isadmin'] = false;
+                        }
+                    } //endif invalid api
+                    $this->azstations = $model->getAzStations($api);                   
+                } //endif apistatus ok
+            } //endif $userapikey
         }
         $this->form = $this->get('Form');
         $this->basemusicfolder = XbmusicHelper::$musicBase;

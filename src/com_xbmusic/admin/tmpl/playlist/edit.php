@@ -368,6 +368,7 @@ $input = Factory::getApplication()->getInput();
 	        			<span class="xbpl20"><i><?php echo 'Messages'; ?></i> : 
 	        				<?php echo $this->messaging; ?></span>
 	        		</p>
+	        	</div>	
 			</div>
     		<div id="loadopts" class="xbbox" style="margin:10px; display:none;">
  				<div class="pull-right">
@@ -476,45 +477,46 @@ $input = Factory::getApplication()->getInput();
         	</div>
     		<hr />
     		<div class="row">
-        		<div class="col-12 col-md-3 form-vertical">
-         			<h4><?php echo Text::_('XBMUSIC_LINKS_TO_TRACKS')?></h4>
+        		<div class="col-12 col-md-6 form-vertical">
+         			<h4><?php echo Text::_('XBMUSIC_TRACK_LIST')?></h4>
            			<?php if (isset($this->tracks)) : ?>  
-           			<div class="xbyscroll xbmh50dvh">
-                		<ul>
-                			<?php foreach ($this->tracks as $listitem) : ?>
-                				<li>[<?php echo $listitem['track_id'];?>] 
-                					<a href="<?php echo $trackelink.$listitem['track_id'];?>">
-                						<?php echo $listitem['title']; ?></a><br /><span class="xbit xbpl20">
-                						<?php echo $listitem['artist']; ?></span>        			
-                    			</li>
-                			<?php endforeach; ?>
-                		</ul>
-           			</div>			
-            		<h4>Clear Track List</h4>
         	    	<?php $popbody = "'Clear all tracks from playlist - Are you sure?'"; 
         	    	  $pophead = 'Confirm empty tracklist'; 
         	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','playlist.clearlist');"; 
         	    	  ?>                
-        	    	 <p><button id="clearlist" class="btn btn-danger btn-sm icon-white" type="button" 
+        	    	 <div class="pull-right"><button id="clearlist" class="btn btn-danger btn-sm icon-white" type="button" 
                 		onclick="<?php echo $confirm; ?>" >
         					<i class="fas fa-link"></i> &nbsp; 
                 			<?php echo Text::_('Clear List'); ?>
                 		</button>        		
-        			</p>
+        			</div>
+           			<div class="xbyscroll xbmh50dvh">
+                		<table>
+                			<tr><td>[List ID]</td><td>Title</td><td>Artist</td></tr>
+                			<?php foreach ($this->tracks as $listitem) : ?>
+                				<tr>
+                					<td>[<?php echo $listitem['track_id'];?>]</td> 
+                					<td><a href="<?php echo $trackelink.$listitem['track_id'];?>">
+                						<?php echo $listitem['title']; ?></a></td>
+                					<td><?php echo $listitem['artist']; ?></td>        			
+                    			</tr>
+                			<?php endforeach; ?>
+                		</table>
+           			</div>			
             		
             		<?php else : ?>
                 		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
             		<?php endif; ?>
     			</div>
-        		<div class="col-12 col-md-9">
+        		<div class="col-12 col-md-3">
         			<?php if ($this->item->az_order == 'sequential') : ?>
     					<div class="pull-left xbmr50">
     						<?php echo $this->form->renderField('allowdupes'); ?>
     					</div>
         				<div class="clearfix"></div>
     				<?php endif; ?>
-    				<?php if ($this->dbtrkcnt > 100) : ?>
-        				<p class="xbr11"><b>Over 100 tracks in playlist.</b> Please use the 
+        				<p class="xbr11"><?php echo $this->dbtrkcnt; ?> tracks in local playlist.</p>
+        				<p> Use the 
         					<a href="index.php?option=com_xbmusic&view=playlisttracks&id=
         					<?php echo $this->item->id; ?>">
         						Playlist Tracks</a> 
@@ -522,23 +524,9 @@ $input = Factory::getApplication()->getInput();
         					<?php if ($this->item->az_order == 'sequential') echo Text::_('reorder'); ?>
         				    and batch remove tracks.
         				</p>
-    				<?php else : ?>
-         				<p>You can add and remove individual tracks here.
-         					<?php if ($this->item->az_order == 'sequential') : ?>
-         						Use the 
-        						<a href="index.php?option=com_xbmusic&view=playlisttracks&id=
-        						<?php echo $this->item->id; ?>">
-        						Playlist Tracks</a> 
-        						view for to reorder and batch remove tracks.
-         					<?php endif; ?>
-        				</p>
-        	       		<div class="xbmh60dvh xbyscroll form-vertical">
-        					<?php echo $this->form->renderField('tracklist'); ?>
-        				</div>
-    				<?php endif; ?>
         		</div>
     		</div>
-		</div>
+		
 
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 

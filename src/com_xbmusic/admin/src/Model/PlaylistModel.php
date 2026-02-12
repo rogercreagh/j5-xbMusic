@@ -289,6 +289,18 @@ class PlaylistModel extends AdminModel {
         return $db->loadAssocList();
     }
     
+    function getCurrentPlaylist() {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('track_id, note, listorder AS oldorder');
+        $query->from('#__xbmusic_trackplaylist');
+        $query->where('playlist_id = '.(int) $this->getItem()->id);
+//        $query->order('ba.listorder ASC', 'a.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+        
+    }
+    
     function storePlaylistTracks($playlist_id, $trackList) {
         $res = false;
         $db = $this->getDatabase();
@@ -490,17 +502,17 @@ class PlaylistModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $loglevel = $params['loglevel'];
         $msglevel = $params['msglevel'];
-        
+        $currentlist = $this->getPlaylistFiles();
         $app = Factory::getApplication();
         $stname = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'title', $data['db_stid']);
-        if ((!empty($data['tracklist'])) && ($data['params']['clearfirst'] == 0)) {
+        if ((!empty($currentlist)) && ($data['params']['clearfirst'] == 0)) { 
             //we have an existing tracklist and we are not clearing it
-            $tracklst = array_merge($data['tracklist'],$tracklst);
-            $msg = 'Imported tracks appended to '.count($data['tracklist']).' in existing list';
+            $tracklst = array_merge($currentlist,$tracklst);
+            $msg = 'Imported tracks appended to '.count($currentlist).' in existing list';
             if ($msglevel > 3) $app->enqueueMessage($msg, 'Info');
             if ($loglevel > 3) $loglines .= XBINFO.$msg."\n";
         } else {
-            $msg='Existing list replaced with new list';
+            $msg='Existing list of '.count($currentlist).' replaced with new list of '.count($tracklst);
             if ($msglevel > 3) $app->enqueueMessage('$msg', 'Info');
             if ($loglevel > 3) $loglines .= XBINFO.$msg."\n";
         }
@@ -675,8 +687,8 @@ class PlaylistModel extends AdminModel {
         $stmedia = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'mediapath', $data['db_stid']);
         $mediapath = JPATH_ROOT.'/xbmusic/'.$stmedia;
         if ($lines = file($m3ufile)) {
-            if (count($lines) >100) {
-                $app->enqueueMessage('M3U file contains over 400 lines. Importing the whole list will take some time and may create memory overflow or other data loss issues. The file will saved as multiple files each containing no more than 400 lines with a suffix added to the name. Please import each file separately from the data folder.','Warning');
+            if (count($lines) >200) {
+                $app->enqueueMessage('M3U file contains over 200 lines. Importing the whole list will take some time and may create memory overflow or other data loss issues. The file will saved as multiple files each containing no more than 400 lines with a suffix added to the name. Please import each file separately from the data folder.','Warning');
                 //process file here - chunk the array as save each as separate file
                 $chunks = array_chunk($lines, 200);
                 clearstatcache();
@@ -717,7 +729,7 @@ class PlaylistModel extends AdminModel {
         }
         if (!empty($missingfiles)) {
             $f = fopen(JPATH_ROOT.'/xbmusic-data/m3u/missing_files.m3u', 'a');
-            fwrite($f, implode("\n", $missingfiles));
+            fwrite($f, implode("\n", $missingfiles)."\n\n");
             fclose($f);
             if ($loglevel > 0) $loglines .= XBSUM.'Missing files list appended to /xbmusic-data/m3u/missing_files.m3u'."\n";
             $warnstr .= 'Missing files list appended to <code>/xbmusic-data/m3u/missing_files.m3u</code><br />';

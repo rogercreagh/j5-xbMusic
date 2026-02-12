@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/azuracast/default.php
- * @version 0.0.59.18 23rd December 2025
+ * @version 0.0.59.20 4th February 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -56,24 +56,25 @@ $wa->addInlineScript("
 		<input type="hidden" id="multi" value="0" />
 		<input type="hidden" id="extlist" value="xxx" />
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
-         
-    	</div>
-        <div class="row">
-        	<div class="col-md-6 xblblcompact form-vertical">
-				<?php echo $this->form->renderField('apilist'); ?>
-        	</div>
-        	<div class="col-md-6 xblblcompact form-vertical">
-    			<?php echo $this->form->renderField('newapikey'); ?>
-    			<div style="text-align:right;">
-                	<button id="impapi" class="btn btn-sm btn-primary" type="button" style="display:none;"
-                		onclick="showEl('azwaiter'); Joomla.submitbutton('azuracast.saveapi');" >
-        				<i class="icon-save icon-white"></i> &nbsp;<?php echo Text::_('XBMUSIC_SAVE_NEW_KEY'); ?>        	
-                	</button>
+ 		<?php if ($this->apierror != 1) : ?> 
+            <div class="row">
+            	<div class="col-md-6 xblblcompact form-vertical">
+    				<?php echo $this->form->renderField('apilist'); ?>
             	</div>
+            	<div class="col-md-6 xblblcompact form-vertical">
+        			<?php echo $this->form->renderField('newapikey'); ?>
+        			<div style="text-align:right;">
+                    	<button id="impapi" class="btn btn-sm btn-primary" type="button" style="display:none;"
+                    		onclick="showEl('azwaiter'); Joomla.submitbutton('azuracast.saveapi');" >
+            				<i class="icon-save icon-white"></i> &nbsp;<?php echo Text::_('XBMUSIC_SAVE_NEW_KEY'); ?>        	
+                    	</button>
+                	</div>
+                	<p class="xbnote"><?php echo Text::_('NB save button appear if key is right length - if pasting key then press enter if button doesn\'t appear')?>
+                </div>
             </div>
-        </div>
-        <div class="clearfix"></div>
-<?php if ($this->noazmess1 != '' ) : ?>
+            <div class="clearfix"></div>
+ 		<?php endif; ?>       
+<?php if ($this->apierror > 0 ) : ?>
     <div class="xbbox gradpink xbht200 xbflexvc">
         <div class="xbcentre"><h3><?php echo $this->noazmess1; ?></h3>
         	<p><?php echo $this->noazmess2; ?></p>
@@ -81,11 +82,13 @@ $wa->addInlineScript("
     </div>
 <?php else: ?>
 	<?php if($this->azme == false): ?>
-		<p><?php echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
+		<p><?php // echo Text::_('XBMUSIC_AZAPI_KEY_INVALID'); ?></p>
 	<?php else : ?>
 		<p><?php echo Text::sprintf('XBMUSIC_USING_SERVER_ACCOUNT',$this->azurl, $this->account); ?> </p>
 		<p><?php echo Text::_('Current API key'); ?>
-		: <?php echo $this->apicomment; ?> <code><?php echo $this->apikey; ?></code></p>
+			: <?php echo $this->apicomment; ?> <code><?php echo $this->apikey; ?></code>
+			<span class="xbnote"><?php echo Text::_('to delete key use Datamanager Azuracast tab')?></span>			
+		</p>
 	<?php endif; ?>
       
 
@@ -93,7 +96,7 @@ $wa->addInlineScript("
 		<P><?php echo Text::_('XBMUSIC_AZAPI_NO_KEY')?>
 	<?php endif; ?>
 	</p>
-	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="" checked="" style="margin:0 5px;" />
+	<p class="xbtc xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?> <input  type="checkbox" id="autoclose" name="autoclose" value="" style="margin:0 5px;" />
     </p>
 	
         <div class="row">
