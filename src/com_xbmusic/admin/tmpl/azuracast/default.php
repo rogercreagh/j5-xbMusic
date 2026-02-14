@@ -307,7 +307,7 @@ $wa->addInlineScript("
     								<?php endif; ?>
     								<?php if (isset($azstation->schcnt)) : ?>
         								<dt>Schedule</dt>
-        								<dd><?php echo $azstation->schcnts; ?>
+        								<dd><?php echo $azstation->schcnt; ?>
         									<?php echo Text::_('schedule timeslots defined'); ?>
         								</dd>
     								<?php endif; ?>
