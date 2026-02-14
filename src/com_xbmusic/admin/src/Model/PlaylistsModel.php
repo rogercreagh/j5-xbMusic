@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.50.2 4th April 2025
+ * @version 0.0.59.21 12th February 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -40,7 +40,8 @@ class PlaylistsModel extends ListModel {
                 'created_by', 'a.created_by',
                 'created_by_alias', 'a.created_by_alias',
                 'ordering', 'a.ordering',
-                'category_id', 'level'
+                'category_id', 'level',
+                'st_title', 'st.title'
             );
             
         }
@@ -119,7 +120,7 @@ class PlaylistsModel extends ListModel {
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
-                    .'a.note, st.title AS st_name, st.az_url AS st_url'
+                    .'a.note, st.title AS st_name, st.az_url AS st_url, st.id as st_id'
                 )
             );
         $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');
@@ -276,7 +277,7 @@ class PlaylistsModel extends ListModel {
 		    $orderCol='category_title '.$orderDirn.', a.ordering';
 		}
 		
-		$query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
+		$query->order($db->qn('st_title').', '.$db->escape($orderCol) . ' ' . $db->escape($orderDirn));
 		
 		return $query;
     } //end getlistquery

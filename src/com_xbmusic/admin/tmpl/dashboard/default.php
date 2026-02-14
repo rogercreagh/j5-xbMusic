@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
- * @version 0.0.59.16 16th December 2025
+ * @version 0.0.59.20 12th February 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -181,7 +181,7 @@ $wa->useScript('xbmusic.xbgeneral');
 				</div>
 
 				<div class="xbbox gradpink">
-					<h3 class="xbmb20"><i class='fas fa-headphones' ></i> <?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
+					<h3 class="xbmb20"><i class='fas fa-headphones' ></i> <a href="index.php?option=com_xbmusic&view=playlists"><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-pink"><?php echo $this->playlistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>

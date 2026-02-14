@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.50.2 4th April 2025
+ * @version 0.0.59.21 12th February 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -62,7 +62,7 @@ if (strpos($listOrder, 'modified') !== false) {
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=playlists'); ?>" method="post" name="adminForm" id="adminForm">
 		<h3><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></h3>
-		
+		<p class="xbnote">This view shows playlists from all stations</p>
 		<?php // Search tools bar
 		  echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this));
 		?>
@@ -103,7 +103,8 @@ if (strpos($listOrder, 'modified') !== false) {
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
 						<?php if($this->azuracast) : ?>
-							<th>Azuracast
+							<th>
+								<?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_AZURACAST', 'st.title', $listDirn, $listOrder); ?>
 							</th>
 						<?php endif; ?>
 						<th><?php echo Text::_('XBMUSIC_TRACKS'); ?>

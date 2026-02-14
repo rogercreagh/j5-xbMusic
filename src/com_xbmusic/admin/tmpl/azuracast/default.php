@@ -110,8 +110,6 @@ $wa->addInlineScript("
         			<?php foreach ($this->xbstations as $station) : ?>
 	        			<?php //$stationkeyid = explode(':',$station['az_apikey'])[0]; ?>
     	        		<?php if ($station['isadmin']) {
-                		    $popbody = "'". Text::sprintf('XBMUSIC_REMOVE_STATION',$station['title'])."'";
-    		      		    $confirm = "doConfirm(".$popbody.",'".$pophead."','azuracast.deletestation','azwaiter');"; 
             		        } ?>
 						<details id="dbst<?php echo $station['id']; ?>">
 							<summary><span class="xbr11"> <?php echo $station['title']; ?></span>
@@ -126,12 +124,17 @@ $wa->addInlineScript("
         							 <?php echo $station['id'];?>;Joomla.submitbutton('azuracast.editstation');" >
 									<i class="icon-edit icon-white"></i> &nbsp;<?php echo Text::_('XB_EDIT'); ?>
 									</button>
-									<button id="delst<?php echo $station['id']; ?>" 
-									class="btn btn-sm btn-danger" type="button"
-        							onclick="document.getElementById('jform_dbstid').value=
-        							 <?php echo $station['id'].';'.$confirm; ?>;" >
-									<i class="icon-trash icon-white"></i> &nbsp;<?php echo Text::_('XB_DELETE'); ?>
-									</button>
+									<?php if ($this->item->server->sysadmin == 2) : ?>
+										<?php $popbody = "'". Text::sprintf('XBMUSIC_REMOVE_STATION',$station['title'])."'";
+    		      		                      $confirm = "doConfirm(".$popbody.",'".$pophead."','azuracast.deletestation','azwaiter');"; 
+										?>
+    									<button id="delst<?php echo $station['id']; ?>" 
+    									class="btn btn-sm btn-danger" type="button"
+            							onclick="document.getElementById('jform_dbstid').value=
+            							 <?php echo $station['id'].';'.$confirm; ?>;" >
+    									<i class="icon-trash icon-white"></i> &nbsp;<?php echo Text::_('XB_DELETE'); ?>
+    									</button>
+									<?php endif; ?>
 								<?php endif; ?>
 								</div>
 							</summary>

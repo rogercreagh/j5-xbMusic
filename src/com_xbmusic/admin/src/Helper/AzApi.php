@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.11 1st December 2025
+ * @version 0.0.59.21 12th February 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -270,6 +270,12 @@ class AzApi {
             $serverstats = $this->azApiGet($url);
             if (!isset($serverstats->code)) {
                 $settings->serverstats = $serverstats;
+                $settings->sysadmin =2;
+            }
+            $url = $this->apiurl.'/admin/updates';
+            $serverstats = $this->azApiGet($url);
+            if (!isset($serverstats->code)) {
+                $settings->update_results = $serverstats;
                 $settings->sysadmin =2;
             }
         }

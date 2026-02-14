@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.59.17 22nd December 2025
+ * @version 0.0.59.21 13th February 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -295,7 +295,19 @@ class PlaylistModel extends AdminModel {
         $query->select('track_id, note, listorder AS oldorder');
         $query->from('#__xbmusic_trackplaylist');
         $query->where('playlist_id = '.(int) $this->getItem()->id);
-//        $query->order('ba.listorder ASC', 'a.title ASC');
+        //        $query->order('ba.listorder ASC', 'a.title ASC');
+        $db->setQuery($query);
+        return $db->loadAssocList();
+        
+    }
+    
+    function getPlaylistFiles() {
+        $db = $this->getDbo();
+        $query = $db->getQuery(true);
+        $query->select('track_id, note, listorder AS oldorder');
+        $query->from('#__xbmusic_trackplaylist');
+        $query->where('playlist_id = '.(int) $this->getItem()->id);
+        //        $query->order('ba.listorder ASC', 'a.title ASC');
         $db->setQuery($query);
         return $db->loadAssocList();
         
@@ -502,7 +514,7 @@ class PlaylistModel extends AdminModel {
         $params = ComponentHelper::getParams('com_xbmusic');
         $loglevel = $params['loglevel'];
         $msglevel = $params['msglevel'];
-        $currentlist = $this->getPlaylistFiles();
+        $currentlist = $this->getCurrentPlaylist();
         $app = Factory::getApplication();
         $stname = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'title', $data['db_stid']);
         if ((!empty($currentlist)) && ($data['params']['clearfirst'] == 0)) { 

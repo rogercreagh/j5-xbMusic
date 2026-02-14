@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.57.0 22nd July 2025
+ * @version 0.0.59.22 13th February 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -38,6 +38,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
         $jverthis = $jversion->getShortVersion();
         if ((version_compare($jverthis, $this->jminver,'lt')) || (version_compare($jverthis, $this->jmaxver, 'ge'))) {
             throw new RuntimeException($this->extname.' requires Joomla version greater than '.$this->jminver. ' and less than '.$this->jmaxver.'. You have '.$jverthis);
+            return false;
         }
         // if we are updating then get the old version and date from component xml before it gets overwritten.
         if ($type=='update') {
@@ -149,7 +150,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
         $message = '';
         if ($type == 'update') {
             //set message so that at least something is displayed if com_installed update bug not fixed
-            $app->enqueueMessage('Updated '.$this->extname.' component from '.$this->oldver.' to v'.$parent->getManifest()->version.' Please see <a href="index.php?option=com_xbmusic">Dashboard</a> for more info.');
+            $app->enqueueMessage('Updated '.$this->extname.' component from '.$this->oldver.' to v'.$manifest->version.' Please see <a href="index.php?option=com_xbmusic">Dashboard</a> for more info.');
             
             $ext_mess .= '<p><b>'.$this->extname.'</b> component has been updated from '.$this->oldver.' of '.$this->olddate;
             $ext_mess .= ' to v<b>'.$manifest->version.'</b> dated '.$manifest->creationDate.'</p>';
