@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource mod_xbimages/services/provider.php
- * @version 0.0.2.0 13th February 2026
+ * @version 0.0.3.0 13th February 2026
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/

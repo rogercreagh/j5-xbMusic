@@ -21,6 +21,7 @@ return new class () implements ServiceProviderInterface {
     public function register(Container $container): void
     {
         $container->registerServiceProvider(new ModuleDispatcherFactoryServiceProvider('\\Crosborne\\Module\\Xbimages'));
+        $container->registerServiceProvider(new HelperFactoryServiceProvider('\\Crosborne\\Module\\Xbimages\\Site\\Helper'));
         $container->registerServiceProvider(new ModuleServiceProvider());
     }
 };

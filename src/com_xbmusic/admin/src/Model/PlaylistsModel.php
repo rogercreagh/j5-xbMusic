@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.59.21 12th February 2026
+ * @version 0.0.59.23 15th February 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -120,7 +120,7 @@ class PlaylistsModel extends ListModel {
                     .'a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
-                    .'a.note, st.title AS st_name, st.az_url AS st_url, st.id as st_id'
+                    .'a.note, st.title AS st_title, st.az_url AS st_url, st.id as st_id'
                 )
             );
         $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackplaylist AS tk WHERE tk.playlist_id = a.id) AS trkcnt');

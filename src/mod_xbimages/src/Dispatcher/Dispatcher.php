@@ -11,15 +11,20 @@ namespace Crosborne\Module\Xbimages\Site\Dispatcher;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Dispatcher\DispatcherInterface;
-use Joomla\CMS\Helper\ModuleHelper;
+use Joomla\CMS\Dispatcher\Dispatcher as JoomlaDispatcher;
+//use Joomla\CMS\Dispatcher\DispatcherInterface;
+//use Joomla\CMS\Helper\ModuleHelper;
 use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\Input\Input;
 use Joomla\Registry\Registry;
-use Crosborne\Module\Xbimages\Site\Helper\XbimagesHelper;
+//use Crosborne\Module\Xbimages\Site\Helper\XbimagesHelper;
+use Joomla\CMS\Helper\HelperFactoryAwareInterface;
+use Joomla\CMS\Helper\HelperFactoryAwareTrait;
 
-class Dispatcher implements DispatcherInterface
+//class Dispatcher implements DispatcherInterface
+class Dispatcher extends JoomlaDispatcher implements HelperFactoryAwareInterface
 {
+    use HelperFactoryAwareTrait;
     protected $module;
     
     protected $app;

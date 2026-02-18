@@ -1,7 +1,7 @@
 /**
  * @package xbmusic
  * @filesource /media/mod_xbimages/js/new-cover.js
- * @version 0.0.2.0 14th February 2026
+ * @version 0.0.2.1 15th February 2026
  * @desc functions to auto details sections and prevent propogation of clicks
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
@@ -16,6 +16,9 @@ const { covers } = Joomla.getOptions('mod_xbimages.vars');
 const { delay } = Joomla.getOptions('mod_xbimages.vars');
 const { albuminfo } = Joomla.getOptions('mod_xbimages.vars');
 var n = covers.length;
+const first = covers[Math.floor(Math.random() * n)];
+var ffile = first[0];
+document.getElementById('coverimg').src = ffile;
 setInterval(function() {
 	var r = Math.floor(Math.random() * n);
 	const cover = covers[r];
