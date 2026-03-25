@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+    <layout title="XBMUSIC_ARTISTS_MENU">
+		<message>
+			<![CDATA[XBMUSIC_ARTISTS_MENU_DESC]]>
+		</message>
+    </layout>
+    
+	<!-- Add fields to the request variables for the layout. -->
+	<fields name="request">
+		<fieldset name="request" label="COM_MENUS_BASIC_FIELDSET_LABEL">
+
+		</fieldset>
+	</fields>
+	
+	<!-- Add fieldsets and fields to the parameters object for the layout. -->
+	<fields name="params">
+
+		<!-- Basic options. -->
+		<fieldset name="basic" lable="XB_OPTIONS">
+			<!-- show cols -->
+			<field name="showimg" type="radio"
+				label="XBMUSIC_SHOW_IMG"
+ 				class="btn-group btn-group-yesno"
+				default="0" 
+			>
+				<option value="0" >JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			<field name="showcat" type="radio"
+				label="XBMUSIC_SHOW_CAT"
+ 				class="btn-group btn-group-yesno"
+				default="0" 
+			>
+				<option value="0" >JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			<field name="showtags" type="radio"
+				label="XBMUSIC_SHOW_TAGS"
+ 				class="btn-group btn-group-yesno"
+				default="1" 
+			>
+				<option value="0" >JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			
+			
+			
+		</fieldset>
+
+		<!-- Advanced options. -->
+		<fieldset name="advanced">
+
+		</fieldset>
+	</fields>
+</metadata>

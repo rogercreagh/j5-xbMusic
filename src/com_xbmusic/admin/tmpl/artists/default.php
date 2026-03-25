@@ -90,7 +90,7 @@ if (strpos($listOrder, 'modified') !== false) {
         		</p>
 			</div>
 			<div class="pull-left" style="width:60%">
-          		<p class="xbtr xbnote xbmb5">Auto close details dropdowns<input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
+          		<p class="xbtr xbnote xbmb5"><?php echo Text::_('XB_AUTOCLOSE_DROPS'); ?>><input  type="checkbox" id="autoclose" name="autoclose" value="yes" checked="true" style="margin:0 5px;" />
           		</p>
           	</div>
 			

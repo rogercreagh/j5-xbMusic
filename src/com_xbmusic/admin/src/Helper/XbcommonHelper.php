@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.59.17 22nd December 2025
+ * @version 0.0.59.17 25thnFebruary 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -1074,6 +1074,87 @@ class XbcommonHelper extends ComponentHelper {
             echo $table->getError();
             return false;
         }
+    }
+    
+    public static function showChangelog($ver, $url) {
+        $output = '<div style="max-width: 800px; background-color: white; border: 1px solid black; padding:20px 30px; margin:10px auto;">';
+        if (!self::remoteFileExists($url)) {
+            $output .= '<p style="color:red;">Could not find changelog file <code>'.$url.'</code></p></div>';
+            return $output;
+        }
+        $xml = simplexml_load_file($url, null , LIBXML_NOCDATA);
+        if ($xml===false) {
+            $output .= '<p style="color:red;">Could not parse changelog file <code>'.$url.'</code></p></div>';
+            return $output;
+        } else {
+            $json = json_encode($xml);
+            $changelog = json_decode($json,true);
+            $log = 0;
+            if (array_key_exists('element',$changelog)) {
+                //only 1 changelog in file
+                $log = $changelog;
+                $newver = $log['version'];
+                if (version_compare($newver, $ver) !== 0) {
+                    $output.= '<p style="color:red;">Changelog for v'.$ver.' not found. v'.$newver.' is only one available.</p>';
+                } else {
+                    $changelog = $changelog['changelog'];
+                    //look for current version
+                    for ($i = 0; $i < count($changelog); $i++) {
+                        if (version_compare($changelog[$i]['version'], $ver) === 0) $log = $changelog[$i];
+                    }
+                    if ($log == 0 ) {
+                        $log = $changelog[0];
+                        $output.= '<p style="color:red;">Changelog for v'.$ver.' not found; displaying most recent</p>';
+                    }
+                }
+                $output .= '<h3>Changelog for ';
+                if (key_exists('title',$log)) {
+                    $output .= $log['title'];
+                    //               unset($log['title']);
+                } else {
+                    $output .= $log['element'];
+                }
+                $output .= ' v'.$log['version'].' ';
+                if (key_exists('date',$log)) {
+                    $output .= $log['date'];
+                }
+                $output .= '</h3><hr />';
+                $colours = array('security'=>'bg-danger', 'addition'=>'bg-success', 'fix'=>'bg-dark','language'=>'bg-primary',
+                    'change'=>'bg-warning text-dark','remove'=>'bg-secondary','note'=>'bg-info'
+                );
+                $output .= '<table style="margin-left:20px; width:90%;">';
+                foreach ($colours as $colkey=>$col) {
+                    if ((isset($log[$colkey])) && isset($log[$colkey]['item'])) {
+                        $output .= '<tr style="border-bottom:1px solid #888;"><td style="background-color:#ddd; vertical-align: top; padding: 5px 10px;">';
+                        $output .=  '<span class="badge '.$col.'" style="font-size: 0.9rem;padding: 0.3rem 0.5rem;">'.$colkey.'</span>';
+                        $output .= '</td><td style="vertical-align: top; padding: 5px 10px;"><ul>';
+                        if (is_array($log[$colkey]['item'])) {
+                            foreach ($log[$colkey]['item'] as $item) {
+                                $output .= '<li>'.$item.'</li>';
+                            }
+                        } else {
+                            $output .= '<li>'.$log[$colkey]['item'].'</li>';
+                        }
+                        $output .= '</ul></td></tr>';
+                    }
+                }
+                $output .= '</table>';
+                
+            }
+            $output .= '</div>';
+            return $output;
+        }
+    }
+  
+    public static function remoteFileExists($url) {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);      // Don't fetch the body
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);       // Set timeout
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);        
+        return $httpCode === 200;
     }
     
     
