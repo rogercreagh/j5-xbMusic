@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Artists Filter Form file v0.0.60.4 28th March 2026 -->
+<!-- xbMusic Artists Filter Form file v0.0.60.5 29th March 2026 -->
 <form>
 	<fields name="filter">
 		<field
@@ -30,20 +30,6 @@
 			<option value="">XB_SELECT_CATEGORY</option>
 		</field>
 	
-<!-- 
-		<field
-			name="level" type="integer"
-			label="JOPTION_FILTER_LEVEL"
-			description="JOPTION_FILTER_LEVEL_DESC"
-			first="1"
-			last="10"
-			step="1"
-			languages="*"
-			onchange="this.form.submit();"
-			>
-			<option value="">XB_SELECT_CAT_LEVELS</option>
-		</field>
- -->
 		<field name="typefilter" type="list"
 			label="XBMUSIC_ARTIST_TYPE"
 			description="Individuals may be linked to xbPeople component for biographical details, Groups may have members listed here as Artists"

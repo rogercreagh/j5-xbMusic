@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistsModel.php
- * @version 0.0.60.4 28th March 2026
+ * @version 0.0.60.5 28th March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -176,32 +176,16 @@ class ArtistsModel extends ListModel {
 		    $query->where($db->qn('a.type').' = '.$typefilter);
 		}
 		
-		// Filter by categories and by level
+		// Filter by categories
 		$categoryId = $this->getState('filter.category_id', array());
-		$level = 10; //$this->getState('filter.level');
 		
-		if (!is_array($categoryId)) {
-		    $categoryId = $categoryId ? array($categoryId) : array();
+		if (is_numeric($categoryId)) {
+		    $query->where($db->quoteName('a.catid') . ' = ' . (int) $categoryId);
+		} elseif (is_array($categoryId)) {
+		    $categoryId = implode(',', $categoryId);
+		    $query->where($db->quoteName('a.catid') . ' IN ('.$categoryId.')');
 		}
 		
-		// Case: Using both categories filter and by level filter
-		if (count($categoryId)) {
-		    $categoryId = ArrayHelper::toInteger($categoryId);
-		    $categoryTable = Table::getInstance('Category', 'JTable');
-		    $subCatItemsWhere = array();
-		    
-		    foreach ($categoryId as $filter_catid) {
-		        $categoryTable->load($filter_catid);
-		        $subCatItemsWhere[] = '(' .
-						        ($level ? 'c.level <= ' . ((int) $level + (int) $categoryTable->level - 1) . ' AND ' : '') .
-						        'c.lft >= ' . (int) $categoryTable->lft . ' AND ' .
-						        'c.rgt <= ' . (int) $categoryTable->rgt . ')';
-		    }
-		    
-		    $query->where('(' . implode(' OR ', $subCatItemsWhere) . ')');
-		} elseif ($level) {  // Case: Using only the by level filter
-		    $query->where('c.level <= ' . (int) $level);
-		} // endif $categoryid
 		
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
