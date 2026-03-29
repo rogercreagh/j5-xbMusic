@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistsModel.php
- * @version 0.0.30.2 7th February 2025
+ * @version 0.0.60.4 28th March 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -30,7 +30,8 @@ class ArtistsModel extends ListModel {
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'name', 'a.name',
-                'alias', 'a.alias',
+                'sortname','a.sortname',
+                'alias', 'a.alias','type','a.type',
                 'checked_out', 'a.checked_out',
                 'checked_out_time', 'a.checked_out_time',
                 'catid', 'a.catid', 'category_title',
@@ -64,8 +65,8 @@ class ArtistsModel extends ListModel {
         $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
         $this->setState('filter.published', $published);
         
-        $level = $this->getUserStateFromRequest($this->context . '.filter.level', 'filter_level');
-        $this->setState('filter.level', $level);
+//        $level = $this->getUserStateFromRequest($this->context . '.filter.level', 'filter_level');
+//        $this->setState('filter.level', $level);
         
         
         $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
@@ -114,7 +115,7 @@ class ArtistsModel extends ListModel {
             $this->getState(
                 'list.select',
                 'DISTINCT a.id, a.name, a.alias, a.description, a.imgurl, '
-                    .'a.type, '
+                    .'a.type, a.sortname,'
                     .'a.ext_links, a.checked_out, a.checked_out_time, a.catid, '
                     .'a.status, a.access, a.created, a.created_by, a.created_by_alias, '
                     .'a.modified, a.modified_by, a.ordering, '
@@ -165,9 +166,19 @@ class ArtistsModel extends ListModel {
 		    $query->where('(a.status = 0 OR a.status = 1)');
 		}
 		
+		// filter by type
+		$typefilter = $this->getState('filter.typefilter');
+		if ($typefilter == -2) {
+		    $query->where($db->qn('a.type').' > 1');
+		} elseif ($typefilter == 0) {
+		    $query->where($db->qn('a.type').' IS NULL');
+		} elseif ($typefilter > 0) {
+		    $query->where($db->qn('a.type').' = '.$typefilter);
+		}
+		
 		// Filter by categories and by level
 		$categoryId = $this->getState('filter.category_id', array());
-		$level = $this->getState('filter.level');
+		$level = 10; //$this->getState('filter.level');
 		
 		if (!is_array($categoryId)) {
 		    $categoryId = $categoryId ? array($categoryId) : array();

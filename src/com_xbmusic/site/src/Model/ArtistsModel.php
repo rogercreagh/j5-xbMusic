@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/src/Model/ArtistsModel.php
- * @version 0.0.60.0 23rd March 2026
+ * @version 0.0.60.2 26th March 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -29,6 +29,7 @@ class ArtistsModel extends ListModel
             $config['filter_fields'] = array(
                 'id', 'a.id',
                 'name', 'a.name',
+                'type','a.type',
                 'category_title',
                 'sortname', 'a.sortname',
                 'type','a.type',
@@ -121,6 +122,16 @@ class ArtistsModel extends ListModel
                 ->bind(':search', $search, ParameterType::STRING);
         }
         
+        // filter by type
+        $typefilter = $this->getState('filter.typefilter');
+        if ($typefilter == -2) {
+            $query->where($db->qn('a.type').' > 1');
+        } elseif ($typefilter == 0) {
+            $query->where($db->qn('a.type').' IS NULL');
+        } elseif ($typefilter > 0) {
+            $query->where($db->qn('a.type').' = '.$typefilter);
+        }
+        
         //filter by tags
         $tagfilt = '';
         //is tagid in query string. If so use it and ignore tag filters. Negative tagid to exclude tag
@@ -183,7 +194,6 @@ class ArtistsModel extends ListModel
         }
         
         $query->order($ordering);
-        
         return $query;
     }
     

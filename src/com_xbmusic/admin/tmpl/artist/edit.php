@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artist/edit.php
- * @version 0.0.30.6 15th February 2025
+ * @version 0.0.60.2 26th March 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -101,7 +101,7 @@ $item = $this->item;
 				<?php if (!($item->type > 0)) : ?>
 					<p class="xbnit xbred"><?php echo Text::_('XBMUSIC_SET_INDIVIDUAL_GROUP'); ?></p>
 				<?php endif; ?>
-				<?php if (($item->type == 2) && (!empty($item->members))) : ?>
+				<?php if (($item->type > 1) && (!empty($item->members))) : ?>
 					<p class="xbr09"><span class="xbit"><?php echo Text::_('XBMUSIC_GROUP_MEMBERS');?></span>:
 					<?php
                         $list = '';  
@@ -203,7 +203,7 @@ $item = $this->item;
         		</ul>
     		<hr />
      			
-     		<?php elseif($this->form->getValue('type')==2): ?>
+     		<?php elseif($this->form->getValue('type')>1): ?>
      			<b><?php echo (count($item->members) == 1) ? Text::_('XBMUSIC_GROUP_MEMBERS_ONE') :
      			    Text::sprintf('XBMUSIC_GROUP_MEMBERS_LISTED',count($item->members)); ?></b>
         		<ul>

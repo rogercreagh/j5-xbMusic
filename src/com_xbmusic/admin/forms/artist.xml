@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Artist Form file v0.0.40.0 18th February 2025 -->
+<!-- xbMusic Artist Form file v0.0.60.2 26th March 2026 -->
 <form>
 	<config>
 		<inlinehelp button="show"/>
@@ -31,10 +31,14 @@
 		<field name="type" type="radio"
 			label="Individual/Group"
 			description="Individuals may be linked to xbPeople component for biographical details, Groups may have members listed here as Artists"
-			class="btn-group btn-group-yesno"
+			default="0"
+			class="btn-group btn-group-yes-no"
 		>
-			<option value="1" >Individual</option>
-			<option value="2">Group</option>
+			<option value="0">(unknown)</option>
+			<option value="1">XB_PERSON</option>
+			<option value="2">XBMUSIC_DUO</option>
+			<option value="3">XBMUSIC_TRIO</option>
+			<option value="4">XB_GROUP</option>
 		</field>
 <!-- for use if xbpeople is installed
 		<field name ="person_id" type="text"

@@ -21,7 +21,9 @@ use Joomla\CMS\HTML\HTMLHelper;
 </label>
 <select name="batch[indgrp]" class= "form-select" id="batch-indgrp">
 	<option value=""><?php echo Text::_('XBMUSIC_NO_CHANGE'); ?></option>
-	<option value="1"><?php echo Text::_('XB_INDIVIDUAL'); ?></option>
-	<option value="2"><?php echo Text::_('XB_GROUP'); ?></option>
+	<option value="1"><?php echo Text::_('XB_PERSON'); ?></option>
+	<option value="2"><?php echo Text::_('XBMUSIC_DUO'); ?></option>
+	<option value="3"><?php echo Text::_('XBMUSIC_TRIO'); ?></option>
+	<option value="4"><?php echo Text::_('XB_GROUP'); ?></option>
 </select>
 </fieldset>

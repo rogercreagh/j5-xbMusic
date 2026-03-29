@@ -53,6 +53,7 @@ if (strpos($listOrder, 'modified') !== false) {
 } else {
     $dateOrderCol = 'modified';
 }
+$arttypes = array("unknown","XB_PERSON","XBMUSIC_DUO","XBMUSIC_TRIO","XB_GROUP");
 
 //if ($saveOrder && !empty($this->items)) {
 //    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
@@ -204,7 +205,7 @@ if (strpos($listOrder, 'modified') !== false) {
 								</p>
 								<?php if(!empty($item->type)) : ?>
 									<span class="xbnit xbpl20">
-								    	<?php echo ($item->type == 2)? Text::_('XB_GROUP') : Text::_('XB_PERSON'); ?>
+			    						(<?php echo Text::_($arttypes[$item->type]); ?>)
 									</span><br />
 									<?php else : ?>
 									<span class="xbnit xbred xbpl20"><?php echo Text::_('XBMUSIC_SET_TYPE'); ?></span><br />

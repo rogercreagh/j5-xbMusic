@@ -2,18 +2,22 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.60.1</version>
+		<version>0.0.60.4</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.60.1</h3> Updated 25th March 2026]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.60.4</h3> Updated 29th March 2026]]></item>
 			<item>Site Artists View</item>
 			<item></item>
 		</addition>
 		<remove>
 		</remove>
 		<change>
-			<item>Multiple bug fixes</item>
+			<item>Added Duo and Trio to artists type options</item>
+			<item>Site searchtools layout separated search/filter from sort/items-page</item>
 		</change>
 		<fix>
+			<item>Admin Artists sorting corrected</item>
+			<item>Hiding tables columns on mobile/tablet screens</item>
+			<item>Multiple other bug fixes and display tweaks</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>
