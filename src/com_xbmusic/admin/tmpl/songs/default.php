@@ -29,8 +29,8 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns')
-    ->useScript('multiselect')
+//$wa->useScript('table.columns')
+$wa->useScript('multiselect')
     ->useScript('xbmusic.xbgeneral');
     
 $app       = Factory::getApplication();

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlists/default.php
- * @version 0.0.59.21 12th February 2026
+ * @version 0.0.61.0 31st March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,7 +29,7 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.xbpop', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns');
+//$wa->useScript('table.columns');
 $wa->useScript('multiselect');
 
 $app       = Factory::getApplication();

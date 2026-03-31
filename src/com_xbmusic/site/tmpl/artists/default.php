@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/Artists/default.php
- * @version 0.0.60.2 26th March 2026
+ * @version 0.0.61.0 31st March 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -15,7 +15,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Uri\Uri;
-//use Crosborne\Component\Xbmusic\Site\Helper\RouteHelper as XbmusicHelperRoute;
+use Crosborne\Component\Xbmusic\Site\Helper\RouteHelper as XbmusicHelperRoute;
 //use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 

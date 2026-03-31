@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.60.5 28th March 2025
+ * @version 0.0.61.0 31st March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -40,7 +40,7 @@ class PlaylistsModel extends ListModel {
                 'created_by', 'a.created_by',
                 'created_by_alias', 'a.created_by_alias',
                 'ordering', 'a.ordering',
-                'category_id', 'level',
+                'category_id',
                 'st_title', 'st.title'
             );
             
@@ -63,11 +63,7 @@ class PlaylistsModel extends ListModel {
         $this->setState('filter.search', $search);
         
         $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
-        $this->setState('filter.published', $published);
-        
-        $level = $this->getUserStateFromRequest($this->context . '.filter.level', 'filter_level');
-        $this->setState('filter.level', $level);
-        
+        $this->setState('filter.published', $published);        
         
         $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
 //        $artlist        = $this->getUserStateFromRequest($this->context . '.filter.artlist', 'filter_artlist', '1');
@@ -135,13 +131,13 @@ class PlaylistsModel extends ListModel {
         ->join('LEFT', '#__users AS uc ON uc.id=a.checked_out');
         
         // Join over the categories.
-        $query->select('c.title AS category_title, c.created_user_id AS category_uid, c.level AS category_level'.
+        $query->select('c.title AS category_title, c.created_user_id AS category_uid'.
             ',c.path AS category_path')
             ->join('LEFT', '#__categories AS c ON c.id = a.catid');
             
         // Join over the parent categories.
-        $query->select('parent.title AS parent_category_title, parent.id AS parent_category_id,
-						parent.created_user_id AS parent_category_uid, parent.level AS parent_category_level')
+        $query->select('parent.title AS parent_category_title, parent.id AS parent_category_id,'.
+						'parent.created_user_id AS parent_category_uid, parent.level AS parent_category_level')
 						->join('LEFT', '#__categories AS parent ON parent.id = c.parent_id');
 						
 		// Filter by access level.

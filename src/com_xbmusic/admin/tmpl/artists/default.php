@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artists/default.php
- * @version 0.0.59.17 21st Decemnber 2025
+ * @version 0.0.61.0 31st March 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,8 +29,8 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns')
-    ->useScript('multiselect')
+//$wa->useScript('table.columns')
+$wa->useScript('multiselect')
     ->useScript('xbmusic.xbgeneral');
 
 $app       = Factory::getApplication();

@@ -6,7 +6,7 @@
 		<element>com_xbmusic</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>0.0.60.5</version>
+		<version>0.0.61.0</version>
 		<infourl>https://crosborne.uk/xbmusic</infourl>
 		<downloads>
 			<downloadurl type="full" format="zip">https://crosborne.uk/downloads?download=28</downloadurl>
@@ -14,7 +14,7 @@
         <tags>
           <tag>alpha</tag>
         </tags>
-        <sha256>2283699923bb0db71d0879b0f4d8a21c49045ab500e77406e847bfdac550dc75</sha256>
+        <sha256>c7430b4e68af5bb6f5be0cd721038f7de6743f63474063a0efb27ce7e1d56042</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
