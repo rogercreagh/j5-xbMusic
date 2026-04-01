@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.61.0 31st March 2025
+ * @version 0.0.61.1 1st April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -125,7 +125,7 @@ class AlbumsModel extends ListModel {
         ->join('LEFT', '#__users AS uc ON uc.id=a.checked_out');
         
         // Join over the categories.
-        $query->select('c.title AS category_title, c.created_user_id AS category_uid,'. 
+        $query->select('c.title AS category_title, c.created_user_id AS category_uid'. 
             ',c.path AS category_path')
             ->join('LEFT', '#__categories AS c ON c.id = a.catid');
             
@@ -164,13 +164,9 @@ class AlbumsModel extends ListModel {
 		// Filter by categories
 		$categoryId = $this->getState('filter.category_id', array());
 		
-		if (is_numeric($categoryId)) {
-		    $query->where($db->quoteName('a.catid') . ' = ' . (int) $categoryId);
-		} elseif (is_array($categoryId)) {
-		    $categoryId = implode(',', $categoryId);
-		    $query->where($db->quoteName('a.catid') . ' IN ('.$categoryId.')');
-		}	
-		
+		if (is_array($categoryId) && (!empty($categoryId))) $categoryId = $categoryId[0];
+		if (is_numeric($categoryId)) $query->where($db->quoteName('a.catid') . ' = ' . (int) $categoryId);
+
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
 		

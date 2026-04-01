@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistsModel.php
- * @version 0.0.61.0 31st March 2025
+ * @version 0.0.61.1 1st April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -170,12 +170,8 @@ class PlaylistsModel extends ListModel {
 		// Filter by categories
 		$categoryId = $this->getState('filter.category_id', array());
 		
-		if (is_numeric($categoryId)) {
-		    $query->where($db->quoteName('a.catid') . ' = ' . (int) $categoryId);
-		} elseif (is_array($categoryId)) {
-		    $categoryId = implode(',', $categoryId);
-		    $query->where($db->quoteName('a.catid') . ' IN ('.$categoryId.')');
-		}
+		if (is_array($categoryId) && (!empty($categoryId))) $categoryId = $categoryId[0];
+		if (is_numeric($categoryId)) $query->where($db->quoteName('a.catid') . ' = ' . (int) $categoryId);
 		
 		// Filter by search in title.
 		$search = $this->getState('filter.search');
