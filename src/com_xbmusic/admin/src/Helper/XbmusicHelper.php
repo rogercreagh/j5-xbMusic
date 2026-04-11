@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbazuracastHelper.php
- * @version 0.0.59.16 15th December 2025
+ * @version 0.0.60.2 4th April 2025
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -790,6 +790,58 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 	public static function getArtistSongs($artistid) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('s.id AS songid, s.title AS songtitle, s.composer AS composer');
+	    $query->from('#__xbmusic_songs AS s');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = ts.track_id');
+	    $query->where('ta.artist_id = '.$db->q($artistid));
+	    $query->group('s.id');
+	    $query->order('s.title ASC');
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
+	}
+	
+	public static function getArtistTrackSongs($artistid) {
+	    /**
+SELECT s.id AS songid, s.title AS songtitle, t.filepathname, a.id AS albumid, a.title AS albumtitle, a.rel_date AS albumyear
+FROM j512_xbmusic_songs AS s
+LEFT JOIN j512_xbmusic_tracksong AS ts ON ts.song_id = s.id
+LEFT JOIN j512_xbmusic_trackartist AS ta ON ta.track_id = ts.track_id
+LEFT JOIN j512_xbmusic_tracks AS t ON t.id = ts.track_id
+LEFT JOIN j512_xbmusic_albums AS a ON a.id = t.album_id
+WHERE ta.artist_id = '8'
+ORDER BY s.title ASC
+        **/
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('s.id AS songid, s.title AS songtitle, t.filepathname, a.id AS albumid, a.title AS albumtitle, a.rel_date AS albumyear');
+	    $query->from('#__xbmusic_songs AS s');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.song_id = s.id');
+	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = ts.track_id');
+	    $query->join('LEFT','#__xbmusic_tracks AS t ON t.id = ts.track_id');
+	    $query->join('LEFT','#__xbmusic_albums AS a ON a.id = t.album_id');
+	    $query->where('ta.artist_id = '.$db->q($artistid));
+	    $query->order('s.title ASC');
+	    $db->setQuery($query);
+	    $tracks = $db->loadAssocList();
+	    if (count($tracks) > 1) {	        
+    	    for ($i = 0; $i < count($tracks); $i++) {
+    	       $tracks[$i]['vers'] = false;
+    	       if ( ($i<count($tracks)-1) && ($tracks[$i]['songid'] ==  $tracks[$i+1]['songid'])) {
+    	           $tracks[$i]['vers'] = true;
+    	       }
+      	       if (($i>0) && ($tracks[$i]['songid'] ==  $tracks[$i-1]['songid'])) {
+    	          $tracks[$i]['vers'] = true;    	           
+    	       }
+            }
+	    }
+	    return $tracks;	    
+	}
+	
+	public static function getArtistTracks($artistid) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);

@@ -1,0 +1,85 @@
+<?php 
+ /*******
+ * @package xbMusic
+ * @filesource site/src/Model/ArtistModel.php
+ * @version 0.0.60.2 26th March 2026
+ * @author Roger C-O
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
+ * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
+ ******/
+
+namespace Crosborne\Component\Xbmusic\Site\Model;
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Helper\TagsHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Model\ItemModel;
+use Joomla\Database\ParameterType;
+
+use Joomla\Utilities\ArrayHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
+
+class ArtistModel extends ItemModel {
+
+    protected $_context = 'com_xbmusic.artist';
+    
+    protected function populateState()
+    {
+        $app = Factory::getApplication();
+        
+        // Load state from the request.
+        $pk = $app->input->getInt('id');
+        $this->setState('artist.id', $pk);
+        
+        // Load the parameters.
+        $params = $app->getParams();
+        $this->setState('params', $params);
+    }
+    
+    public function getItem($pk = null)
+    {
+        $pk = (!empty($pk)) ? $pk : (int) $this->getState('artist.id');
+        
+        try
+        {
+            $db = $this->getDatabase();
+            $query = $db->getQuery(true)
+            ->select(
+                $this->getState(
+                    'item.select', 'a.*'
+                    )
+                );
+            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a')
+            ->where($db->quoteName('a.id') . ' = :id')
+            ->bind(':id', $pk, ParameterType::INTEGER);
+            
+            $db->setQuery($query);
+            
+            $data = $db->loadObject();
+            
+            if (empty($data))
+            {
+                throw new \Exception(Text::_('XBMUSIC_ERROR_ARTIST_NOT_FOUND'), 404);
+            }
+        }
+        catch (\Exception $e)
+        {
+            if ($e->getCode() == 404)
+            {
+                // Need to go through the error handler to allow Redirect to work.
+                throw new \Exception($e->getMessage(), 404);
+            }
+            else
+            {
+                $this->setError($e);
+                $this->_item[$pk] = false;
+            }
+        }
+        // need to also get tracks, albums and songs and group members/membership
+        
+        return $data;
+    }
+   
+}

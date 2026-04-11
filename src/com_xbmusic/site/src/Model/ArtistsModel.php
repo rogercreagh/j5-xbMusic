@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/src/Model/ArtistsModel.php
- * @version 0.0.60.2 26th March 2026
+ * @version 0.0.60.2 4th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -97,7 +97,7 @@ class ArtistsModel extends ListModel
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.name, a.alias, a.description, a.imgurl, '
+                'DISTINCT a.id, a.name, a.sortname, a.alias, a.description, a.imgurl, '
                 .'a.type, a.ext_links, a.catid, '
                 .'a.status, a.access' 
                 )
@@ -123,7 +123,8 @@ class ArtistsModel extends ListModel
         }
         
         // filter by type
-        $typefilter = $this->getState('filter.typefilter');
+        
+        $typefilter = $this->getState('filter.typefilter', -1);
         if ($typefilter == -2) {
             $query->where($db->qn('a.type').' > 1');
         } elseif ($typefilter == 0) {
@@ -217,7 +218,7 @@ class ArtistsModel extends ListModel
                 } //end if is_object
                 $item->singles = XbmusicHelper::getArtistSingles($item->id);
                 $item->albums = XbmusicHelper::getArtistAlbums($item->id);
-                $item->songs = XbmusicHelper::getArtistSongs($item->id);
+                $item->songs = XbmusicHelper::getArtistTrackSongs($item->id);
                 
                 $item->tags = $tagsHelper->getItemTags('com_xbmusic.artist' , $item->id);
                 

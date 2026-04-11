@@ -12,17 +12,17 @@ namespace Crosborne\Component\Xbmusic\Site\Helper;
 
 defined('_JEXEC') or die;
 
-//use Joomla\CMS\Categories\CategoryNode;
+use Joomla\CMS\Categories\CategoryNode;
 use Joomla\CMS\Language\Multilanguage;
 
 abstract class RouteHelper
 {
-    public static function getArtistRoute($id, $slug, $language = 0, $layout = null)
+    public static function getArtistRoute($id, $slug, $language = null, $layout = null)
     {
         // Create the link
-        $link = 'index.php?option=com_myxbmusic&view=artist&id=' . $id . '&slug=' . $slug;
+        $link = 'index.php?option=com_xbmusic&view=artist&id=' . $id . '&slug=' . $slug;
         
-        if ($language && $language !== '*' && Multilanguage::isEnabled())
+        if (!empty($language) && $language !== '*' && Multilanguage::isEnabled())
         {
             $link .= '&lang=' . $language;
         }

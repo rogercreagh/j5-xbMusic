@@ -40,8 +40,13 @@ class HtmlView extends BaseHtmlView {
         $this->xbstations = XbazuracastHelper::getStations();
         if ($this->azuracast ==1) {
             $this->azstations = $this->get('AzStations');
-             $this->apiname = $params->get('az_apiname','');
-             $this->azurl = $params->get('az_url','');
+            if (!$this->azstations) {
+                $this->azstations = '';
+                $this->azuracast = 0;
+            } else {
+                $this->apiname = $params->get('az_apiname','');
+                $this->azurl = $params->get('az_url','');
+            }
         } else {
             $this->azstations = '';
         }

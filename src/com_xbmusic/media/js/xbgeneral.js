@@ -62,3 +62,28 @@ function setElTranslate(targ, text) {
 	let el = document.getElementById(targ);
 	el.innerHTML = Joomla.JText._(text);
 }
+
+/**
+ * @name playAudio()
+ * @description plays an audi file in an html2 audio element with 
+ */
+function playAudio(name, filepathname, timeout = '0') {
+	name = decodeURIComponent(name);
+	filepathname = decodeURIComponent(filepathname);
+	var title = document.getElementById("playertitle")
+	title.textContent = name;
+	var audio = document.getElementById("player");
+	audio.src = filepathname;
+	audio.load();
+	if (timeout > 0) {
+		audio.addEventListener("play", function(e) {
+		        setTimeout(() => {
+		            audio.pause();
+		            audio.currentTime = 0; // Works as audio stop
+		     }, timeout * 1000);		
+		}); 
+	}
+	audio.play();
+}
+
+

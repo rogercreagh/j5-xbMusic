@@ -22,7 +22,7 @@
 			<field name="showimg" type="radio"
 				label="XBMUSIC_SHOW_IMG"
  				class="btn-group btn-group-yesno"
-				default="0" 
+				useglobal="true"
 			>
 				<option value="0" >JHIDE</option>
 				<option value="1">JSHOW</option>
@@ -30,7 +30,7 @@
 			<field name="showcat" type="radio"
 				label="XBMUSIC_SHOW_CAT"
  				class="btn-group btn-group-yesno"
-				default="0" 
+				useglobal="true"
 			>
 				<option value="0" >JHIDE</option>
 				<option value="1">JSHOW</option>
@@ -38,14 +38,34 @@
 			<field name="showtags" type="radio"
 				label="XBMUSIC_SHOW_TAGS"
  				class="btn-group btn-group-yesno"
-				default="1" 
+				useglobal="true"
 			>
 				<option value="0" >JHIDE</option>
 				<option value="1">JSHOW</option>
 			</field>
-			
-			
-			
+			<field name="showplay" type="radio"
+				label="XBMUSIC_SHOW_PLAY"
+				description="XBMUSIC_SHOW_PLAY_DESC"
+ 				class="btn-group btn-group-yesno"
+				useglobal="true"
+			>
+				<option value="0" >JHIDE</option>
+				<option value="1">JSHOW</option>
+			</field>
+			<field name="playtime" type="list"
+	       		label="XBMUSIC_PLAY_LIMIT"
+       			description="XBMUSIC_PLAY_LIMIT_DESC"
+        		useglobal="true"
+       		 	showon="showplay:1"
+			>
+      			<option value="0">XBMUSIC_PLAY_LIMIT_FULL</option>
+      			<option value="10">10 seconds</option>
+      			<option value="15">15 seconds</option>
+      			<option value="20">20 seconds</option>
+      			<option value="30">30 seconds</option>
+      			<option value="45">45 seconds</option>
+        	</field>
+        	
 		</fieldset>
 
 		<!-- Advanced options. -->

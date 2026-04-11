@@ -156,6 +156,31 @@ ul.nav-tabs {
 
 /* end of joomla system overrides */
 
+/* dialog item previews */
+.xbpveye { color:#44c; }
+.xbpveye:hover { 
+	cursor:pointer;
+	color:#2ac;
+}
+.xbpvitem {
+	padding:15px 30px;  
+}
+.xbpvitem .joomla-dialog-header h3 {
+	font-size:1.1rem; 
+	font-weight:normal; 
+	color:gray;}
+.xbpvitem .joomla-dialog-header .buttons-holder {
+	font-size:0.8rem;
+}
+/* ext link icons */
+.xbicomag {
+  color:#828;
+}
+.xbicomag:hover {
+  color:#c4c;
+}
+
+
 /* boxes with rounded corner border and gradient shading */
 .xbbox {
 	padding: 8px 7px 7px 15px;
@@ -415,6 +440,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 
 /* margins */
 .xbm0 { margin:0 !important; } /*flagged important as used to override any template margins*/
+.xbm5 { margin: 5px; }
 .xbml10, .xbsubtitle { margin-left:10px; }
 .xbml15 { margin-left:15px; }
 .xbml20 { margin-left:20px; }
@@ -537,6 +563,10 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 
 #xbcomponent .xbcompacttable td {
 	padding: 4px 10px;	
+}
+
+.xbnobullets {
+	list-style: none;
 }
 
 /* definition list with term and definition on same line (NB overflow will not be indented */

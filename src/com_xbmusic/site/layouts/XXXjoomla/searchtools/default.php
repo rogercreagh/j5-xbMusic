@@ -79,19 +79,25 @@ $filtersActiveClass = $hideActiveFilters ? '' : ' js-stools-container-filters-vi
 // Load search tools
 HTMLHelper::_('searchtools.form', $data['options']['formSelector'], $data['options']);
 ?>
+<style>
+    .filter-search-bar.btn-group,
+    .filter-search-actions.btn-group {
+        margin:0;
+    }
+</style>
 <div class="js-stools" role="search">
     <?php if ($data['options']['showSelector']) : ?>
     <div class="js-stools-container-selector">
         <?php echo $this->sublayout('selector', $data); ?>
     </div>
     <?php endif; ?>
-    <div class="js-stools-container-bar">
-        <div class="btn-toolbar">
+    <div class="js-stools-container-bar" style=">
+        <div class="btn-toolbar" style="justify-content:flex-start;">
             <?php echo $this->sublayout('bar', $data); ?>
         </div>
     </div>
     <!-- Filters div -->
-    <div class="js-stools-container-filters clearfix<?php echo $filtersActiveClass; ?>">
+    <div class="js-stools-container-filters clearfix<?php echo $filtersActiveClass; ?>" style="margin-bottom:0;max-height:4rem;">
         <?php if ($data['options']['filterButton']) : ?>
             <?php echo $this->sublayout('filters', $data); ?>
         <?php endif; ?>

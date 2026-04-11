@@ -544,6 +544,7 @@ class DatamanModel extends AdminModel {
     
     public function getAzStations() {
         $api = new AzApi();
+        if ($api->getStatus() == false)  return false;
         return $api->azStations();
     }
     

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.59.21 12th February 2026
+ * @version 0.0.60.1 1st April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -53,11 +53,15 @@ class AzApi {
             $this->status = false;
             return;        
         }
+        if (($dbapiid ==0) && ($apifullkey == '')) {
+            $this->status = false;
+            return;
+        }
         //If we're given a server url use it, otherwise use params default
         if (!$azurl) {
             $azurl = trim($params->get('az_url',''),'/');
         }
-        if (!filter_var($azurl, FILTER_VALIDATE_URL)) {
+        if ((($azurl == '')) || (!filter_var($azurl, FILTER_VALIDATE_URL))) {
             $app->enqueueMessage('Invalid URL : '.$azurl,'Error');
             $this->status = false;
             return;
