@@ -39,7 +39,7 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
 		<tr>
 			<td>
                 <h3><?php if ($item->type > 1): ?>
-                		<i class='fas fa-users-line' >
+                		<i class='fas fa-users-line' ></i>
                 	<?php else : ?>
                 		<i class='fas fa-user' ></i> 
                 	<?php endif; ?>

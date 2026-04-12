@@ -51,7 +51,9 @@ class ArtistModel extends ItemModel {
                     'item.select', 'a.*'
                     )
                 );
-            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a');
+            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a')
+            ->where($db->quoteName('a.id') . ' = :id')
+            ->bind(':id', $pk, ParameterType::INTEGER);
             $query->select('c.title AS category_title, c.path AS category_path');
             $query->join('LEFT', '#__categories AS c ON c.id = a.catid');
             
