@@ -51,9 +51,9 @@ class ArtistModel extends ItemModel {
                     'item.select', 'a.*'
                     )
                 );
-            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a')
-            ->where($db->quoteName('a.id') . ' = :id')
-            ->bind(':id', $pk, ParameterType::INTEGER);
+            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a');
+            $query->select('c.title AS category_title, c.path AS category_path');
+            $query->join('LEFT', '#__categories AS c ON c.id = a.catid');
             
             $db->setQuery($query);
             
@@ -77,7 +77,10 @@ class ArtistModel extends ItemModel {
                 $this->_item[$pk] = false;
             }
         }
-        // need to also get tracks, albums and songs and group members/membership
+        
+        $tagsHelper = new TagsHelper;
+        $data->tags = $tagsHelper->getItemTags('com_xbmusic.artist' , $data->id);
+        
         
         return $data;
     }

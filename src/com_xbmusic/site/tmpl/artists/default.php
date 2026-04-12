@@ -24,10 +24,9 @@ HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('bootstrap.popover', '.hasPopover', ['trigger'=>'hover']);
 
 $wa = $this->document->getWebAssetManager();
-$wa->useScript('table.columns')
-->useScript('joomla.dialog')
-->useScript('multiselect')
-->useScript('xbmusic.xbgeneral');
+$wa->useScript('joomla.dialog')
+    ->useScript('multiselect')
+    ->useScript('xbmusic.xbgeneral');
 
 
 $listOrder = $this->escape($this->state->get('list.ordering'));
@@ -140,15 +139,17 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 		<td>
     		<?php if (!empty($item->ext_links)) : ?>
     			<?php foreach ($item->ext_links as $linkobj) : ?>
-    			    <span class="xbr12"><a href="<?php echo $linkobj->link_url; ?>" target="_blank" 
+    			    <span class="xbr12">
+    			    	<a href="<?php echo $linkobj->link_url; ?>" target="_blank" 
         			    class="hasPopover" title="" 
     						data-bs-content="<?php echo ($linkobj->link_desc!='') ? $linkobj->link_desc : $linkobj->link_text; ?>">
-    						><?php $key = trim(strtolower($linkobj->link_text));
+    					<?php $key = trim(strtolower($linkobj->link_text));
         			    if (key_exists($key, $iconarr)) { 
-        			        echo $iconarr[$key];
+        			        echo '<span class="xbicomag">'.$iconarr[$key].'</span>';
         			    } else {
         			        echo '<span class="xbr10">'.$linkobj->link_text.'</span>';
-        			    } ?></a>
+        			    } ?>
+        			    </a>
 					</span>
     			<?php endforeach; ?>
     		<?php endif; ?>

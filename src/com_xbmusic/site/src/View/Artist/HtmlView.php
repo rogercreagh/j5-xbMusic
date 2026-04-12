@@ -30,6 +30,12 @@ class HtmlView extends BaseHtmlView
             throw new GenericDataException(implode("\n", $errors), 500);
         }
         
+        if ($this->item->ext_links) $this->item->ext_links = json_decode($this->item->ext_links);
+        $this->item->ext_links_cnt = 0;
+        if(is_object($this->item->ext_links)) {
+            $this->item->ext_links_cnt = count((array)$this->item->ext_links);
+        }
+        
         return parent::display($tpl);
     }
 }

@@ -31,9 +31,9 @@ window.pvItem = function(pophead, view, id = '') {
 		popupType: 'ajax',
 		textHeader: pophead,
 		src: vars.root + 'index.php?option=com_xbmusic&view='+view+'&tmpl=component&layout=modal&id='+id,
-		className: pvclass,
-		height: '50vh',
-		width:'75%'
+		className: pvclass+' xbpvitem',
+		height: '60vh',
+		width:'67%'
 	});
 	dialog.addEventListener('joomla-dialog:close', () => {
 	    dialog.destroy();

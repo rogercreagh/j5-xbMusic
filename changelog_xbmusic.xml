@@ -2,6 +2,35 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.61.5</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.61.5</h3> Updated 12th April 2026]]></item>
+			<item>Site Artist Popover</item>
+			<item>Site artist list song play buttons</item>
+			<item>Play duration limited per global and menu options</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Reordered columns in site artists table</item>
+		</change>
+		<fix>
+			<item>Multiple other bug fixes and display tweaks</item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.61.1</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.61.1</h3> Updated 1st April 2026]]></item>
