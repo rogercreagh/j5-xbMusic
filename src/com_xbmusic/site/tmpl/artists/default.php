@@ -223,6 +223,9 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
                             	onclick="pvItem(<?php echo $pvtit; ?>,'album','<?php echo $album['albumid']; ?>');">
                             	<span class="icon-eye xbpl10"></span>
                             </span>
+                            
+                            
+                            
 			            </li>
 					<?php endforeach; ?>
 					</ul>
@@ -247,6 +250,11 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 
 	                <?php echo $album['albumtitle']; ?> 
 	                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
+                			<?php $pvtit = "'".Text::_('XBMUSIC_ALBUM_DETAILS')."'"; ?>
+                            <span class="xbpveye" 
+                            	onclick="pvItem(<?php echo $pvtit; ?>,'album','<?php echo $album['albumid']; ?>');">
+                            	<span class="icon-eye xbpl10"></span>
+                            </span>
 	            </p>
 	        	</details>
 			<?php else : ?>

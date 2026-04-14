@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Site Artists Filter Form file v0.60.0 23rd March 2026 -->
+
+<form>
+	<fields name="filter">
+	
+		<field
+			name="search"
+			type="text"
+			label="XB_FILTER_SEARCH_NAME"
+			description="XB_FILTER_SEARCH_NAME_DESC"
+			hint="JSEARCH_FILTER"
+		/>
+
+		<field name="typefilter" type="list"
+			label="XBMUSIC_ARTIST_TYPE"
+			description="XBMUSIC_ARTIST_TYPE_DESC"
+  			onchange="this.form.submit();"
+			default="-1"
+		>
+			<option value="-1">All Artists</option>
+			<option value="1">Only individuals</option>
+			<option value="-2">All Groups</option>
+			<option value="2">Only Duos</option>
+			<option value="3">Only Trios</option>
+			<option value="4">Only 4+ Groups</option>
+		</field>	
+		<field
+			name="tagfilt" type="tag"
+			label="XB_FILTER_TAGS"
+			description="Select tags"
+			hint="filter by tags"
+			multiple="true"
+			class="multipleTags"
+			mode="nested"
+			onchange="this.form.submit();"
+		/>
+		<field name="taglogic" type="radio"
+			label="XB_FIELD_TAGLOGIC"
+			description="XB_FIELD_TAGLOGIC_DESC"
+  			class="btn-group btn-small radiotop"
+			default="0"
+		>
+			<option value="1" onchange="this.form.submit();">XB_ALL</option>
+			<option value="0" onchange="this.form.submit();">XB_ANY</option>
+			<option value="2" onchange="this.form.submit();">XB_NONE</option>
+		</field>	
+		
+	</fields>
+
+	<fields name="list">
+
+		<field
+			name="fullordering"
+			type="list"
+			label="JGLOBAL_SORT_BY"
+			default="a.sortname ASC"
+			onchange="this.form.submit();"
+			>
+			<option value="">JGLOBAL_SORT_BY</option>
+			<option value="a.name ASC">XBMUSIC_NAME_ASC</option>
+			<option value="a.name DESC">XBMUSIC_NAME_DESC</option>
+			<option value="a.sortname ASC">XBMUSIC_SORTNAME_ASC</option>
+			<option value="a.sortname DESC">XBMUSIC_SORTNAME_DESC</option>
+		</field>
+
+		<field
+			name="limit"
+			type="limitbox"
+			label="JGLOBAL_LIST_LIMIT"
+			default="25"
+			onchange="this.form.submit();"
+		/>
+	
+	</fields>
+</form>

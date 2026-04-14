@@ -2,11 +2,12 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.61.5</version>
+		<version>0.0.61.6</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.61.5</h3> Updated 12th April 2026]]></item>
-			<item>Site Artist Popover</item>
-			<item>Site artist list song play buttons</item>
+			<item><![CDATA[<h3>Alpha Release v0.0.61.6</h3> Updated 14th April 2026]]></item>
+			<item>Site Album modal popover</item>
+			<item>Site Artist modal popover</item>
+			<item>Site Artists list - song play buttons</item>
 			<item>Play duration limited per global and menu options</item>
 		</addition>
 		<remove>

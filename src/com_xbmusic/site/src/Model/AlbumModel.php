@@ -1,7 +1,7 @@
 <?php 
  /*******
  * @package xbMusic
- * @filesource site/src/Model/ArtistModel.php
+ * @filesource site/src/Model/AlbumModel.php
  * @version 0.0.61.6 13th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
@@ -17,13 +17,14 @@ use Joomla\CMS\Helper\TagsHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\ItemModel;
 use Joomla\Database\ParameterType;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
 //use Joomla\Utilities\ArrayHelper;
 //use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class ArtistModel extends ItemModel {
+class AlbumModel extends ItemModel {
 
-    protected $_context = 'com_xbmusic.artist';
+    protected $_context = 'com_xbmusic.album';
     
     protected function populateState()
     {
@@ -31,7 +32,7 @@ class ArtistModel extends ItemModel {
         
         // Load state from the request.
         $pk = $app->input->getInt('id');
-        $this->setState('artist.id', $pk);
+        $this->setState('album.id', $pk);
         
         // Load the parameters.
         $params = $app->getParams();
@@ -40,7 +41,7 @@ class ArtistModel extends ItemModel {
     
     public function getItem($pk = null)
     {
-        $pk = (!empty($pk)) ? $pk : (int) $this->getState('artist.id');
+        $pk = (!empty($pk)) ? $pk : (int) $this->getState('album.id');
         
         try
         {
@@ -51,7 +52,7 @@ class ArtistModel extends ItemModel {
                     'item.select', 'a.*'
                     )
                 );
-            $query->from($db->quoteName('#__xbmusic_artists') . ' AS a')
+            $query->from($db->quoteName('#__xbmusic_albums') . ' AS a')
             ->where($db->quoteName('a.id') . ' = :id')
             ->bind(':id', $pk, ParameterType::INTEGER);
             $query->select('c.title AS category_title, c.path AS category_path');
@@ -63,7 +64,7 @@ class ArtistModel extends ItemModel {
             
             if (empty($data))
             {
-                throw new \Exception(Text::_('XBMUSIC_ERROR_ARTIST_NOT_FOUND').' : '.$pk, 404);
+                throw new \Exception(Text::_('XBMUSIC_ERROR_ALBUM_NOT_FOUND').' : '.$pk, 404);
             }
         }
         catch (\Exception $e)
@@ -81,8 +82,10 @@ class ArtistModel extends ItemModel {
         }
         
         $tagsHelper = new TagsHelper;
-        $data->tags = $tagsHelper->getItemTags('com_xbmusic.artist' , $data->id);
+        $data->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $data->id);
         
+        //get tracklist with playlists
+        $data->tracks = XbmusicHelper::getAlbumTracks($data->id, true);
         
         return $data;
     }

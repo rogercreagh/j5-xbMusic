@@ -53,10 +53,10 @@ class AzApi {
             $this->status = false;
             return;        
         }
-        if (($dbapiid ==0) && ($apifullkey == '')) {
-            $this->status = false;
-            return;
-        }
+//        if (($dbapiid ==0) && ($apifullkey == '')) {
+//            $this->status = false;
+//            return;
+//        }
         //If we're given a server url use it, otherwise use params default
         if (!$azurl) {
             $azurl = trim($params->get('az_url',''),'/');

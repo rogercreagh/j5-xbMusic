@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbazuracastHelper.php
- * @version 0.0.60.2 4th April 2025
+ * @version 0.0.61.6 14th April 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -717,7 +717,7 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 
-	public static function getAlbumTracks($aid) {
+	public static function getAlbumTracks($aid, $playlists = false) {
 	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
@@ -726,7 +726,21 @@ class XbmusicHelper extends ComponentHelper
 	    $query->where('t.album_id = '.$db->q($aid));
 	    $query->order('t.discno, t.trackno, t.title ASC');
 	    $db->setQuery($query);
-	    return $db->loadAssocList();
+	    $tracks = $db->loadAssocList();
+	    if ($playlists) {
+	        $query->clear();
+	        $query->select('p.id AS plid, p.title AS pltitle');
+	        $query->from('#__xbmusic_trackplaylist AS tp');
+	        $query->leftJoin('#__xbmusic_azplaylists AS p on p.id = tp.playlist_id');
+	        foreach ($tracks as &$trk) {
+	            $query->clear('where');
+    	        $query->where('tp.track_id = '.$db->q($trk['trackid']));
+    	        //could also where pl status = 1 and showpublic = 1
+    	        $db->setQuery($query);
+    	        $trk['playlists'] = $db->loadAssocList();
+	        }
+	    }
+	    return $tracks;
 	}
 	
 	public static function getAlbumArtists($albumid) {
