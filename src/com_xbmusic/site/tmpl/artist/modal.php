@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/Artist/default.php
- * @version 0.0.61.5 12th April 2026
+ * @version 0.0.61.7 14th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -46,39 +46,18 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
                 	<?php echo $item->name; ?>
                 </h3>
 				<?php if ($item->name != $item->sortname) : ?>
-			    	<?php echo Text::_('XBMUSIC_SORTNAME').' '.$item->sortname; ?>
+			    	<span class="xbnote"><?php echo Text::_('XBMUSIC_SORTNAME'); ?></span> <?php echo $item->sortname; ?>
 			    <?php endif; ?>
-			    <?php if ($item->description != '') : 
-			         echo Text::_('XB_DESCRIPTION'); ?>
+			    <?php if ($item->description != '') : ?>
+			    	<span class="xbnote"> <?php echo Text::_('XB_DESCRIPTION'); ?></span>
+			   		<?php echo Text::_('XB_DESCRIPTION'); ?>
 			    	<div class="xbbox" style="width:100%;">
     					<?php echo $item->description; ?>
     				</div>
     			<?php endif; ?>
-				<table>
-					<?php if ($item->catid > 0) : ?>
-  						<tr><td>
-  							<?php echo Text::_('XB_CATEGORY'); ?>
-    					</td><td>
-                    		<span class="xblabel label-cat" >
-                    			<?php echo $item->category_title; ?>
-                    		</span>	
-						</td></tr>
-					<?php endif; ?>
-					<?php if ($item->tags) : ?>
-						<tr><td>
-							<?php echo Text::_('XB_TAGS'); ?>
-						</td><td>
-				    		<?php foreach ($item->tags as $t) : ?>
-    							<span class="xblabel label-tag">
-    								<?php echo $t->title; ?>
-    							</span><span style="width:15px;"></span>
-    						<?php endforeach; ?>
-						</td></tr>
-        			<?php endif; ?>
-          		</table>        
         	</td>
 		<?php if ($item->imgurl != '') : ?>
-			<td style="width:220px;">
+			<td style="width:220px; vertical-align:top;">
 				<?php  $src = trim($item->imgurl); ?>    	
     			<?php $tip = '<img src=\''.$src.'\'  />'; ?>
     			<img src="<?php echo $src; ?>" alt="<?php echo $item->name; ?>" 
@@ -91,7 +70,7 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
 		</tr>      
     </table>
     <?php if ($item->ext_links_cnt > 0) : ?>
-          <?php echo Text::_('Internet Links'); ?>
+        <span class="xbnote"><?php echo Text::_('XB_INTERNET_LINKS'); ?></span>
 		<div class="xbbox" style="width:100%;">
      		<table>
      			<?php foreach($item->ext_links as $link) : ?>
@@ -100,7 +79,8 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
      					<?php $key = trim(strtolower($link->link_text));
         			    if (key_exists($key, $iconarr)) : ?>
         			    	<span class="xbr12 xbpl10">
-        			    		<a href="<?php echo $link->link_url; ?>" target="_blank" class="xbicomag"><?php echo $iconarr[$key]; ?></a>
+        			    		<a href="<?php echo $link->link_url; ?>"
+        			    			target="_blank" class="xbicomag"><?php echo $iconarr[$key]; ?></a>
         			        </span>
         			    	<?php echo $link->link_text; ?>
         			    <?php else : ?>
@@ -117,4 +97,28 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
      		</table>
      	</div>
     <?php endif; ?>
+	<table class="xbmt20">
+		<tr>
+		<?php if ($item->catid > 0) : ?>
+			<td>
+  				<span class="xbnote"><?php echo Text::_('XB_CATEGORY'); ?></span>
+			</td><td>
+        		<span class="xblabel label-cat" >
+        			<?php echo $item->category_title; ?>
+        		</span>	
+			</td>
+		<?php endif; ?>
+		<?php if ($item->tags) : ?>
+			<td>
+				<span class="xbnote"><?php echo Text::_('XB_TAGS'); ?></span>
+			</td><td>
+	    		<?php foreach ($item->tags as $t) : ?>
+					<span class="xblabel label-tag">
+						<?php echo $t->title; ?>
+					</span><span style="width:15px;"></span>
+				<?php endforeach; ?>
+			</td>
+		<?php endif; ?>
+		</tr>
+	</table>        
 </div>

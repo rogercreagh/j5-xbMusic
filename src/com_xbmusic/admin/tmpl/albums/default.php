@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/albums/default.php
- * @version 0.0.61.0 31st December 2026
+ * @version 0.0.61.7 14th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -62,7 +62,13 @@ if (strpos($listOrder, 'modified') !== false) {
 //    HTMLHelper::_('draggablelist.draggable');
 //}
 
+$root = Uri::root();
+$document = Factory::getApplication()->getDocument();
+$document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
+
 ?>
+<script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
+
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=albums'); ?>" method="post" name="adminForm" id="adminForm">
 		<h2><i class='fas fa-compact-disc' ></i> <?php echo Text::_('XBMUSIC_LIST_ALBUMS'); ?></h2>
@@ -186,13 +192,12 @@ if (strpos($listOrder, 'modified') !== false) {
 									<span title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->title); ?></span>
 								<?php endif; ?>
-								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=album&tmpl=component&id='.$item->id)."'"; ?>
-          						<?php $pvtit = "'".$item->title."'"; ?>
-                                <span  data-bs-toggle="modal" data-bs-target="#pvModal" data-bs-source="<?php echo $pvuri; ?>" 
-                                	data-bs-itemtitle="<?php echo $item->title; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
-          							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
-                                	><span class="icon-eye xbpl10"></span></span>
-								</p>
+          						
+                    			<?php $pvtit = "'".Text::_('XBMUSIC_ALBUM_DETAILS')."'"; ?>
+                                <span class="xbpveye" 
+                                	onclick="pvItem(<?php echo $pvtit; ?>,'album','<?php echo $item->id; ?>');">
+                                	<span class="icon-eye xbpl10"></span>
+                                </span>          						
 								<p class="xbr09 xbnit"><?php echo Xbtext::_('XBMUSIC_RELEASED',XBSP2 + XBTRL).$item->rel_date; ?><br />
         							<?php if ($item->format) echo $item->format; ?>
     								<?php if($item->num_discs > 1) echo Xbtext::_('XB_ON',XBSP2 + XBTRL). $item->num_discs. Xbtext::_('XBMUSIC_DISCS',XBSP1 + XBTRL); ?> 

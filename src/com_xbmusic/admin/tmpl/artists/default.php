@@ -60,7 +60,13 @@ $arttypes = array("unknown","XB_PERSON","XBMUSIC_DUO","XBMUSIC_TRIO","XB_GROUP")
 //    HTMLHelper::_('draggablelist.draggable');
 //}
 
+$root = Uri::root();
+$document = Factory::getApplication()->getDocument();
+$document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
+
 ?>
+<script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
+
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=artists'); ?>" method="post" name="adminForm" id="adminForm">
 		<h2><i class='fas fa-users-line' ></i> <?php echo Text::_('XBMUSIC_LIST_ARTISTS'); ?></h2>
@@ -196,12 +202,11 @@ $arttypes = array("unknown","XB_PERSON","XBMUSIC_DUO","XBMUSIC_TRIO","XB_GROUP")
 									<span title="<?php echo Text::sprintf('JFIELD_ALIAS_LABEL', $this->escape($item->alias)); ?>">
 										<?php echo $this->escape($item->name); ?></span>
 								<?php endif; ?>
-								<?php $pvuri = "'".(Uri::root().'index.php?option=com_xbmusc&view=artist&tmpl=component&id='.$item->id)."'"; ?>
-          						<?php $pvtit = "'".$item->name."'"; ?>
-                                <span  data-bs-toggle="modal" data-bs-target="#pvModal" data-bs-source="<?php echo $pvuri; ?>" 
-                                	data-bs-itemtitle="<?php echo $item->name; ?>" title="<?php echo Text::_('XB_MODAL_PREVIEW'); ?>" 
-          							onclick="var pv=document.getElementById('pvModal');pv.querySelector('.modal-body .iframe').setAttribute('src',<?php echo $pvuri; ?>);pv.querySelector('.modal-title').textContent=<?php echo $pvtit; ?>;"
-                                	><span class="icon-eye xbpl10"></span></span>
+                    			<?php $pvtit = "'".Text::_('XBMUSIC_ARTIST_DETAILS')."'"; ?>
+                                <span class="xbpveye" 
+                                	onclick="pvItem(<?php echo $pvtit; ?>,'artist','<?php echo $item->id; ?>');">
+                                	<span class="icon-eye xbpl10"></span>
+                                </span>          						
 								</p>
 								<?php if(!empty($item->type)) : ?>
 									<span class="xbnit xbpl20">

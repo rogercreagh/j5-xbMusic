@@ -393,7 +393,13 @@ a.xbbadge:focus {
 }
 
 /* xb classes for simple styles 
-some common combinations are also defined (eg xbnit - normal weight,italic, 5px left pad)
+some common combinations are also defined 
+	xbnit - normal weight,italic, 5px left pad
+	xbcredit - xbr08 & xbit
+	xbtitle - xbr12 & xbbold
+	xbsubtitle - xbr11 
+	xbnote - xbr09 xbnorm xbit
+	xbnit - xbnorm xbit
 */
 
 /* centre div or table cell */
@@ -413,14 +419,15 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 } 
 
 /* font sizes in em */
+/* xbNN are deprecated - use xbrNN instead */
 .xb15 { font-size:1.5em; }
-.xb12, .xbtitle { font-size:1.2em; }
-.xb11, .xbsubtitle { font-size:1.1em; }
+.xb12 { font-size:1.2em; }
+.xb11 { font-size:1.1em; }
 .xb10 { font-size:1.0em; }
 .xb095 { font-size:0.95em; }
-.xb09, .xbnote { font-size:0.9em; }
+.xb09 { font-size:0.9em; }
 .xb085 { font-size:0.85em; }
-.xb08, .xbcredit { font-size:0.8em; }
+.xb08 { font-size:0.8em; }
 
 /* font sizes in rem */
 .xbr15 { font-size:1.5rem; }
@@ -469,6 +476,7 @@ some common combinations are also defined (eg xbnit - normal weight,italic, 5px 
 .xbpl10 {padding-left:10px;}
 .xbpl15 {padding-left:15px;}
 .xbpl20 {padding-left:20px;}
+.xbpl30 {padding-left:30px;}
 .xbpl50 {padding-left:50px;}
 .xbpr5, .xbnit { padding-right:5px; }
 .xbpr10 { padding-right:10px;}

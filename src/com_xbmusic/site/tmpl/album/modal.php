@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/album/modal.php
- * @version 0.0.61.6 14th April 2026
+ * @version 0.0.61.7 14th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -40,7 +40,8 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
 			<td>
                 <h3>
                 	<i class='fas fa-compact-disc' ></i>
-                	<?php echo $item->title; ?><br /><?php echo $item->albumartist; ?>
+                	<?php echo $item->title; ?><br />
+                	<span class="xbnorm"><?php echo $item->albumartist; ?></span>
                 </h3>
 				<?php if ($item->subtitle != '') : ?>
 			    	<?php echo $item->subtitle; ?><br />
@@ -51,50 +52,12 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
                     echo $numdiscarr[$item->num_discs];
                 }?>
 			    <br />
-			    <?php if ($item->description != '') : 
-			         echo Text::_('XB_DESCRIPTION'); ?>
+			    <?php if ($item->description != '') : ?>
+			        <span class="xbnote"><?php echo Text::_('XB_DESCRIPTION'); ?></span>
 			    	<div class="xbbox" style="width:100%;">
     					<?php echo $item->description; ?>
     				</div>
     			<?php endif; ?>
-                <?php if (count($item->tracks) > 0) : ?>
-                    <?php echo Text::_('Tracks and playlists'); ?>
-                    <div class="xbbox">
-                    	<ul class="xbnobullets">
-            	        	<?php foreach ($item->tracks as $track) : ?>
-                    	    	<li><?php echo $track['discno'].' '.$track['trackno'].' : '.$track['tracktitle']; 
-                    	    	if (key_exists('playlists',$track)) : ?>
-                    	    	    <?php foreach ($track['playlists'] as $plist ) : ?>
-                    	    	    	<span class="xbbadge badge-yellow"><?php echo $plist['pltitle']; ?></span>
-                    	    	    <?php endforeach; ?>
-                    	    	<?php endif; ?>       	    	
-                    	    	</li>
-                    		<?php endforeach; ?>
-                    		</ul>	
-                    </div>
-                <?php endif; ?>
-				<table>
-					<?php if ($item->catid > 0) : ?>
-  						<tr><td>
-  							<?php echo Text::_('XB_CATEGORY'); ?>
-    					</td><td>
-                    		<span class="xblabel label-cat" title="<?php echo $item->category_path;?>">
-                    			<?php echo $item->category_title; ?>
-                    		</span>	
-						</td></tr>
-					<?php endif; ?>
-					<?php if ($item->tags) : ?>
-						<tr><td>
-							<?php echo Text::_('XB_TAGS'); ?>
-						</td><td>
-				    		<?php foreach ($item->tags as $t) : ?>
-    							<span class="xblabel label-tag" title="<?php echo $t->path;?>">
-    								<?php echo $t->title; ?>
-    							</span><span style="width:15px;"></span>
-    						<?php endforeach; ?>
-						</td></tr>
-        			<?php endif; ?>
-          		</table>        
         	</td>
 		<?php if ($item->imgurl != '') : ?>
 			<td style="width:220px;">
@@ -109,8 +72,37 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
 		<?php endif; ?>
 		</tr>      
     </table>
+    <?php $cnt = count($item->tracks);
+    if ($cnt > 0) : ?>
+        <span class="xbnote"><?php echo Text::_('Tracks and playlists').'<br />'; 
+        
+            if ($item->tot_tracks > count($item->tracks)) {
+                echo Text::sprintf('XBMUSIC_TRACKS_COUNT_USED',$item->tot_tracks,$cnt).')';
+            } else {
+                echo $cnt.Xbtext::_('XBMUSIC_TRACKS_USED', XBSP1 + XBTRL);
+            }
+        ?></span>
+        <div class="xbbox">
+        	<table>                   	
+	        	<?php foreach ($item->tracks as $track) : ?>
+        	    	<tr><td><?php echo ($track['discno'] != '1/1') ? $track['discno'] : '&nbsp;&nbsp'; ?>
+        	    		<?php echo ($track['trackno'] > 0) ? $track['trackno'] : ''; ?></td>
+        	    	<td><?php echo $track['tracktitle']; ?></td>
+        	    	<td class="xbpl20">
+        	    		<?php if (key_exists('playlists',$track)) : ?>
+        	    	    <?php foreach ($track['playlists'] as $plist ) : ?>
+        	    	    	<span class="xblabel label-yellow"><?php echo $plist['pltitle']; ?></span>
+        	    	    <?php endforeach; ?>
+        	    	<?php endif; ?>       	    	
+        	    	</td></tr>
+        		<?php endforeach; ?>
+         	</table>
+        </div>
+    <?php else: ?>
+    	<p class="xbit xbbgltred"><?php echo Text::_('XBMUSIC_NO_TRACKS_LISTED'); ?></p>
+    <?php endif; ?>
     <?php if ($item->ext_links_cnt > 0) : ?>
-          <?php echo Text::_('Internet Links'); ?>
+        <span class="xbnote"><?php echo Text::_('XB_INTERNET_LINKS'); ?></span>
 		<div class="xbbox" style="width:100%;">
      		<table>
      			<?php foreach($item->ext_links as $link) : ?>
@@ -119,7 +111,8 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
      					<?php $key = trim(strtolower($link->link_text));
         			    if (key_exists($key, $iconarr)) : ?>
         			    	<span class="xbr12 xbpl10">
-        			    		<a href="<?php echo $link->link_url; ?>" target="_blank" class="xbicomag"><?php echo $iconarr[$key]; ?></a>
+        			    		<a href="<?php echo $link->link_url; ?>" 
+        			    			target="_blank" class="xbicomag"><?php echo $iconarr[$key]; ?></a>
         			        </span>
         			    	<?php echo $link->link_text; ?>
         			    <?php else : ?>
@@ -136,4 +129,27 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
      		</table>
      	</div>
     <?php endif; ?>
+	<table class="xbmt20">
+		<?php if ($item->catid > 0) : ?>
+			<tr><td>
+				<span class="xbnote"><?php echo Text::_('XB_CATEGORY'); ?></span>
+			</td><td>
+        		<span class="xblabel label-cat" title="<?php echo $item->category_path;?>">
+        			<?php echo $item->category_title; ?>
+        		</span>	
+			</td>
+		<?php endif; ?>
+		<?php if ($item->tags) : ?>
+			<td>
+				<span class="xbnote"><?php echo Text::_('XB_TAGS'); ?></span>
+			</td><td>
+	    		<?php foreach ($item->tags as $t) : ?>
+					<span class="xblabel label-tag" title="<?php echo $t->path;?>">
+						<?php echo $t->title; ?>
+					</span><span style="width:15px;"></span>
+				<?php endforeach; ?>
+			</td></tr>
+		<?php endif; ?>
+	</table>        
+    
 </div>

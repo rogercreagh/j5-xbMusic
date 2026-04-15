@@ -122,7 +122,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 	<tr>
 		<td>
 			<span class="xbbold"><?php echo $item->name; ?></span>
-			<?php if ($item->description != '') : ?>
+			<?php if (($item->description != '') || ($item->imgurl != '')) : ?>
     			<?php $pvtit = Text::_('XBMUSIC_ARTIST_DETAILS'); ?>
                 <span class="xbpveye" onclick="pvItem('<?php echo $pvtit; ?>','artist','<?php echo $item->id; ?>');"  >
                   <span class="icon-eye xbpl10"></span></span>
@@ -202,9 +202,6 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 					<?php foreach ($item->albums as $album) : ?>
 						<li>							
 							<?php if(($this->showimg) && ($album['imgurl']!='')) :?>
-								<?php //$src = JPATH_ROOT.'/'.parse_url($album['imgurl'],PHP_URL_PATH);
-								//$src = JPATH_ROOT.'/'.$bits['path'];
-								?>
 								<?php  $src = trim($album['imgurl']);
 								if ((!$src=='') && (XbcommonHelper::check_url($src))) :
 								    $tip = '<img src=\''.$src.'\' style=\'width:500px;\' />';

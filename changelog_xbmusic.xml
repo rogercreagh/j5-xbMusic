@@ -2,6 +2,34 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.61.7</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.61.7</h3> Updated 15th April 2026]]></item>
+			<item>Admin Artists view preview artist modal</item>
+			<item>Admin Albums view preview album modal</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Changed layout for album and artist modal preview</item>
+		</change>
+		<fix>
+			<item>Multiple other bug fixes and display tweaks</item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.61.6</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.61.6</h3> Updated 14th April 2026]]></item>
