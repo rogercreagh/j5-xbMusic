@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/album/edit.php
- * @version 0.0.30.6 15th February 2025
+ * @version 0.0.62.0 16th April 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -169,7 +169,8 @@ $item = $this->item;
         				<tr>
         					<th style="padding:5px 0;"><?php echo Text::_('XBMUSIC_TRACK'); ?></th>
         					<th class="xbpr50" style="width:200px;"><?php echo Text::_('XBMUSIC_ARTISTS_TRACK'); ?></th>
-        					<th class="xbpl50"><?php echo Text::_('XBMUSIC_SONGS_TRACK'); ?></th>
+        					<th class="xbpr50"><?php echo Text::_('XBMUSIC_SONGS_TRACK'); ?></th>
+        					<th><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></th>
         				</tr>
         			</thead>
         			<tbody>
@@ -199,6 +200,13 @@ $item = $this->item;
                               <span class="icon-eye xbpl10 xbpr20"></span><br />
         			    		<?php    }
         			    		 } ?> 
+        			    	</td>
+        			    	<td>
+        			    		<?php if (!empty($track['playlists'])) : ?>
+        			    			<?php foreach ($track['playlists'] as $plist) : ?>
+        	    	    				<span class="xblabel label-yellow"><?php echo $plist['pltitle']; ?></span>
+        			    			<?php endforeach; ?>
+        			    		<?php endif; ?>
         			    	</td>
         			    </tr>
         			    <?php endforeach; ?>

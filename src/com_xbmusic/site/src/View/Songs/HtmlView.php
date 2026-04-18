@@ -1,14 +1,14 @@
 <?php 
  /*******
  * @package xbMusic
- * @filesource site/src/View/Artists/HtmlView.php
+ * @filesource site/src/View/Sons/HtmlView.php
  * @version 0.0.62.0 17th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
-namespace Crosborne\Component\Xbmusic\Site\View\Artists;
+namespace Crosborne\Component\Xbmusic\Site\View\Songs;
 
 defined('_JEXEC') or die;
 
@@ -36,13 +36,15 @@ class HtmlView extends BaseHtmlView
         $this->activeFilters = $this->get('ActiveFilters');
         $this->pagination = $this->get('Pagination');
         
+        $this->indexfield = $this->filterForm->getGroup('filter')['filter_idx'];
+        
         $app = Factory::getApplication();
         $comparams = ComponentHelper::getParams('com_xbmusic');
         $activeMenuItem = $app->getMenu()->getActive();
-        if ($activeMenuItem->link == 'index.php?option=com_xbmusic&view=artists') {
+        if ($activeMenuItem->link == 'index.php?option=com_xbmusic&view=songs') {
             $mymenu = $activeMenuItem;
         } else {
-            $mymenu = $app->getMenu()->getItems('link','index.php?option=com_xbmusic&view=artists');
+            $mymenu = $app->getMenu()->getItems('link','index.php?option=com_xbmusic&view=songs');
             if (!empty($mymenu)) $mymenu = $mymenu[0];
         }
         if (empty($mymenu)) { //we are unable to find a relevant menu item

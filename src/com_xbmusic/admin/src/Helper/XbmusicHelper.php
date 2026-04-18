@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbazuracastHelper.php
- * @version 0.0.61.6 14th April 2026
+ * @version 0.0.62.0 16th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -717,8 +717,8 @@ class XbmusicHelper extends ComponentHelper
 	}
 	
 
-	public static function getAlbumTracks($aid, $playlists = false) {
-	    //$db = Factory::getContainer()->get(DatabaseInterface::cl
+	public static function getAlbumTracks($aid, $playlists = false, $isadmin = false) {
+	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
 	    $query->select('t.id AS trackid, t.title AS tracktitle, t.filepathname, t.sortartist, t.discno, t.trackno');
@@ -731,11 +731,13 @@ class XbmusicHelper extends ComponentHelper
 	        $query->clear();
 	        $query->select('p.id AS plid, p.title AS pltitle');
 	        $query->from('#__xbmusic_trackplaylist AS tp');
-	        $query->leftJoin('#__xbmusic_azplaylists AS p on p.id = tp.playlist_id');
+	        $query->leftJoin('#__xbmusic_azplaylists AS p','p.id = tp.playlist_id');
 	        foreach ($tracks as &$trk) {
 	            $query->clear('where');
     	        $query->where('tp.track_id = '.$db->q($trk['trackid']));
-    	        //could also where pl status = 1 and showpublic = 1
+    	        if (!$isadmin) {
+    	           $query->where('p.status = 1 AND p.publicschd = 1');
+    	        }
     	        $db->setQuery($query);
     	        $trk['playlists'] = $db->loadAssocList();
 	        }
@@ -750,7 +752,7 @@ class XbmusicHelper extends ComponentHelper
 	    $query->select('DISTINCT a.name AS artistname, a.id AS artistid, ta.role AS artistrole');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->join('LEFT','#__xbmusic_trackartist AS ta ON ta.track_id = t.id');
-	    $query->leftjoin('#__xbmusic_artists AS a ON a.id = ta.artist_id');
+	    $query->leftJoin('#__xbmusic_artists AS a','a.id = ta.artist_id');
 	    $query->where('t.album_id = '.$db->q($albumid).' AND a.name <> \'\'');
 	    //$query->group('a.name');
 	    $query->order('a.sortname ASC');
@@ -765,8 +767,8 @@ class XbmusicHelper extends ComponentHelper
 	    $query = $db->getQuery(true);
 	    $query->select('s.title AS songtitle, s.id AS songid, s.alias AS songalias, ts.role AS songrole, ts.note AS songnote, ts.listorder AS songorder');
 	    $query->from('#__xbmusic_tracks AS t');
-	    $query->leftjoin('#__xbmusic_tracksong AS ts ON ts.track_id = t.id');
-	    $query->leftjoin('#__xbmusic_songs AS s ON s.id = ts.song_id');
+	    $query->leftJoin('#__xbmusic_tracksong AS ts','ts.track_id = t.id');
+	    $query->leftJoin('#__xbmusic_songs AS s','s.id = ts.song_id');
 	    $query->where('t.album_id = '.$db->q($albumid));
 	    $query->order('s.title ASC');
 	    $db->setQuery($query);
@@ -786,6 +788,29 @@ class XbmusicHelper extends ComponentHelper
 	    $query->order('a.sortname ASC');
 	    $db->setQuery($query);
 	    return $db->loadAssocList();	    
+	}
+	
+	/**
+	 * @desc given song id returns all versions. Artist name & image, trk title & file & year, album title
+	 * @param int $songid
+	 * @return Assoc Array
+	 */
+	public static function getSongTracks($songid) {
+	    $db = Factory::getDbo();
+	    $query = $db->getQuery(true);
+	    $query->select('a.id AS artistid, a.name AS artistname, a.imgurl AS artistimg');
+	    $query->from('#__xbmusic_artists AS a');
+	    $query->leftJoin('#__xbmusic_trackartist AS ta','ta.artist_id = a.id');
+	    $query->leftJoin('#__xbmusic_tracks AS t','t.id = ta.track_id');
+	    $query->select('t.id AS trackid, t.title AS tracktitle, t.rel_date AS reldate');
+	    $query->select('t.filepathname AS trackfile,t.imgurl AS trackimg');
+	    $query->leftJoin('#__xbmusic_albums AS b','b.id = t.album_id');
+	    $query->select('b.id AS albumid, b.title AS albumtitle');
+	    $query->join('LEFT','#__xbmusic_tracksong AS ts ON ts.track_id = ta.track_id');
+	    $query->where('ts.song_id = '.$db->q($songid));
+	    
+	    $db->setQuery($query);
+	    return $db->loadAssocList();
 	}
 	
 	public static function getSongAlbums($songid) {

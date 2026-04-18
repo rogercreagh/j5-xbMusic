@@ -118,3 +118,17 @@ table[id^=subfieldList] thead tr td div.btn-group {
 	margin: 10px;
 }
 
+/* filter index */
+.js-stools-field-filter .xbfilteridx {
+  display:none;
+}
+
+.control-group .xbfilteridx {
+	display:inline-table;
+	margin: 0;
+}
+.control-group fieldset#filter_idx {
+	margin-bottom: 10px;
+}
+.js-stools-container-filters { height:3rem; }
+

@@ -74,19 +74,22 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
     </table>
     <?php $cnt = count($item->tracks);
     if ($cnt > 0) : ?>
-        <span class="xbnote"><?php echo Text::_('Tracks and playlists').'<br />'; 
+        <span class="xbnote"><?php echo Text::_('XBMUSIC_TRACKS_PLAYLISTS').'<br />'; 
         
             if ($item->tot_tracks > count($item->tracks)) {
-                echo Text::sprintf('XBMUSIC_TRACKS_COUNT_USED',$item->tot_tracks,$cnt).')';
+                echo Text::sprintf('XBMUSIC_TRACKS_COUNT_USED',$item->tot_tracks,$cnt,'WreckersRadio');
             } else {
                 echo $cnt.Xbtext::_('XBMUSIC_TRACKS_USED', XBSP1 + XBTRL);
             }
         ?></span>
         <div class="xbbox">
-        	<table>                   	
-	        	<?php foreach ($item->tracks as $track) : ?>
-        	    	<tr><td><?php echo ($track['discno'] != '1/1') ? $track['discno'] : '&nbsp;&nbsp'; ?>
-        	    		<?php echo ($track['trackno'] > 0) ? $track['trackno'] : ''; ?></td>
+        	<table>   
+        		<tr><th>Tk.No.</th><th>Title</th><th>Playlists/Programmes</th></tr>             	
+				<?php foreach ($item->tracks as $track) : ?>
+        	    	<tr><td>
+        	    		<?php if ($item->num_discs>1) echo $track['discno'] . '&nbsp;&nbsp';
+                        echo ($track['trackno'] > 0) ? $track['trackno'] : '--'; ?>
+                    </td>
         	    	<td><?php echo $track['tracktitle']; ?></td>
         	    	<td class="xbpl20">
         	    		<?php if (key_exists('playlists',$track)) : ?>

@@ -2,6 +2,32 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.62.1</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.62.1</h3> Updated 18th April 2026]]></item>
+			<item>Site Songs view with alphabetical index</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Playlists added to album modal preview</item>
+		</change>
+		<fix>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.61.7</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.61.7</h3> Updated 15th April 2026]]></item>

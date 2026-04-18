@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/Artists/default.php
- * @version 0.0.61.3 5th April 2026
+ * @version 0.0.62.0 17th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -137,7 +137,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 		</td>
 		
 		<td>
-    		<?php if (!empty($item->ext_links)) : ?>
+    		<?php if (($this->showlinks) && !empty($item->ext_links)) : ?>
     			<?php foreach ($item->ext_links as $linkobj) : ?>
     			    <span class="xbr12">
     			    	<a href="<?php echo $linkobj->link_url; ?>" target="_blank" 

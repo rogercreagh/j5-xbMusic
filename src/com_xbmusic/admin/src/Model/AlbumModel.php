@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumModel.php
- * @version 0.0.30.8 17th February 2025
+ * @version 0.0.62.0 16th April 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
  ******/
 
@@ -341,7 +341,7 @@ class AlbumModel extends AdminModel {
      * @return array assoc
      */
     private function getAlbumTrackList($albumid) {
-        $tracklist = XbmusicHelper::getAlbumTracks($albumid);
+        $tracklist = XbmusicHelper::getAlbumTracks($albumid, true, true);
         foreach ($tracklist as &$track) {
             $track['songlist'] = XbmusicHelper::getTrackSongs($track['trackid']);
             $track['artistlist'] = XbmusicHelper::getTrackArtists($track['trackid']);

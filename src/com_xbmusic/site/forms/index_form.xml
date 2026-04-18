@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Generic Index Form file v0.62.0 17th April 2026 -->
+
+<form>
+	<fields name="filter">
+	
+    	<field 
+			name="idx" type="radio"
+			label="Title Index" 
+			class="btn-group btn-small radiotop xbfilteridx"
+			default="0"
+		>
+			<option value="0" onchange="this.form.submit();">clr</option>
+			<option value="A" onchange="this.form.submit();">A</option>
+			<option value="B" onchange="this.form.submit();">B</option>
+			<option value="C" onchange="this.form.submit();">C</option>
+			<option value="D" onchange="this.form.submit();">D</option>
+			<option value="E" onchange="this.form.submit();">E</option>
+			<option value="F" onchange="this.form.submit();">F</option>
+			<option value="G" onchange="this.form.submit();">G</option>
+			<option value="H" onchange="this.form.submit();">H</option>
+			<option value="I" onchange="this.form.submit();">I</option>
+			<option value="J" onchange="this.form.submit();">J</option>
+			<option value="K" onchange="this.form.submit();">K</option>
+			<option value="L" onchange="this.form.submit();">L</option>
+			<option value="M" onchange="this.form.submit();">M</option>
+			<option value="N" onchange="this.form.submit();">N</option>
+			<option value="O" onchange="this.form.submit();">O</option>
+			<option value="P" onchange="this.form.submit();">P</option>
+			<option value="Q" onchange="this.form.submit();">Q</option>
+			<option value="R" onchange="this.form.submit();">R</option>
+			<option value="S" onchange="this.form.submit();">S</option>
+			<option value="T" onchange="this.form.submit();">T</option>
+			<option value="U" onchange="this.form.submit();">U</option>
+			<option value="V" onchange="this.form.submit();">V</option>
+			<option value="W" onchange="this.form.submit();">W</option>
+			<option value="X" onchange="this.form.submit();">X</option>
+			<option value="Y" onchange="this.form.submit();">Y</option>
+			<option value="Z" onchange="this.form.submit();">Z</option>
+			<option value="30" onchange="this.form.submit();">num</option>			
+		</field>
+
+		
+	</fields>
+
+</form>
