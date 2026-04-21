@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/src/Model/ArtistsModel.php
- * @version 0.0.60.2 4th April 2026
+ * @version 0.0.63.0 21st April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,7 +32,7 @@ class ArtistsModel extends ListModel
                 'type','a.type',
                 'category_title',
                 'sortname', 'a.sortname',
-                'type','a.type',
+                'type','a.type','tagfilt'
             );
         }
         
@@ -59,6 +59,15 @@ class ArtistsModel extends ListModel
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
+        
+        $published = $this->getUserStateFromRequest($this->context . '.filter.typefilter', 'filter_filter_typefilter', '');
+        $this->setState('filter.typefilter', $published);
+        
+        $published = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+        $this->setState('filter.tagfilt', $published);
+        
+        $published = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+        $this->setState('filter.taglogic', $published);
         
         // List state information.
         parent::populateState($ordering, $direction);
@@ -123,15 +132,11 @@ class ArtistsModel extends ListModel
         }
         
         // filter by type
-        
-        $typefilter = $this->getState('filter.typefilter', -1);
-        if ($typefilter == -2) {
-            $query->where($db->qn('a.type').' > 1');
-        } elseif ($typefilter == 0) {
-            $query->where($db->qn('a.type').' IS NULL');
-        } elseif ($typefilter > 0) {
+        $typefilter = $this->getState('filter.typefilter');
+        if ($typefilter > 0) {
             $query->where($db->qn('a.type').' = '.$typefilter);
         }
+        
         
         //filter by tags
         $tagfilt = '';
@@ -151,7 +156,7 @@ class ArtistsModel extends ListModel
         if ($tagfilt[0] > 0) {
             $tagfilt = ArrayHelper::toInteger($tagfilt);
             $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.album').'
+                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.artist').'
                     AND tmap.content_item_id = a.id)';
             switch ($taglogic) {
                 case 1: //all tags must be matched
@@ -171,7 +176,7 @@ class ArtistsModel extends ListModel
                         $tagIds = implode(',', $tagfilt);
                         if ($tagIds) {
                             $subQueryAny = '(SELECT DISTINCT content_item_id AS cid FROM #__contentitem_tag_map
-                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.album').')';
+                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.artist').')';
                             $query->innerJoin('(' . (string) $subQueryAny . ') AS tm ON tm.cid = a.id');
                         }
                     } //end else

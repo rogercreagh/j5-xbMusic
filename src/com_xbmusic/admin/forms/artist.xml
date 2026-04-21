@@ -36,9 +36,7 @@
 		>
 			<option value="0">(unknown)</option>
 			<option value="1">XB_PERSON</option>
-			<option value="2">XBMUSIC_DUO</option>
-			<option value="3">XBMUSIC_TRIO</option>
-			<option value="4">XB_GROUP</option>
+			<option value="2">XB_GROUP</option>
 		</field>
 <!-- for use if xbpeople is installed
 		<field name ="person_id" type="text"

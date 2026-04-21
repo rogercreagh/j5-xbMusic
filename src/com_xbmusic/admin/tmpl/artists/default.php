@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artists/default.php
- * @version 0.0.61.0 31st March 2025
+ * @version 0.0.63.0 21st April 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -53,7 +53,16 @@ if (strpos($listOrder, 'modified') !== false) {
 } else {
     $dateOrderCol = 'modified';
 }
-$arttypes = array("unknown","XB_PERSON","XBMUSIC_DUO","XBMUSIC_TRIO","XB_GROUP");
+$arttypes = array("unknown","XB_PERSON","XB_GROUP");
+$iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
+    'twitter'=>'<i class="fab fa-twitter"></i>',
+    'instagram'=>'<i class="fab fa-instagram"></i>',
+    'bandcamp'=>'<i class="fab fa-bandcamp"></i>',
+    'spotify'=>'<i class="fab fa-spotify"></i>',
+    'youtube'=>'<i class="fab fa-youtube-square"></i>',
+    'website'=>'<i class="fas fa-globe"></i>'
+);
+
 
 //if ($saveOrder && !empty($this->items)) {
 //    $saveOrderingUrl = 'index.php?option=com_xbmusic&task=songs.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
@@ -114,6 +123,8 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 						<th style="width75px;"><!-- image --></th>
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_NAME', 'a.title', $listDirn, $listOrder); ?>
+						</th>
+						<th><?php echo Text::_('XB_LINKS'); ?>
 						</th>
 						<th><?php echo Text::_('XBMUSIC_ALBUMS'); ?>
 						</th>
@@ -239,6 +250,24 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
     								</span><br />
 								<?php endif; ?>
 							</div>
+						</td>
+						<td>
+							<?php if(!empty($item->ext_links)) : ?>
+                			<?php foreach ($item->ext_links as $linkobj) : ?>
+                			    <span class="xbr12">
+                			    	<a href="<?php echo $linkobj->link_url; ?>" target="_blank" 
+                    			    class="hasPopover" title="" 
+                						data-bs-content="<?php echo ($linkobj->link_desc!='') ? $linkobj->link_desc : $linkobj->link_text; ?>">
+                					<?php $key = trim(strtolower($linkobj->link_text));
+                    			    if (key_exists($key, $iconarr)) { 
+                    			        echo '<span class="xbicomag">'.$iconarr[$key].'</span>';
+                    			    } else {
+                    			        echo '<span class="xbr10">'.$linkobj->link_text.'</span>';
+                    			    } ?>
+                    			    </a>
+            					</span>
+	                			<?php endforeach; ?>
+							<?php endif; ?>
 						</td>
 						<td class="xbr09" onclick="stopProp(event);">
 							<?php if (count($item->albums) > 1) : ?>

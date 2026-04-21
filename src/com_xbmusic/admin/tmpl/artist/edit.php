@@ -178,7 +178,7 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
-    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKS')); ?>
+    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', 'Albums,Tracks,Songs,External') ; ?>
 		<?php echo $this->form->renderField('artistlinksnote'); ?>	    
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">

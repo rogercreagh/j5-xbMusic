@@ -30,7 +30,7 @@ class SongsModel extends ListModel
                 'id', 's.id',
                 'title', 's.title',
                 'category_title',
-                'idxtitle', 
+                'idxtitle', 'tagfilt'
          
             );
         }

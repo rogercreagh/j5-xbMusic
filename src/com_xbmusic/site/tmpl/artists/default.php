@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/Artists/default.php
- * @version 0.0.62.0 17th April 2026
+ * @version 0.0.63.0 20th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -32,7 +32,7 @@ $wa->useScript('joomla.dialog')
 $listOrder = $this->escape($this->state->get('list.ordering'));
 $listDirn  = $this->escape($this->state->get('list.direction'));
 
-$arttypes = array("unknown","XBMUSIC_SOLO","XBMUSIC_DUO","XBMUSIC_TRIO","XB_GROUP");
+$arttypes = array("","XB_PERSON","XB_GROUP");
 $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
                 'twitter'=>'<i class="fab fa-twitter"></i>',
                 'instagram'=>'<i class="fab fa-instagram"></i>',

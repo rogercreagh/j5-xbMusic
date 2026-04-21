@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/AlbumsModel.php
- * @version 0.0.61.1 1st April 2025
+ * @version 0.0.63.0 21st April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -40,7 +40,7 @@ class AlbumsModel extends ListModel {
                 'created_by', 'a.created_by',
                 'created_by_alias', 'a.created_by_alias',
                 'ordering', 'a.ordering',
-                'status', 'category_id'
+                'status', 'category_id','tagfilt'
             );
             
         }

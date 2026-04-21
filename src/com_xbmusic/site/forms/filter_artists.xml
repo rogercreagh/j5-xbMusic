@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- xbMusic Site Artists Filter Form file v0.60.0 23rd March 2026 -->
+<!-- xbMusic Site Artists Filter Form file v0.63.0 21st April 2026 -->
 
 <form>
 	<fields name="filter">
@@ -12,18 +12,15 @@
 			hint="JSEARCH_FILTER"
 		/>
 
-		<field name="typefilter" type="list"
+		<field name="typefilter" type="radio"
 			label="XBMUSIC_ARTIST_TYPE"
 			description="XBMUSIC_ARTIST_TYPE_DESC"
-  			onchange="this.form.submit();"
-			default="-1"
+			class="btn-group btn-small radiotop"			
+  			default="-1"
 		>
-			<option value="-1">All Artists</option>
-			<option value="1">Only individuals</option>
-			<option value="-2">All Groups</option>
-			<option value="2">Only Duos</option>
-			<option value="3">Only Trios</option>
-			<option value="4">Only 4+ Groups</option>
+			<option onchange="this.form.submit();" value="-1">XB_ALL</option>
+			<option onchange="this.form.submit();" value="1">XB_PEOPLE</option>
+			<option onchange="this.form.submit();" value="2">XB_GROUPS</option>
 		</field>	
 		<field
 			name="tagfilt" type="tag"
