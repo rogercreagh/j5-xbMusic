@@ -58,8 +58,15 @@ class SongsModel extends ListModel
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
+        
         $idx = $this->getUserStateFromRequest($this->context . '.filter.idx', 'filter_idx');
         $this->setState('filter.idx', $idx);
+        
+        $published = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+        $this->setState('filter.tagfilt', $published);
+        
+        $published = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+        $this->setState('filter.taglogic', $published);
         
         // List state information.
         parent::populateState($ordering, $direction);

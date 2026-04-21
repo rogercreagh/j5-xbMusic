@@ -59,13 +59,19 @@ class PlaylistsModel extends ListModel {
             $this->context .= '.' . $layout;
         }
         
-        $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-        $this->setState('filter.search', $search);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search','');
+        $this->setState('filter.search', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
-        $this->setState('filter.published', $published);        
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
+        $this->setState('filter.published', $filt);        
         
-        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+        $this->setState('filter.tagfilt', $filt);
+        
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+        $this->setState('filter.taglogic', $filt);
+        
+        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id','');
 //        $artlist        = $this->getUserStateFromRequest($this->context . '.filter.artlist', 'filter_artlist', '1');
 //        $scfilt        = $this->getUserStateFromRequest($this->context . '.filter.scfilt', 'filter_scfilt', '');
         
@@ -217,7 +223,7 @@ class PlaylistsModel extends ListModel {
     	if ($tagfilt[0] > 0) {
     	    $tagfilt = ArrayHelper::toInteger($tagfilt);
     	    $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.album').'
+                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.playlist').'
                     AND tmap.content_item_id = a.id)';
     	    switch ($taglogic) {
     	        case 1: //all tags must be matched
@@ -237,7 +243,7 @@ class PlaylistsModel extends ListModel {
     	                $tagIds = implode(',', $tagfilt);
     	                if ($tagIds) {
     	                    $subQueryAny = '(SELECT DISTINCT content_item_id AS cid FROM #__contentitem_tag_map
-                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.album').')';
+                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.playlist').')';
     	                    $query->innerJoin('(' . (string) $subQueryAny . ') AS tm ON tm.cid = a.id');
     	                }
     	            } //end else

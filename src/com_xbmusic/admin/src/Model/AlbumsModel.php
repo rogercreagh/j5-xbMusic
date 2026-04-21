@@ -58,13 +58,19 @@ class AlbumsModel extends ListModel {
             $this->context .= '.' . $layout;
         }
         
-        $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-        $this->setState('filter.search', $search);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search','');
+        $this->setState('filter.search', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
-        $this->setState('filter.published', $published);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
+        $this->setState('filter.published', $filt);
         
-        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+        $this->setState('filter.tagfilt', $filt);
+        
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+        $this->setState('filter.taglogic', $filt);
+                
+        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id','');
 //        $artlist        = $this->getUserStateFromRequest($this->context . '.filter.artlist', 'filter_artlist', '1');
 //        $scfilt        = $this->getUserStateFromRequest($this->context . '.filter.scfilt', 'filter_scfilt', '');
         

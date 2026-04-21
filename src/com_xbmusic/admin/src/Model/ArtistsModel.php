@@ -59,19 +59,22 @@ class ArtistsModel extends ListModel {
             $this->context .= '.' . $layout;
         }
         
-        $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
-        $this->setState('filter.search', $search);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search','');
+        $this->setState('filter.search', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
-        $this->setState('filter.published', $published);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '');
+        $this->setState('filter.published', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.typefilter', 'filter_filter_typefilter', '');
-        $this->setState('filter.typefilter', $published);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.typefilter', 'filter_filter_typefilter', '');
+        $this->setState('filter.typefilter', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.typefilter', 'filter_filter_typefilter', '');
-        $this->setState('filter.typefilter', $published);
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+        $this->setState('filter.tagfilt', $filt);
         
-        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id');
+        $filt = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+        $this->setState('filter.taglogic', $filt);
+        
+        $categoryId = $this->getUserStateFromRequest($this->context . '.filter.category_id', 'filter_category_id','');
 //        $artlist        = $this->getUserStateFromRequest($this->context . '.filter.artlist', 'filter_artlist', '1');
 //        $scfilt        = $this->getUserStateFromRequest($this->context . '.filter.scfilt', 'filter_scfilt', '');
         
@@ -218,7 +221,7 @@ class ArtistsModel extends ListModel {
 		    $taglogic = $tagId>0 ? 0 : 2;
 		} else {
 		    $tagfilt = $this->getState('filter.tagfilt');
-		    $taglogic = $this->getState('filter.taglogic');  //0=ANY 1=ALL 2= None
+		    $taglogic = $this->getState('filter.taglogic',0);  //0=ANY 1=ALL 2= None
 		}
 		if (!is_array($tagfilt)) {
 		    $tagfilt = array($tagfilt);
