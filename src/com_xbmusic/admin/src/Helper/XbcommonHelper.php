@@ -786,11 +786,14 @@ class XbcommonHelper extends ComponentHelper {
         return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[(int) floor($base)];
     }
     
-    public static function secondsToHms($seconds) {
+    public static function secondsToHms($seconds, $showzerohrs = true) {
         $hours = floor($seconds / 3600);
         $minutes = floor(($seconds % 3600) / 60);
         $seconds = $seconds % 60;
-        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        if ($showzerohrs || ($hours > 0)) {
+            return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
+        }
+        return sprintf('%02d:%02d', $minutes, $seconds);
     }
     
     

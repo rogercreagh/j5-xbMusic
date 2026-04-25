@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- xbMusic Site Artists Filter Form file v0.63.0 21st April 2026 -->
+
+<form>
+	<fields name="filter">
+	
+		<field
+			name="search"
+			type="text"
+			label="XB_FILTER_SEARCH_NAME"
+			description="XBMUSIC_FILTER_SEARCH_ALBUM_DESC"
+			hint="JSEARCH_FILTER"
+		/>
+<!-- 
+		<field
+			name="tagfilt" type="tag"
+			label="XB_FILTER_TAGS"
+			description="Select tags"
+			hint="filter by tags"
+			multiple="true"
+			class="multipleTags"
+			mode="nested"
+			onchange="this.form.submit();"
+		/>
+		<field name="taglogic" type="radio"
+			label="XB_FIELD_TAGLOGIC"
+			description="XB_FIELD_TAGLOGIC_DESC"
+  			class="btn-group btn-small radiotop"
+			default="0"
+		>
+			<option value="1" onchange="this.form.submit();">XB_ALL</option>
+			<option value="0" onchange="this.form.submit();">XB_ANY</option>
+			<option value="2" onchange="this.form.submit();">XB_NONE</option>
+		</field>	
+ -->
+		
+	</fields>
+
+	<fields name="list">
+
+		<field
+			name="fullordering"
+			type="list"
+			label="JGLOBAL_SORT_BY"
+			default="rand"
+			onchange="this.form.submit();"
+			>
+			<option value="">JGLOBAL_SORT_BY</option>
+			<option value="a.title ASC">XBMUSIC_ALBUM_ASC</option>
+			<option value="a.title DESC">XBMUSIC_ALBUM_DESC</option>
+			<option value="a.sortartist ASC">XBMUSIC_ALBUM_ARTIST_ASC</option>
+			<option value="a.sortartist DESC">XBMUSIC_ALBUM_ARTIST_DESC</option>
+			<option value="rand">XB_RANDOM</option>
+		</field>
+
+		<field
+			name="limit"
+			type="limitbox"
+			label="JGLOBAL_LIST_LIMIT"
+			default="16"
+			limits="16,32,64,128"
+			showall="true"
+			onchange="this.form.submit();"
+		/>	
+	</fields>
+</form>

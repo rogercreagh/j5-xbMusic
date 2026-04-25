@@ -2,6 +2,35 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.0.63.2</version>
+		<addition>
+			<item><![CDATA[<h3>Alpha Release v0.0.63.2</h3> Updated 25th April 2026]]></item>
+			<item>Site Albums gallery view added with popover, title/artist search, sort by random, artist or title</item>
+		</addition>
+		<remove>
+		</remove>
+		<change>
+			<item>Artists type reset to Person or Group only. Use tags for other artist info</item>
+			<item>Improvement to album modal layout</item>
+		</change>
+		<fix>
+			<item>bug in tag filter subquery</item>
+			<item>bug causing active tag filter not to remain open</item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.62.1</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.62.1</h3> Updated 18th April 2026]]></item>

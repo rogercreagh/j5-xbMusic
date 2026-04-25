@@ -17,7 +17,7 @@
 	<fields name="params">
 
 		<!-- Basic options. -->
-		<fieldset name="basic" lable="XB_OPTIONS">
+		<fieldset name="basic" label="XB_OPTIONS">
 			<!-- show cols -->
 			<field name="showimg" type="radio"
 				label="XBMUSIC_SHOW_IMG"

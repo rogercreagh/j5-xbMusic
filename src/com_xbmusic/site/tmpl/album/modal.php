@@ -83,14 +83,18 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
             }
         ?></span>
         <div class="xbbox">
-        	<table>   
-        		<tr><th>Tk.No.</th><th>Title</th><th>Playlists/Programmes</th></tr>             	
+        	<table class="table table-striped">   
+        		<tr><th>Tk.No.</th><th><?php echo Text::_('XB_TITLE');?></th>
+        			<th><?php echo Text::_('XBMUSIC_DURATION');?></th>
+        			<th class="xbpl20"><?php echo Text::_('XBMUSIC_PLAYLIST_PROGS');?></th>
+        		</tr>             	
 				<?php foreach ($item->tracks as $track) : ?>
         	    	<tr><td>
         	    		<?php if ($item->num_discs>1) echo $track['discno'] . '&nbsp;&nbsp';
                         echo ($track['trackno'] > 0) ? $track['trackno'] : '--'; ?>
                     </td>
         	    	<td><?php echo $track['tracktitle']; ?></td>
+        	    	<td class="xbpl10"><?php echo XbcommonHelper::secondsToHms($track['duration'],false);?></td>
         	    	<td class="xbpl20">
         	    		<?php if (key_exists('playlists',$track)) : ?>
         	    	    <?php foreach ($track['playlists'] as $plist ) : ?>

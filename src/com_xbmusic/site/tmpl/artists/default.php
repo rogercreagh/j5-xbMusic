@@ -39,7 +39,8 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
                 'bandcamp'=>'<i class="fab fa-bandcamp"></i>',
                 'spotify'=>'<i class="fab fa-spotify"></i>',
                 'youtube'=>'<i class="fab fa-youtube-square"></i>',
-                'website'=>'<i class="fas fa-globe"></i>'
+                'website'=>'<i class="fas fa-globe"></i>',
+                'wikipedia'=>'<i class="fab fa-wikipedia-w"></i>'
             );
 
 $root = Uri::root();
@@ -103,7 +104,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 			<?php echo HTMLHelper::_('searchtools.sort', 'XB_FULL_NAME', 'a.name', $listDirn, $listOrder); ?>
 			<i><?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_SORTNAME', 'a.sortname', $listDirn, $listOrder); ?></i>
 		</th>
-		<th> </th>
+		<th><?php echo Text::_('XB_LINKS'); ?></th>
 		<th class="hidden-phone"><?php echo Text::_('XBMUSIC_SONGS'); ?></th>
 		<th><?php echo Text::_('XBMUSIC_ALBUMS'); ?></th>
 		<?php if ($this->showcat || $this->showtags) : ?>
@@ -199,6 +200,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 					<div class="xbyscroll" style="max-height:180px;">
 					<p class="xbnote"><?php echo Text::_('XBMUSIC_ALBUMS_NOTALL_TRACKS'); ?></p>
 					<ul class="xbnobullets xbm5">
+					<?php $pvtit = "'".Text::_('XBMUSIC_ALBUM_DETAILS')."'"; ?>
 					<?php foreach ($item->albums as $album) : ?>
 						<li>							
 							<?php if(($this->showimg) && ($album['imgurl']!='')) :?>
@@ -215,7 +217,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 							
 			                <?php echo $album['albumtitle']; ?> 
 			                <?php if($album['rel_date']) echo ' ('.$album['rel_date'].') '; ?>
-                			<?php $pvtit = "'".Text::_('XBMUSIC_ALBUM_DETAILS')."'"; ?>
+                			
                             <span class="xbpveye" 
                             	onclick="pvItem(<?php echo $pvtit; ?>,'album','<?php echo $album['albumid']; ?>');">
                             	<span class="icon-eye xbpl10"></span>

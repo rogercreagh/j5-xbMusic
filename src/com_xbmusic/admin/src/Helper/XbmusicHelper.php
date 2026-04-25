@@ -721,7 +721,7 @@ class XbmusicHelper extends ComponentHelper
 	    //$db = Factory::getContainer()->get(DatabaseInterface::class);
 	    $db = Factory::getDbo();
 	    $query = $db->getQuery(true);
-	    $query->select('t.id AS trackid, t.title AS tracktitle, t.filepathname, t.sortartist, t.discno, t.trackno');
+	    $query->select('t.id AS trackid, t.title AS tracktitle, t.filepathname, t.sortartist, t.discno, t.trackno, t.duration');
 	    $query->from('#__xbmusic_tracks AS t');
 	    $query->where('t.album_id = '.$db->q($aid));
 	    $query->order('t.discno, t.trackno, t.title ASC');

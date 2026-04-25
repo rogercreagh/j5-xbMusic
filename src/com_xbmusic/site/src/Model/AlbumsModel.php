@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/src/Model/ArtistsModel.php
- * @version 0.0.63.0 21st April 2026
+ * @version 0.0.63.2 25th April 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -19,7 +19,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\Database\ParameterType;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 
-class ArtistsModel extends ListModel
+class AlbumsModel extends ListModel
 {
  
     public function __construct($config = array())
@@ -28,11 +28,12 @@ class ArtistsModel extends ListModel
         {
             $config['filter_fields'] = array(
                 'id', 'a.id',
-                'name', 'a.name',
-                'type','a.type',
+                'title', 'a.title',
+                'albumartist', 'a.albumartist',
+                'sortartist', 'a.sortartist',
                 'category_title',
-                'sortname', 'a.sortname',
-                'tagfilt'
+                'rel_date', 'a.rel_date',
+                'tagfilt','rand'
             );
         }
         
@@ -55,19 +56,17 @@ class ArtistsModel extends ListModel
      *
      * @since   3.0.1
      */
-    protected function populateState($ordering = 'a.name', $direction = 'ASC')
+    protected function populateState($ordering = 'rand', $direction = 'ASC')
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
+
+
+//         $filt = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
+//         $this->setState('filter.tagfilt', $filt);
         
-        $published = $this->getUserStateFromRequest($this->context . '.filter.typefilter', 'filter_filter_typefilter', '');
-        $this->setState('filter.typefilter', $published);
-        
-        $published = $this->getUserStateFromRequest($this->context . '.filter.tagfilt', 'filter_filter_tagfilt', '');
-        $this->setState('filter.tagfilt', $published);
-        
-        $published = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
-        $this->setState('filter.taglogic', $published);
+//         $filt = $this->getUserStateFromRequest($this->context . '.filter.taglogic', 'filter_filter_taglogic', '');
+//         $this->setState('filter.taglogic', $filt);
         
         // List state information.
         parent::populateState($ordering, $direction);
@@ -106,13 +105,13 @@ class ArtistsModel extends ListModel
         $query->select(
             $this->getState(
                 'list.select',
-                'DISTINCT a.id, a.name, a.sortname, a.alias, a.description, a.imgurl, '
-                .'a.type, a.ext_links, a.catid, '
+                'DISTINCT a.id AS albumid, a.title AS albumtitle, a.sortartist, a.albumartist, a.imgurl, '
+                .'a.rel_date, a.num_discs, a.tot_tracks, a.catid, '
                 .'a.status, a.access' 
                 )
             );
-        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_trackartist AS tk WHERE tk.artist_id = a.id) AS trkcnt');
-        $query->from($db->qn('#__xbmusic_artists') . ' AS a');
+        $query->select('(SELECT COUNT(DISTINCT(tk.id)) FROM #__xbmusic_tracks AS tk WHERE tk.album_id = a.id AND tk.status = 1) AS trkcnt');
+        $query->from($db->qn('#__xbmusic_albums') . ' AS a');
         
         // Join over the categories.
         $query->select('c.title AS category_title, c.path AS category_path')
@@ -126,17 +125,17 @@ class ArtistsModel extends ListModel
         $search = $this->getState('filter.search');
         if (!empty($search))
         {
-            $search = '%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%');
-            $query->where($db->qn('a.name'). ' LIKE :search')
+            $sin = $db->qn('a.title');
+            $search = strtolower( trim($search));
+            if (strpos($search,'a:') === 0) {
+                $search = substr($search,2);
+                $sin = $db->qn('a.albumartist');
+            }
+            
+            $search = '%' . str_replace(' ', '%', $db->escape($search, true) . '%');
+            $query->where($sin. ' LIKE :search')
                 ->bind(':search', $search, ParameterType::STRING);
         }
-        
-        // filter by type
-        $typefilter = $this->getState('filter.typefilter');
-        if ($typefilter > 0) {
-            $query->where($db->qn('a.type').' = '.$typefilter);
-        }
-        
         
         //filter by tags
         $tagfilt = '';
@@ -156,7 +155,7 @@ class ArtistsModel extends ListModel
         if ($tagfilt[0] > 0) {
             $tagfilt = ArrayHelper::toInteger($tagfilt);
             $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.artist').'
+                    WHERE tmap.type_alias = '.$db->quote('com_xbmusic.album').'
                     AND tmap.content_item_id = a.id)';
             switch ($taglogic) {
                 case 1: //all tags must be matched
@@ -176,7 +175,7 @@ class ArtistsModel extends ListModel
                         $tagIds = implode(',', $tagfilt);
                         if ($tagIds) {
                             $subQueryAny = '(SELECT DISTINCT content_item_id AS cid FROM #__contentitem_tag_map
-                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.artist').')';
+                                    WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote('com_xbmusic.album').')';
                             $query->innerJoin('(' . (string) $subQueryAny . ') AS tm ON tm.cid = a.id');
                         }
                     } //end else
@@ -188,18 +187,26 @@ class ArtistsModel extends ListModel
         $query->where($db->qn('a.status').' = 1');
         
         // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', 'a.id');
+        $orderCol  = $this->state->get('list.ordering', 'rand');
         $orderDirn = $this->state->get('list.direction', 'ASC');
         
-        if ($orderCol === 'title') {
-            $ordering = [
-                $db->quoteName('a.title') . ' ' . $db->escape($orderDirn),
-            ];
+        if ($orderCol === 'rand') {
+            $query->order('rand()');
         } else {
-            $ordering = $db->escape($orderCol) . ' ' . $db->escape($orderDirn);
+            if ($orderCol === 'title') {
+                
+                $ordering = [
+                    $db->quoteName('a.title') . ' ' . $db->escape($orderDirn),
+                ];
+            } else {
+                $ordering = $db->escape($orderCol);
+            }
+            if ($orderDirn != '') {
+                $ordering .= ' ' . $db->escape($orderDirn);
+            }
+            
+            $query->order($ordering);
         }
-        
-        $query->order($ordering);
         return $query;
     }
     
@@ -207,26 +214,8 @@ class ArtistsModel extends ListModel
         $items  = parent::getItems();
         if ($items) {
             $tagsHelper = new TagsHelper;
-            foreach ($items as $item) {
-                if($item->ext_links) $item->ext_links = json_decode($item->ext_links);
-                $item->ext_links_list ='';
-                $item->ext_links_cnt = 0;
-                if(is_object($item->ext_links)) {
-                    $item->ext_links_cnt = count((array)$item->ext_links);
-                    if ($item->ext_links_cnt > 0) {
-                        $item->ext_links_list ='<ul>';
-                        foreach($item->ext_links as $lnk) {
-                            $item->ext_links_list .= '<li><a href="'.$lnk->link_url.'" target="_blank">'.$lnk->link_text.'</a></li>';
-                        }
-                        $item->ext_links_list = $item->ext_links_list.'</ul>';
-                    }
-                } //end if is_object
-                $item->singles = XbmusicHelper::getArtistSingles($item->id);
-                $item->albums = XbmusicHelper::getArtistAlbums($item->id);
-                $item->songs = XbmusicHelper::getArtistTrackSongs($item->id);
-                
-                $item->tags = $tagsHelper->getItemTags('com_xbmusic.artist' , $item->id);
-                
+            foreach ($items as $item) {                
+                $item->tags = $tagsHelper->getItemTags('com_xbmusic.album' , $item->albumid);               
             } //end foreach
         } //endif items
         return $items;

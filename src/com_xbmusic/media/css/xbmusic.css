@@ -132,3 +132,36 @@ table[id^=subfieldList] thead tr td div.btn-group {
 }
 .js-stools-container-filters { height:3rem; }
 
+/* image grid */
+:root {
+  --xbgallery-gap: 1rem;
+  --xbgallery-items-per-row: 1; /* Default for mobile */
+}
+
+.xbgallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--xbgallery-gap);
+}
+
+.xbgallery-item {
+  flex: 0 0 calc(
+    (100% / var(--xbgallery-items-per-row)) - 
+    (var(--xbgallery-gap) * (var(--xbgallery-items-per-row) - 1) / var(--xbgallery-items-per-row))
+  );
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 500px) {
+  :root { --xbgallery-items-per-row: 2; }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 900px) {
+  :root { --xbgallery-items-per-row: 3; }
+}
+
+/* Large Desktop: 4 columns */
+@media (min-width: 1100px) {
+  :root { --xbgallery-items-per-row: 4; }
+}
