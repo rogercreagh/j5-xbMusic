@@ -2,9 +2,9 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
-		<version>0.0.63.2</version>
+		<version>0.0.63.3</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.63.2</h3> Updated 25th April 2026]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.63.3</h3> Updated 25th April 2026]]></item>
 			<item>Site Albums gallery view added with popover, title/artist search, sort by random, artist or title</item>
 		</addition>
 		<remove>
