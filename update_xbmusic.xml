@@ -6,15 +6,15 @@
 		<element>com_xbmusic</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>0.0.63</version>
+		<version>0.0.63.3</version>
 		<infourl>https://crosborne.uk/xbmusic</infourl>
 		<downloads>
-			<downloadurl type="full" format="zip">https://crosborne.uk/downloads?download=28</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/rogercreagh/j5-xbMusic/releases/download/v0.0.63.3-beta/mod_xbmusic_v0.0.63.3.zip</downloadurl>
 		</downloads>
         <tags>
           <tag>alpha</tag>
         </tags>
-        <sha256>9ca90a9f5f658dd2318ae91725366d2bc5e944fbb225312b275cdcac50203432</sha256>
+        <sha256>5bd2e50c92133fabdab5b459ea74c4628cad53fb23593f9f63c966abee24d752</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
