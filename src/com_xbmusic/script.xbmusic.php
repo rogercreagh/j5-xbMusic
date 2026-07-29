@@ -23,8 +23,8 @@ use Joomla\CMS\Version;
 
 class Com_xbmusicInstallerScript extends InstallerScript
 {
-    protected $jminver = '5.0';
-    protected $jmaxver = '6.0';
+    protected $jminver = '5.0'; //minimum acceptable version
+    protected $jmaxver = '6.0'; //minimum unacceptable version
     protected $extension = 'com_xbmusic';
     protected $extname = 'xbMusic';
     protected $extslug = 'xbmusic';

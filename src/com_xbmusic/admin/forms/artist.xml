@@ -114,7 +114,7 @@
 			
 		<field name="newimage" type="media"
 			label="Select Image" description="Select a image for this artist" 
-			directory="xbmusic/artwork/artists"
+			directory="xbmusic/artists"
 		/>
 		<field name="newimagetitle" type="text"
 			label="Image Title"

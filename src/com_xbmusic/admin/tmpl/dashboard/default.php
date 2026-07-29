@@ -21,7 +21,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 
 HTMLHelper::_('behavior.multiselect');
-HTMLHelper::_('formbehavior.chosen', 'select');
+// HTMLHelper::_('formbehavior.chosen', 'select');
 
 $wa = $this->document->getWebAssetManager();
 $wa->useScript('xbmusic.xbgeneral');

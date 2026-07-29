@@ -4,8 +4,9 @@
 		<type>component</type>
 		<version>0.0.63.3</version>
 		<addition>
-			<item><![CDATA[<h3>Alpha Release v0.0.63.3</h3> Updated 25th April 2026]]></item>
+			<item><![CDATA[<h3>Alpha Release v0.0.63.3</h3> Updated 29th July 2026]]></item>
 			<item>Site Albums gallery view added with popover, title/artist search, sort by random, artist or title</item>
+			<item>Added Wikipedia icon for external links</item>
 		</addition>
 		<remove>
 		</remove>
@@ -16,6 +17,7 @@
 		<fix>
 			<item>bug in tag filter subquery</item>
 			<item>bug causing active tag filter not to remain open</item>
+			<item>artist image selector in admin poining at wrong folde</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>

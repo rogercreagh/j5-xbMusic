@@ -1,0 +1,4 @@
+/* the contents of this file to be appended to admin templat/user.css on install */
+
+#fieldset-layout div.form-grid div.control-group:first-child { margin:0;}
+#jform_params_layoutnote1desc-desc  {margin-left:40px;}

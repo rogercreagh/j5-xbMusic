@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource site/tmpl/Artists/default.php
- * @version 0.0.62.1 18th April 2026
+ * @version 0.0.63.3 25th July 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -38,7 +38,8 @@ $iconarr = array('facebook'=>'<i class="fab fa-facebook"></i>',
                 'bandcamp'=>'<i class="fab fa-bandcamp"></i>',
                 'spotify'=>'<i class="fab fa-spotify"></i>',
                 'youtube'=>'<i class="fab fa-youtube-square"></i>',
-                'website'=>'<i class="fas fa-globe"></i>'
+                'website'=>'<i class="fas fa-globe"></i>',
+                'wikipedia'=>'<i class="fab fa-wikipedia-w"></i>'  
             );
 
 $root = Uri::root();
