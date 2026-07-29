@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.0.59.22 13th February 2026
+ * @version 0.1.0.0 29th July 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -24,7 +24,7 @@ use Joomla\CMS\Version;
 class Com_xbmusicInstallerScript extends InstallerScript
 {
     protected $jminver = '5.0'; //minimum acceptable version
-    protected $jmaxver = '6.0'; //minimum unacceptable version
+    protected $jmaxver = '7.0'; //minimum unacceptable version
     protected $extension = 'com_xbmusic';
     protected $extname = 'xbMusic';
     protected $extslug = 'xbmusic';
