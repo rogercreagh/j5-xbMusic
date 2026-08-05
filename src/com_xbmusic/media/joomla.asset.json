@@ -35,7 +35,6 @@
 			"type" : "script",
 			"uri" : "com_xbmusic/xbtags-field-fancy-select.js",
 			"dependencies" : [
-				"wcpolyfill",
 				"choicesjs"
 			]
 		}, {
