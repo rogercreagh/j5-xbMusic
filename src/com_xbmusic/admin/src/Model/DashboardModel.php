@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DashboardModel.php
- * @version 0.0.41.5 8th March 2025
+ * @version 0.1.0.0 5th August 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -162,13 +162,4 @@ class DashboardModel extends ListModel {
         return $array;
     }
     
-    public function urlExists($url) {
-        $file_headers = @get_headers($url);
-        if(!$file_headers || $file_headers[0] == 'HTTP/1.1 404 Not Found') {
-            return false;
-        }
-        return true;
-        
-    }
-
 }

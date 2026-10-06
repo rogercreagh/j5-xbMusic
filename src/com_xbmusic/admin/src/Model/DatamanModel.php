@@ -19,8 +19,10 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\CMS\Uri\Uri;
 use DirectoryIterator;
+use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
+use RegexIterator;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
@@ -162,6 +164,13 @@ class DatamanModel extends AdminModel {
         return $cnts['newtrk'];
     } //end parseFilesMp3()
     
+    /**
+     * @name getMp3FileList()
+     * @desc gets an array of all files in a folder
+     * @param unknown $folder
+     * @param string $ext
+     * @return string[]
+     */
     private function getMp3FileList($folder, $ext = 'mp3') {
         //$folder must be full path
         $mp3list =[];
@@ -848,6 +857,45 @@ class DatamanModel extends AdminModel {
             }
         }
         return $result;
+    }
+    
+    /**
+     * @name checkTrackFiles()
+     * @desc iterates through the media files and tracks checking if file has no track or track file is missing
+     * @return boolean | array (true if all ok, array of missing items)
+     */
+    public function checkTrackFiles() {
+        $res = false;
+        $missingtracks = [];
+        $missingfiles = self::recursiveGetFilename(JPATH_ROOT.'/xbmusic/');
+        // get array of existing filepaths with integer index
+        $allfiles = [];
+        // get array of existing tracks with id index
+        $alltracks = [];
+        $missingtracks = array_diff($alltracks, $allfiles);
+        $missingfiles = array_diff($allfiles, $alltracks);
+        if ()
+            return $res;
+    }
+    
+    public function recursiveGetFilename(string $folder, $ext = "mp3") {
+        $extensions = ['jpg', 'jpeg', 'png']; // Array of extensions to find
+        
+        // Create the directory iterator
+        $dirIterator = new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS);
+        // Create the recursive iterator to traverse subdirectories
+        $recursiveIterator = new RecursiveIteratorIterator($dirIterator);
+        // Create a regex filter to match specific extensions
+        // The pattern $pattern = '/\.(jpg|jpeg|png)$/i'; matches any file ending with .jpg, .jpeg, or .png (case-insensitive)
+        $pattern = '/\.('.$ext.')$/i';
+        $regexIterator = new RegexIterator($recursiveIterator, $pattern, RegexIterator::GET_MATCH);
+        
+        $files = [];
+        foreach ($regexIterator as $file) {
+            $files[] = $file->getPathname();
+        }
+        return $files;
+        
     }
     
 }

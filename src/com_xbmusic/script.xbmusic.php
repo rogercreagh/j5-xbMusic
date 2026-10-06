@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource script.xbmusic.php
- * @version 0.1.0.0 29th July 2026
+ * @version 0.1.0.0 6th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -23,6 +23,16 @@ use Joomla\CMS\Version;
 
 class Com_xbmusicInstallerScript extends InstallerScript
 {
+    
+    /* Files to be deleted on this update
+     * Prune the list at the next minor version update
+     * Add comment with version each files was deleted at
+     * SITE or ADMIN will be replaced with the relevant path from JRoot
+     */
+    protected $delfiles = array(
+        'ADMIN/layouts/indgrp.php', 
+        'ADMIN/layouts/untag.php'); 
+    
     protected $jminver = '5.0'; //minimum acceptable version
     protected $jmaxver = '7.0'; //minimum unacceptable version
     protected $extension = 'com_xbmusic';
@@ -32,6 +42,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
     protected $date = '32nd January 2024';
     protected $oldver = 'v1.2.3.4';
     protected $olddate = '32nd January 2024';
+    
     
     function preflight($type, $parent) {
         $jversion = new Version();
@@ -50,8 +61,7 @@ class Com_xbmusicInstallerScript extends InstallerScript
     
     function install($parent) {
     }
-  
-    
+     
     function uninstall($parent) {
         $app = Factory::getApplication();
         $message = 'Uninstalling '.$this->extname.' component v.'.$parent->getManifest()->version.' '.$parent->getManifest()->creationDate.'<br />';
@@ -124,8 +134,41 @@ class Com_xbmusicInstallerScript extends InstallerScript
     }
     
     function update($parent) {
+        
         $app = Factory::getApplication();
         $message = '';
+        
+/**/         if (!empty($this->delfiles)) {
+            $admin = '/administrator/components/com_xbmusic';
+            $site ='/components/com_xbmusic';
+             $message .= 'Removing redundant files<br />';
+             foreach ($this->delfiles as $target) {
+                 if (substr($target, 0, 5) == 'ADMIN') $target = str_replace('ADMIN', $admin, $target);
+                if (substr($target, 0, 4) == 'SITE') $target = str_replace('SITE', $site, $target);
+                $target = JPATH_ROOT.$target;
+                if (file_exists($target)) {
+                    if (is_dir($target)) {
+                        if ($this->rrmdir($target)) {
+                            //$dcnt ++;
+                            $message .= 'RMDIR ';
+                        }
+                    } else {
+                        if (unlink($target)) {
+                            $message .= 'DELETED ';
+                            //$cnt ++;
+                        } else {
+                            $message .= 'DELETE FAILED ';
+                            //$ecnt ++;
+                        }
+                    }
+                } else {
+                    $message .= 'FILE NOT FOUND: ';
+                }
+                $message .= $target.'<br />';
+               
+            }
+        }
+ /**/            
         if (!file_exists(JPATH_ROOT.'/xbmusic-data/logs')) {
             mkdir(JPATH_ROOT.'/xbmusic-data/logs',0775,true);
             $message .= 'Log &amp; data files folder <code>/xbmusic-data/</code> created.<br />';
@@ -390,5 +433,32 @@ class Com_xbmusicInstallerScript extends InstallerScript
            }
            return $result;
        }
+  
+       /**
+        * @name rrmdir()
+        * @desc recursively removes folder and all contents
+        * @param string $dir full path to folder
+        * @return boolean
+        */
+       protected function rrmdir(string $dir) {
+           $dir = rtrim($dir, "/");
+           if (is_dir($dir)) {
+               $objects = scandir($dir);
+               foreach ($objects as $object) {
+                   if ($object != "." && $object != "..") {
+                       if (filetype($dir."/".$object) == "dir") {
+                           $this->rrmdir($dir."/".$object);
+                       } else {
+                           unlink($dir."/".$object);
+                       }
+                   }
+               }
+               reset($objects);
+               rmdir($dir);
+               return true;
+           }
+           return false;
+       }
+       
        
 }

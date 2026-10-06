@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default_batch_body.php
- * @version 0.0.19.2 27th November 2023
+ * @version 0.1.0.0 5th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2019
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -46,7 +46,7 @@ $catfilt = $this->state->get('filter.category_id','');
 		</div>
 		<div class="col-lg-6">
 			<div class="controls">
-				<?php echo LayoutHelper::render('untag', array()); ?>
+				<?php echo LayoutHelper::render('xbmusic.batch.untag', array()); ?>
 			</div>
 		</div>
 	</div>

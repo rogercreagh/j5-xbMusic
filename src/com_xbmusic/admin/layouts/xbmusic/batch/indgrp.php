@@ -1,7 +1,7 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/layouts/indgrp.php
+ * @filesource admin/layouts/xbmusic/batch/indgrp.php
  * @version 0.0.63.3 25th July 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
