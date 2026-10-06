@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/artists/default_batch_body.php
- * @version 0.0.9.0 21st June 2024
+ * @version 0.1.0.0 5th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2019
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -33,6 +33,7 @@ $catfilt = $this->state->get('filter.category_id','');
 		<div class="col-lg-6">
     		<div class="control-group xbmt20" >
     			<div class="controls">
+                    <?php //echo LayoutHelper::render('xbmusic.form.field.xbtags', array()); ?>
                     <?php echo LayoutHelper::render('joomla.html.batch.tag', array()); ?>
     			</div>
     		</div>
@@ -41,13 +42,13 @@ $catfilt = $this->state->get('filter.category_id','');
 	<div class="row">
 		<div class="col-lg-6">
 			<div class="controls">
-				<?php echo LayoutHelper::render('indgrp', array()); ?>
+				<?php echo LayoutHelper::render('xbmusic.batch.indgrp', array()); ?>
 			</div>
 		
 		</div>
 		<div class="col-lg-6">
 			<div class="controls">
-				<?php echo LayoutHelper::render('untag', array()); ?>
+				<?php echo LayoutHelper::render('xbmusic.batch.untag', array()); ?>
 			</div>
 		</div>
 	</div>

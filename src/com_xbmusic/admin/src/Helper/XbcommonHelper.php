@@ -886,6 +886,7 @@ class XbcommonHelper extends ComponentHelper {
      */
     public static function check_url(string $url) {
         $headers = @get_headers( $url);
+        if(!$headers) return false;
         $headers = (is_array($headers)) ? implode( "\n ", $headers) : $headers;
         return (bool)preg_match('#^HTTP/.*\s+[(200 |301 |302 )]+\s#i', $headers);
     }

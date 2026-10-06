@@ -2,6 +2,37 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.1.0.0</version>
+		<addition>
+			<item><![CDATA[<h3>Beta Release v0.1.0.0</h3> Updated 6th October 2026]]></item>
+			<item>Testing ok on J6, still runs on J5</item>
+			<item></item>
+		</addition>
+		<remove>
+			<item>Refernces to wcpolyfill removed as no longer needed and causing error</item>
+		</remove>
+		<change>
+			<item>Download url is now to github release not crosborne.uk</item>
+			<item>Added delete redundant files option to update script</item>
+			<item>Move layout indgrp and untag to xbmusic/batch</item>
+		</change>
+		<fix>
+			<item></item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.0.63.3</version>
 		<addition>
 			<item><![CDATA[<h3>Alpha Release v0.0.63.3</h3> Updated 29th July 2026]]></item>
