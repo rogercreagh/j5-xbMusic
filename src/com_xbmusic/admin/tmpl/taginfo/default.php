@@ -54,8 +54,8 @@ $longlist = 4;
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=taginfo'); ?>" method="post" name="adminForm" id="adminForm">
 		<div class="row">
 			<div class="col-sm-6">
-        		<h3><?php echo Text::_('XBMUSIC_XBMUSIC_TAGINFO'); ?></h3>
-              	<p class="xb095"><?php echo Text::_('XBMUSIC_TAGINFOPAGE_SUBTITLE'); ?></p>
+        		<h3><?php echo Text::_('XB_ITEMS_WITH_TAG'); ?></h3>
+              	<p class="xb095"><?php echo Text::_('XB_TAGINFOPAGE_SUBTITLE'); ?></p>
 			</div>
 			<div class= "col-sm-6">
 				<a href="<?php echo $telink.$item->id; ?>" class="xbbadge badge-tag xbr15" style="color:#fff;padding:15px;">

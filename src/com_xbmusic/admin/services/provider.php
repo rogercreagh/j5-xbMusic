@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/services/provider.php
- * @version 0.0.0.2 25th September 2025
+ * @version 0.1.0.0 10th October 2026
  * @since v0.0.0.1 31st March 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
@@ -46,7 +46,7 @@ return new class implements ServiceProviderInterface {
                 $component->setRouterFactory($container->get(RouterFactoryInterface::class));
                 
                 return $component;
-        }
+            }
         );
-    }
+     }
 };

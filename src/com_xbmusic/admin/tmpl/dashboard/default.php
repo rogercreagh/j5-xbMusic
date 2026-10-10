@@ -284,7 +284,7 @@ $wa->useScript('xbmusic.xbgeneral');
 					<table class="xbwp100">
 						<tr>
 							<td class="xbwp50 xbpl20">
-								<span class="xbnit xbpl10"><?php echo Text::_('XBMUSIC_TAGS_TOTAL'); ?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('XB_TAGS_TOTAL'); ?></span>
 								<span class="xbbadge badge-tag"><?php echo $this->tagcnts['total'];?></span>
 							</td>
 							<td class="xbwp50">
