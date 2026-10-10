@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Field/XbtagsField.php
- * @version 0.0.18.8 8th November 2024
+ * @version 0.1.0.0 9th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -98,7 +98,7 @@ class XbtagsField extends ListField
             $maxlevel = $levels;
             if ($parent_id>1) {
                 //get parent level
-                $ptag = XbcommonHelper::getTag($parent_id);
+                $ptag = XbcommonHelper::getTags($parent_id);
                 $maxlevel += $ptag->level;
             }
         }

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.0.59.17 25thnFebruary 2026
+ * @version 0.1.0.0 9th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -14,29 +14,32 @@ defined('_JEXEC') or die;
 
 
 use Joomla\CMS\Factory;
-// use Joomla\CMS\Access\Access;
-//use Joomla\CMS\Application\ApplicationHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Component\ComponentHelper;
-//use Joomla\CMS\Filter\OutputFilter;
-//use Joomla\CMS\Filter\InputFilter;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
-//use Joomla\CMS\Object\CMSObject;
 use Joomla\CMS\Table\Table;
-// use Joomla\CMS\Uri\Uri;
-//use Joomla\Database;
-//use Joomla\Database\DatabaseInterface;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\DatabaseQuery;
+use Joomla\Database\ParameterType;
 use Joomla\Filter\OutputFilter;
-//use DOMDocument;
 use DateTime;
 use Exception;
+//use Joomla\CMS\Access\Access;
+//use Joomla\CMS\Application\ApplicationHelper;
+//use Joomla\CMS\Filter\InputFilter;
+//use Joomla\CMS\Object\CMSObject;
+//use Joomla\CMS\Uri\Uri;
+//use Joomla\Database;
+//use DOMDocument;
 //use Symfony\Component\Validator\Constraints\Existence;
 //use Crosborne\Component\Xbmusic\Administrator\Helper\getid3\Getid3;
 //use Joomla\CMS\Filter\InputFilter;
 
+
 class XbcommonHelper extends ComponentHelper { 
+    
     
     /****************** xbLibrary functions ***********/
     /** Sections
@@ -272,6 +275,87 @@ class XbcommonHelper extends ComponentHelper {
     }
     
     /**
+     * @name getTags()
+     * @desc gets a tag's details given its id
+     * @param (int | array) $tagid
+     * @return mixed
+     */
+    public static function getTags($tagid) {
+        if (!is_array($tagid)) $tagid = array((int)$tagid);
+        $tagid = ArrayHelper::toInteger($tagid);
+        $db = Factory::getDBO();
+        //$db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true);
+        $query->select('*')
+        ->from('#__tags AS a ')
+        ->where($db->qn('a.id').' IN ('.implode(',',$tagid).')');
+        $db->setQuery($query);
+        return $db->loadObjectList();
+    }
+    
+    /**
+     * @name getTagByAlias()
+     * @desc gets a tag's details given its alias
+     * @param (int) $tagid
+     * @return mixed
+     */
+    public static function getTagByAlias(string $alias) {
+        $alias = self::makeAlias($alias);
+        $db = Factory::getDBO();
+        //$db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true);
+        $query->select('*')
+        ->from('#__tags AS a ')
+        ->where('a.alias = '.$db->q($alias));
+        $db->setQuery($query);
+        return $db->loadObject();
+    }
+    
+    /**
+     * @name tagFilterQuery()
+     * @desc given tag filter ids and logic appends appropriate where statement to query
+     * @param DatabaseQuery $query - existing query object
+     * @param array $tagfilt - array of tag ids to filter by
+     * @param int $taglogic 1=all, 2=none, else: any
+     * @param string typealias - extension item type used in table #__contentitem_tag_map
+     * @return \Joomla\Database\DatabaseQuery object
+     */
+    public static function tagFilterQuery(DatabaseQuery $query, array $tagfilt, int $taglogic, $typealias = 'com_xbmusic.track') {
+        
+        if (!empty($tagfilt)) {
+            $tagfilt = ArrayHelper::toInteger($tagfilt);
+            $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
+                WHERE tmap.type_alias = \''.$typealias.'\''.'
+                AND tmap.content_item_id = a.id)';
+            switch ($taglogic) {
+                case 1: //all
+                    for ($i = 0; $i < count($tagfilt); $i++) {
+                        $query->where($tagfilt[$i].' IN '.$subquery);
+                    }
+                    break;
+                case 2: //none
+                    for ($i = 0; $i < count($tagfilt); $i++) {
+                        $query->where($tagfilt[$i].' NOT IN '.$subquery);
+                    }
+                    break;
+                default: //any
+                    if (count($tagfilt)==1) {
+                        $query->where($tagfilt[0].' IN '.$subquery);
+                    } else {
+                        $tagIds = implode(',', $tagfilt);
+                        if ($tagIds) {
+                            $subQueryAny = '(SELECT DISTINCT content_item_id FROM #__contentitem_tag_map
+                                WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote($typealias).')';
+                            $query->innerJoin('(' . (string) $subQueryAny . ') AS tagmap ON tagmap.content_item_id = a.id');
+                        }
+                    }
+                    break;
+            }
+        }
+        return $query;
+    }
+    
+    /**
      * @name addTagToItems()
      * @desc adds an existing tag to one or more items of a given type using the batch command
      * @param string $compitem - the component item type in dotted lower case eg com_content.article
@@ -370,14 +454,27 @@ class XbcommonHelper extends ComponentHelper {
         return $tid;
     }
     
+    public static function getTagGroupsAliases(string $itemtype) {
+        $groups = [];
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $parentids = $params->get($itemtype.'tagparents',[]);
+        if (!empty($parentids)) {
+            $parr = self::getTags($parentids);
+            foreach ($parr as $tag) {
+                $groups[] = $tag->alias;
+            }
+        }
+        return $groups;
+    }
+    
     /**
-     * @name getCatChildren()
+     * @name getTagChildren()
      * @desc retruns all descendents of given category
      * @param int $id
      */
-    public static function getTagChildren($pathorid) {
+    public static function oldgetTagChildren($pathorid) {
         if (is_int($pathorid)) {
-            $path = self::getTag($pathorid)->path;
+            $path = self::getTags($pathorid)->path;
         } else if (is_string($pathorid)) {
             $path = $pathorid;
         } else {
@@ -388,7 +485,7 @@ class XbcommonHelper extends ComponentHelper {
         $query = $db->getQuery(true);
         $query->select('*');
         $query->select('(SELECT COUNT(*) FROM '.$db->qn('#__tags').' AS ccnt WHERE ccnt.path LIKE '.$db->q($path.'/%').') AS desccnt');
-        $query->from($db->qn('#__categories').' AS c');
+        $query->from($db->qn('#__tags').' AS c');
         $query->where($db->qn('path').' LIKE '.$db->q($path.'/%'));
         $query->order($db->qn('path'));
         $db->setQuery($query);
@@ -399,6 +496,132 @@ class XbcommonHelper extends ComponentHelper {
             }
         }
         return $result;
+    }
+
+    /**
+     * @name getTagChildren()
+     * @param int|string $parentkey - id or alias or title of parent tag
+     * @param integer $levels - number of levels below parent to show. 0 to show all descendents
+     * @param boolean $inclpar - if true (default) the parent tag will be included in list
+     * @param array $pubstate
+     * @return NULL|object list
+     */
+    public static function getTagChildren($parentkey, int $levels = 0, $inclpar = false, $pubstate = [1])
+    {
+        
+        $db     = Factory::getDbo();
+        $query  = $db->getQuery(true);
+        //get parent and level
+        $query->select(
+            [
+                $db->quoteName('a.id'),
+                $db->quoteName('a.title'),
+                $db->quoteName('a.alias'),
+                $db->quoteName('a.level'),
+                $db->quoteName('a.parent_id'),
+                $db->quoteName('a.path'),
+            ]
+            );
+        $query->from($db->quoteName('#__tags', 'a'));
+        if (is_int($parentkey)) {
+            $query->where($db->qn('id'). ' = :parent')
+            ->bind(':parent', $parentkey, ParameterType::INTEGER);
+        } else {
+            $parentkey = self::makeAlias($parentkey);
+            $query->where($db->quoteName('a.alias'). ' = :parent')
+            ->bind(':parent', $parentkey, ParameterType::STRING);
+        }
+        $db->setQuery($query);
+        $parent = $db->loadObject();
+        
+        if (is_null($parent)) return null;
+        
+        //get children of parent
+        $query->clear();
+        $query->select(               
+            [
+                $db->quoteName('a.id'),
+                $db->quoteName('a.title'),
+                $db->quoteName('a.alias'),
+                $db->quoteName('a.level'),
+                $db->quoteName('a.parent_id'),
+                $db->quoteName('a.path'),
+            ]
+        )->from($db->quoteName('#__tags', 'a'));
+        
+        $query->where($db->quoteName('a.path').' LIKE '.$db->q('%'.$parent->alias.'%'));
+        
+        $startlevel = $parent->level;
+        if ((int)$levels > 0){
+            $endlevel = $startlevel + $levels;
+            $query->where($db->qn('a.level').' <= '.$db->q((int)$endlevel));           
+        }
+        if (!$inclpar) {
+            $query->where($db->qn('a.level').' > '.$db->q((int)$startlevel));
+        }
+               
+        // Filter on the published state
+        if ((is_array($pubstate)) && !empty($pubstate)) {
+            $pubstate = ArrayHelper::toInteger($pubstate);
+            $query->whereIn($db->quoteName('a.published'), $pubstate);
+        }                
+        $query->order($db->quoteName('a.lft'));
+        $db->setQuery($query);
+        $items = $db->loadObjectList();
+        return $items;
+    }
+    
+    /**
+     * @name getTagChildOpts()
+     * @desc returns child tags as a formatted list of options for a select control
+     * @param int | string $parentkey - 
+     * @param int $levels - number of descendent levels to include. 0 will list all descendents
+     * @param boolean $dispar - if true parent tag will be selectable, otherwise displayed but disabled
+     * @param array $pubstate
+     * @return array[]|string[]|mixed[]
+     */
+    public static function getTagChildOpts($parentkey, int $levels = 0, $dispar = true, $pubstate = [1]) 
+    {
+        $options = [];
+        $optionstr = '';
+        $items = self::getTagChildren($parentkey, $levels, true, $pubstate);
+        // Assemble the list options.
+        if ($items) {
+            $items = (array)$items; //cast to array so we can access parent (first item)
+            
+            foreach ($items as $key=>&$item) {
+                $repeat       = (isset($item->level) && $item->level - 1 >= 0) ? $item->level - 1 : 0;
+                //               $option->text = str_repeat('- ', $repeat) . $option->text;
+                $prefix = ($repeat>0) ? str_repeat("\u{2003}",$repeat)."\u{2514}\u{2500} " : '';
+                $item->title = $prefix.$item->title;
+                $options[] = HTMLHelper::_('select.option', $item->id, $item->title);            
+            }
+            $optionstr = HTMLHelper::_('select.options', $options, 'value', 'text');
+            //disable parent listing
+            if ($dispar) {
+                $disopt = str_replace('>'.$items[0]->title, ' disabled >'.$items[0]->title, $optionstr);
+                $optionstr = $disopt;
+            }
+        }
+        return $optionstr;
+    }
+                
+    public static function getTagItemCnts($id) {
+        $res = array('albumcnt'=>0, 'artistcnt'=>0, 'playlistcnt'=>0, 'songcnt'=>0, 'trackcnt'=>0, 'total'=>0);
+        $db = Factory::getDbo();
+        $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS a WHERE a.type_alias = "com_xbmusic.album" AND a.tag_id = '.$db->q($id));
+        $res['albumcnt'] = $db->loadResult();
+        $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS a WHERE a.type_alias = "com_xbmusic.artist" AND a.tag_id = '.$db->q($id));
+        $res['artistcnt'] = $db->loadResult();
+        $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS a WHERE a.type_alias = "com_xbmusic.playlist" AND a.tag_id = '.$db->q($id));
+        $res['playlistcnt'] = $db->loadResult();
+        $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS a WHERE a.type_alias = "com_xbmusic.song" AND a.tag_id = '.$db->q($id));
+        $res['songcnt'] = $db->loadResult();
+        $db->setQuery('SELECT COUNT(*) FROM #__contentitem_tag_map AS a WHERE a.type_alias = "com_xbmusic.track" AND a.tag_id = '.$db->q($id));
+        $res['trackcnt'] = $db->loadResult();
+        $tot = array_sum($res);
+        $res['total'] = $tot;
+        return $res;
     }
     
     /**************** 3. Database Functions ********************/
@@ -928,66 +1151,6 @@ class XbcommonHelper extends ComponentHelper {
     
 /*************** TAG FUNCTIONS  ****************/    
 
-    /**
-     * @name getTag()
-     * @desc gets a tag's details given its id
-     * @param (int) $tagid
-     * @return mixed
-     */
-    public static function getTag($tagid) {
-        $db = Factory::getDBO();
-        //$db = Factory::getContainer()->get(DatabaseInterface::class);
-        $query = $db->getQuery(true);
-        $query->select('*')
-        ->from('#__tags AS a ')
-        ->where('a.id = '.$tagid);
-        $db->setQuery($query);
-        return $db->loadObject();
-    }
-       
-    /**
-     * @name tagFilterQuery()
-     * @desc given tag filter ids and logic appends appropriate where statement to query
-     * @param DatabaseQuery $query - existing query object
-     * @param array $tagfilt - array of tag ids to filter by
-     * @param int $taglogic 1=all, 2=none, else: any
-     * @param string typealias - extension item type used in table #__contentitem_tag_map
-     * @return \Joomla\Database\DatabaseQuery object
-     */
-    public static function tagFilterQuery(DatabaseQuery $query, array $tagfilt, int $taglogic, $typealias = 'com_xbmusic.track') {
-        
-        if (!empty($tagfilt)) {
-            $tagfilt = ArrayHelper::toInteger($tagfilt);
-            $subquery = '(SELECT tmap.tag_id AS tlist FROM #__contentitem_tag_map AS tmap
-                WHERE tmap.type_alias = \''.$typealias.'\''.'
-                AND tmap.content_item_id = a.id)';
-            switch ($taglogic) {
-                case 1: //all
-                    for ($i = 0; $i < count($tagfilt); $i++) {
-                        $query->where($tagfilt[$i].' IN '.$subquery);
-                    }
-                    break;
-                case 2: //none
-                    for ($i = 0; $i < count($tagfilt); $i++) {
-                        $query->where($tagfilt[$i].' NOT IN '.$subquery);
-                    }
-                    break;
-                default: //any
-                    if (count($tagfilt)==1) {
-                        $query->where($tagfilt[0].' IN '.$subquery);
-                    } else {
-                        $tagIds = implode(',', $tagfilt);
-                        if ($tagIds) {
-                            $subQueryAny = '(SELECT DISTINCT content_item_id FROM #__contentitem_tag_map
-                                WHERE tag_id IN ('.$tagIds.') AND type_alias = '.$db->quote($typealias).')';
-                            $query->innerJoin('(' . (string) $subQueryAny . ') AS tagmap ON tagmap.content_item_id = a.id');
-                        }
-                    }
-                    break;
-            }
-        }
-        return $query;
-    }
   
 /***************** IMAGE FUNCTIONS *****************/    
     

@@ -1,49 +1,50 @@
 <?php
 /*******
  * @package xbMusic
- * @filesource admin/tmpl/tracks/default_batch_body.php
- * @version 0.1.0.0 5th October 2026
+ * @filesource admin/tmpl/songs/default_batch_body.php
+ * @version 0.1.0.0 10th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2019
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 defined('_JEXEC') or die;
 
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 
-$catfilt = $this->state->get('filter.category_id','');
-//$published = $this->state->get('filter.published');
 ?>
-
 <div class="container-fluid">
-	<div class="row">
-		<div class="col-lg-6">
-		<?php if ($catfilt == '') : ?>
-			<div class="control-group" style="margin-top:20px;">
-				<div class="controls">
-                    <?php echo LayoutHelper::render('joomla.html.batch.item', ['extension' => 'com_xbmusic']); ?>
-				</div>
-			</div>
-        <?php else: ?>
-        	<div  style="margin-top:20px;"><p><?php echo Text::_('XB_CHANGE_CAT_FILTER') ?></p></div>
-		<?php endif; ?>
-		</div>
-		<div class="col-lg-6">
-    		<div class="control-group span6">
-    			<div class="controls">
-                    <?php echo LayoutHelper::render('joomla.html.batch.tag', array()); ?>
-    			</div>
-    		</div>
+	<div class="xbbatchgrid">
+		<div class="xbbatchgrid-item">
+            <?php echo LayoutHelper::render('joomla.html.batch.item', ['extension' => 'com_xbmusic']); ?>
+			<?php echo LayoutHelper::render('xbmusic.batch.indgrp', array()); ?>
+ 		</div>
+		<div class="xbbatchgrid-item">
+			<?php //get group tags
+                $groups = XbcommonHelper::getTagGroupsAliases('song');
+                foreach ($groups as $grpname) : ?>
+                	<div class="control-group">
+    					<div class="controls">
+    						<?php echo LayoutHelper::render('xbmusic.batch.childtags', array('parent'=>$grpname)); ?>
+    					</div>
+					</div>
+			<?php endforeach; ?>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-lg-6">
+  
+	<div class="xbbatchgrid">
+		<div class="xbbatchgrid-item">
+			<div class="control-group">
+				<div class="controls">
+					<?php echo LayoutHelper::render('xbmusic.batch.untag', array()); ?>
+ 	           </div>
+			</div>
 		</div>
-		<div class="col-lg-6">
-			<div class="controls">
-				<?php echo LayoutHelper::render('xbmusic.batch.untag', array()); ?>
+		<div class="xbbatchgrid-item">
+			<div class="control-group">
+				<div class="controls">
+                  <?php echo LayoutHelper::render('joomla.html.batch.tag', array()); ?>
+				</div>
 			</div>
 		</div>
 	</div>

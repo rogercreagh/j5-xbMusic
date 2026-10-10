@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/ArtistModel.php
- * @version 0.0.30.8 17th February 2025
+ * @version 0.1.0.0 9th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -46,7 +46,16 @@ class ArtistModel extends AdminModel {
     );
     
     public function batch($commands, $pks, $contexts) {
-        $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
+        $taggroups = array();
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $parentids = $params->get('artisttagparents',[]);
+        if (!empty($parentids)) {
+            $parr = XbcommonHelper::getTags($parentids);
+            foreach ($parr as $parent) {
+                $taggroups[$parent->alias.'child'] = 'batchTag';
+            }
+            $this->batch_commands = array_merge($this->batch_commands, $taggroups, $this->xbmusic_batch_commands);
+        }
         return parent::batch($commands, $pks, $contexts);
     } 
     
@@ -76,7 +85,7 @@ class ArtistModel extends AdminModel {
         }
         return true;
     }
-    
+        
     protected function batchIndgrp($value, $pks, $contexts) {
         if ($value > 0) {
             $cnt = 0;
@@ -273,6 +282,8 @@ class ArtistModel extends AdminModel {
         $filter = InputFilter::getInstance();
         $infomsg = '';
         $warnmsg = '';
+        //check if we are updating an existing item or saving a new one
+        $newitem = ((isset($data['id'])) && ($data['id'] > 0)) ? false : true;
 
         if (!empty($data['newimage'])) {
             $imgurl = Uri::root().substr($data['newimage'],0,strpos($data['newimage'], "#"));
@@ -290,7 +301,8 @@ class ArtistModel extends AdminModel {
  //       } elseif (empty($data['imgurl'])) {
  //           $data['imageinfo'] = [];
 //            $data['imgurl'] = '';            
-        } if ($data['imgurl'] != '') {
+        } 
+        if ($data['imgurl'] != '') {
             $file = str_replace(Uri::root(),'',$data['imgurl']);
             $data['imageinfo']['folder'] = dirname($file);
             $file = JPATH_ROOT.'/'.$file;
@@ -316,14 +328,15 @@ class ArtistModel extends AdminModel {
                 }      
                        
             } else {
-                $data['imageinfo'] = [];
-                $data['imgurl'] = '';
+                unset($data['imageinfo']);
+                unset($data['imgurl']);
             }
         } else {
-            $data['imageinfo'] = [];
+            unset($data['imageinfo']);
+            unset($data['imgurl']);
         }            
         
-        $data['imageinfo'] = json_encode($data['imageinfo']);
+        if (isset($data['imageinfo'])) $data['imageinfo'] = json_encode($data['imageinfo']);
         
         if ($input->get('task') == 'save2copy') {
             $origTable = clone $this->getTable();
@@ -343,23 +356,25 @@ class ArtistModel extends AdminModel {
             // standard Joomla practice is to set the new copy record as unpublished
             $data['status'] = 0;
         }
-        
-       
-        //alias is the name so we'll set and check it every time
-        $newalias = OutputFilter::stringURLSafe($data['name']);
-        if (($data['id'] == 0) && XbcommonHelper::checkValueExists($newalias, '#__xbmusic_artists', 'alias')) {
-            $warnmsg .= 'Duplicate alias - this artist name is already in the database';
-            $app->enqueueMessage($warnmsg,'Error');
-            return false;
+        if ($newitem) {
+            //alias is the name so we'll set and check it every time
+            $newalias = OutputFilter::stringURLSafe($data['name']);
+            if (XbcommonHelper::checkValueExists($newalias, '#__xbmusic_artists', 'alias')) {
+                $warnmsg .= 'Duplicate alias - this artist name is already in the database';
+                $app->enqueueMessage($warnmsg,'Error');
+                return false;
+            }
+            $data['alias'] = XbcommonHelper::makeAlias($newalias);        
+            
         }
-        $data['alias'] = $newalias;        
-        
+       
         if (isset($data['created_by_alias'])) {
             $data['created_by_alias'] = $filter->clean($data['created_by_alias'], 'TRIM');
         }
         
+        
         //merge any tag groups back into tags
-        $parentids = $params->get('tracktagparents',[]);
+        $parentids = $params->get('artisttagparents',[]);
         if (!empty($parentids)) {
             $thelp = new TagsHelper;
             $parr = $thelp->getTags($parentids);

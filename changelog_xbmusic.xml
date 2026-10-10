@@ -4,20 +4,21 @@
 		<type>component</type>
 		<version>0.1.0.0</version>
 		<addition>
-			<item><![CDATA[<h3>Beta Release v0.1.0.0</h3> Updated 6th October 2026]]></item>
-			<item>Testing ok on J6, still runs on J5</item>
-			<item></item>
+			<item><![CDATA[<h3>Beta Release v0.1.0.0</h3> Updated 10th October 2026]]></item>
+			<item>Testing ok on J6, still ok on J5</item>
+			<item>Additional TagGroup functions in XbcommonHelper.php</item>
 		</addition>
 		<remove>
-			<item>Refernces to wcpolyfill removed as no longer needed and causing error</item>
+			<item>References to wcpolyfill removed as no longer needed and causing error</item>
 		</remove>
 		<change>
 			<item>Download url is now to github release not crosborne.uk</item>
 			<item>Added delete redundant files option to update script</item>
-			<item>Move layout indgrp and untag to xbmusic/batch</item>
+			<item>Move layout indgrp.php and  new childtags.php to xbmusic/batch</item>
 		</change>
 		<fix>
-			<item></item>
+			<item>Admin TagInfo not counting children</item>
+			<item>Batch by tag group on admin list views. Updates to models and tmpls</item>
 		</fix>
 		<language>
 			<item>en-GB only</item>
@@ -27,6 +28,7 @@
 		</security>
 		<note>
 			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item>XbMusic tested on J5.4.9 and J6.1.4</item>
 			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
 		</note>
 	</changelog>	
