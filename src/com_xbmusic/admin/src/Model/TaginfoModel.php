@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TaginfoModel.php
- * @version 0.0.52.5 2nd June 2025
+ * @version 0.1.0.0 9th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -62,8 +62,8 @@ class TaginfoModel extends ItemModel {
                 $item->songs = ($item->songcnt > 0) ? $this->getTagMusicItems($item->id, 'song') : '';
                 $item->tracks = ($item->trackcnt > 0) ? $this->getTagMusicItems($item->id, 'track') : '';
                 $item->others = $this->getTagOtherItems($item->id);
-                $item->children = XbcommonHelper::getTagChildren($item->path);
-                $item->parent_title = ($item->parent_id > 1) ? XbcommonHelper::getTag($item->parent_id)->title : '';
+                $item->children = XbcommonHelper::getTagChildren($item->id);
+                $item->parent_title = ($item->parent_id > 1) ? XbcommonHelper::getTags($item->parent_id)->title : '';
             }
             
             return $this->item;

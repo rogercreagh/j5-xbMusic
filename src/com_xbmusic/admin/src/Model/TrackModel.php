@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.0.59.16 16th December+ 2025
+ * @version 0.1.0.0 10th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -42,7 +42,16 @@ class TrackModel extends AdminModel {
     } 
     
     public function batch($commands, $pks, $contexts) {
-        $this->batch_commands = array_merge($this->batch_commands, $this->xbmusic_batch_commands);
+        $taggroups = array();
+        $params = ComponentHelper::getParams('com_xbmusic');
+        $parentids = $params->get('tracktagparents',[]);
+        if (!empty($parentids)) {
+            $parr = XbcommonHelper::getTags($parentids);
+            foreach ($parr as $parent) {
+                $taggroups[$parent->alias.'child'] = 'batchTag';
+            }
+            $this->batch_commands = array_merge($this->batch_commands, $taggroups, $this->xbmusic_batch_commands);
+        }
         return parent::batch($commands, $pks, $contexts);
     } 
     

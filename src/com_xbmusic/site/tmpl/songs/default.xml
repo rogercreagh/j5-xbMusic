@@ -45,7 +45,7 @@
 				<option value="1">JSHOW</option>
 			</field>
 			<field name="showtags" type="radio"
-				label="XBMUSIC_SHOW_TAGS"
+				label="XB_SHOW_TAGS"
  				class="btn-group btn-group-yesno"
 				useglobal="true"
 			>
