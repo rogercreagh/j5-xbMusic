@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/track/edit.php
- * @version 0.0.52.5 31st May 2025
+ * @version 0.1.0.1 13th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -78,7 +78,7 @@ $item = $this->item;
       	<?php  $fpn = $this->form->getValue('filepathname'); ?>
     	<div class="row form-vertical" <?php if ((!empty($fpn) ) && (file_exists($fpn) )) echo 'style="display:none;"'; ?>>
    			<div class="col-md-6">
-   				<p><?php echo Text::_('Select music track')?>
+   				<p><?php echo Text::_('XBMUSIC_SELECT_MUSIC_TRACK')?>
 		    	<div id="container"> </div>
     		</div>
     		<div class="col-md-6">
@@ -92,13 +92,13 @@ $item = $this->item;
        	<?php $localpath = (empty($fpn)) ? '' : str_replace($this->basemusicfolder,'',pathinfo($fpn, PATHINFO_DIRNAME)).'/'; ?>
     	<div class="row">
     		<div class="col-md-6">
-    			<p><i><?php echo Text::_('Music Folder'); ?></i> : 
+    			<p><i><?php echo Text::_('XBMUSIC_MUSIC_FOLDER'); ?></i> : 
     				<?php echo $this->basemusicfolder; ?></p>
-    			<p><i><?php echo Text::_('Track folder'); ?></i> : 
+    			<p><i><?php echo Text::_('XBMUSIC_TRACK_FOLDER'); ?></i> : 
     				<?php echo $localpath; ?></p>
      		</div>
     		<div class="col-md-3">
-    			<p><i><?php echo Text::_('Track file'); ?></i> : 
+    			<p><i><?php echo Text::_('XBMUSIC_TRACK_FILE'); ?></i> : 
         			<b><?php echo (empty($fpn)) ? '' : basename($fpn); ?></b></p>
 				<?php if (!empty($fpn)) : ?>        			
                     <audio controls>
@@ -132,14 +132,14 @@ $item = $this->item;
             	    	<div class="col-md-5">
             	    	<?php if (key_exists('title', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo $this->replaced['title']; ?></dd></dl>
             	    	<?php endif; ?>
             	    	</div>
             	    	<div class="col-md-5">
             	    	<?php if (key_exists('alias', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo $this->replaced['alias']; ?></dd></dl>
             	    	<?php endif; ?>
             	    	</div>
@@ -155,7 +155,7 @@ $item = $this->item;
      			<?php echo $this->form->renderField('sortartist'); ?> 
     	    	<?php if (key_exists('sortartist', $this->replaced)) : ?>
     	    		<dl class="xbdl xbred">
-    	    			<dt><?php echo Text::_('Old value');?></dt>
+    	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
     	    			<dd><?php echo $this->replaced['sortartist']; ?></dd></dl>
     	    	<?php endif; ?>
      		</div>
@@ -164,7 +164,7 @@ $item = $this->item;
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('XB_GENERAL')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
    					<div class="row xb09">
@@ -173,45 +173,45 @@ $item = $this->item;
         					<fieldset id="filedets" class="xbbox xbboxwht xbyscroll">
         						<legend>File details</legend>
     		           			<dl class="xbdl">
-    		           				<dt><?php echo Text::_('Duration'); ?></dt>
+    		           				<dt><?php echo Text::_('XB_DURATION'); ?></dt>
     		           				<dd><?php echo $item->fileinfo->playtime_string; ?></dd>
-    		           				<dt><?php echo Text::_('Type'); ?></dt>
+    		           				<dt><?php echo Text::_('XB_TYPE'); ?></dt>
     		           				<dd><?php echo $item->fileinfo->mime_type.' ('.$item->fileinfo->fileformat.')'; ?></dd>
-    		           				<dt><?php echo Text::_('File size'); ?></dt>
+    		           				<dt><?php echo Text::_('XB_FILE_SIZE'); ?></dt>
     		           				<dd><?php echo number_format($item->fileinfo->filesize/1024,2).'kB'; ?></dd>
-    		           				<dt><?php echo Text::_('Bitrate'); ?></dt>
+    		           				<dt><?php echo Text::_('XBMUSIC_BITRATE'); ?></dt>
     		           				<dd><?php echo number_format($item->audioinfo->bitrate/1000,0).'bps,'; ?>
-    		           				<?php echo Text::_('mode').' '.$item->audioinfo->bitrate_mode; ?></dd>
-    		           				<dt><?php echo Text::_('Channels'); ?></dt>
+    		           				<i><?php echo Text::_('XBMUSIC_MODE').' '.$item->audioinfo->bitrate_mode; ?></i></dd>
+    		           				<dt><?php echo Text::_('XBMUSIC_CHANNELS'); ?></dt>
     		           				<dd><?php echo $item->audioinfo->channels; ?>
     		           				<?php echo $item->audioinfo->channelmode; ?></dd>
-    		           				<dt><?php echo Text::_('Sample rate'); ?></dt>
+    		           				<dt><?php echo Text::_('XBMUSIC_SAMPLE_RATE'); ?></dt>
     		           				<dd><?php echo number_format($item->audioinfo->sample_rate/1000,1).'kHz'; ?></dd>
-    		           				<dt><?php echo Text::_('Effective compression ratio'); ?></dt>
+    		           				<dt><?php echo Text::_('XBMUSIC_EFFECTIVE_COMPRESSION'); ?></dt>
     		           				<dd><?php echo number_format((1-$item->audioinfo->compression_ratio)*100,1).'%'; ?></dd>
     		           			</dl>
         					</fieldset>
         					<?php else : ?>
-        						<p class="xbit"><?php echo Text::_('fileinfo not available from id3 data'); ?></p>
+        						<p class="xbit"><?php echo Text::_('XBMUSIC_FILE_INFO_NOT_IN_ID3'); ?></p>
         					<?php endif; ?>
 						</div>   					
 		           		<div class="col-12 col-lg-7">
         					<?php echo $this->form->renderField('rec_date'); ?> 
             	    	<?php if (key_exists('rec_date', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo $this->replaced['rec_date']; ?></dd></dl>
             	    	<?php endif; ?>
         					<?php echo $this->form->renderField('rel_date'); ?> 
             	    	<?php if (key_exists('rel_date', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo $this->replaced['rel_date']; ?></dd></dl>
             	    	<?php endif; ?>
         					<?php echo $this->form->renderField('duration'); ?> 
             	    	<?php if (key_exists('duration', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo $this->replaced['duration']; ?></dd></dl>
             	    	<?php endif; ?>
     	        			<?php //echo $item->id3_tags->duration; ?>
@@ -223,7 +223,7 @@ $item = $this->item;
         				</div>
 		           		<div class="col-12 col-lg-6">
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
-		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
+		           					<?php echo Text::_('XB_PREVIEW_MARKDOWN'); ?>
 		           				</div>
 								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
@@ -236,7 +236,7 @@ $item = $this->item;
         			<?php echo $this->form->renderField('catid'); ?> 
             	    	<?php if (key_exists('catid', $this->replaced)) : ?>
             	    		<dl class="xbdl xbred">
-            	    			<dt><?php echo Text::_('Old value');?></dt>
+            	    			<dt><?php echo Text::_('XB_OLD_VALUE');?></dt>
             	    			<dd><?php echo XbcommonHelper::getCat($this->replaced['catid'])->title; ?></dd></dl>
             	    	<?php endif; ?>
          			<?php echo $this->form->renderField('access'); ?> 
@@ -246,7 +246,7 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('XB_TAGS')); ?>
 			<div class="row">
 				<div class="col-12">
                   <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
@@ -266,18 +266,18 @@ $item = $this->item;
     		</div>
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Linked Items')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKED_ITEMS')); ?>
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
-         		<h4><?php echo Text::_('Connections to other items')?></h4>
-       			<b><?php echo Text::_('Album'); ?></b>
+         		<h4><?php echo Text::_('XBMUSIC_CONNECTIONS_TO_ITEMS')?></h4>
+       			<b><?php echo Text::_('XBMUSIC_ALBUM'); ?></b>
        			<br />
    				<?php if ($item->album_id >0) : ?>   				
    					<a href="<?php echo $albelink.$item->album['id'];?>">
    						<?php echo $item->album['title'];?></a> [<?php echo $item->album['rel_date']; ?>]
    				<?php endif; ?>
         		<hr />
-        		<b><?php echo Text::_('Songs'); ?></b>
+        		<b><?php echo Text::_('XBMUSIC_SONGS'); ?></b>
         		<?php if (!empty($item->songs)) : ?>
             		<ul>
             			<?php foreach ($item->songs as $listitem) : ?>
@@ -289,7 +289,7 @@ $item = $this->item;
             		</ul>
          		<?php endif; ?>
        			<hr />
-        		<b><?php echo Text::_('Artists'); ?></b>
+        		<b><?php echo Text::_('XB_ARTISTS'); ?></b>
          		<?php if (!empty($item->artists)) : ?>
             		<ul>
             			<?php foreach ($item->artists as $listitem) : ?>
@@ -300,18 +300,18 @@ $item = $this->item;
             			<?php endforeach; ?>
 	        		</ul>
         		<?php endif; ?>
-        		<p class="xbnote"><?php echo Text::_('Links above are to edit page for the item'); ?></p>
+        		<p class="xbnote"><?php echo Text::_('XBMUSIC_LINKS_TO_EDIT'); ?></p>
         		<?php if ($this->id3loaded==1) : ?>
         			<hr />
         			<div class="xbred">
         			</div>
-        			<h4><?php echo Text::_('Items from ID3 data'); ?></h4>
+        			<h4><?php echo Text::_('XBMUSIC_ITEMS_FROM_ID3'); ?></h4>
         			<?php if (!empty($this->id3data['albumdata']))
-        			    echo '<i>'.Text::_('Album').'</i>: '.$this->id3data['albumdata']['title'].'<hr />';
+        			    echo '<i>'.Text::_('XBMUSIC_ALBUM').'</i>: '.$this->id3data['albumdata']['title'].'<hr />';
     			    if (!empty($this->id3data['song']))
-    			        echo '<i>'.Text::_('Song').'</i>: '.$this->id3data['song']['title'].'<hr />';
+    			        echo '<i>'.Text::_('XBMUSIC_SONG').'</i>: '.$this->id3data['song']['title'].'<hr />';
     			    if (!empty($this->id3data['artists'])) {
-    		            echo '<i>'.Text::_('Artists').'</i>:'.'<ul style="list-style:none;">';
+    		            echo '<i>'.Text::_('XB_ARTISTS').'</i>:'.'<ul style="list-style:none;">';
     		            foreach ($this->id3data['artists'] as $artist) {
     		                echo '<li>'.$artist['name'].'</li>';
     		            }
@@ -319,7 +319,7 @@ $item = $this->item;
     			    }
         			?>
         			<p class="xbnote">
-        				<?php echo Text::_('Items above will be created if necessary and linked to this track on Save'); ?>
+        				<?php echo Text::_('XBMUSIC_ITEMS_ABOVE_WILL_BE_CREATED'); ?>
         			</p>
         		<?php endif; ?>
     		</div>
@@ -344,7 +344,7 @@ $item = $this->item;
 
 		<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('Image')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'image', Text::_('XB_IMAGE')); ?>
         	<div class="row">
            		<div class="col-12 col-md-5">
                     <?php $imgurl = $this->form->getValue('imgurl'); ?>
@@ -352,9 +352,9 @@ $item = $this->item;
                     	<p class="xbnit"><?php echo Text::_('artwork not yet available, either load from music file or selected and existing image');?></p>
                     <?php else : ?>
                     	<?php if (key_exists('imgurl', $this->replaced)) {
-                    	    echo Text::_('New image reloaded from music file');
+                    	    echo Text::_('XBMUSIC_NEW_IMAGE_RELOADED');
                     	} else {
-                    	   echo Text::_('Artwork'); 
+                    	   echo Text::_('XB_ARTWORK'); 
                     	} ?><br/>
                     	<img src="<?php echo $imgurl; ?>" style/>
                     <?php endif; ?>
@@ -380,12 +380,12 @@ $item = $this->item;
     					<?php if (!empty($item->imageinfo)) : ?>
     						<p class="xbbold xbit"><?php echo Text::_('Original ID3 image data');?></p>
     						<dl class="xbdl">
-        						<dt><?php echo Text::_('Type'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_TYPE'); ?>:</dt>
         						<dd><?php echo $item->imageinfo->image_mime;?></dd>
-        						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_DIMENSIONS'); ?>:</dt>
         						<dd><?php echo $item->imageinfo->image_width;?>&nbsp;x&nbsp;
         						<?php echo $item->imageinfo->image_height;?> px</dd>
-        						<dt><?php echo Text::_('Size'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_SIZE'); ?>:</dt>
         						<dd><?php echo number_format($item->imageinfo->datalength/1024, 2);?> kB</dd>
     						</dl>
     					<?php else : ?>
@@ -398,12 +398,12 @@ $item = $this->item;
     						?>
     						<dl class="xbdl">
     						
-        						<dt><?php echo Text::_('Type'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_TYPE'); ?>:</dt>
         						<dd><?php echo $imageinfo['mime'];?></dd>
-        						<dt><?php echo Text::_('Dimensions'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_DIMENSIONS'); ?>:</dt>
         						<dd><?php echo $imageinfo[0];?>&nbsp;x&nbsp;
         						<?php echo $imageinfo[1];?> px</dd>
-        						<dt><?php echo Text::_('Size'); ?>:</dt>
+        						<dt><?php echo Text::_('XB_SIZE'); ?>:</dt>
         						<dd><?php echo number_format(filesize($imgpath)/1024, 2);?> kB</dd>
     						</dl>
 						<?php else : ?>    
@@ -436,10 +436,10 @@ $item = $this->item;
         
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('ID3 data')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'id3', Text::_('XBMUSIC_ID3_DATA')); ?>
         	<div class="row">
            		<div class="col-12 col-md-6">
-           			<p><?php echo Text::_('Saved raw data from file'); ?>
+           			<p><?php echo Text::_('XBMUSIC_SAVED_RAW_DATA'); ?>
 					<?php if (!empty($item->id3_tags)) : ?>
     					<fieldset id="id3dets" class="xbbox xbboxwht ">
     						<legend>Saved ID3 Tags</legend>
@@ -456,7 +456,7 @@ $item = $this->item;
     						</dl>
     					</fieldset>
 					<?php else : ?>
-						<p class="xbit"><?php echo Text::_('no id3 tags have been saved yet'); ?></p>
+						<p class="xbit"><?php echo Text::_('XBMUSIC_NO_ID3_SAVED'); ?></p>
 					<?php endif; ?>
  					<?php if (!empty($item->fileinfo)) : ?>
     					<fieldset id="id3dets" class="xbbox xbboxwht ">
@@ -468,7 +468,7 @@ $item = $this->item;
     						</dl>
     					</fieldset>
 					<?php else : ?>
-						<p class="xbit"><?php echo Text::_('file info has not been saved yet'); ?></p>
+						<p class="xbit"><?php echo Text::_('XBMUSIC_FILE_INFO_NOT_SAVED'); ?></p>
 					<?php endif; ?>
 					<?php if (!empty($item->audioinfo)) : ?>
     					<fieldset id="id3dets" class="xbbox xbboxwht ">
@@ -480,13 +480,13 @@ $item = $this->item;
     						</dl>
     					</fieldset>
 					<?php else : ?>
-						<p class="xbit"><?php echo Text::_('audio info has not been saved yet'); ?></p>
+						<p class="xbit"><?php echo Text::_('XBMUSIC_AUDIO_DATA_NOT_SAVED'); ?></p>
 					<?php endif; ?>
         		</div>
         		
         		<div class="col-12 col-md-6">
         			<?php if ($this->id3loaded==1) : ?>
-        				<p><?php echo Text::_('Reloaded file data'); ?></p>
+        				<p><?php echo Text::_('XBMUSIC_RELOADED_FILE_DATA'); ?></p>
     					<?php if (!empty($this->id3data['id3tags'])) : ?>
         					<fieldset id="id3dets" class="xbbox xbboxwht ">
         						<legend>Reloaded ID3 Tags</legend>
@@ -503,7 +503,7 @@ $item = $this->item;
         						</dl>
         					</fieldset>
     					<?php else : ?>
-    						<p class="xbit"><?php echo Text::_('no id3 tags reloaded'); ?></p>
+    						<p class="xbit"><?php echo Text::_('XBMUSIC_NO_ID3_RELOADED'); ?></p>
     					<?php endif; ?>
      					<?php if (!empty($this->id3data['fileinfo'])) : ?>
         					<fieldset id="id3dets" class="xbbox xbboxwht ">
@@ -516,7 +516,7 @@ $item = $this->item;
         						</dl>
         					</fieldset>
     					<?php else : ?>
-    						<p class="xbit"><?php echo Text::_('file info has not been saved yet'); ?></p>
+    						<p class="xbit"><?php echo Text::_('XBMUSIC_FILE_INFO_NOT_SAVED'); ?></p>
     					<?php endif; ?>
     					<?php if (!empty($this->id3data['audioinfo'])) : ?>
         					<fieldset id="id3dets" class="xbbox xbboxwht ">
@@ -529,18 +529,18 @@ $item = $this->item;
         						</dl>
         					</fieldset>
     					<?php else : ?>
-    						<p class="xbit"><?php echo Text::_('audio info has not been saved yet'); ?></p>
+    						<p class="xbit"><?php echo Text::_('XBMUSIC_AUDIO_DATA_NOT_SAVED'); ?></p>
     					<?php endif; ?>
 
 
         			<?php else : ?>
-        				<p class="xbnote"><?php echo Text::_('if file data is reloaded the replacement data will appear here for checking before it is saved'); ?></p>
+        				<p class="xbnote"><?php echo Text::_('XBMUSIC_IF_FILE_DATA'); ?></p>
         			<?php endif; ?>
         		</div>
         	</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
         
-		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
+		<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('XB_PUBLISHING')); ?>
         <div class="row">
             <div class="col-12 col-lg-6">
                 <fieldset id="fieldset-publishingdata" class="options-form">
@@ -562,9 +562,9 @@ $item = $this->item;
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php if ($this->canDo->get('core.admin') ) : ?>
-            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('Permissions')); ?>
+            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('XB_PERMISSIONS')); ?>
             <fieldset id="fieldset-rules" class="options-form">
-                <legend><?php echo Text::_('User Group Permissions'); ?></legend>
+                <legend><?php echo Text::_('XB_USER_GROUP_PERMISSIONS'); ?></legend>
                 <div>
                 	<?php echo $this->form->getInput('rules'); ?>
                 </div>

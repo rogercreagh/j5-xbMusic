@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/tracks/default.php
- * @version 0.0.61.0 31st March 2025
+ * @version 0.1.0.1 10th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -126,17 +126,17 @@ function playAudio(name, filepathname) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>, 
 							<span class="xbr09">
-								<?php echo Text::_('Filename'); ?>, 
-								<?php echo HTMLHelper::_('searchtools.sort', 'Dates', 'a.rel_date', $listDirn, $listOrder); ?>
-								<?php echo HTMLHelper::_('searchtools.sort', 'Artist', 'a.sortartist', $listDirn, $listOrder); ?>
+								<?php echo Text::_('XB_FILENAME'); ?>, 
+								<?php echo HTMLHelper::_('searchtools.sort', 'XB_DATES', 'a.rel_date', $listDirn, $listOrder); ?>
+								<?php echo HTMLHelper::_('searchtools.sort', 'XB_ARTIST', 'a.sortartist', $listDirn, $listOrder); ?>
 							</span>
 						</th>
-						<th style="width:105px;"><?php echo Text::_('Artwork'); ?>
+						<th style="width:105px;"><?php echo Text::_('XB_ARTWORK'); ?>
 						</th>
-						<th class=""><?php echo HTMLHelper::_('searchtools.sort', 'Album', 'album.title', $listDirn, $listOrder); ?>, 
-						<?php echo Text::_('Song(s)'); ?>,
-						<?php echo Text::_('Performers'); ?>, 
-						<?php echo Text::_('Playlists'); ?>
+						<th class=""><?php echo HTMLHelper::_('searchtools.sort', 'XBMUSIC_ALBUM', 'album.title', $listDirn, $listOrder); ?>, 
+						<?php echo Text::_('XBMUSIC_SONG_S'); ?>,
+						<?php echo Text::_('XBMUSIC_PERFORMERS'); ?>, 
+						<?php echo Text::_('XBMUSIC_PLAYLISTS'); ?>
 						</th>
 						<th class="nowrap " style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -226,14 +226,14 @@ function playAudio(name, filepathname) {
 								<span class="xbr09">
     								<?php if($item->rec_date != '') : ?>
     									<span class="xbpr20">
-        									<?php echo Text::_('Rec.'); ?>: <?php echo XbcommonHelper::strDateReformat($item->rec_date); ?>
+        									<?php echo Text::_('XBMUSIC_REC'); ?>: <?php echo XbcommonHelper::strDateReformat($item->rec_date); ?>
     									</span>
     								<?php endif; ?>
     								<?php if($item->rel_date != '') : ?>									
-    									<?php echo Text::_('Rel.'); ?>: <?php echo XbcommonHelper::strDateReformat($item->rel_date); ?>
+    									<?php echo Text::_('XBMUSIC_REL'); ?>: <?php echo XbcommonHelper::strDateReformat($item->rel_date); ?>
     								<?php endif; ?>
 								</span>
-								<br /><span class="xbr09"><span class="xbit"><?php echo Text::_('Artist')?></span>: 
+								<br /><span class="xbr09"><span class="xbit"><?php echo Text::_('XB_ARTIST')?></span>: 
 								<?php echo $item->sortartist; ?></span>
 								</p>
 							</div>
@@ -251,13 +251,13 @@ function playAudio(name, filepathname) {
 							<?php endif; ?>
     					</td>
 						<td class="xbr09" onclick="stopProp(event);"><!--   onclick="stopProp(event);" can be removed once fix is in next J5 release-->
-							<i><?php echo Text::_('Album'); ?></i>: 
+							<i><?php echo Text::_('XBMUSIC_ALBUM'); ?></i>: 
 							<?php if ($item->albumid >0) : ?>
     							<a href="index.php?option=com_xbmusic&task=album.edit&retview=tracks&id=<?php echo $item->albumid; ?>" title="Edit">
     								<?php echo $item->albumtitle; ?>
     							</a>
 							<?php else: ?>
-								<i><?php echo Text::_('album not listed'); ?></i>
+								<i><?php echo Text::_('XBMUSIC_ALBUM_NOT_LISTED'); ?></i>
 							<?php endif; ?>
 							
 							<hr class="xbmt5 xbmb5" />
@@ -273,20 +273,20 @@ function playAudio(name, filepathname) {
     									</ul>
     								</details>
     							<?php elseif (count($item->songs)==1) : ?>
-    								<i><?php echo Text::_('Song title'); ?></i>: 
+    								<i><?php echo Text::_('XBMUSIC_SONG_TITLE'); ?></i>: 
     								<a href="index.php?option=com_xbmusic&task=song.edit&retview=tracks&id=<?php echo $item->songs[0]['id']; ?>" title="Edit">
     									<?php echo $item->songs[0]['title']; ?>
     								</a>
     							<?php endif; ?>
 							<?php else: ?>
-								<span class="xbnit"><?php echo Text::_('no song linked'); ?></span>
+								<span class="xbnit"><?php echo Text::_('XBMUSIC_NO_SONG_LINKED'); ?></span>
 							<?php endif; ?>
 							
 							<hr class="xbmt5 xbmb5" />
 							<?php if(count($item->artists)>0) : ?>
     							<?php if (count($item->artists) > 1) : ?>
     								<details>
-    									<summary><?php echo count($item->artists).' '.Text::_('Performers listed'); ?></summary>
+    									<summary><?php echo count($item->artists).' '.Text::_('XBMUSIC_PERFORMERS_LISTED'); ?></summary>
     									<ul>
     									<?php foreach ($item->artists as $artist) : ?>
     										<li><a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $artist['id']; ?>">
@@ -295,25 +295,25 @@ function playAudio(name, filepathname) {
     									</ul>
     								</details>
     							<?php elseif (count($item->artists)==1) : ?>
-    								<i><?php echo Text::_('Artists'); ?></i>: 
+    								<i><?php echo Text::_('XB_ARTISTS'); ?></i>: 
     								<a href="index.php?option=com_xbmusic&task=artist.edit&retview=tracks&id=<?php echo $item->artists[0]['id']; ?>">
     									<?php echo $item->artists[0]['name']; ?>
     								</a>
     							<?php endif; ?>
 							<?php elseif($item->sortartist !='') : ?>
-    							<i><?php echo Text::_('Album Artist'); ?></i>: 
+    							<i><?php echo Text::_('XBMUSIC_ALBUM_ARTIST'); ?></i>: 
     								<?php echo $item->sortartist; ?>
     						<?php else : ?>
-								<span class="xbnit"><?php echo Text::_('no artist linked'); ?></span>
+								<span class="xbnit"><?php echo Text::_('XBMUSIC_NO_ARTIST_LINKED'); ?></span>
 							<?php endif; ?>
 							
 								
 							<hr class="xbmt5 xbmb5" />
-							<i><?php echo Text::_('Playlists'); ?></i>: 
+							<i><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?></i>: 
 							<?php if (count($item->playlists) >0) : ?>
-								<i><?php echo Text::_('Playlist'); ?></i>:
+								<i><?php echo Text::_('XBMUSIC_PLAYLIST'); ?></i>:
 							<?php else: ?>
-								<i><?php echo Text::_('not assigned to any playlist'); ?></i>
+								<i><?php echo Text::_('XBMUSIC_NOT_ASSIGNED_TO_PLAYLIST'); ?></i>
 							<?php endif; ?> 
 						</td>
 						<td>

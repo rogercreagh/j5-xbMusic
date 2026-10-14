@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/song/edit.php
- * @version 0.0.40.0 18th February 2025
+ * @version 0.1.0.1 13th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -75,7 +75,7 @@ $item = $this->item;
      <div class="main-card">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', ['active' => 'general', 'recall' => true]); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('General')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'general', Text::_('XB_GENERAL')); ?>
 			<div class="row form-vertical">
            		<div class="col-12 col-lg-9">
    					<div class="row xb09">
@@ -91,7 +91,7 @@ $item = $this->item;
         				</div>
 		           		<div class="col-12 col-lg-6">
 		           			<div class="control-group"><div class="control-label" style="width:90%;">
-		           					<?php echo Text::_('Preview with Markdown formatting'); ?>
+		           					<?php echo Text::_('XB_PREVIEW_MARKDOWN'); ?>
 		           				</div>
 								<div id="pv_desc" class="xbbox xbboxwht" style="height:23.5rem; overflow-y:scroll;">
 		           				</div>
@@ -109,7 +109,7 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('Tags')); ?>
+         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'taggroups', Text::_('XB_TAGS')); ?>
 			<div class="row">
 				<div class="col-12">
                   <p class="xbnote"><?php echo Text::_('XB_TAGS_EDIT_NOTE1'); ?></p>
@@ -129,13 +129,13 @@ $item = $this->item;
     		</div>
          <?php echo HTMLHelper::_('uitab.endTab'); ?>
 	
-    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('Links')); ?>
+    <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'links', Text::_('XB_LINKS')); ?>
 		<?php echo $this->form->renderField('songlinksnote'); ?>	    
 		<div class="row form-vertical">
     		<div class="col-12 col-md-3">
      		<h4><?php echo Text::_('XB_LINKS_OTHER_ITEMS')?></h4>
      		<hr />
-   			<b><?php echo Text::_('Albums'); ?></b>
+   			<b><?php echo Text::_('XBMUSIC_ALBUMS'); ?></b>
    			<?php if (isset($item->albums)) : ?>  			
     		<ul>
     			<?php foreach ($item->albums as $listitem) : ?>
@@ -149,7 +149,7 @@ $item = $this->item;
         		<p class="xbnit"><?php echo Text::_('XBMUSIC_NO_ALBUMS_LISTED'); ?></p>
     		<?php endif; ?>
     		<hr />
-    		<b><?php echo Text::_('Tracks'); ?></b>
+    		<b><?php echo Text::_('XBMUSIC_TRACKS'); ?></b>
    			<?php if (isset($item->tracks)) : ?>  			
     		<ul>
     			<?php foreach ($item->tracks as $listitem) : ?>
@@ -164,7 +164,7 @@ $item = $this->item;
     		<?php endif; ?>
     		<hr />
    			<?php if (isset($item->artists)) : ?>  			
-    		<b><?php echo Text::_('Artists'); ?></b>
+    		<b><?php echo Text::_('XB_ARTISTS'); ?></b>
     		<ul>
     			<?php foreach ($item->artists as $listitem) : ?>
     				<li>
@@ -190,7 +190,7 @@ $item = $this->item;
        		
      <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('Publishing')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'publishing', Text::_('XB_PUBLISHING')); ?>
         <div class="row">
             <div class="col-12 col-lg-6">
                 <fieldset id="fieldset-publishingdata" class="options-form">
@@ -212,9 +212,9 @@ $item = $this->item;
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php if ($this->canDo->get('core.admin') ) : ?>
-            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('Permissions')); ?>
+            <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'permissions', Text::_('XB_PERMISSIONS')); ?>
             <fieldset id="fieldset-rules" class="options-form">
-                <legend><?php echo Text::_('User Group Permissions'); ?></legend>
+                <legend><?php echo Text::_('XB_USER_GROUP_PERMISSIONS'); ?></legend>
                 <div>
                 	<?php echo $this->form->getInput('rules'); ?>
                 </div>

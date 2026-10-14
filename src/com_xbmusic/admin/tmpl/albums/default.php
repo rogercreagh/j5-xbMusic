@@ -116,7 +116,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th style="width:105px;"><?php echo Text::_('XBMUSIC_ARTWORK'); ?>
+						<th style="width:105px;"><?php echo Text::_('XB_ARTWORK'); ?>
 						</th>
 						<th><?php echo HTMLHelper::_('searchtools.sort', 'Artists', 'a.sortartist', $listDirn, $listOrder); ?>
 						</th>

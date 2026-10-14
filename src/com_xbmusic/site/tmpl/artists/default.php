@@ -57,7 +57,7 @@ $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 <?php if ($this->showplay) : ?>
     <div class="pull-right">
     	<?php if ($this->playtime>0) : ?>
-    		<p class="xbnote xbr09 xbmb5 xbtr"><?php echo Text::sprintf('play restricted to %s seconds', $this->playtime); ?></p>
+    		<p class="xbnote xbr09 xbmb5 xbtr"><?php echo Text::sprintf('XBMUSIC_PLAY_RESTRICTED_N_SECS', $this->playtime); ?></p>
     	<?php endif; ?>
     	<audio id="player" controls style="height:30px;border-radius:12px;"
     		src="<?php echo Uri::root(true).'/xbmusic/'; ?>">

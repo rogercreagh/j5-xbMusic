@@ -2,6 +2,37 @@
 	<changelog>
 		<element>com_xbmusic</element>
 		<type>component</type>
+		<version>0.1.0.1</version>
+		<addition>
+			<item><![CDATA[<h3>Beta Release v0.1.0.1</h3> Updated 14th October 2026]]></item>
+			<item><![CDATA[<b>**Database change**</b> - added <code>xbmusic_aztrack_history</code> table]]></item>
+			<item>Many but not all missing language strings added</item>
+			<item></item>
+		</addition>
+		<remove>
+			<item></item>
+		</remove>
+		<change>
+			<item><![CDATA[<b>**Database change**</b> - renamed `az_trid` to `az_tid` in <code>xbmusic_tracks</code> table]]></item>
+		</change>
+		<fix>
+			<item></item>
+		</fix>
+		<language>
+			<item>en-GB only</item>
+			<item>Language files incomplete</item>
+		</language>
+		<security>
+		</security>
+		<note>
+			<item><![CDATA[Not listed on <a href="https://extensions.joomla.org" target="_blank">JED</a>]]></item>
+			<item>XbMusic tested on J5.4.9 and J6.1.4</item>
+			<item><![CDATA[Raise bugs and feature requests on <a href="https://github.com/rogercreagh/j5-xbMusic/issues" target="_blank">GitHub</a>]]></item>
+		</note>
+	</changelog>	
+	<changelog>
+		<element>com_xbmusic</element>
+		<type>component</type>
 		<version>0.1.0.0</version>
 		<addition>
 			<item><![CDATA[<h3>Beta Release v0.1.0.0</h3> Updated 10th October 2026]]></item>

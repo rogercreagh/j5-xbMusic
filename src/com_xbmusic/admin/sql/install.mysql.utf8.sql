@@ -1,4 +1,4 @@
-# sql installation file for component xbMusic 0.0.59.17 22nd Decsember 2025
+# sql installation file for component xbMusic 0.1.0.1 12th October 2026
 # NB no data is installed with this file, default categories are created by the installation script
 
 INSERT INTO `#__content_types` (`type_title`, `type_alias`, `table`, `rules`, `field_mappings`, `router`, `content_history_options`) 
@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_tracks` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(190) NOT NULL,
   `alias` varchar(190) NOT NULL,
-  `az_trid` int(10) unsigned NOT NULL Default '0',
+  `az_tid` varchar(30)  NOT NULL Default '' COMMENT 'Song (track) ID from Azuracast',
   `az_stid` int(10) unsigned NOT NULL Default '0',
   `az_info` mediumtext,
   `description` mediumtext,
@@ -311,6 +311,20 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_azschedules` (
 )  ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 # link tables userapikeys, trackartist, trackplaylist, tracksong, artistgroup
+
+CREATE TABLE IF NOT EXISTS `#__xbmusic_aztrack_history` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `track_id` int(11) NOT NULL DEFAULT '0',
+  `az_tid` varchar(20) NOT NULL COMMENT 'Song (track) iID from Azuracast',
+  `st_id` int(10) unsigned COMMENT 'local xbmusic station ID (az station id not unique across servers)',
+  `az_sh_id` int(10) unsigned NOT NULL COMMENT 'song history ID from azuracast',
+  `playtime` datetime,	
+  `playlist_id` int(10) COMMENT 'null if playlist not in xbmusic'
+  `az_playlist` varchar(30) COMMENT 'Name provided by azuracast'
+  `note` mediumtext COMMENT 'used to save track info if not matched',
+  PRIMARY KEY (`id`),
+
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_userapikeys` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

@@ -97,7 +97,7 @@ $trackslink = 'index.php?option=com_xbmusic&view=tracks&catid=';
             				<?php echo HTMLHelper::_('searchtools.sort', ('XBMUSIC_ALBUMS'), 'albumcnt', $listDirn, $listOrder );?>
             			</th>
             			<th style="text-align:center;">
-            				<?php echo HTMLHelper::_('searchtools.sort', ('XBMUSIC_ARTISTS'), 'artistcnt', $listDirn, $listOrder );?>
+            				<?php echo HTMLHelper::_('searchtools.sort', ('XB_ARTISTS'), 'artistcnt', $listDirn, $listOrder );?>
             			</th>
             			<th style="text-align:center;">
             				<?php echo HTMLHelper::_('searchtools.sort', ('XBMUSIC_PLAYLISTS'), 'playlistcnt', $listDirn, $listOrder );?>

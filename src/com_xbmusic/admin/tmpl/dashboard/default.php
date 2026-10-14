@@ -1,4 +1,4 @@
- <?php 
+<?php 
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dashboard/default.php
@@ -111,7 +111,7 @@ $wa->useScript('xbmusic.xbgeneral');
 				</div>
 
 				<div class="xbbox gradblue">
-					<h3 class="xbmb20"><i class='fas fa-users-line' ></i> <a href="index.php?option=com_xbmusic&view=artists"><?php echo Text::_('XBMUSIC_ARTISTS'); ?></a></h3>
+					<h3 class="xbmb20"><i class='fas fa-users-line' ></i> <a href="index.php?option=com_xbmusic&view=artists"><?php echo Text::_('XB_ARTISTS'); ?></a></h3>
 					<p><span class="xbnit"><?php echo Text::_('XB_TOTAL'); ?></span>
 						<span class="xbbadge badge-blue"><?php echo $this->artistcnts['total']; ?></span>
             			<span class="xbpl50 xbnit"><?php echo Text::_('XB_STATUS_CNTS'); ?> : </span>

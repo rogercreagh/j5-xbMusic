@@ -1,4 +1,4 @@
-        <?php 
+<?php 
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/playlisttracks/default.php

@@ -163,7 +163,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->artistcnt > 0) ? 'gradblue' : 'xbbggy'; ?>">
 					<p><?php echo ($item->artistcnt > 0) ? $item->artistcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_ARTISTS',XBSP3 + XBTRL).Text::_('XB_IN_CATEGORY'); ?>  
+					echo Xbtext::_('XB_ARTISTS',XBSP3 + XBTRL).Text::_('XB_IN_CATEGORY'); ?>  
 						<span class="xblabel label-cat"><?php echo $item->title; ?></span></p>
 					<?php if ($item->artistcnt > 0) : ?>
     					<?php if ($item->artistcnt < $longlist+1) : ?>

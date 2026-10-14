@@ -87,7 +87,7 @@ $numdiscarr = array('','','double album','3 disc set', '4 disc set', 'box set');
         <div class="xbbox">
         	<table class="table table-striped">   
         		<tr><th>Tk.No.</th><th><?php echo Text::_('XB_TITLE');?></th>
-        			<th><?php echo Text::_('XBMUSIC_DURATION');?></th>
+        			<th><?php echo Text::_('XB_DURATION');?></th>
         			<th class="xbpl20"><?php echo Text::_('XBMUSIC_PLAYLIST_PROGS');?></th>
         		</tr>             	
 				<?php foreach ($item->tracks as $track) : ?>

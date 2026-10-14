@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/taginfo/default.php
- * @version 0.0.52.5 3rd June 2025
+ * @version 0.1.0.1 13th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -106,14 +106,14 @@ $longlist = 4;
 			</div>
 		</div>
 		<?php if ($item->level > 1) : ?>
-				<p class="xbmb5"><i><?php echo Text::_('Parent of this tag'); ?></i>
+				<p class="xbmb5"><i><?php echo Text::_('XB_TAG_PARENT'); ?></i>
 					<a href="<?php echo $tinflink.$item->parent_id; ?>"   
 						class="xblabel label-tag xbml15" ><?php echo $item->parent_title; ?></a>
 				</p>
 		<?php endif; ?>
 		<div>		
 			<?php if ($item->children) : ?>
-				<p class="xbmb5 xbit"><?php echo Text::_('Descendents of this tag'); ?></p>
+				<p class="xbmb5 xbit"><?php echo Text::_('XB_TAG_DESCENDENTS'); ?></p>
 				<ul class="inline xbml20" style="margin-left:20px;">
 					<?php foreach ($item->children as $child) : ?>
 						<li><a href="<?php echo $tinflink.$child['id']; ?>" 
@@ -152,7 +152,7 @@ $longlist = 4;
 			<div class= "col-sm-4">
 				<div class="xbbox <?php echo ($item->artistcnt > 0) ? 'gradblue' : 'xbbggy'; ?>">
 					<p><?php echo ($item->artistcnt > 0) ? $item->artistcnt : Text::_('JNO');
-					echo Xbtext::_('XBMUSIC_ARTISTS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
+					echo Xbtext::_('XB_ARTISTS',XBSP3 + XBTRL).Text::_('XB_TAGGED'); ?>  
 						<span class="xblabel label-tag"><?php echo $item->title; ?></span></p>
 					<?php if ($item->artistcnt > 0) : ?>
     					<div 

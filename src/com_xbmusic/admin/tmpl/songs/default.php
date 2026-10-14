@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/songs/default.php
- * @version 0.0.30.4 12th February 2025
+ * @version 0.1.0.1 13th October 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -106,9 +106,9 @@ if (strpos($listOrder, 'modified') !== false) {
 						<th >
 							<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_TITLE', 'a.title', $listDirn, $listOrder); ?>
 						</th>
-						<th><?php echo Text::_('Recordings'); ?>
+						<th><?php echo Text::_('XBMUSIC_RECORDINGS'); ?>
 						</th>
-						<th><?php echo Text::_('Playlists'); ?>
+						<th><?php echo Text::_('XBMUSIC_PLAYLISTS'); ?>
 						</th>
 						<th class="nowrap" style="width:110px;" >
 							<?php echo HTMLHelper::_('searchtools.sort', 'XB_CATEGORY', 'category_title', $listDirn, $listOrder); ?>							
@@ -236,7 +236,7 @@ if (strpos($listOrder, 'modified') !== false) {
 				                	<?php echo $track['albumtitle']; ?></a>
 				                <?php endif; ?>
 							<?php else : ?>
-								<p class="xbnit xbr09"><?php echo Text::_('no tracks connected'); ?>
+								<p class="xbnit xbr09"><?php echo Text::_('XBMUSIC_NO_TRACKS_CONNECTED'); ?>
 							<?php endif; ?>
 						</td>
 						<td onclick="stopProp(event);">playlists
