@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_aztrack_history` (
   `st_id` int(10) unsigned COMMENT 'local xbmusic station ID (az station id not unique across servers)',
   `az_sh_id` int(10) unsigned NOT NULL COMMENT 'song history ID from azuracast',
   `playtime` datetime,	
-  `playlist_id` int(10) COMMENT 'null if playlist not in xbmusic'
-  `az_playlist` varchar(30) COMMENT 'Name provided by azuracast'
+  `playlist_id` int(10) COMMENT 'null if playlist not in xbmusic',
+  `az_playlist` varchar(30) COMMENT 'Name provided by azuracast',
   `note` mediumtext COMMENT 'used to save track info if not matched',
   PRIMARY KEY (`id`),
 

@@ -14,7 +14,7 @@
         <tags>
           <tag>beta</tag>
         </tags>
-        <sha256>235deb0815d96fa6bdea8285be295cc388047351439e8ff838fb9caeeb379b4f</sha256>
+        <sha256>cc77446beecf383039882254b48bde018e300b300b1ce4428eecdf435d59596e</sha256>
     	<changelogurl>https://raw.githubusercontent.com/rogercreagh/j5-xbMusic/main/changelog_xbmusic.xml</changelogurl>
 		<maintainer>Roger C-O</maintainer>
 		<maintainerurl>https://crosborne.uk/xbmusic</maintainerurl>
