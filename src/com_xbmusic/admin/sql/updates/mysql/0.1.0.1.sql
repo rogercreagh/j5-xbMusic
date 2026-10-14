@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_aztrack_history` (
   `az_playlist` varchar(30) COMMENT 'Name provided by azuracast',
   `note` mediumtext COMMENT 'used to save track info if not matched',
   PRIMARY KEY (`id`),
+  KEY(`track_id`)
 
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
