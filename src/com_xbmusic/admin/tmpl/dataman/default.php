@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.0.59.17 21st December 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -43,6 +43,11 @@ $wa->useScript('keepalive')
 <script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 
 <div id="xbcomponent" >
+	<p class="xbtr xbnote xbmb5"><?php echo Text::_('XBMUSIC_DROPDOWNS_REMAIN_OPEN'); ?></p>
+	<input  type="hidden" id="autoclose" name="autoclose" value="no" checked="false" />    
+	<script language="JavaScript" type="text/javascript"
+		src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" >
+    </script>
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=dataman'); ?>" method="post" name="adminForm" id="adminForm">
 		<input type="hidden" id="basefolder" value="<?php echo $this->basemusicfolder; ?>" />
 		<input type="hidden" id="multi" value="1" />
@@ -50,7 +55,7 @@ $wa->useScript('keepalive')
 		<input type="hidden" id="posturi" value="<?php echo Uri::base(true).'/components/com_xbmusic/vendor/Foldertree.php'; ?>"/>
 		<input  type="hidden" id="autoclose" name="autoclose" value="yes" checked="true" />
 
-        <h2><i class='icon-database' ></i> Data Manager</h2>
+        <h2><i class='icon-database' ></i><?php echo Text::_('XBMUSIC_DATA_MANAGER'); ?></h2>
 
  		<?php
             $waitmessage = 'XBMUSIC_WAITING_SERVER';
@@ -63,9 +68,31 @@ $wa->useScript('keepalive')
             <p class="xbinfo">
             	<?php echo Text::_('XBMUSIC_IMPORT_DETAILS');?>
             </p>
+<details id="impset">
+	<summary>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_GENERAL_IMPORT_SETTINGS'); ?></span>
+	</summary>	
+	<div class="row">
+		<div class="col-md-8 form-vertical">
+         	<?php echo $this->form->renderField('impcat'); ?>
+         	<?php echo $this->form->renderField('selcat'); ?>
+         	<?php echo $this->form->renderField('splitsongs'); ?>
+         	<?php echo $this->form->renderField('nobrackets'); ?>
+		</div>
+		<div class="col-md-4">
+			<p>Additional tags to add to all imported items</p>
+         	<?php echo $this->form->renderField('tracktags'); ?>
+         	<?php echo $this->form->renderField('albumtags'); ?>
+         	<?php echo $this->form->renderField('artisttags'); ?>
+         	<?php echo $this->form->renderField('songtags'); ?>
+			
+		</div>
+	</div>
+
+</details>            
 <details id="imptk">
 	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_TRACKS'); ?></span>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_TRACKS_ID3'); ?></span>
 	</summary>	
 	<div class="row form-vertical">
 		<div class="col-md-6">
@@ -73,7 +100,6 @@ $wa->useScript('keepalive')
 	    	<div id="container"> </div>
 		</div>
 		<div class="col-md-6">
-        	<!-- <div id="selected_file">Selected filepath will appear here</div> -->
 			<p class="xbinfo"><?php  echo Text::_('XBMUSIC_IMPORT_NOTE1')?>
 				<br /><?php echo Text::_('XBMUSIC_IMPORT_NOTE2')?></p>	
         	<?php echo $this->form->renderField('foldername'); ?> 
@@ -92,21 +118,8 @@ $wa->useScript('keepalive')
 				</tr>
 			</table>
     	</div>
-	<div class="row">
-		<div class="col-md-8 form-vertical">
-         	<?php echo $this->form->renderField('impcat'); ?>
-         	<?php echo $this->form->renderField('splitsongs'); ?>
-         	<?php echo $this->form->renderField('nobrackets'); ?>
-		</div>
-		<div class="col-md-4">
-			<p>Additional tags to add to all imported items</p>
-         	<?php echo $this->form->renderField('tracktags'); ?>
-         	<?php echo $this->form->renderField('albumtags'); ?>
-         	<?php echo $this->form->renderField('artisttags'); ?>
-         	<?php echo $this->form->renderField('songtags'); ?>
-			
 	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
-	    	  $pophead = 'Confirm Import from MP3'; 
+	    	  $pophead = Text::_('XBMUSIC_CONFIRM_MP3IMPORT'); 
 	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3','waiter');"; 
 	    	  ?>
 	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
@@ -114,22 +127,46 @@ $wa->useScript('keepalive')
 					<i class="icon-download"></i> &nbsp;
         			<?php echo Text::_('XB_IMPORT'); ?>
         		</button>        		
-			</p>
-		</div>
-	</div>
 </details>
 <hr />
 <details id="impcsv">
 	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_CSV')?></span>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV'); ?></span>
 	</summary>
-	<p>tba </p>
-<p>Functionality expected here:</p>
-<ol>
-    <li>Import datatype from csv</li>
-    <li>choose file</li>
-    
-</ol>
+	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV_NOTE'); ?>
+	</p>
+        	<?php echo $this->form->renderField('csvfile'); ?> 
+    <details id="impazids">
+    	<summary><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS')?></summary>
+    	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS_DESC'); ?></p>
+	<div class="row form-vertical">
+		<div class="col-md-6">
+			<?php echo $this->form->renderField('azstation'); ?> 
+        	<?php $popbody = "'<i>Update Track Azuracast IDs from </i>'+document.getElementById('jform_csvfile').value"; 
+        	  $pophead = 'Confirm Update from CSV'; 
+        	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.updateaztid','azwaiter');"; ?>  
+    	    <p><button id="updcsv" class="btn btn-warning" type="button" 
+    				onclick="<?php echo $confirm; ?>" 
+    			>
+    				<i class="icon-download"></i> &nbsp;<?php echo Text::_('XB_IMPORT'); ?>
+    		</button></p>        	     		    	
+		</div>
+		<div class="col-md-6">
+			<?php echo $this->form->renderField('updateazids'); ?> 
+			<?php echo $this->form->renderField('expmissfiles'); ?> 
+			<?php echo $this->form->renderField('expmisstrks'); ?> 
+		</div>
+	</div>
+    		
+    </details>
+    <details>
+    	<summary><?php echo Text::_('XBMUSIC_IMPORT_TRACKS_CSV');?></summary>
+    	<p class="xbnote">imports tracks from a CSV file containing the MP3 filepathnames in a column called <code>path</code>
+    	<br />if a column called <code>unique_id</code> is also present should be in the correct format (string with 20 hex number digits) for an Azuracast Song (=xbMusic Track) ID it will be used for the  az_tid column for the new track. Other data will be read from the MP3 IDv3 tags. If ID3 tags not present then artist, album and genre may be read from the csv if present.	
+    	
+    	<p>Import button</p>
+    	
+    </details>
 </details>
 <hr />
 <details id="imppl">
@@ -152,11 +189,11 @@ $wa->useScript('keepalive')
 </details>
 	
 	<hr />
-	<h4>Import Logs</h4>
+	<p  class="xbr11 xbbold">Logs</p>
 		<div class="row">
 			<div class="col-md-6">
 				<h4><?php echo Text::_('XB_LOG_FILE')?></h4>
-				<div class="xbbox gradyellow xbyscroll xbmh300">
+				<div id="logbox" class="xbbox gradyellow xbyscroll xbmh300">
 					<?php if ($this->log == '') : ?>
 						<p><i>no log loaded</i></p>
 					<?php else: ?>
@@ -164,9 +201,16 @@ $wa->useScript('keepalive')
 					<?php endif; ?>
 				</div>
 			</div>
-			<div class="col-md-6">
+			<div class="col-md-6 form-vertical">
 				<h4><?php echo Text::_('XB_SELECT_LOG_FILE')?></h4>
 				<?php echo $this->form->renderField('logfile'); ?>
+				<?php echo $this->form->renderField('logfilter'); ?>
+    	    <p><button id="loadlog" class="btn btn-info" type="button" 
+    				onclick="Joomla.submitbutton('dataman.loadlog');" 
+    			>
+    				<i class="icon-refresh"></i> &nbsp;<?php echo Text::_('Refresh Log'); ?>
+    		</button></p>        	     		    	
+				
 			</div>
 		</div>
 				
@@ -175,16 +219,64 @@ $wa->useScript('keepalive')
 	</div>
    			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'report', Text::_('XB_REPORT')); ?>
-                <p class="xbinfo">
+          <div>
+             <p class="xbinfo">
                 	<?php echo Text::_('XBMUSIC_GENERATE_REPORTS')?>
+               <br /><span class="xbit xb09">For checks on music files and images see Files tab above</span>
                 </p>
-<p>Functionality expected here:</p>
-<ol>
-    <li>Show orphan artists & songs without track</li>
-    <li>Show orphan tracks without playlist, album</li>
-    
-    <li></li>
-</ol>
+           <details id="chkorphans">
+              <summary>
+                Check for orphans
+                </summary>
+            <ul>
+                <li>Artists with no songs</li>
+                <li>Artists with no tracks</li>
+                <li>Songs with no tracks</li>
+                <li>Albums with no tracks</li>
+                <li>Tracks with no song</li>
+                <li>Tracks with no artist</li>
+                <li>Tracks with no Playlist</li>
+            </ul>
+               </details>
+           
+           <details id="chkmultiples">
+              <summary>
+                Check for Multiple Songs or Artists for Tracks
+                </summary>
+             
+             <ul>
+             <li>Tracks listed with mulitple Artists</li>  
+             <li>Tracks with possible multiple artists</li>  
+             <li>Tracks listed with multiple Songs</li>  
+             <li>Tracks with possible multiple songs</li>  
+             <li>Song titles that could be separate songs</li>  
+             <li>Artist names that could be separate artists</li>  
+             </ul>
+               </details>
+           <details id="chkplists">
+              <summary>
+                Check for Playlist consistency
+                </summary>
+             <ul>
+               <li>Tracks not in any playlist</li>
+               <li>Playlists with dead tracks</li>
+             </ul>
+           </details>
+           
+			<details id="chkdupes">
+				<summary>
+	           		Check for Duplicates
+	           	</summary>
+           		<p>This will check for possible duplicate values in database</p>
+           		<ul>
+           			<li>tracks using same mp3 file</li>
+           			<li>artists with similar names</li>
+           		</ul>
+			</details>
+
+            <p class="xbit xb09">To check for possible duplicate tracks use the tool in Azuracast
+
+            </div>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'export', Text::_('XB_EXPORT')); ?>
                 <p class="xbinfo">
@@ -353,55 +445,84 @@ $wa->useScript('keepalive')
 <?php endif; ?>
 			
 			<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'filemanager', Text::_('XB_FILES')); ?>
-
-        	<?php echo $this->form->renderField('fmnote1'); ?> 
-			<?php if (empty($this->symlinks)) : ?>
-				<?php echo Text::_('XBMUSIC_NO_SYMLINKS'); ?>
-			<?php else : ?>
-				<h4><?php echo count($this->symlinks).' '.Text::_('XBMUSIC_EXISTING_SYMLINKS');?></h4>
-                <table class="table-striped xbml50">
-                  	<tr><th style="text-align:right;">Name in <code>/xbmusic</code></th>
-                  		<th style="width:50px;text-align:center;">-></th>
-                  		<th>Target Path</th>
-                  		<th></th></tr>
-				<?php $n=0; 
-				foreach ($this->symlinks as $link) : ?>
-					<tr><td style="text-align:right;">
-				    	<?php $n++; 
-				    	   $name = str_replace(JPATH_ROOT.'/xbmusic/', '', $link['name']); 
-				    	   $popbody = '<b>'.$name.'</b> linked to '.$link['target'];
-				    	   $pophead = 'Confirm OK to Remove Symlink';
-				    	   echo '<b>'.$name.'</b>'; ?>
-				    	</td><td style="text-align:center">-></td><td><?php echo $link['target']; ?></td>
-				    	<td style="padding:5px;">
-				    		<button id="remsym<?php echo $n;?>" class="btn btn-danger btn-sm" type="button"
-                   				onclick="document.getElementById('rem_name').value='<?php echo $link['name']; ?>';
-                   					doConfirm('<?php echo $popbody; ?>',
-                   					'<?php echo $pophead; ?>',
-                   					'dataman.remsymlink');" >
-        						<i class="icon-link icon-white"></i> <?php echo Text::_('XBMUSIC_REMOVE_LINK'); ?>
-        					</button>
-        				</td>
-				    </tr>
-				<?php endforeach; ?>
-				</table>
-				<p>&nbsp;</p>
-			<?php endif; ?>
-        	<?php echo $this->form->renderField('link_target'); ?> 
-        	<?php echo $this->form->renderField('link_name'); ?> 
-        	<?php echo $this->form->renderField('fmnote2'); ?> 
-        	<?php $pophead = 'Confirm Create SymLink in /xbmusic/'; 
-        	   $confirm = "doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value+
-        			'<br /><i>as</i> <b>'+document.getElementById('jform_link_name').value+'</b>',
-                    '".$pophead."','dataman.makesymlink');";
-        	?>
-	    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
-        		onclick="<?php echo $confirm; ?>" >
-					<i class="icon-link"></i> 
-        		<?php echo Text::_('XBMUSIC_CREATE_LINK'); ?>
-        		</button>        		
-			</p>
+<div>
+	<details>
+		<summary>
+			<?php echo Text::_('XBMUSIC_MUSIC_FILES'); ?>
+		</summary>
+        	<p class="xbnote"><?php echo Text::_('XBMUSIC_MUSIC_FILES_NOTE'); ?></p>
+		<ul>
+			<li>Tracks with missing mp3 file</li>
+			<li>Unused mp3 files</li>
+			<li>Azuracast files missing</li>
+			<li>Tracks not in Azuracast</li>
+		</ul>
+	</details>
+    
+	<details>
+		<summary>
+			<?php echo Text::_('XBMUSIC_IMAGE_FILES'); ?>
+		</summary>
+		<ul>
+			<li>Tracks missing image</li>
+			<li>Albums missing image</li>
+			<li>Unused images</li>
+		</ul>
+	</details>
+	
+	<details>
+		<summary>
+			<?php echo Text::_('XBMUSIC_SYMLINKS'); ?>
+		</summary>
+		<?php if (empty($this->symlinks)) : ?>
+			<?php echo Text::_('XBMUSIC_NO_SYMLINKS'); ?>
+		<?php else : ?>
+			<h4><?php echo count($this->symlinks).' '.Text::_('XBMUSIC_EXISTING_SYMLINKS');?></h4>
+            <table class="table-striped xbml50">
+              	<tr><th style="text-align:right;">Name in <code>/xbmusic</code></th>
+              		<th style="width:50px;text-align:center;">-></th>
+              		<th>Target Path</th>
+              		<th></th></tr>
+			<?php $n=0; 
+			foreach ($this->symlinks as $link) : ?>
+				<tr><td style="text-align:right;">
+			    	<?php $n++; 
+			    	   $name = str_replace(JPATH_ROOT.'/xbmusic/', '', $link['name']); 
+			    	   $popbody = '<b>'.$name.'</b> linked to '.$link['target'];
+			    	   $pophead = 'Confirm OK to Remove Symlink';
+			    	   echo '<b>'.$name.'</b>'; ?>
+			    	</td><td style="text-align:center">-></td><td><?php echo $link['target']; ?></td>
+			    	<td style="padding:5px;">
+			    		<button id="remsym<?php echo $n;?>" class="btn btn-danger btn-sm" type="button"
+               				onclick="document.getElementById('rem_name').value='<?php echo $link['name']; ?>';
+               					doConfirm('<?php echo $popbody; ?>',
+               					'<?php echo $pophead; ?>',
+               					'dataman.remsymlink');" >
+    						<i class="icon-link icon-white"></i> <?php echo Text::_('XBMUSIC_REMOVE_LINK'); ?>
+    					</button>
+    				</td>
+			    </tr>
+			<?php endforeach; ?>
+			</table>
+			<p>&nbsp;</p>
+		<?php endif; ?>
+    	<?php echo $this->form->renderField('link_target'); ?> 
+    	<?php echo $this->form->renderField('link_name'); ?> 
+    	<?php echo $this->form->renderField('fmnote2'); ?> 
+    	<?php $pophead = 'Confirm Create SymLink in /xbmusic/'; 
+    	   $confirm = "doConfirm('<i>Link</i> '+document.getElementById('jform_link_target').value+
+    			'<br /><i>as</i> <b>'+document.getElementById('jform_link_name').value+'</b>',
+                '".$pophead."','dataman.makesymlink');";
+    	?>
+    	 <p><button id="impmp3" class="btn btn-warning" type="button" 
+    		onclick="<?php echo $confirm; ?>" >
+				<i class="icon-link"></i> 
+    		<?php echo Text::_('XBMUSIC_CREATE_LINK'); ?>
+    		</button>        		
+		</p>
+	</details>
         				
+</div>
 			<?php echo HTMLHelper::_('uitab.endTab'); ?>
 
             <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
@@ -418,6 +539,11 @@ $wa->useScript('keepalive')
     <?php echo XbcommonHelper::credit('xbMusic');?>
     
     <script language="JavaScript" type="text/javascript"
-      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" ></script>
-    
+      src="<?php echo Uri::root(); ?>media/com_xbmusic/js/closedetails.js" >
+    </script>
+	<script>
+		//sets all options with value="disable" to disabled
+    	opts = document.querySelectorAll('select option[value="disable"]');
+		opts.forEach((opt, index)=>{opt.setAttribute('disabled', 'true');});     	
+    </script>
 </div>

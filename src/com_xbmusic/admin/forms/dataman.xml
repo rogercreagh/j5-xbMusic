@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.0.42.7 25th March 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -32,20 +32,29 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		<field name="filename" type="hidden" 
 			label="File name" description="" 
 		/>
-		<field name="impcat" type="radio"
+		<field name="selcat" type="radio"
 			label="Joomla Category"
-			description="Default item categories are specified in global options. Here you can override to create a category based on import date  for all item types created when importing from track file ID3 data"
-			class="btn-group "
+			description="Default track categories are specified in global options. Here you can override the default or create a category based on import date for all item types created by the current import."
+			class="btn-group btn-small"
  			default=""
  			useglobal="true"
 		>
 			<option value="0">Use Item Defaults</option>
 			<option value="1">Create from Date</option>
+			<option value="3">Select from list</option>
 		</field>	
+		<field name="impcat" type="xbsubcat"
+			label="Select Tracks Category"
+			description="This will only apply to tracks that are created by this import. Artists, Albums and Songs will use the global default"
+			extension="com_xbmusic"
+			item_type="track"
+		>
+		</field>
+			
 		<field name="splitsongs" type="radio"
 			label="Split medley to songs"
 			description="attempt to split track titles containing , or / into separate songs"
-			class="btn-group"
+			class="btn-group btn-small"
 			default=""
 			useglobal="true"
 		>
@@ -55,10 +64,13 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 		<field name="nobrackets" type="radio"
 			label="Song Title remove brackets"
 			description="Remove text in square or round brackets when cresating song titles. Often this is used to indicate a live performance or recording date, but sometimes may be a valid part of the title. eg 'Have You Ever Been (to Electric Ladyland)"
-			class="btn-group"
+			class="btn-group btn-small"
 			default=""
 			useglobal="true"
 		>
+			<option value="0">Leave</option>
+			<option value="1">Remove</option>	
+		</field>
 		<field 
 			name="tracktags" type="tag"
 			label="Track Tags"
@@ -86,36 +98,79 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			multiple="true" mode="ajax"
 			custom="deny"
 			class="xbtags"
-		/>
-		
-			<option value="0">Leave</option>
-			<option value="1">Remove</option>
-		</field>
+		/>		
 		<field name="logfile" type="filelist" 
-        	default="0" 
+        	default="" 
         	label="Select log to view" 
-        	description="Log files are named 'import_YYYY-MM-DD.log'" 
+        	description="Log files in /xbmusic-data/logs are named with import type and date last saved. New file is started each day." 
         	directory="xbmusic-data/logs" 
-        	filter="\.mp3" 
+        	fileFilter="\.log" 
         	exclude="false" stripext="false"
         	hide_none="true" hide_default="true"
         >
-        	<option value="0">Most Recent</option>
+        	<option value="">Most Recent</option>
         </field>
         
         <field name="logfilter" type="radio"
         	label="Filter displayed log"
         	description="Simplify display of log data"
         	class="btn-group"
-        	default="2"
+        	default=""
         >
-        	<option value="0">All items</option>
-        	<option value="1">Summary only</option>
-        	<option value="2">Errors</option>
-        	<option value="3">Errors &amp; warnings</option>
+        	<option value="">All items</option>
+        	<option value="[SUM">Summary only</option>
+        	<option value="[SUM,[ERR">Summary &amp; Errors</option>
+        	<option value="[SUM,[ERR,[WARN">Sum., Errors &amp; Warnings</option>
         </field>
 <!--        	onchange="this.form.submit();" -->
        	
+		<field name="csvfile" type="filelist" 
+        	default="0" 
+        	label="Select CSV file" 
+        	description="File should be in the /xbmusic-data folder" 
+        	directory="xbmusic-data" 
+        	fileFilter="\.csv" 
+        	exclude="false" stripext="false"
+        	hide_none="false" hide_default="true"
+        >
+        </field>
+        <field name="azstation" type="xbazstations"
+        	label="Select Station"
+        	description="Station defines the path to the media folder within /xbmusic. Select 'No station' to use /xbmusic/ as the media root"
+        >
+        	<option value="">No station</option>
+        </field>
+        
+        <field name="updateazids" type="radio"
+        	label="Update option"
+        	description="Either Update all existing az_tid if track filename present in list, or only update missing ones."
+        	class="btn-group"
+        	default="1"
+        >
+        	<option value="0">Only New</option>
+        	<option value="1">Update All</option>
+        </field>
+        
+        <field name="expmissfiles" type="radio"
+        	label="Save Missing Files List"
+        	description="Save list of files not found in media folder"
+        	class="btn-group"
+        	default="1"
+        >
+        	<option value="0">JNO</option>
+        	<option value="1">JYES</option>
+        </field>
+        
+        <field name="expmisstrks" type="radio"
+        	label="Save Missing Tracks List"
+        	description="Save list of files that exist but are not yet in database. Will save full rows from the AzTid import file in CSV format"
+        	class="btn-group"
+        	default="1"
+        >
+        	<option value="0">JNO</option>
+        	<option value="1">JYES</option>
+        </field>
+        
 	</fieldset>
 	<fieldset name="azuracast" label="Azuracast"
 	>
@@ -129,7 +184,7 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 	<fieldset name="files" label="File Management"
 	>
 		<field name="fmnote1" type="note"
-			label="Music Files"
+			label="XBMUSIC_MUSIC_FILES"
 			description="Music files are hardcoded to a folder xbmusic/ in the root of the joomla installation. To include files from a different location on the server you can create a symlink to the target folder below. You must ensure that the WebServer user has read and write access to the folder. For most common Apache2 installations the user is www-data. It may be simplest to make the target nusic folder read-write for all users (chmod -R 777 [targetfolderpath]), The server will need to be able to read the entire path to the target and have read+write permissions for the target folder and subfolders" 
 		/>
 		<field name="link_target" type="text"
@@ -139,8 +194,9 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
 			default=""
 		/>
 		<field name="link_name" type="text"
-			label="Link name in /xbmusic"
-			description="Enter the name without path for the new symlink. Must not be an existing folder or file in xbmusic/ and the path must exist in xbmusic"
+			label="Link name in /xbmusic/"
+			description="Enter the name for the new symlink under /xbmusic. Must not be an existing folder or file in xbmusic/. Path can include subfolders which must not already exist. eg if mystation/media/ already exists as either symlink or real folder under /xbmusic/ then you cannot create a new symlink at mystation/oldmedia because mystation/ already exists."
+			hint="station_name/media"
 			default=""
 			showon="link_target!:"
 		/> 

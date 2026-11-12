@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.0.59.12 2nd December 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,21 +14,22 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\Filter\OutputFilter;
+//use Joomla\Filter\OutputFilter;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-use Joomla\CMS\Uri\Uri;
+//use Joomla\CMS\Uri\Uri;
 use DirectoryIterator;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
+use SplFileObject;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
-use \SimpleXMLElement;
-use Joomla\CMS\Filesystem\Folder;
+//use \SimpleXMLElement;
+//use Joomla\CMS\Filesystem\Folder;
 
 class DatamanModel extends AdminModel {
 
@@ -75,7 +76,8 @@ class DatamanModel extends AdminModel {
         $this->usedaycat = ($usedaycat === '') ? $params->get('impcat','0') : $usedaycat;
         $this->defcats = XbmusicHelper::getDefaultItemCats($this->usedaycat);
         //start log
-        $loghead = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
+        $loghead = '[IMPORT TRKS ID3] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
+        $logfile = 'trkid3_import_'.date('Y-m-d').'.log';
         $logmsg = '';            //        }
         // set up counts for logging and start time
         $cnts = array('newtrk'=>0,'duptrk'=>0,'newalb'=>0,'newart'=>0,'newsng'=>0,'errtrk'=>0);
@@ -102,7 +104,7 @@ class DatamanModel extends AdminModel {
                         $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
                         if ($msglevel>1) $app->enqueueMessage($errmsg,'Error');
                         $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
-                        XbmusicHelper::writelog($logmsg);
+                        XbmusicHelper::writelog($logfile, $logmsg);
                         return false;
                     } else {
                         $files = $mp3list;
@@ -118,7 +120,7 @@ class DatamanModel extends AdminModel {
                         $errmsg = Text::sprintf('%s mp3 files found which exceeds the limit (%s). Aborting scan.',$itemcnt,$maxitems);
                         if ($msglevel>1) $app->enqueueMessage($errmsg,'Error');
                         $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
-                        XbmusicHelper::writelog($logmsg);
+                        XbmusicHelper::writelog($logfile, $logmsg);
                         return false;
                     } else {
                         foreach ($subfolders as $folder) {
@@ -138,14 +140,14 @@ class DatamanModel extends AdminModel {
             $errmsg .= Text::_('XBMUSIC_INVALID_FILES_LIST');
             if ($msglevel>1) Factory::getApplication()->enqueueMessage($errmsg,'Error');
             $logmsg .= $loghead.XBERR.$errmsg.XBENDLOG;
-            XbmusicHelper::writelog($logmsg);
+            XbmusicHelper::writelog($logfile, $logmsg);
             return false;
         } //endif
         if (count($files)==0){
             $errmsg .= Xbtext::_('XBMUSIC_NO_MP3_FOUND',XBSP2 + XBTRL).$folder;
             if ($msglevel>2) Factory::getApplication()->enqueueMessage($errmsg,'Warning');
             $logmsg .= $loghead.XBWARN.$errmsg.XBENDLOG;
-            XbmusicHelper::writelog($logmsg);
+            XbmusicHelper::writelog($logfile, $logmsg);
             return false;
         }
         // ok we're going to iterate through the files
@@ -160,14 +162,14 @@ class DatamanModel extends AdminModel {
         $loghead .= '[SUM] Elapsed time '.date('s', time()-$starttime).' seconds'."\n";
         $loghead .= XBENDITEM;
         $logmsg = $loghead.$logmsg.XBENDLOG;
-        XbmusicHelper::writelog($logmsg);
+        XbmusicHelper::writelog($logfile, $logmsg);
         return $cnts['newtrk'];
     } //end parseFilesMp3()
     
     /**
      * @name getMp3FileList()
      * @desc gets an array of all files in a folder
-     * @param unknown $folder
+     * @param string $folder
      * @param string $ext
      * @return string[]
      */
@@ -548,7 +550,123 @@ class DatamanModel extends AdminModel {
         
     }
     
-    
+     /**
+     * @name updateAzTrkIds
+     * @desc reads csv file containing cols for 'path' and 'unique_id' for mp3file name and azuracst id
+     * Adds missing ids to tracks table. Option from input to update any changed ones and get staion path
+     * Will default to Add only and mp3 under /xbmusic with not station path
+     * Will write results to log file and alert to screen
+     * @param string $filename - if absent will get filename from input
+     * returns array of counts
+     */
+    public function updateAzTrkIds($filename = '') {
+        $res = array('idadded'=>0,'idupdated'=>0, 'filesmissing'=>0, 'trksmissing'=>0, 
+            'rows'=>0, 'filesfound'=>0, 'trksfound'=>0, 'errors'=>0);
+        $missingfiles = '';
+        $missingtracks = '';
+        $errorlist='';
+        $jip = Factory::getApplication()->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        if ($filename != '') {
+            $file = $filename;
+        } else {
+            $file = trim($post['csvfile']); 
+        }
+        $stid = (int) $post['azstation'];
+        $updateazids = (int) $post['updateazids'];
+        $csvpathname = JPATH_ROOT.'/xbmusic-data/'.$file;
+        $mediapath = JPATH_ROOT.'/xbmusic/';
+        if ($stid > 0) {
+            $station = XbcommonHelper::getItem('#__xbmusic_azstations', $stid);
+            $mediapath .= $station->mediapath;
+        }
+        $logstr = "[IMPORT AZTRKIDS] Azuracst unique_ids to tracks.az_tid "."\n";
+        $logstr .= XBSUM.' Source file: '.$file."\n";
+        $logstr .= XBSUM.' Imported at '.date('H:i:s D jS M Y')."\n";       
+        $data = $this->readSmallCsv($csvpathname);
+        if (!empty($data)) {
+            $missingtracksrows = [array_keys($data[0])];
+           foreach ($data as $row) {
+               $res['rows'] ++;
+               $thisfile = $mediapath.$row['path'];
+               if (file_exists($thisfile)) {
+                   $res['filesfound'] ++;
+                   // check if file is in database
+                   $item = XbcommonHelper::getItem('#__xbmusic_tracks', $thisfile,'filepathname');
+                   if (is_null($item)) {
+                       // add file to needs importing list
+                       $res['trksmissing'] ++;
+                       $missingtracks .= $thisfile . "\n";
+                       $missingtracksrows[] = $row;
+                   } else {
+                       $res['trksfound'] ++;
+                       if (empty($item->az_tid) || ($item->az_tid == '0')) {
+                           if (XbcommonHelper::setItemValue('#__xbmusic_tracks', 'az_tid', $item->id, $row['unique_id'])) {
+                               $res['idadded'] ++;
+                           } else {
+                               $res['errors'] ++;
+                               $errorlist .= XBERR.' Add az_tid failed : '.$item->id.' : '.$item->title."\n";
+                           }                           
+                       } else {
+                           if (($updateazids > 0) && ($item->az_tid != $row['unique_id'])) { 
+                               if (XbcommonHelper::setItemValue('#__xbmusic_tracks', 'az_tid', $item->id, $row['unique_id'])) {
+                                   $res['idupdated'] ++;
+                               } else {
+                                   $res['errors'] ++;
+                                   $errorlist .= XBERR.' Update az_tid failed : '.$item->id.' : '.$item->title."\n";
+                               }
+                           }
+                       }
+                   } // end missing track                  
+               } else {
+                   // add file to list needing fetching and importing
+                   $res['filesmissing'] ++;
+                   $missingfiles .= $thisfile."\n";
+               } //end file_exists
+           } //endforeach           
+           $logstr .= XBSUM.' Rows: '.$res['rows'].', Missing Files: '.$res['filesmissing'].', Files found: '.$res['filesfound'];
+           $logstr .= ', Missing Tracks: '.$res['trksmissing'].', Tracks found: '.$res['trksfound'];
+           $logstr .= ', Added: '.$res['idadded'].', Updated: '.$res['idupdated'].', Errors: '.$res['errors']."\n";
+           if ($res['filesmissing']>0) {
+               $logstr .= "\n".XBWARN." =================\n".XBWARN." ".$res['filesmissing']." Files Missing\n";
+               $logstr .= $missingfiles;
+               if ($post['expmissfiles'] == '1' ) {
+                   //for this we can just write the missing files list to file, csv not required
+                   $missfilelistname = JPATH_ROOT.'/xbmusic-data/'.'files_missing_'.date('Y-m-d').'.txt';
+                   $missfilelistname = XbcommonHelper::makeUniqueFilename($missfilelistname);
+                   $f = fopen($missfilelistname, 'w'); 
+                   fwrite($f, $missingfiles);
+                   fclose($f);
+                   $logstr .= XBWARN." missing files list written to /xbmusic-data/".pathinfo($missfilelistname, PATHINFO_BASENAME);
+                   $logstr .= "\n";
+               }
+           }
+           if ($res['trksmissing']>0) {
+               $logstr .= "\n".XBWARN." =================\n".XBWARN." ".$res['trksmissing']."Tracks Missing\n";
+               $logstr .= $missingtracks;
+               if ($post['expmisstrks'] == '1' ) {
+                   //for this we need to generate a csv, but we will use the lines
+                   $filesimportlistname = JPATH_ROOT.'/xbmusic-data/'.'files_to_import_'.date('Y-m-d').'.txt';
+                   $filesimportlistname = XbcommonHelper::makeUniqueFilename($filesimportlistname);
+                   $this->writeCsv($filesimportlistname, $missingtracksrows);
+               }
+           }
+           if ($res['errors']>0) {
+               $logstr .= "\n".XBERR." =================\n".XBERR." ERRORS\n";
+               $logstr .= $errorlist;
+           }
+        } else {
+            $logstr .= XBSUM.' No data read from file'."\n";
+        } // end data ok
+        $logfile = 'azids_import_'.date('Y-m-d').'.log';
+        $app =  Factory::getApplication()->setUserState('com_xbmusic.dataman.logfile', $logfile);
+        
+        XbmusicHelper::writelog($logfile, $logstr);          
+//        Factory::getApplication()->enqueueMessage(str_replace("\n", '<br />', $logstr));
+
+        return $res;
+    }
+   
     /************ AZURACAST FUNCTIONS ************/
     
     public function getAzStations() {
@@ -702,88 +820,97 @@ class DatamanModel extends AdminModel {
         //needs to also delete stid from playlists, tracks
     }
     
-    /**
-     * @name importAzStations()
-     * @desc this will retrieve all stations available using the config api key
-     * @desc this may not be the same as the key saved with the station in the database
-     * @desc if the az_url and az_stid for a returned station is not already in the database
-     * @desc then a new station will be created
-     * @desc existing stations in the database will not be updated
-     */
-//     public function importAzStations() {
-//         $api = new AzApi();
-//         $apikey = $api->getApikey();
-//         $azurl = $api->getAzurl();
-//         $apiname = $api->getApicomment();
-//         $azstations = $api->azStations();
-//         if (isset($azstations->code)) 
-//             return $azstations;
-//         $uncatid = XbcommonHelper::getCatByAlias('uncategorised')->id;
-//         $uid = $this->getCurrentUser()->id;
-        
-//         if ($azstations) {
-//             //$db = Factory::getContainer()->get(DatabaseInterface::cl
-//             $db = Factory::getDbo();
-//             $query = $db->getQuery(true);
-//             $query->select('az_stid');
-//             $query->from('#__xbmusic_azstations');
-//             $query->where($db->qn('az_url').' = '.$db->q($azurl));
-//             $db->setQuery($query);
-//             $dbstations = $db->loadColumn();
-//             $missing = [];
-//             if ($dbstations) {
-//                 foreach ($azstations as $station) {
-//                     if (!in_array($station->id, $dbstations)) {
-//                         $missing[] = $station;
-//                     }
-//                 }
-//             } else {
-//                 $missing = $azstations;
-//             }
-//             $colarr = array('id', 'az_stid', 'title', 'alias', 
-//                     'az_apikey', 'az_apiname', 'az_url',
-//                     'az_stream','website', 'az_player', 
-//                     'catid', 'description', 'az_info',
-//                     'created','created_by', 'created_by_alias'
-//                 );
-//             if (count($missing)>0) {
-//                 foreach ($missing as $station) {
-//                     $values=array($db->q(0),$db->q($station->id),$db->q($station->name),$db->q($station->shortcode),
-//                         $db->q($apikey), $db->q($apiname), $db->q($azurl),
-//                         $db->q($station->listen_url), $db->q($station->url),$db->q($station->public_player_url),
-//                         $db->q($uncatid),$db->q($station->description),$db->q(json_encode($station)),
-//                         $db->q(Factory::getDate()->toSql()),$db->q($uid), $db->q('import from Azuracast')
-//                     );
-//                     $query->clear();
-//                     $query->insert($db->qn('#__xbmusic_azstations'));
-//                     $query->columns(implode(',',$db->qn($colarr)));
-//                     $query->values(implode(',',$values));
-//                     $db->setQuery($query);
-//                     $res = $db->execute();
-//                     if ($res == false) Factory::getApplication()->enqueueMessage('sql error '. $query>dump());       
-//                 }
-//             }                          
-//         }
-//         return true;
-//     }
     
-   
-//     public function azPlaylists(int $stid) {
-//         $api = new AzApi();
-//         return $api->azPlaylists($stid);
-//     }
-    
-//     public function azPlaylistPls(int $stid, int $plid) {
-//         $api = new AzApi();
-//         return $api->azPlaylistPls($stid, $plid);
-//     }
-    
-//     public function getAzuracast() {
-        
-//     }
     
     /************ FILES FUNCTIONS ************/
+    
+    public function readLog($logfile, $logfilter='') {
+        XbmusicHelper::readlog($logfile, $logfilter);
+               
+    }
        
+    private function readBigCsv(string $pathname) {
+        //        $pathname = JPATH_ROOT.'/xbmusic-data/'.$filename;
+        $result = [];
+        if (file_exists($pathname)) {
+            $handle = fopen($pathname, "r");
+            if ($handle) {
+                $headers = fgetcsv($handle, 0, ","); // Read header row
+                $headcnt = count($headers);
+                $result = [];
+                while (($data = fgetcsv($handle, 0, ",")) !== false) {
+                    if (count($data) == $headcnt) $result[] = array_combine($headers, $data);
+                }
+                fclose($handle);
+            }
+        }           
+        return $result;
+    }
+    
+    private function readSmallCsv(string $pathname) {
+        //        $pathname = JPATH_ROOT.'/xbmusic-data/'.$filename;
+        if (file_exists($pathname)) {
+            $rows = array_map('str_getcsv', file($pathname));
+            $headers = array_shift($rows);
+            $headcnt = count($headers);
+            foreach ($rows as $key=>$row) {
+                if (count($row) != $headcnt) unset($rows[$key]);
+            }
+            $result = array_map(function($row) use ($headers) {
+                return array_combine($headers, $row);
+            }, $rows);
+            return $result;
+        }
+        return [];
+    }
+    
+    private function writeCsv(string $filepathname, array $data) {
+        $handle = fopen($filepathname, "w");
+        if ($handle) {
+            $errs = [];
+            foreach ($data as $row) {
+                if (fputcsv($handle, $row, ",","\"","")===false) {
+                    $errs[] = $row[0];
+                }           
+            }
+            fclose($handle);
+            if (!empty($errs)) Factory::getApplication()->enqueueMessage('Errors in following rows:<br />'.implode(', ',$errs),'error');
+            return $errs;                  
+        }
+    }
+
+    private function splReadCsv(string $filename) {
+        $rows = [];
+        $file = new \SplFileObject($filename);
+        $file->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
+        foreach ($file as $data)
+            if (is_array($data))
+                $rows[] = $data;                
+        $file = null;
+        $headers = array_shift($rows);
+        $result = array_map(function($row) use ($headers) {
+            return array_combine($headers, $row);
+            }, $rows);                   
+        return $result;
+    }
+    
+// TODO new function to write csv
+    private function splWriteCsv(string $filename, array $datarows) {
+        $file = new SplFileObject($filename, 'w');
+        
+        // Set CSV control (delimiter, enclosure, escape) if needed
+        $file->setCsvControl(',', '"', '\\');
+        
+        foreach ($datarows as $row) {
+            $file->fputcsv($row);
+        }
+        
+        // Close the file
+        $file->fflush();
+        $file = null;
+        return true;
+    }
+
     public function newsymlink($targ, $name) {
         $res = false;
         $targ = rtrim($targ,"/ ");
@@ -862,24 +989,25 @@ class DatamanModel extends AdminModel {
     /**
      * @name checkTrackFiles()
      * @desc iterates through the media files and tracks checking if file has no track or track file is missing
+     * 
      * @return boolean | array (true if all ok, array of missing items)
      */
     public function checkTrackFiles() {
         $res = false;
         $missingtracks = [];
-        $missingfiles = self::recursiveGetFilename(JPATH_ROOT.'/xbmusic/');
+        $missingfiles = [];
         // get array of existing filepaths with integer index
-        $allfiles = [];
+        $allfiles = self::recursiveGetFilename(JPATH_ROOT.'/xbmusic/');
         // get array of existing tracks with id index
         $alltracks = [];
         $missingtracks = array_diff($alltracks, $allfiles);
         $missingfiles = array_diff($allfiles, $alltracks);
-        if ()
+        if (false)
             return $res;
     }
     
     public function recursiveGetFilename(string $folder, $ext = "mp3") {
-        $extensions = ['jpg', 'jpeg', 'png']; // Array of extensions to find
+        //$extensions = ['mp3', 'jpeg', 'png']; // Array of extensions to find
         
         // Create the directory iterator
         $dirIterator = new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS);

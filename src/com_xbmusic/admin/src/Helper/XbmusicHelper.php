@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XbazuracastHelper.php
- * @version 0.0.62.0 16th April 2026
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -793,7 +793,7 @@ class XbmusicHelper extends ComponentHelper
 	/**
 	 * @desc given song id returns all versions. Artist name & image, trk title & file & year, album title
 	 * @param int $songid
-	 * @return Assoc Array
+	 * @return Array assoc
 	 */
 	public static function getSongTracks($songid) {
 	    $db = Factory::getDbo();
@@ -976,17 +976,16 @@ ORDER BY s.title ASC
 	        }
 	    }
 	    if (!is_null($file)) {
-	        $logtxt = file_get_contents($file->getPathname());
-	        return $logtxt;
+//	        $logtxt = file_get_contents($file->getPathname());
+//	        return $logtxt;
+            return $file->getBasename();
 	    }
 	    return '';
 	}
 	
-	public static function writelog(string $logstr, $filename = '') {
-	    if ($filename == '') {
-	        $filename = 'trks_import_'.date('Y-m-d').'.log';
-	    }
-	    $logstr .= self::readlog($filename);
+	public static function writelog(string $filename, string $logstr) {
+	    //append previous logfile if it exists to new one
+	    $logstr .= self::readlog($filename); 
 	    $pathname = JPATH_ROOT.'/xbmusic-data/logs/'.$filename;
 	    $f = fopen($pathname, 'w');
 	    fwrite($f, $logstr);
@@ -994,9 +993,12 @@ ORDER BY s.title ASC
 	}
 	
 	public static function readlog(string $filename, $filter ='') {
+	    if ($filename == '') $filename = self::getLastImportLog();
 	    $pathname = JPATH_ROOT.'/xbmusic-data/logs/'.$filename;
 	    if (file_exists($pathname)) {
     	    if ($filter == '') return file_get_contents($pathname);
+    	    // [IMP... lines will always be shown
+    	    $filter .= ',[IMP'; 
             $logstr = '';
 	        $flags = explode(',',$filter);
     	    if ($lines = file($pathname)) {
@@ -1005,9 +1007,14 @@ ORDER BY s.title ASC
 	                    if (str_starts_with($line, $flag)) $logstr .= $line;
 	                }
 	           }
+    	    } else {
+    	        $errstr = Text::_('XBMUSIC_ERROR_READING_LOG').XbText::code($filename).'<br />';
+    	        $errstr .= str_replace("\n", '<br />', $logstr);
+    	        Factory::getApplication()->enqueueMessage($errstr,'Error');
     	    }
+    	    
 	    } else {
-	        $logstr = '';
+	        $logstr = 'Log file '.$filename.' not found';
 	    }
 	    return $logstr;
 	}

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/XcommonHelper.php
- * @version 0.1.0.0 9th October 2026
+ * @version 0.1.1.0 10th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -737,7 +737,7 @@ class XbcommonHelper extends ComponentHelper {
     /**
      * @name getItem()
      * @desc returns a single item row as an object or array. If column values are not unique will return the first found
-     * @param string $table - the table name
+     * @param string $table - the table name including '#__'
      * @param string $val - the value to match
      * @param string $col - the column to look in, defaults to 'id'
      * @param string $where - optional additional where condition
@@ -846,6 +846,22 @@ class XbcommonHelper extends ComponentHelper {
             $alias = $temp.'-'.sprintf("%02d",$i);
         }
         return $alias;
+    }
+    
+    /**
+     * @name makeUniqueFilename()
+     * @desc takes a file pathname and adds a suffix to filename to make it unique
+     * @param string $filepathname
+     * @return string unique filename
+     */
+    public static function makeUniqueFilename(string $filepathname) {
+        $n = 0;
+        $pinfo = pathinfo($filepathname);
+        while (file_exists($filepathname)) {
+            $n ++;
+            $filepathname = $pinfo['dirname'].'/'.$pinfo['filename'].'_'.$n.'.'.$pinfo['extension'];
+        }
+        return $filepathname;
     }
        
     /**
@@ -997,7 +1013,7 @@ class XbcommonHelper extends ComponentHelper {
      * @name formatBytes
      * @desc takes a number and returns a formatted string
      * @desc from https://stackoverflow.com/questions/2510434/format-bytes-to-kilobytes-megabytes-gigabytes
-     * @param unknown $size
+     * @param number $size
      * @param number $precision
      * @return string
      */
@@ -1149,8 +1165,6 @@ class XbcommonHelper extends ComponentHelper {
         return false;
     }
     
-/*************** TAG FUNCTIONS  ****************/    
-
   
 /***************** IMAGE FUNCTIONS *****************/    
     
@@ -1211,7 +1225,10 @@ class XbcommonHelper extends ComponentHelper {
         return $uniq_array;
     }
     
-    /**
+ 
+ /*************** OTHER FUNCTIONS ******************/
+    
+ /**
      * @name setComponentOptions()
      * @desc sets a component options from an array of keys=>values
      * @param array $options

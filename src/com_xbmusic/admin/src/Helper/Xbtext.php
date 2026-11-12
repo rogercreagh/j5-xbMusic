@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/Xbtext.php
- * @version 0.0.30.0 7th February 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2024
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -99,5 +99,17 @@ XBUCALL all upper case
     public static function q(string $text, $translate = false) {
         if ($translate) $text = Text::_($text);
         return '"'.$text.'"';
+    }
+    
+    /**
+     * @name code()
+     * @desc wraps code html htags around text, optional translate
+     * @param string $text - text to be wrapped
+     * @param boolean $translate - true to translate
+     * @return string - wrapped text
+     */
+    public static function code(string $text, $translate = false) {
+        if ($translate) $text = Text::_($text);
+        return ' <code>'.$text.'</code> ';
     }
 }

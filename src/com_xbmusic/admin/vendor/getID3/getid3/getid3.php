@@ -2,7 +2,8 @@
 /*******
  * @package xbMusic
  * @filesource admin/vendor/getID3...
- * @version 0.0.0.1 31st March 2024
+ * @version 0.1.0.2 4th November 2026
+ * @since v0.0.0.1 31st March 2024
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -17,6 +18,8 @@
 // Please see readme.txt for more information                  //
 //                                                            ///
 /////////////////////////////////////////////////////////////////
+
+// v0.1.0.2 replaced backticks with shell_exec() at approx 493, 1831, 1842
 
 // define a constant rather than looking up every time it is needed
 if (!defined('GETID3_OS_ISWINDOWS')) {
@@ -490,7 +493,7 @@ class getID3
 					if (strpos($value, ' ') !== false) {
 						if (!empty($path_so_far)) {
 							$commandline = 'dir /x '.escapeshellarg(implode(DIRECTORY_SEPARATOR, $path_so_far));
-							$dir_listing = `$commandline`;
+							$dir_listing = shell_exec($commandline);
 							$lines = explode("\n", $dir_listing);
 							foreach ($lines as $line) {
 								$line = trim($line);
@@ -1828,7 +1831,7 @@ class getID3
 					if (file_exists(GETID3_HELPERAPPSDIR.'vorbiscomment.exe')) {
 
 						$commandline = '"'.GETID3_HELPERAPPSDIR.'vorbiscomment.exe" -w -c "'.$empty.'" "'.$file.'" "'.$temp.'"';
-						$VorbisCommentError = `$commandline`;
+						$VorbisCommentError = shell_exec($commandline);
 
 					} else {
 
@@ -1839,7 +1842,7 @@ class getID3
 				} else {
 
 					$commandline = 'vorbiscomment -w -c '.escapeshellarg($empty).' '.escapeshellarg($file).' '.escapeshellarg($temp).' 2>&1';
-					$VorbisCommentError = `$commandline`;
+					$VorbisCommentError = shell_exec($commandline);
 
 				}
 

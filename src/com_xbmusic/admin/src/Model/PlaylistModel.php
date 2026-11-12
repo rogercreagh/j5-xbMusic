@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/PlaylistModel.php
- * @version 0.0.59.21 13th February 2026
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -394,9 +394,9 @@ class PlaylistModel extends AdminModel {
             $result = $api->getAzPlaylistM3u($station->az_stid, $data['az_plid'], $m3ufpathname);
             if ($result == true) {
  //               $stalias = XbcommonHelper::getItemValue('#__xbmusic_azstations', 'alias', $data['db_stid']);
-                $logfilename = 'az_import_'.$station->alias.'_'.$data['alias'].date('Y-m-d-Hi').'.log';
+                $logfilename = 'playlist_m3u_import_'.$station->alias.'_'.$data['alias'].date('Y-m-d').'.log';
                 $loglines = '';
-                $loghead = '[IMPORT M3U]Importing M3U file from Azuracast for Playlist '.$data['title']."\n";
+                $loghead = '[IMPORT PLAYLIST M3U]Importing M3U file from Azuracast for Playlist '.$data['title']."\n";
                 if (file_exists($m3ufpathname)) {
                     if ($loglevel > 0) $loglines .= XBSUM.'Source File: '.$fname."\n";
                     $newtrks = $this->getM3uTracks($m3ufpathname, $data, $loglines);
@@ -436,7 +436,7 @@ class PlaylistModel extends AdminModel {
                     if ($msglevel >1) $app->enqueueMessage('Could not find m3u file '.$m3ufpathname,'Error');
                     $loglines .= XBERR.'Import file '.basename($m3ufpathname).' not found. '."\n";
                 }
-                XbmusicHelper::writelog($loghead.$loglines, $logfilename);
+                XbmusicHelper::writelog($logfilename, $loghead.$loglines );
                 return true;
             } else {
                 if ($msglevel >1) $app->enqueueMessage('API error: '.print_r($result,true),'Error');
@@ -499,7 +499,7 @@ class PlaylistModel extends AdminModel {
             if ($msglevel > 1) $app->enqueueMessage($msg.'<Code>xbmusic-data/m3u/'.$fname.'</code>','Error');
             if ($loglevel > 1) $loglines .= XBERR.$msg.'/xbmusic-data/m3u/'.$fname."\n";
         }
-        if (($loglines != '') && ($loglevel > 0)) XbmusicHelper::writelog($loghead.$loglines, $logfilename);                
+        if (($loglines != '') && ($loglevel > 0)) XbmusicHelper::writelog($logfilename, $loghead.$loglines);                
         return true;
     }
     

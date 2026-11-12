@@ -62,7 +62,7 @@ $wa->useScript('xbmusic.xbgeneral');
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->trackcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XB_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
@@ -97,7 +97,7 @@ $wa->useScript('xbmusic.xbgeneral');
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->songcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XB_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
@@ -132,7 +132,7 @@ $wa->useScript('xbmusic.xbgeneral');
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->artistcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XB_TAGS_USED')); ?></span>
 							</td>
 						<tr>
 							<td><span class="xbnit"><?php echo Text::_('XB_CATEGORY_BRANCH'); ?></span>: <?php echo $this->rootcat_artist; ?>
@@ -166,7 +166,7 @@ $wa->useScript('xbmusic.xbgeneral');
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->albumcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XB_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
@@ -202,7 +202,7 @@ $wa->useScript('xbmusic.xbgeneral');
 							</td>
 							<td class="xbwp50">
 								<span class="xbbadge badge-cyan"><?php echo $this->playlistcnts['tagcnt'];?></span>
-								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XBMUSIC_TAGS_USED')); ?></span>
+								<span class="xbnit xbpl10"><?php echo lcfirst(Text::_('XB_TAGS_USED')); ?></span>
 							</td>
 						</tr>
 						<tr>
@@ -288,7 +288,7 @@ $wa->useScript('xbmusic.xbgeneral');
 								<span class="xbbadge badge-tag"><?php echo $this->tagcnts['total'];?></span>
 							</td>
 							<td class="xbwp50">
-								<span class="xbnit xbpl10"><?php echo Text::_('XBMUSIC_TAGS_USED'); ?></span>
+								<span class="xbnit xbpl10"><?php echo Text::_('XB_TAGS_USED'); ?></span>
 								<span class="xbbadge badge-ltblue"><?php echo $this->tagcnts['used'];?></span>
 							</td>
 						</tr>

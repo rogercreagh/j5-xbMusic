@@ -16,7 +16,7 @@
 
 		<field name="az_stid" type="number"
 			label="Azuracast Id" 
-			descripition="ID on the Azuracast server - other stations on different servers may have the same id"
+			description="ID on the Azuracast server - other stations on different servers may have the same id"
 			class="xbfix120 readonly" readonly="true"
 			size="10" default="0"			 
 		/>
@@ -100,7 +100,7 @@
 	<fieldset name="azuracast">
 	
 		<field name="az_url" type="text"
-			label="Azuracast Url" descripition="Base url for Azuracast server"
+			label="Azuracast Url" description="Base url for Azuracast server"
 			class="readonly" readonly="true"
 		/>
 			
@@ -115,32 +115,33 @@
 		/>
 
 		<field name="az_stream" type="text"
-			label="Primary Stream URL" descripition="URL for the primary stream"
+			label="Primary Stream URL" description="URL for the primary stream"
 			readonly="true"
 		/>
 			
 		<field name="az_player" type="text"
-			label="AZ Player" descripition="Server public player page - includes play/pause and 5 song history. Not dependent on external website"
+			label="AZ Player" description="Server public player page - includes play/pause and 5 song history. Not dependent on external website"
 			readonly="true"
 		/>
 		
 		<field name="website" type="url"
-			label="Station Website" descripition="Home page for station website"
+			label="Station Website" description="Home page for station website"
 			maxlength="120"			
 		/>
 			
 		<field name="webplayer" type="url"
-			label="Website player" descripition="URL for stream player embedded in webpage"
+			label="Website player" description="URL for stream player embedded in webpage"
 			maxlength="120"
 			hint="https://"
 		/>
 				
 		<field name="mediapath" type="text"
-			label="Media location" descripition="Path from JPATH_ROOT/xbmusic to station media folder (may be copy or symlink to shared storage)"
-			hint="stationname/media"
+			label="Media location" description="Path from JPATH_ROOT/xbmusic/ to station media folder (may be copy or symlink to shared storage)"
+			hint="station_name/media"
 			size="40" maxlength="120"
 		/>
-			
+
+<!-- 
 		<field name="foldername" type="text"
 			label="Selected Folder"
 			description=""
@@ -157,6 +158,7 @@
 		<field name="filename" type="hidden" 
 			label="File name" description="" 
 		/>
+ -->			
 	</fieldset>
 	
 <!-- Standard joomla -->

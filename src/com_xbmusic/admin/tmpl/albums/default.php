@@ -66,8 +66,8 @@ $root = Uri::root();
 $document = Factory::getApplication()->getDocument();
 $document->addScriptOptions('com_xbmusic.uri', array("root" => $root));
 
-?>
-<script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
+?>	
+ <script type="module" src="<?php echo Uri::root(); ?>/media/com_xbmusic/js/xbdialog.js"></script>
 
 <div id="xbcomponent" >
 	<form action="<?php echo Route::_('index.php?option=com_xbmusic&view=albums'); ?>" method="post" name="adminForm" id="adminForm">

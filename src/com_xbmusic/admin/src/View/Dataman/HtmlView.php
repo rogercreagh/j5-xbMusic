@@ -2,9 +2,9 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/View/Dataman/HtmlView.php
- * @version 0.0.59.5 20th November 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
- * @copyright Copyright (c) Roger Creagh-Osborne, 2025
+ * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  ******/
 
@@ -50,12 +50,18 @@ class HtmlView extends BaseHtmlView {
         } else {
             $this->azstations = '';
         }
-        $this->form = $this->get('Form');
+        $model = $this->getModel('dataman');
+        $this->form = $model->getForm();
         $this->basemusicfolder = XbmusicHelper::$musicBase;
-        $this->log = XbmusicHelper::getLastImportLog();
-        $this->log = str_replace("\n", '<br />', $this->log);
-        $this->warnings = $this->get('Warnings');
-        $this->symlinks = $this->get('Symlinks');
+ //       $this->warnings = $model->getW;
+        $this->symlinks = $model->getSymlinks();
+
+        $app = Factory::getApplication();
+        $this->logfile = $app->getUserState('com_xbmusic.dataman.logfile', '');
+        $this->logfilter = $app->getUserState('com_xbmusic.dataman.logfilter', '');
+        $this->log = XbmusicHelper::readlog($this->logfile, $this->logfilter);
+        $this->log = str_replace("\n", '<br />', $this->log); 
+        
         $this->addToolbar();
         
         return parent::display($tpl);

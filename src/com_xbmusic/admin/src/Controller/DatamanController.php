@@ -2,7 +2,7 @@
  /*******
  * @package xbMusic
  * @filesource admin/src/Controller/DatamanController.php
- * @version 0.0.54.1 17th June 2025
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -12,6 +12,7 @@ namespace Crosborne\Component\Xbmusic\Administrator\Controller;
 
 defined('_JEXEC') or die;
 
+use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Joomla\CMS\Factory;
 //use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\MVC\Controller\FormController;
@@ -39,14 +40,26 @@ class DatamanController extends FormController
         
     }
     
-    public function loadLogfile() {
-        $jip = Factory::getApplication()->getInput();
-        $post   = $jip->get('jform', 'array()', 'ARRAY');
+    public function updateaztid() {
+//        $jip = Factory::getApplication()->getInput();
+ //       $post   = $jip->get('jform', 'array()', 'ARRAY');
+//        $file = trim($post['csvfile']);
+//        Factory::getApplication()->enqueueMessage($file);
         $model = $this->getModel('dataman');
-        $wynick = $model->readLog($post['logfile'], $post['logfilter']);
+        $wynick = $model->updateAzTrkIds();
         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
         $this->setRedirect($redirectTo );
+        
     }
+    
+//     public function loadLogfile() {
+//         $jip = Factory::getApplication()->getInput();
+//         $post   = $jip->get('jform', 'array()', 'ARRAY');
+//        // $model = $this->getModel('dataman');
+//         $wynick = $model->readLog($post['logfile'], $post['logfilter']);
+//         $redirectTo =('index.php?option=com_xbmusic&view=dataman');
+//         $this->setRedirect($redirectTo );
+//     }
     
     public function saveErrors() {
         $jinput = Factory::getApplication()->input;
@@ -129,6 +142,18 @@ class DatamanController extends FormController
         $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
         $this->setRedirect($redirectTo );
         
+    }
+    
+    function loadlog() {
+        $app =  Factory::getApplication();
+        $jip =  $app->input;
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        $app->setUserState('com_xbmusic.dataman.logfile', $post['logfile']);
+        $app->setUserState('com_xbmusic.dataman.logfilter', $post['logfilter']);
+        
+        $redirectTo =('index.php?option=com_xbmusic&task=display&view=dataman');
+        $this->setRedirect($redirectTo );
+       
     }
     
 }

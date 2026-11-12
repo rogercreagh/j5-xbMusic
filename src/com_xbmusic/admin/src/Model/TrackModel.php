@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/TrackModel.php
- * @version 0.1.0.0 10th October 2026
+ * @version 0.1.1.0 12th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2024
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -120,8 +120,8 @@ class TrackModel extends AdminModel {
         $loglevel = $params->get('loglevel',3);
         $newmsg = Text::_('XBMUSIC_NEW_ITEMS_CREATED').':<br />';
         $newdata = []; //only one track per file
-        $ilogmsg = '[IMPORT] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
-        
+        $ilogmsg = '[IMPORT TRK ID3] Import ID3 Started '.date('H:i:s D jS M Y')."\n";
+        $logfile = 'trkid3_import_'.date('Y-m-d').'.log';
         $data = $app->getInput()->get('jform',[],'array');
 //         $app->enqueueMessage(print_r($data,true));
         if ($data['id']>0) {
@@ -135,7 +135,7 @@ class TrackModel extends AdminModel {
                 $msg = Text::_('XBMUSIC_TRACK_IN_DB').Xbtext::_($tid,XBSP1 + XBDQ);
                 $ilogmsg .= XBERR.$msg.XBENDITEM;
                 $app->enqueueMessage(trim($msg),'Error');
-                XbmusicHelper::writelog($ilogmsg);
+                XbmusicHelper::writelog($logfile, $ilogmsg);
                 return false;
             }
             $data['filepathname'] = $filepathname; 
@@ -161,7 +161,7 @@ class TrackModel extends AdminModel {
             $msg = Xbtext::_('XBMUSIC_NO_ID3_TITLE',XBNL + XBTRL);
             $ilogmsg .= XBERR.$msg.XBENDITEM;
             $app->enqueueMessage(trim($msg),'Error');
-            XbmusicHelper::writelog($ilogmsg);
+            XbmusicHelper::writelog($logfile, $ilogmsg);
             return false;
         }
         
@@ -620,7 +620,8 @@ class TrackModel extends AdminModel {
             $trackdata['artistlist'] = XbcommonHelper::uniqueNestedArray($trackdata['artistlist'], 'artist_id');
             $this->storeTrackArtists($tid, $trackdata['artistlist']);
             //$this->storeTrackPlaylists($tid, $trackdata['playlists']);
-            if (!empty($ilogmsg)) XbmusicHelper::writelog($ilogmsg);
+            $logfile = 'trkid3_import_'.date('Y-m-d').'.log';
+            if (!empty($ilogmsg)) XbmusicHelper::writelog($logfile, $ilogmsg);
             if (!empty($infomsg)) $app->enqueueMessage($infomsg);
             return true;
         }

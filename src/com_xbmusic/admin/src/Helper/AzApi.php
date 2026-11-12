@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Helper/AzApi.php
- * @version 0.0.60.1 1st April 2026
+ * @version 0.1.0.2 4th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2026
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -351,7 +351,6 @@ class AzApi {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_URL, $url);
             $result = curl_exec($ch);
-            curl_close($ch);
             $result = json_decode($result);
             if (isset($result->code) && ($result->code == 429)) {
                 //we have an api overload so wait 2 secs for a max of 2 times
