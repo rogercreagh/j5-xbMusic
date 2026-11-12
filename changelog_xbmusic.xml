@@ -4,7 +4,7 @@
 		<type>component</type>
 		<version>0.1.1.0</version>
 		<addition>
-			<item><![CDATA[<h3>Beta Release v0.1.0.3</h3> Updated 12th November 2026]]></item>
+			<item><![CDATA[<h3>Beta Release v0.1.1.0</h3> Updated 12th November 2026]]></item>
 			<item>New Dataman function to import az_tid from media list csv file</item>
 			<item>New XbcommonHelper funtion makeUniqueFilename()</item>
 			<item>Create csv of missing files and tracks from media list csv when importing az_tid</item>
