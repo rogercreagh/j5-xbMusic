@@ -2,7 +2,12 @@
 
 #### Component com_xbmusic
 
-- v0.1.x Admin alpha releases
+- v0.1.x Admin beta releases
+  - 0.1.0.1 first beta
+
+  - 0.1.1.0 import azids from csv
+
+  - 0.1.2.0 import tracks from list
 
 - v0.2.x Admin beta releases
 

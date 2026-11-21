@@ -19,6 +19,14 @@ use Joomla\CMS\MVC\Controller\FormController;
 
 class DatamanController extends FormController
 {
+    function imphistory() {
+        $model = $this->getModel('dataman');
+        $wynick = $model->readHistoryJson();
+        $redirectTo =('index.php?option=com_xbmusic&view=dataman');
+        $this->setRedirect($redirectTo );
+        
+    }
+    
     function importmp3() {
         $jip = Factory::getApplication()->getInput();
         $post   = $jip->get('jform', 'array()', 'ARRAY');

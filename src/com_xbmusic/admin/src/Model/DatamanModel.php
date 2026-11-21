@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/src/Model/DatamanModel.php
- * @version 0.1.1.0 12th November 2026
+ * @version 0.1.1.2 20th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html 
@@ -14,11 +14,10 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
-//use Joomla\Filter\OutputFilter;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\AdminModel;
-//use Joomla\CMS\Uri\Uri;
 use DirectoryIterator;
+use Exception;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -28,8 +27,7 @@ use Crosborne\Component\Xbmusic\Administrator\Helper\XbmusicHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\XbcommonHelper;
 use Crosborne\Component\Xbmusic\Administrator\Helper\Xbtext;
 use Crosborne\Component\Xbmusic\Administrator\Helper\AzApi;
-//use \SimpleXMLElement;
-//use Joomla\CMS\Filesystem\Folder;
+
 
 class DatamanModel extends AdminModel {
 
@@ -549,6 +547,119 @@ class DatamanModel extends AdminModel {
     private function createImageFile($id3imgdata) {
         
     }
+
+    /************ AZURACAST FUNCTIONS ************/
+
+    public function readHistoryJson(string $filename='') {
+        $res = array('total'=>0, 'added'=>0, 'dupes'=>0,'notfound'=>0, 'errors'=>0);        
+        $missingazids = '';
+        $errorlist = '';
+        
+        $app = Factory::getApplication();
+        $jip = $app->getInput();
+        $post   = $jip->get('jform', 'array()', 'ARRAY');
+        if ($filename != '') {
+            $file = $filename;
+        } else {
+            $file = trim($post['jsonfile']);
+        }
+        $stid = (int) $post['azstation'];
+        if ($stid == 0) {
+            $app->enqueueMessage('Please select station before importing','Warning');
+            return $res;
+        }
+        $logstr = "[IMPORT AZTRKHIST] Azuracast song history to #__xbmusic_aztrack_history"."\n";
+        $historytxt = file_get_contents(JPATH_ROOT.'/xbmusic-data/'.$file);
+        if ($historytxt === false) {
+            $app->enqueueMessage('Error reading /xbmusic/'.$file, 'Error');
+            return $res;
+        }
+        $history = json_decode($historytxt);
+        if (is_null($history)) {
+            $app->enqueueMessage('Error decoding json<br />'.$historytext, 'Error');
+            return $res;
+        }
+        $end = date('Y-m-d H:i:s', $history[0]->played_at);
+        $start = date('Y-m-d H:i:s', end($history)->played_at);
+        reset($history);
+        $logstr .= XBSUM.'From : '.$start.' to '.$end."\n";
+        $logstr .= XBSUM.'Source file: '.$file."\n";
+        $logstr .= XBSUM.'Imported at '.date('H:i:s D jS M Y')."\n";
+//        Factory::getApplication()->enqueueMessage(str_replace("\n", '<br />', $logstr));
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true);
+        $query->insert($db->qn('#__xbmusic_aztrack_history'));
+        $colarr =  array('track_id','az_sid','st_id','az_sh_id',
+            'playtime','playlist_id','az_playlist','note');        
+        $query->columns(implode(',',$db->qn($colarr)));
+        
+        foreach ($history as $event) {
+            $res['total'] ++;
+            $trk = XbcommonHelper::getItem('#__xbmusic_tracks',$event->song->id,'az_sid');
+            if ($trk) {
+                $tid = $trk->id;
+                if (XbcommonHelper::getItem('#__xbmusic_aztrack_history', $event->sh_id, 'az_sh_id')) {                    
+                    //this history event already imported;
+                    $res['dupes'] ++;
+                } else {
+                    $query->clear('values');
+                    $pl = XbcommonHelper::getItem('#__xbmusic_azplaylists', XbcommonHelper::makeAlias($event->playlist), 'title');
+                    $plid = ($pl) ? $pl->id : 0;
+                    $values = array(
+                        $db->q($tid), $db->q($event->song->id), $db->q($stid), $db->q($event->sh_id), 
+                        $db->q(date('Y-m-d H:i:s', $event->played_at)),
+                        $db->q($plid), $db->q($event->playlist), $db->q(json_encode($event))
+                    );                   
+                    $query->values(implode(',',$values));
+                    try {
+                        $db->setQuery($query);
+                        $addok = $db->execute();
+                    } catch (\Exception $e) {
+                        $app->enqueueMessage($e->getCode().' '.$e->getMessage().'<br />'. $query>dump(),'Error');
+                    } finally {
+                        if ($addok) { 
+                            $res['added'] ++; 
+                        } else { 
+                            $res['errors'] ++;
+                            $errorlist .= $event->song->id.', "'.$event->song->text."\"\n";
+                        }                       
+                    } //end try
+                } //end if dupe
+            } else {                
+                // if az_sid not in database
+                $res['notfound'] ++;
+                $missingazids .= $event->song->id.', "'.$event->song->text."\"\n";
+            } //end if trk
+        } //end foreach
+        $logstr .= XBSUM.' Rows: '.$res['total'];
+        $logstr .= ', Added: '.$res['added'].', Missing IDs: '.$res['notfound'].', Duplicate History: '.$res['dupes'];
+        $logstr .= ', Errors: '.$res['errors']."\n";
+        if ($res['notfound']>0) {
+            $logstr .= " ____________________\n".XBWARN." ".$res['notfound']." Missing Ids\n";
+            $logstr .= $missingazids;
+            if ($post['expmissids'] == '1' ) {
+                //for this we can just write the missing files list to file, csv not required
+                $missidlistname = JPATH_ROOT.'/xbmusic-data/'.'tracksongids_missing_'.date('Y-m-d').'.txt';
+                $missidlistname = XbcommonHelper::makeUniqueFilename($missidlistname);
+                $f = fopen($missidlistname, 'w');
+                fwrite($f, $missingazids);
+                fclose($f);
+                $logstr .= XBWARN." missing id list written to /xbmusic-data/".pathinfo($missidlistname, PATHINFO_BASENAME);
+                $logstr .= "\n";
+            }
+        }
+        if ($res['errors']>0) {
+            $logstr .= " ____________________\n".XBERR." Errors\n";
+            $logstr .= $errorlist;
+        }
+        $logstr .= "\n ============================ \n\n";
+        $logfile = 'azhistory_import_'.date('Y-m-d').'.log';
+        $app->setUserState('com_xbmusic.dataman.logfile', $logfile);
+    
+        XbmusicHelper::writelog($logfile, $logstr);
+        
+        return $res;     
+    }
     
      /**
      * @name updateAzTrkIds
@@ -565,7 +676,8 @@ class DatamanModel extends AdminModel {
         $missingfiles = '';
         $missingtracks = '';
         $errorlist='';
-        $jip = Factory::getApplication()->getInput();
+        $app = Factory::getApplication();
+        $jip = $app->getInput();
         $post   = $jip->get('jform', 'array()', 'ARRAY');
         if ($filename != '') {
             $file = $filename;
@@ -573,6 +685,11 @@ class DatamanModel extends AdminModel {
             $file = trim($post['csvfile']); 
         }
         $stid = (int) $post['azstation'];
+        if ($stid == 0) {
+            $app->enqueueMessage('Please select station before importing','Warning');
+            return $res;
+        }
+        
         $updateazids = (int) $post['updateazids'];
         $csvpathname = JPATH_ROOT.'/xbmusic-data/'.$file;
         $mediapath = JPATH_ROOT.'/xbmusic/';
@@ -580,12 +697,14 @@ class DatamanModel extends AdminModel {
             $station = XbcommonHelper::getItem('#__xbmusic_azstations', $stid);
             $mediapath .= $station->mediapath;
         }
-        $logstr = "[IMPORT AZTRKIDS] Azuracst unique_ids to tracks.az_tid "."\n";
+        $logstr = "[IMPORT AZTRKIDS] Azuracst unique_ids to tracks.az_tid and song_id to tracks.az_sid"."\n";
         $logstr .= XBSUM.' Source file: '.$file."\n";
         $logstr .= XBSUM.' Imported at '.date('H:i:s D jS M Y')."\n";       
         $data = $this->readSmallCsv($csvpathname);
         if (!empty($data)) {
-            $missingtracksrows = [array_keys($data[0])];
+           $missingtracksrows = [array_keys($data[0])];
+           $db = $this->getDatabase();
+           $query = $db->getQuery(true);
            foreach ($data as $row) {
                $res['rows'] ++;
                $thisfile = $mediapath.$row['path'];
@@ -600,21 +719,35 @@ class DatamanModel extends AdminModel {
                        $missingtracksrows[] = $row;
                    } else {
                        $res['trksfound'] ++;
+                       $query->clear();
+                       $query->update($db->qn('#__xbmusic_tracks'));
+                       $query->set($db->qn('az_tid').' = '.$db->q($row['unique_id']));
+                       $query->set($db->qn('az_sid').' = '.$db->q($row['song_id']));
+                       $query->where($db->qn('id').' = '.$db->q($item->id));
+                       $db->setQuery($query);
                        if (empty($item->az_tid) || ($item->az_tid == '0')) {
-                           if (XbcommonHelper::setItemValue('#__xbmusic_tracks', 'az_tid', $item->id, $row['unique_id'])) {
+                           try {
+                               $ret = $db->execute();
+                           } catch (Exception $e) {
+                               $errorlist .= 'Error in updateAzTrkIds().add'."\n".$e->getMessage()."\n".$query->dump()."\n";
+                           }
+                           if ($ret) {
                                $res['idadded'] ++;
                            } else {
                                $res['errors'] ++;
-                               $errorlist .= XBERR.' Add az_tid failed : '.$item->id.' : '.$item->title."\n";
+                               $errorlist .= XBERR.' Add az_ids failed : '.$item->id.' : '.$item->title."\n";
                            }                           
-                       } else {
-                           if (($updateazids > 0) && ($item->az_tid != $row['unique_id'])) { 
-                               if (XbcommonHelper::setItemValue('#__xbmusic_tracks', 'az_tid', $item->id, $row['unique_id'])) {
+                       } elseif ($updateazids > 0)  { 
+                           try {
+                               $ret = $db->execute();
+                           } catch (Exception $e) {
+                               $errorlist .= 'Error in updateAzTrkIds().update'."\n".$e->getMessage()."\n".$query->dump()."\n";
+                           }
+                           if ($ret) {
                                    $res['idupdated'] ++;
-                               } else {
-                                   $res['errors'] ++;
-                                   $errorlist .= XBERR.' Update az_tid failed : '.$item->id.' : '.$item->title."\n";
-                               }
+                           } else {
+                               $res['errors'] ++;
+                               $errorlist .= XBERR.' Update az_ids failed : '.$item->id.' : '.$item->title."\n";
                            }
                        }
                    } // end missing track                  
@@ -628,7 +761,7 @@ class DatamanModel extends AdminModel {
            $logstr .= ', Missing Tracks: '.$res['trksmissing'].', Tracks found: '.$res['trksfound'];
            $logstr .= ', Added: '.$res['idadded'].', Updated: '.$res['idupdated'].', Errors: '.$res['errors']."\n";
            if ($res['filesmissing']>0) {
-               $logstr .= "\n".XBWARN." =================\n".XBWARN." ".$res['filesmissing']." Files Missing\n";
+               $logstr .= " ____________________\n".XBWARN." ".$res['filesmissing']." Files Missing\n";
                $logstr .= $missingfiles;
                if ($post['expmissfiles'] == '1' ) {
                    //for this we can just write the missing files list to file, csv not required
@@ -642,7 +775,7 @@ class DatamanModel extends AdminModel {
                }
            }
            if ($res['trksmissing']>0) {
-               $logstr .= "\n".XBWARN." =================\n".XBWARN." ".$res['trksmissing']."Tracks Missing\n";
+               $logstr .= " ____________________\n".XBWARN." ".$res['trksmissing']."Tracks Missing\n";
                $logstr .= $missingtracks;
                if ($post['expmisstrks'] == '1' ) {
                    //for this we need to generate a csv, but we will use the lines
@@ -652,14 +785,15 @@ class DatamanModel extends AdminModel {
                }
            }
            if ($res['errors']>0) {
-               $logstr .= "\n".XBERR." =================\n".XBERR." ERRORS\n";
+               $logstr .= " ____________________\n".XBERR." Errors\n";
                $logstr .= $errorlist;
            }
         } else {
             $logstr .= XBSUM.' No data read from file'."\n";
         } // end data ok
+        $logstr .= "\n =========================== \n\n";
         $logfile = 'azids_import_'.date('Y-m-d').'.log';
-        $app =  Factory::getApplication()->setUserState('com_xbmusic.dataman.logfile', $logfile);
+        $app->setUserState('com_xbmusic.dataman.logfile', $logfile);
         
         XbmusicHelper::writelog($logfile, $logstr);          
 //        Factory::getApplication()->enqueueMessage(str_replace("\n", '<br />', $logstr));
@@ -667,8 +801,6 @@ class DatamanModel extends AdminModel {
         return $res;
     }
    
-    /************ AZURACAST FUNCTIONS ************/
-    
     public function getAzStations() {
         $api = new AzApi();
         if ($api->getStatus() == false)  return false;
@@ -878,39 +1010,7 @@ class DatamanModel extends AdminModel {
             return $errs;                  
         }
     }
-
-    private function splReadCsv(string $filename) {
-        $rows = [];
-        $file = new \SplFileObject($filename);
-        $file->setFlags(SplFileObject::READ_CSV | SplFileObject::SKIP_EMPTY | SplFileObject::DROP_NEW_LINE);
-        foreach ($file as $data)
-            if (is_array($data))
-                $rows[] = $data;                
-        $file = null;
-        $headers = array_shift($rows);
-        $result = array_map(function($row) use ($headers) {
-            return array_combine($headers, $row);
-            }, $rows);                   
-        return $result;
-    }
     
-// TODO new function to write csv
-    private function splWriteCsv(string $filename, array $datarows) {
-        $file = new SplFileObject($filename, 'w');
-        
-        // Set CSV control (delimiter, enclosure, escape) if needed
-        $file->setCsvControl(',', '"', '\\');
-        
-        foreach ($datarows as $row) {
-            $file->fputcsv($row);
-        }
-        
-        // Close the file
-        $file->fflush();
-        $file = null;
-        return true;
-    }
-
     public function newsymlink($targ, $name) {
         $res = false;
         $targ = rtrim($targ,"/ ");

@@ -2,7 +2,7 @@
 /*******
  * @package xbMusic
  * @filesource admin/tmpl/dataman/default.php
- * @version 0.1.1.0 12th November 2026
+ * @version 0.1.1.2 20th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2025
  * @license GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
@@ -68,6 +68,12 @@ $wa->useScript('keepalive')
             <p class="xbinfo">
             	<?php echo Text::_('XBMUSIC_IMPORT_DETAILS');?>
             </p>
+            <?php  if($this->azuracast == 1) : ?>
+            	<p>
+    				<?php echo $this->form->renderField('azstation'); ?> 
+    			</p>
+    		<?php endif; ?>
+
 <details id="impset">
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_GENERAL_IMPORT_SETTINGS'); ?></span>
@@ -80,7 +86,7 @@ $wa->useScript('keepalive')
          	<?php echo $this->form->renderField('nobrackets'); ?>
 		</div>
 		<div class="col-md-4">
-			<p>Additional tags to add to all imported items</p>
+			<p><?php echo Text::_('XBMUSIC_ADDITIONAL_TAGS'); ?></p>
          	<?php echo $this->form->renderField('tracktags'); ?>
          	<?php echo $this->form->renderField('albumtags'); ?>
          	<?php echo $this->form->renderField('artisttags'); ?>
@@ -118,7 +124,7 @@ $wa->useScript('keepalive')
 				</tr>
 			</table>
     	</div>
-	    	<?php $popbody = "'<i>Import from </i>'+document.getElementById('jform_foldername').value"; 
+	    	<?php $popbody = "'<i>".Text::_('XBMUSIC_IMPORT_FROM')." </i>'+document.getElementById('jform_foldername').value"; 
 	    	  $pophead = Text::_('XBMUSIC_CONFIRM_MP3IMPORT'); 
 	    	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.importmp3','waiter');"; 
 	    	  ?>
@@ -127,48 +133,80 @@ $wa->useScript('keepalive')
 					<i class="icon-download"></i> &nbsp;
         			<?php echo Text::_('XB_IMPORT'); ?>
         		</button>        		
-</details>
-<hr />
-<details id="impcsv">
-	<summary>
-		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV'); ?></span>
-	</summary>
-	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV_NOTE'); ?>
-	</p>
-        	<?php echo $this->form->renderField('csvfile'); ?> 
-    <details id="impazids">
-    	<summary><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS')?></summary>
-    	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS_DESC'); ?></p>
-	<div class="row form-vertical">
-		<div class="col-md-6">
-			<?php echo $this->form->renderField('azstation'); ?> 
-        	<?php $popbody = "'<i>Update Track Azuracast IDs from </i>'+document.getElementById('jform_csvfile').value"; 
-        	  $pophead = 'Confirm Update from CSV'; 
-        	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.updateaztid','azwaiter');"; ?>  
-    	    <p><button id="updcsv" class="btn btn-warning" type="button" 
-    				onclick="<?php echo $confirm; ?>" 
-    			>
-    				<i class="icon-download"></i> &nbsp;<?php echo Text::_('XB_IMPORT'); ?>
-    		</button></p>        	     		    	
-		</div>
-		<div class="col-md-6">
-			<?php echo $this->form->renderField('updateazids'); ?> 
-			<?php echo $this->form->renderField('expmissfiles'); ?> 
-			<?php echo $this->form->renderField('expmisstrks'); ?> 
-		</div>
-	</div>
-    		
     </details>
+    <hr />
+    <details id="impcsv">
+    	<summary>
+    		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV'); ?></span>
+    	</summary>
+    	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_DATA_CSV_NOTE'); ?>
+    	</p>
+        <?php echo $this->form->renderField('csvfile'); ?> 
+        <?php if($this->azuracast == 1) : ?>
+            <details id="impazids">
+            	<summary><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS')?></summary>
+            	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_AZTIDS_DESC'); ?></p>
+        	<div class="row form-vertical">
+        		<div class="col-md-4">
+        			<?php echo $this->form->renderField('updateazids'); ?> 
+        		</div>
+        		<div class="col-md-4">
+        			<?php echo $this->form->renderField('expmissfiles'); ?> 
+        		</div>
+        		<div class="col-md-4">
+        			<?php echo $this->form->renderField('expmisstrks'); ?> 
+        		</div>
+        	</div>
+        			
+        			
+        	<?php $popbody = "'<i>".Text::_('XBMUSIC_UPDATE_AZTIDS_FROM')." </i>'+document.getElementById('jform_csvfile').value"; 
+        	  $pophead = Text::_('XBMUSIC_CONFIRM_UPDATE_CSV'); 
+        	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.updateaztid','azwaiter');"; ?>  
+            <p><button id="updcsv" class="btn btn-warning" type="button" 
+        			onclick="<?php echo $confirm; ?>" 
+        		>
+        			<i class="icon-download"></i> &nbsp;<?php echo Text::_('XB_IMPORT'); ?>
+        	</button></p>        	     		    	   		
+        </details>
+       <?php endif; ?>
     <details>
     	<summary><?php echo Text::_('XBMUSIC_IMPORT_TRACKS_CSV');?></summary>
-    	<p class="xbnote">imports tracks from a CSV file containing the MP3 filepathnames in a column called <code>path</code>
-    	<br />if a column called <code>unique_id</code> is also present should be in the correct format (string with 20 hex number digits) for an Azuracast Song (=xbMusic Track) ID it will be used for the  az_tid column for the new track. Other data will be read from the MP3 IDv3 tags. If ID3 tags not present then artist, album and genre may be read from the csv if present.	
-    	
+    	<p class="xbnote">imports tracks from a CSV file containing the MP3 filepathnames in a column called <code>path</code>.
+       		Data will be read from the MP3 IDv3 tags. If other relevant data colums are present they may be added to the ID3 data.	
+    	<?php if($this->azuracast==1): ?>
+        	<br />if columns <code>unique_id</code> and <code>song_id</code> are present they will be used for the az_tid and az_sid columns for the new track.
+    	<?php endif; ?>
     	<p>Import button</p>
     	
     </details>
 </details>
 <hr />
+<details id="impjson">
+	<summary>
+		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_HISTORY_JSON')?></span>
+	</summary>
+	<p class="xbnote"><?php echo Text::_('XBMUSIC_IMPORT_HISTORY_JSON_NOTE'); ?>
+	</p>
+	<div class="row form-vertical">
+		<div class="col-md-6">
+		    <?php echo $this->form->renderField('jsonfile'); ?> 
+		</div>
+		<div class="col-md-6">
+ 			<?php echo $this->form->renderField('expmissids'); ?> 
+        	<?php $popbody = "'<i>". Text::_('XBMUSIC_IMPORT_SONG_HIST')." </i>'+document.getElementById('jform_csvfile').value"; 
+        	  $pophead = Text::_('XBMUSIC_CONFIRM_JSON_IMPORT'); 
+        	  $confirm = "doConfirm(".$popbody.",'".$pophead."','dataman.imphistory','azwaiter');"; ?>  
+    	    <p><button id="updcsv" class="btn btn-warning" type="button" 
+    				onclick="<?php echo $confirm; ?>" 
+    			>
+    				<i class="icon-download"></i> &nbsp;<?php echo Text::_('XB_IMPORT'); ?>
+    		</button></p> 
+    	</div>
+    </div>       	     		    	
+	
+</details>
+<hr />
+
 <details id="imppl">
 	<summary>
 		<span class="xbr11 xbbold"><?php echo Text::_('XBMUSIC_IMPORT_PLAYLIST')?></span>

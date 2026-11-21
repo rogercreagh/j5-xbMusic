@@ -2,7 +2,7 @@
 <!-- 
  * @package xbMusic
  * @filesource admin/forms/dataman.xml
- * @version 0.1.1.0 12th November 2026
+ * @version 0.1.1.2 20th November 2026
  * @author Roger C-O
  * @copyright Copyright (c) Roger Creagh-Osborne, 2021
  * @license GNU/GPLv3 http://www.gnu.org/Filelicenses/gpl-3.0.html
@@ -134,11 +134,22 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
         	hide_none="false" hide_default="true"
         >
         </field>
-        <field name="azstation" type="xbazstations"
-        	label="Select Station"
-        	description="Station defines the path to the media folder within /xbmusic. Select 'No station' to use /xbmusic/ as the media root"
+		<field name="jsonfile" type="filelist" 
+        	default="0" 
+        	label="Select JSON file" 
+        	description="File should be in the /xbmusic-data folder" 
+        	directory="xbmusic-data" 
+        	fileFilter="\.json" 
+        	exclude="false" stripext="false"
+        	hide_none="false" hide_default="true"
         >
-        	<option value="">No station</option>
+        </field>
+
+        <field name="azstation" type="xbazstations"
+        	label="Select Station for imported items"
+        	description="Station defines the path to the media folder within /xbmusic and is saved with tracks, playlists and history"
+        >
+        	<option value="0">No station</option>
         </field>
         
         <field name="updateazids" type="radio"
@@ -161,9 +172,19 @@ addfieldprefix="Crosborne\Component\Xbmusic\Administrator\Field"
         	<option value="1">JYES</option>
         </field>
         
-        <field name="expmisstrks" type="radio"
+        <field name="expmisstrks" type="radio" 
         	label="Save Missing Tracks List"
         	description="Save list of files that exist but are not yet in database. Will save full rows from the AzTid import file in CSV format"
+        	class="btn-group"
+        	default="1"
+        >
+        	<option value="0">JNO</option>
+        	<option value="1">JYES</option>
+        </field>
+        
+        <field name="expmissids" type="radio" 
+        	label="Save Missing AzIds List"
+        	description="Save list of Az_songIds that are not linked to a track. Will saves Az_songId and Artist-Album-Title in text file"
         	class="btn-group"
         	default="1"
         >
