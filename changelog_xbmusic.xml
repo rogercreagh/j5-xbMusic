@@ -10,8 +10,8 @@
 		<remove>
 		</remove>
 		<change>
-			<item><![CDATA[<b>**Database change**</b> - <code>xbmusic_track_history<code> renamed az_tid to azsid to reflect use of Azuracast Song ID to identify history item]]></item>
-			<item><![CDATA[<b>**Database change**</b> - <code>xbmusic_tracks<code> add column az_sid to allow store Azuracast Song ID as well as Unique ID]]></item>
+			<item><![CDATA[<b>**Database change**</b> - <code>xbmusic_track_history</code> renamed az_tid to azsid to reflect use of Azuracast Song ID to identify history item]]></item>
+			<item><![CDATA[<b>**Database change**</b> - <code>xbmusic_tracks</code> add column az_sid to allow store Azuracast Song ID as well as Unique ID]]></item>
 		</change>
 		<fix>
 		</fix>
