@@ -324,8 +324,7 @@ CREATE TABLE IF NOT EXISTS `#__xbmusic_aztrack_history` (
   `playlist_id` int(10) NOT NULL DEFAULT '0',
   `az_playlist` varchar(30) COMMENT 'Name provided by azuracast',
   `note` mediumtext COMMENT 'used to save track info if not matched',
-  PRIMARY KEY (`id`),
-
+  PRIMARY KEY (`id`)
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 DEFAULT COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `#__xbmusic_userapikeys` (
